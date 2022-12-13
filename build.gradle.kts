@@ -8,21 +8,30 @@ plugins {
 }
 
 group = "ru.zveron"
-version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+version = "0.0.1"
 
-repositories {
-    mavenCentral()
+allprojects {
+    repositories {
+        mavenCentral()
+    }
 }
 
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
+subprojects {
+    apply {
+        plugin("kotlin")
+        plugin("org.jetbrains.kotlin.jvm")
+    }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+
+    group = rootProject.group
+    version = rootProject.version
+
+    java.sourceCompatibility = JavaVersion.VERSION_17
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "17"
+        }
     }
 }
