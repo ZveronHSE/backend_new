@@ -18,6 +18,9 @@ val grpcKotlinVersion: String by project
 allprojects {
     repositories {
         mavenCentral()
+        maven {
+            url = uri("https://jitpack.io")
+        }
     }
 }
 
