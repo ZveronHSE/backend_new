@@ -24,12 +24,6 @@ data class Address(
     val longitude: Double,
     val latitude: Double
 ) {
-//    @OneToMany(mappedBy = "address")
-//    var lot: MutableList<Lot> = mutableListOf()
-//
-//    @OneToMany(mappedBy = "address")
-//    var profile: MutableList<Profile> = mutableListOf()
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
@@ -42,6 +36,6 @@ data class Address(
 
     @Override
     override fun toString(): String {
-        return "Address(id = $id , region = $region , district = $district , town = $town , street = $street , house = $house , longitude = $longitude , latitude = $latitude)"
+        return "Address(id = $id, town = $town, longitude = $longitude, latitude = $latitude)"
     }
 }
