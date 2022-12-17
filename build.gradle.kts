@@ -38,12 +38,13 @@ buildscript {
 
 subprojects {
     data class DataSource(
+        // TODO надо бы все это вынести в отдельный градл скриптик
         val url: String,
         val username: String,
         val password: String,
     )
 
-    extra["getDataSource"] = fun(): DataSource {
+    extra["getDataSource"] = fun(): DataSource { // TODO надо бы все это вынести в отдельный градл скриптик
         val pathToApplicationYml = "src/main/resources/application.yml"
 
         val applicationYaml = try {
@@ -155,7 +156,7 @@ subprojects {
     }
 }
 
-// Когда будет много методов для грейдла, можно будет сделать отдельный класс и покрыть его тестами
+// TODO надо бы все это вынести в отдельный градл скриптик, можно будет сделать отдельный класс и покрыть его тестами
 fun getNextChangeSetNumber(path: String): String {
     val result = (
             File(path)
