@@ -30,7 +30,46 @@ allprojects {
     }
 }
 
+buildscript {
+    dependencies {
+        classpath("org.yaml:snakeyaml:1.33")
+    }
+}
+
 subprojects {
+    data class DataSource(
+        val url: String,
+        val username: String,
+        val password: String,
+    )
+
+    extra["getDataSource"] = fun(): DataSource {
+        val pathToApplicationYml = "src/main/resources/application.yml"
+
+        val applicationYaml = try {
+            File(projectDir, pathToApplicationYml).inputStream().use {
+                (org.yaml.snakeyaml.Yaml().load(it) as Map<*, *>)
+            }
+        } catch (ex: Exception) {
+            throw IllegalArgumentException(
+                "Для того, чтобы проект собрался, необходимо иметь файл, " +
+                        "расположенный по пути и иметь настройки для spring: $pathToApplicationYml"
+            )
+        }
+
+        try {
+            val map = ((applicationYaml["spring"] as Map<*, *>)["datasource"] as Map<*, *>)
+
+            return DataSource(
+                url = map["url"] as String,
+                username = map["username"] as String,
+                password = map["password"] as String
+            )
+        } catch (ex: Exception) {
+            throw IllegalArgumentException("Вероятно, не хватает в application.yml данных про БД: ${ex.message}")
+        }
+    }
+
     apply {
         plugin("kotlin")
         plugin("org.jetbrains.kotlin.jvm")
@@ -78,10 +117,7 @@ subprojects {
         }
     }
 
-//    val properties = File(rootDir, "src/main/resources/application.yml").inputStream().use {
-//        Properties().apply { load(it) }
-//    }
-//    val propNameSomething = properties.getValue("prop.name.something") as String
+    val dataSource = (extra["getDataSource"] as () -> DataSource)()
 
     /*
     Таска на генерацию следующего changeSet'а.
@@ -109,8 +145,6 @@ subprojects {
         group = "liquibase"
 
         val migrationName: String? by project
-        val username: String? by project
-        val password: String? by project
 
         dependsOn("build")
         dependsOn("clean")
@@ -119,14 +153,13 @@ subprojects {
         tasks.findByName("diffChangeLog")!!.mustRunAfter("build")
 
         val changeSetName = migrationName ?: project.properties["changeSetDefaultName"]
-        val changeSetUrl =
-            "jdbc:postgresql://localhost:5555/" + project.properties["db"] // https://stackoverflow.com/questions/37748721/how-to-use-spring-properties-in-gradle-build
-        val changeSetUsername = username ?: project.properties["dbUser"]
-        val changeSetPassword = password ?: project.properties["dbPassword"]
+        val changeSetUrl = dataSource.url
+        val changeSetUsername = dataSource.username
+        val changeSetPassword = dataSource.password
         val changeSetDriver = project.properties["dbDriver"]
-        val changeSetsDirectory = project.properties["changeLogDirectory"]
+        val changeSetsDirectory = "src/main/resources/db/changelog/"
         val changeSetReferenceUrl = project.properties["referenceUrl"]
-        val changeSetNumber = getNextChangeSetNumber(changeSetsDirectory.toString())
+        val changeSetNumber = getNextChangeSetNumber(changeSetsDirectory)
 
         liquibase {
             activities.register("main") {

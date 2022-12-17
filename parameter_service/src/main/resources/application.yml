@@ -2,7 +2,7 @@ spring:
   liquibase:
     change-log: classpath:db/master.yaml
   datasource:
-    url: jdbc:postgresql://localhost:5555/address
+    url: jdbc:postgresql://localhost:5555/parameter
     password: zveron_password
     username: zveron_user
   jpa:
