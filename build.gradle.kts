@@ -119,28 +119,6 @@ subprojects {
 
     val dataSource = (extra["getDataSource"] as () -> DataSource)()
 
-    /*
-    Таска на генерацию следующего changeSet'а.
-
-    Перед запуском нужно, чтобы БД находилась
-    в актуальном состоянии (все старые changeSet'ы были применены)
-
-    Как запустить:
-        1) Через плагин в идее: zveron -> Tasks -> liquibase -> createNextChangeSet
-        2) Через консоль: ./gradlew createNextChangeSet
-
-    Опциональные параметры:
-        *) migrationName - название нового changeSet'а (без цифры)
-        *) url - url для подключения к БД
-        *) username - пользователь для подключения к БД
-        *) password - пароль для подключения к БД
-    Дефолтные значения параметров лежат в gradle.properties
-
-    Пример запуска:
-        ./gradlew -PmigrationName=new_cool_change_set createNextChangeSet
-
-    P.S. - полученный скрипт по-прежнему нужно редактировать
-     */
     tasks.register("createNextChangeSet") {
         group = "liquibase"
 
