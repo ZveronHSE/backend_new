@@ -9,9 +9,3 @@ class AddressServiceApplication
 fun main(args: Array<String>) {
 	runApplication<AddressServiceApplication>(*args)
 }
-
-fun test() {
-	exampleRequest {
-
-	}
-}

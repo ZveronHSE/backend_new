@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  db:
+    restart: always
+    container_name: db
+    image: 'postgres:13.9-alpine'
+    environment:
+      - POSTGRES_USER=zveron_user
+      - POSTGRES_PASSWORD=zveron_password
+      - TZ=Europe/Moscow
+      - PGTZ=Europe/Moscow
+    expose:
+      - 5432
+    ports:
+      - "5555:5432"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
