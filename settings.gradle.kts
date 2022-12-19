@@ -15,4 +15,8 @@ pluginManagement {
     }
 }
 
-include("address_service", "parameter_service")
+include(
+    "address_service",
+    "parameter_service",
+    "blacklist_service"
+)

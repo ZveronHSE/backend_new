@@ -1,0 +1,20 @@
+grpc:
+  server:
+    port: 6566
+server:
+  port: 6567
+spring:
+  liquibase:
+    change-log: classpath:db/master.yaml
+  application:
+    name: blacklist-service
+  datasource:
+    url: jdbc:postgresql://localhost:5555/blacklist
+    password: zveron_password
+    username: zveron_user
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true

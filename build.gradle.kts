@@ -94,6 +94,7 @@ subprojects {
         implementation("io.grpc:grpc-core:$grpcVersion")
 
         // База данных
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
         implementation("org.postgresql:postgresql:42.3.8")
         implementation("org.liquibase:liquibase-core:4.18.0")
         implementation("org.hibernate:hibernate-core:5.6.7.Final")
@@ -104,6 +105,14 @@ subprojects {
         liquibaseRuntime("org.springframework.boot:spring-boot:$springVersion")
         liquibaseRuntime(sourceSets.getByName("main").compileClasspath)
         liquibaseRuntime(sourceSets.getByName("main").output)
+
+        // Тесты
+        testImplementation("io.grpc:grpc-testing:$grpcVersion")
+        testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
+        testImplementation("io.kotest:kotest-assertions-core-jvm:5.2.2")
+        testImplementation("org.testcontainers:postgresql:1.16.3")
+        testImplementation("org.testcontainers:junit-jupiter:1.16.3")
+        testImplementation("org.assertj:assertj-core:3.22.0")
     }
 
     group = rootProject.group
@@ -116,6 +125,10 @@ subprojects {
             freeCompilerArgs = listOf("-Xjsr305=strict")
             jvmTarget = "17"
         }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 
     val dataSource = (extra["getDataSource"] as () -> DataSource)()
