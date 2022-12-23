@@ -82,13 +82,11 @@ subprojects {
     }
 
     dependencies {
-        // Для включения Dependcy Injection и прочих аннотаций
-        implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
-
         // Для компиляции проекта
         implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
 
         // Grpc корутины, сервисы и клиенты
+        implementation("net.devh:grpc-spring-boot-starter:2.13.1.RELEASE")
         implementation("io.grpc:grpc-kotlin-stub:$grpcKotlinVersion")
         implementation("io.grpc:grpc-stub:$grpcVersion")
         implementation("io.grpc:grpc-core:$grpcVersion")

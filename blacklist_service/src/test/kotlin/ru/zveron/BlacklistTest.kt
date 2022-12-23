@@ -11,7 +11,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import javax.sql.DataSource
 
 @ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 abstract class BlacklistTest {
     @Autowired

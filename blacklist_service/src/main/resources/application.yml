@@ -1,9 +1,9 @@
 grpc:
   server:
     port: 6566
-server:
-  port: 6567
 spring:
+  main:
+    banner-mode: off
   liquibase:
     change-log: classpath:db/master.yaml
   application:
