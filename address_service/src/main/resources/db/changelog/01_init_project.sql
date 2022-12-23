@@ -16,5 +16,5 @@ CREATE TABLE public.address
 );
 
 -- changeset sofia.terekhova:1671303542606-3
-ALTER TABLE public.address
-    ADD CONSTRAINT "UK8unp71l1qqu2fqir4qhhjp5hb" UNIQUE (longitude, latitude);
+create unique index address_latitude_longitude_uindex
+    on public.address (latitude, longitude);
