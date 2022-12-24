@@ -16,5 +16,5 @@ CREATE TABLE public.address
 );
 
 -- changeset sofia.terekhova:1671303542606-3
-create unique index address_latitude_longitude_uindex
-    on public.address (latitude, longitude);
+create unique index address_longitude_latitude_uindex
+    on public.address (longitude, latitude);

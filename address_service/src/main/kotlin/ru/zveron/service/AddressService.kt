@@ -27,11 +27,8 @@ class AddressService(
     }
 
     override suspend fun saveAddressIfNotExists(request: AddressRequest): AddressResponse {
-        val address = if (addressRepository.existsByLongitudeAndLatitude(request.longitude, request.latitude)) {
-            addressRepository.getByLongitudeAndLatitude(request.longitude, request.latitude)
-        } else {
-            addressRepository.save(request.toEntity())
-        }
+        val address = addressRepository.findByLongitudeAndLatitude(request.longitude, request.latitude)
+            ?: addressRepository.save(request.toEntity())
 
         return address.toResponse()
     }
