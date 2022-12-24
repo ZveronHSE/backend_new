@@ -14,6 +14,7 @@ import ru.zveron.util.CreateEntitiesUtil.mockAddressIdRequest
 import ru.zveron.util.CreateEntitiesUtil.mockAddressRequest
 import javax.persistence.EntityNotFoundException
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class AddressServiceTest : DataBaseApplicationTest() {
     @Autowired
     lateinit var addressRepository: AddressRepository
@@ -44,12 +45,11 @@ class AddressServiceTest : DataBaseApplicationTest() {
 
 
     @Test
-    fun `SaveAddressIfNotExists save new first address`(): Unit = runBlocking {
+    fun `SaveAddressIfNotExists save new address`(): Unit = runBlocking {
         val request = mockAddressRequest()
         val response = addressService.saveAddressIfNotExists(request)
 
         response.asClue {
-            it.id shouldBe 1L
             it.house shouldBe request.house
             it.street shouldBe request.street
             it.longitude shouldBe request.longitude
@@ -66,7 +66,6 @@ class AddressServiceTest : DataBaseApplicationTest() {
 
 
         response.asClue {
-            it.id shouldBe 1L
             it.house shouldBe request.house
             it.street shouldBe request.street
             it.longitude shouldBe request.longitude
