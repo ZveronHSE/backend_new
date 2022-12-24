@@ -91,6 +91,9 @@ subprojects {
         implementation("io.grpc:grpc-stub:$grpcVersion")
         implementation("io.grpc:grpc-core:$grpcVersion")
 
+        // Логгирование
+        implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
+
         // База данных
         implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
         implementation("org.postgresql:postgresql:42.3.8")
