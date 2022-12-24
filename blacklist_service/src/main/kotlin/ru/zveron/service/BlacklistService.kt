@@ -2,7 +2,6 @@ package ru.zveron.service
 
 import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.service.GrpcService
-import org.springframework.transaction.annotation.Transactional
 import ru.zveron.AddToBlacklistRequest
 import ru.zveron.BlacklistServiceGrpcKt
 import ru.zveron.DeleteAllRecordsWhereUserBlocksRequest
@@ -63,13 +62,11 @@ class BlacklistService(private var blacklistRepository: BlacklistRepository) :
             Empty.getDefaultInstance()
         } ?: throw BlacklistException("Нельзя удалить себя из черного списка")
 
-    @Transactional
     override suspend fun deleteAllRecordsWhereUserBlocks(request: DeleteAllRecordsWhereUserBlocksRequest): Empty =
         Empty.getDefaultInstance().also {
             blacklistRepository.deleteAllById_OwnerUserId(request.ownerId)
         }
 
-    @Transactional
     override suspend fun deleteAllRecordsWhereUserIsBlocked(request: DeleteAllRecordsWhereUserIsBlockedRequest): Empty =
         Empty.getDefaultInstance().also {
             blacklistRepository.deleteAllById_ReportedUserId(request.deletedUserId)

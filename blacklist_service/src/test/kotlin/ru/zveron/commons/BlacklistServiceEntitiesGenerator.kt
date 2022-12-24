@@ -1,14 +1,14 @@
 package ru.zveron.commons
 
+import org.apache.commons.lang3.RandomUtils
 import ru.zveron.addToBlacklistRequest
 import ru.zveron.deleteFromBlacklistRequest
 import ru.zveron.entity.BlacklistRecord
 import ru.zveron.existInBlacklistRequest
-import kotlin.random.Random
 
 object BlacklistServiceEntitiesGenerator {
 
-    fun generateUserId() = Random.nextLong(1, Long.MAX_VALUE)
+    fun generateUserId() = RandomUtils.nextLong()
 
     fun generateNIds(n: Int) = List(n) { generateUserId() }
 
