@@ -6,7 +6,5 @@ import ru.zveron.entity.Address
 
 @Repository
 interface AddressRepository : JpaRepository<Address, Long> {
-    fun existsByLongitudeAndLatitude(longitude: Double, latitude: Double): Boolean
-
-    fun getByLongitudeAndLatitude(longitude: Double, latitude: Double): Address
+    fun findByLongitudeAndLatitude(longitude: Double, latitude: Double): Address?
 }

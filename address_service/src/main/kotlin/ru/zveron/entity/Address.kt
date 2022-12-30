@@ -1,6 +1,5 @@
 package ru.zveron.entity
 
-import org.hibernate.Hibernate
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
@@ -19,23 +18,8 @@ data class Address(
     val region: String? = null,
     val district: String? = null,
     val town: String? = null,
-    val street: String? = null,
-    val house: String? = null,
+    val street: String,
+    val house: String,
     val longitude: Double,
     val latitude: Double
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
-        other as Address
-
-        return id == other.id
-    }
-
-    override fun hashCode(): Int = javaClass.hashCode()
-
-    @Override
-    override fun toString(): String {
-        return "Address(id = $id, town = $town, longitude = $longitude, latitude = $latitude)"
-    }
-}
+)
