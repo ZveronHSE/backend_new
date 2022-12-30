@@ -1,7 +1,6 @@
 package ru.zveron.service
 
 import net.devh.boot.grpc.server.service.GrpcService
-import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import ru.zveron.contract.AddressIdRequest
 import ru.zveron.contract.AddressRequest
 import ru.zveron.contract.AddressResponse
@@ -11,17 +10,15 @@ import ru.zveron.mapper.AddressMapper.toResponse
 import ru.zveron.repository.AddressRepository
 import javax.persistence.EntityNotFoundException
 
+@Suppress("BlockingMethodInNonBlockingContext")
 @GrpcService
 class AddressService(
     private val addressRepository: AddressRepository
 ) : AddressServiceGrpcKt.AddressServiceCoroutineImplBase() {
 
     override suspend fun getAddress(request: AddressIdRequest): AddressResponse {
-        val address = try {
-            addressRepository.getReferenceById(request.id)
-        } catch (ex: JpaObjectRetrievalFailureException) {
-            throw EntityNotFoundException("Address by id ${request.id} didnt find")
-        }
+        val address = addressRepository.findById(request.id)
+            .orElseThrow { throw EntityNotFoundException("Address by id ${request.id} didn't find") }
 
         return address.toResponse()
     }
