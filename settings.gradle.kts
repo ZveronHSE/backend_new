@@ -18,5 +18,6 @@ pluginManagement {
 include(
     "address_service",
     "parameter_service",
-    "blacklist_service"
+    "blacklist_service",
+    "favorites_service"
 )
