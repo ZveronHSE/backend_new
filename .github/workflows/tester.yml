@@ -23,9 +23,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Test blacklist service
-        if: ${{ github.event.label.name == 'blacklist' }}
+        if: contains(github.event.pull_request.labels.*.name, 'blacklist')
         run: gradle :blacklist_service:test
 
       - name: Test address service
-        if: ${{ github.event.label.name == 'address' }}
+        if: contains(github.event.pull_request.labels.*.name, 'address')
         run: gradle :address_service:test

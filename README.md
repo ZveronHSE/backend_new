@@ -55,6 +55,6 @@ spring:
 для нового модуля, а затем в `.github/workflows/tester.yml` добавить обработку этого лейбла. Пример:
 ```yaml
       - name: Test <новый модуль> service
-        if: ${{ github.event.label.name == '<лейбл нового модуля>' }}
+        if: contains(github.event.pull_request.labels.*.name, '<лейбл нового модуля>')
         run: gradle :<директория нового модуля>:test
 ```
