@@ -45,3 +45,16 @@ spring:
 
    Пример запуска:
    `./gradlew -PmigrationName=new_cool_change_set createNextChangeSet`
+
+## CI / CD / Deploy
+### CI
+1. Пайплайны запускаются при создании PR. `Detect affected modules` - смотрит какие модули были изменены и 
+навешивает соответсвующие лейблы на PR. `Test affected modules` подготавливает тестовую среду и запускает 
+тесты в тех модулях, лейблы которых присутсвуют в PR.
+2. **Поэтому** когда вы создаете новый модуль, необходимо в `.github/labeler.yml` добавить по аналогии лейбл
+для нового модуля, а затем в `.github/workflows/tester.yml` добавить обработку этого лейбла. Пример:
+```yaml
+      - name: Test <новый модуль> service
+        if: ${{ github.event.label.name == '<лейбл нового модуля>' }}
+        run: gradle :<директория нового модуля>:test
+```

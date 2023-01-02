@@ -1,5 +1,4 @@
-name: test-workflow
-run-name: ${{ github.actor }} is running test workflow
+name: "Test affected modules"
 
 on:
   - pull_request
