@@ -1,7 +1,9 @@
-name: "Label PR"
+name: "Label branch"
 
 on:
-  - pull_request
+  push:
+    branches-ignore:
+      - main
 
 jobs:
   label:
