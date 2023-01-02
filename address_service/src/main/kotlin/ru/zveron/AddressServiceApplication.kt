@@ -7,6 +7,5 @@ import org.springframework.boot.runApplication
 class AddressServiceApplication
 
 fun main(args: Array<String>) {
-	// Имитирую изменения в другом модуле
 	runApplication<AddressServiceApplication>(*args)
 }

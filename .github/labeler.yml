@@ -1,5 +1,0 @@
-blacklist:
-  - "blacklist_service/**"
-
-address:
-  - "address_service/**"

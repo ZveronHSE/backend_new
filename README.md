@@ -48,14 +48,13 @@ spring:
 
 ## CI / CD / Deploy
 ### Continuous integration
-1. Пайплайны запускаются при создании PR. `Detect affected modules` - смотрит, какие модули были изменены и 
-навешивает соответствующие лейблы на PR. `Test affected modules` подготавливает тестовую среду и запускает 
-тесты в тех модулях, лейблы которых присутсвуют в PR.
-2. **Поэтому**, когда вы создаете новый модуль, необходимо в `.github/labeler.yml` добавить, по аналогии, лейбл
-для нового модуля, а затем в `.github/workflows/tester.yml` добавить обработку этого лейбла. Пример:
+1. Пайплайны запускаются при создании PR. `Test affected modules` подготавливает тестовую среду и запускает 
+тесты в тех модулях, файлы которых были изменены.
+2. **Поэтому**, когда вы создаете новый модуль, необходимо в `.github/workflows/tester.yml` добавить обработку 
+изменений этого модуля. Пример:
 ```yaml
-      - name: Test <новый модуль> service
-        if: contains(github.event.pull_request.labels.*.name, '<лейбл нового модуля>')
+      - name: Test <название нового модуля>
+        if: contains(steps.changed-files.outputs.modified_files, '<директория нового модуля>')
         run: gradle :<директория нового модуля>:test
 ```
 ### Continuous delivery
