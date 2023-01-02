@@ -10,5 +10,3 @@ jobs:
       - uses: actions/labeler@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-  test-labeled-modules:
-    uses: ./.github/workflows/tester.yml
