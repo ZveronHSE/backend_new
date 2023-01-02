@@ -1,10 +1,7 @@
 name: "Test affected modules"
 
 on:
-  workflow_run:
-    workflows: ["Label PR"]
-    types:
-      - completed
+  - workflow_call
 
 jobs:
   CI:
