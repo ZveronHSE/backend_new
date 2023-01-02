@@ -1,0 +1,17 @@
+name: test-workflow
+run-name: ${{ github.actor }} is running test workflow
+on:
+  push:
+    branches:
+      - "feature/ZV-280-CI"
+jobs:
+  install-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        run: ls
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Test
+        run: docker --version
