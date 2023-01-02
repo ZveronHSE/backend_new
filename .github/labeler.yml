@@ -1,0 +1,5 @@
+theme:blacklist:
+  - "blacklist_service/**"
+
+theme:address:
+  - "address_service/**"

@@ -1,6 +1,5 @@
 package ru.zveron.service
 
-import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -34,7 +33,6 @@ class BlacklistServiceTest : BlacklistTest() {
     @Test
     fun `ExistInBlackList When check if record exists in blacklist and it exists return true`() {
         val (user1Id, user2Id, user3Id) = generateNIds(3)
-        fail("Fuck u dude")
         runBlocking {
             blacklistRepository.save(BlacklistRecord(BlacklistRecord.BlacklistKey(user1Id, user2Id)))
             val record = blacklistRepository.save(BlacklistRecord(BlacklistRecord.BlacklistKey(user1Id, user3Id)))
