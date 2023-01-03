@@ -18,5 +18,7 @@ pluginManagement {
 include(
     "address_service",
     "parameter_service",
-    "blacklist_service"
+    "blacklist_service",
+    "service_registry",
+    "apigateway",
 )
