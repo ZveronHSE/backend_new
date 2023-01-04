@@ -10,11 +10,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-#      - name: Get changed files
-#        id: changed-files
-#        uses: tj-actions/changed-files@v35
-#        with:
-#          base-sha: ${{ github.event.pull_request.base.sha }}
       - name: Get changed files
         shell: bash
         run: |
@@ -34,18 +29,13 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Test blacklist service
-        if: contains(steps.changed-files.outputs.modified_files, 'blacklist_service')
-        run: gradle :blacklist_service:test
+        shell: bash
+        run: if grep -q "blacklist_service" "temp.txt"; then gradle :blacklist_service:test; fi
 
       - name: Test address service
-        if: contains(steps.changed-files.outputs.modified_files, 'address_service')
-        run: gradle :address_service:test
+        shell: bash
+        run: if grep -q "address_service" "temp.txt"; then gradle :address_service:test; fi
 
       - name: Test favorites service
         shell: bash
-        run: |
-          if grep -q "favorites_service" "temp.txt"; then
-            gradle :favorites_service:test
-          fi
-        # if: contains(steps.changed-files.outputs.modified_files, 'favorites_service')
-#        run: gradle :favorites_service:test
+        run: if grep -q "favorites_service" "temp.txt"; then gradle :favorites_service:test; fi
