@@ -16,6 +16,7 @@ jobs:
 #        with:
 #          base-sha: ${{ github.event.pull_request.base.sha }}
       - name: Get changed files
+        shell: bash
         run: |
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
 
@@ -40,6 +41,7 @@ jobs:
         run: gradle :address_service:test
 
       - name: Test favorites service
+        shell: bash
         run: |
           if grep -q "favorites_service" "temp.txt"; then
             gradle :favorites_service:test
