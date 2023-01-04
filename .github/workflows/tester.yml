@@ -33,3 +33,7 @@ jobs:
       - name: Test address service
         if: contains(steps.changed-files.outputs.modified_files, 'address_service')
         run: gradle :address_service:test
+
+      - name: Test favorites service
+        if: contains(steps.changed-files.outputs.modified_files, 'favorites_service')
+        run: gradle :favorites_service:test
