@@ -1,6 +1,5 @@
 package ru.zveron.service
 
-import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -35,7 +34,7 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
     fun `AddProfileToFavorites When adds someones profile to favorites Then it is added`() {
         val (profileId1, profileId2) = generateNIds(2)
         runBlocking {
-            profilesFavoritesService.addProfileToFavorites(
+            profilesFavoritesService.addToFavorites(
                 createAddProfileToFavoritesRequest(profileId1, profileId2)
             )
 
@@ -48,7 +47,7 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
         val profileId1 = generateUserId()
         val exception = shouldThrow<FavoritesException> {
             runBlocking {
-                profilesFavoritesService.addProfileToFavorites(
+                profilesFavoritesService.addToFavorites(
                     createAddProfileToFavoritesRequest(profileId1, profileId1)
                 )
             }
@@ -62,7 +61,7 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
         val (profileId1, profileId2) = generateNIds(2)
         runBlocking {
             profilesFavoritesRepository.save(generateProfileRecords(profileId1, profileId2))
-            profilesFavoritesService.removeProfileFromFavorites(
+            profilesFavoritesService.removeFromFavorites(
                 createRemoveProfileFromFavoritesRequest(profileId1, profileId2)
             )
 
@@ -71,15 +70,17 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
     }
 
     @Test
-    fun `RemoveProfileFromFavorites When removes not favorite profile from favorites Then no exception is thrown`() {
+    fun `RemoveProfileFromFavorites When removes not favorite profile from favorites Then got exception`() {
         val (profileId1, profileId2) = generateNIds(2)
-        shouldNotThrow<FavoritesException> {
+        val exception = shouldThrow<FavoritesException> {
             runBlocking {
-                profilesFavoritesService.removeProfileFromFavorites(
+                profilesFavoritesService.removeFromFavorites(
                     createRemoveProfileFromFavoritesRequest(profileId1, profileId2)
                 )
             }
         }
+
+        exception.message shouldBe "Нельзя удалить профиль не из списка избранного"
     }
 
     @Test
@@ -87,13 +88,13 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
         val profileId1 = generateUserId()
         val exception = shouldThrow<FavoritesException> {
             runBlocking {
-                profilesFavoritesService.removeProfileFromFavorites(
+                profilesFavoritesService.removeFromFavorites(
                     createRemoveProfileFromFavoritesRequest(profileId1, profileId1)
                 )
             }
         }
 
-        exception.message shouldBe "Нельзя удалиться себя из своего списка избранного"
+        exception.message shouldBe "Нельзя удалить себя из своего списка избранного"
     }
 
     @Test
@@ -101,11 +102,11 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
         val (profileId1, profileId2) = generateNIds(2)
         runBlocking {
             profilesFavoritesRepository.save(generateProfileRecords(profileId1, profileId2))
-            val result = profilesFavoritesService.profileExistsInFavorites(
+            val result = profilesFavoritesService.existsInFavorites(
                 crateProfileExistsInFavoritesRequest(profileId1, profileId2)
             )
 
-            result.profileExists shouldBe true
+            result.isExists shouldBe true
         }
     }
 
@@ -113,11 +114,11 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
     fun `ProfileExistsInFavorites When checks if someones profile exists in favorites And it doesn't exist Then returns false`() {
         val (profileId1, profileId2) = generateNIds(2)
         runBlocking {
-            val result = profilesFavoritesService.profileExistsInFavorites(
+            val result = profilesFavoritesService.existsInFavorites(
                 crateProfileExistsInFavoritesRequest(profileId1, profileId2)
             )
 
-            result.profileExists shouldBe false
+            result.isExists shouldBe false
         }
     }
 
@@ -126,7 +127,7 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
         val profileId1 = generateUserId()
         val exception = shouldThrow<FavoritesException> {
             runBlocking {
-                profilesFavoritesService.profileExistsInFavorites(
+                profilesFavoritesService.existsInFavorites(
                     crateProfileExistsInFavoritesRequest(profileId1, profileId1)
                 )
             }
@@ -143,9 +144,9 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
             profilesFavoritesRepository.save(generateProfileRecords(profileId1, profileId3))
             profilesFavoritesRepository.save(generateProfileRecords(profileId2, profileId1))
 
-            val list = profilesFavoritesService.listFavoriteProfiles(createListFavoritesProfilesRequest(profileId1))
+            val list = profilesFavoritesService.getFavoriteProfiles(createListFavoritesProfilesRequest(profileId1))
 
-            list.favoriteProfilesList.map { it.profileId }.shouldContainExactlyInAnyOrder(profileId2, profileId3)
+            list.favoriteProfilesList.map { it.id }.shouldContainExactlyInAnyOrder(profileId2, profileId3)
         }
     }
 
@@ -157,7 +158,7 @@ class ProfilesFavoritesServiceTest : FavoritesTest() {
             profilesFavoritesRepository.save(generateProfileRecords(profileId1, profileId3))
             profilesFavoritesRepository.save(generateProfileRecords(profileId2, profileId1))
 
-            profilesFavoritesService.removeAllProfilesByOwner(createRemoveAllProfilesByOwnerRequest(profileId1))
+            profilesFavoritesService.removeAllByOwner(createRemoveAllProfilesByOwnerRequest(profileId1))
 
             val ids = profilesFavoritesRepository.findAll().map { it.id.ownerUserId }.toSet()
             ids.shouldContainExactly(profileId2)

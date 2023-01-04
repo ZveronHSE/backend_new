@@ -1,126 +1,79 @@
 package ru.zveron.service
 
 import com.google.protobuf.Empty
-import org.apache.commons.lang3.RandomUtils
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
-import ru.zveron.AddLotToFavoritesRequest
-import ru.zveron.GetLotFavoritesCounterRequest
-import ru.zveron.GetLotFavoritesCounterResponse
-import ru.zveron.ListFavoriteLotsRequest
-import ru.zveron.ListFavoriteLotsResponse
-import ru.zveron.LotExistsInFavoritesRequest
-import ru.zveron.LotExistsInFavoritesResponse
-import ru.zveron.LotFavoritesServiceGrpcKt
-import ru.zveron.RemoveAllByFavoriteLotRequest
-import ru.zveron.RemoveAllLotsByOwnerRequest
-import ru.zveron.RemoveLotFromFavoritesRequest
 import ru.zveron.entity.LotsFavoritesRecord
-import ru.zveron.entity.LotsFavoritesCounter
-import ru.zveron.favoriteLot
-import ru.zveron.getLotFavoritesCounterResponse
-import ru.zveron.listFavoriteLotsResponse
-import ru.zveron.lotExistsInFavoritesResponse
-import ru.zveron.repository.LotsFavoritesCounterRepository
+import ru.zveron.exception.FavoritesException
+import ru.zveron.favorites.lot.AddLotToFavoritesRequest
+import ru.zveron.favorites.lot.GetFavoriteLotsRequest
+import ru.zveron.favorites.lot.GetFavoriteLotsResponse
+import ru.zveron.favorites.lot.GetLotCounterRequest
+import ru.zveron.favorites.lot.GetLotCounterResponse
+import ru.zveron.favorites.lot.LotFavoritesServiceGrpcKt
+import ru.zveron.favorites.lot.LotsExistInFavoritesRequest
+import ru.zveron.favorites.lot.LotsExistInFavoritesResponse
+import ru.zveron.favorites.lot.RemoveAllByFavoriteLotRequest
+import ru.zveron.favorites.lot.RemoveAllLotsByOwnerRequest
+import ru.zveron.favorites.lot.RemoveLotFromFavoritesRequest
+import ru.zveron.favorites.lot.favoriteLot
+import ru.zveron.favorites.lot.getFavoriteLotsResponse
+import ru.zveron.favorites.lot.getLotCounterResponse
+import ru.zveron.favorites.lot.lotsExistInFavoritesResponse
 import ru.zveron.repository.LotsFavoritesRecordRepository
-import javax.transaction.Transactional
 
 @Service
 class LotsFavoritesService(
-    private val lotRepository: LotsFavoritesRecordRepository,
-    private val lotCounterRepository: LotsFavoritesCounterRepository
+    private val lotRepository: LotsFavoritesRecordRepository
 ) : LotFavoritesServiceGrpcKt.LotFavoritesServiceCoroutineImplBase() {
 
-    companion object {
-        const val SHARDS_NUMBER = 4
-    }
-
-    @Transactional
-    override suspend fun addLotToFavorites(request: AddLotToFavoritesRequest): Empty {
-        val key = LotsFavoritesRecord.LotsFavoritesKey(
-            ownerUserId = request.favoritesOwnerId,
-            favoriteLotId = request.favoriteLotId
-        )
-
-        if (!lotCounterRepository.existsById_LotId(request.favoriteLotId)) {
-            add2FavoritesAndCreateShards(key)
-            return Empty.getDefaultInstance()
-        }
-
-        if (!lotRepository.existsById(key)) {
-            add2FavoritesAndIncrementShard(key)
-        }
-
-        return Empty.getDefaultInstance()
-    }
-
-    @Transactional
-    override suspend fun removeLotFromFavorites(request: RemoveLotFromFavoritesRequest): Empty =
-        LotsFavoritesRecord.LotsFavoritesKey(
-            ownerUserId = request.favoritesOwnerId,
-            favoriteLotId = request.favoriteLotId
-        ).let {
-            if (lotRepository.existsById(it)) {
-                removeFromFavoritesAndDecrementShard(it)
-            }
-
-            Empty.getDefaultInstance()
-        }
-
-    override suspend fun lotExistsInFavorites(request: LotExistsInFavoritesRequest): LotExistsInFavoritesResponse =
-        lotRepository.existsById(
-            LotsFavoritesRecord.LotsFavoritesKey(
-                ownerUserId = request.favoritesOwnerId,
-                favoriteLotId = request.favoriteLotId
+    override suspend fun addToFavorites(request: AddLotToFavoritesRequest): Empty =
+        lotRepository.save(
+            LotsFavoritesRecord(
+                LotsFavoritesRecord.LotsFavoritesKey(
+                    ownerUserId = request.favoritesOwnerId,
+                    favoriteLotId = request.favoriteLotId
+                )
             )
-        ).let { lotExistsInFavoritesResponse { lotExists = it } }
+        ).let { Empty.getDefaultInstance() }
 
-    override suspend fun listFavoriteLots(request: ListFavoriteLotsRequest): ListFavoriteLotsResponse =
-        listFavoriteLotsResponse {
+    override suspend fun removeFromFavorites(request: RemoveLotFromFavoritesRequest): Empty =
+        try {
+            lotRepository.deleteById(
+                LotsFavoritesRecord.LotsFavoritesKey(
+                    ownerUserId = request.favoritesOwnerId,
+                    favoriteLotId = request.favoriteLotId
+                )
+            ).let { Empty.getDefaultInstance() }
+        } catch (e: EmptyResultDataAccessException) {
+            throw FavoritesException("Нельзя удалить объявление не из списка избранного")
+        }
+
+    override suspend fun existInFavorites(request: LotsExistInFavoritesRequest): LotsExistInFavoritesResponse =
+        lotsExistInFavoritesResponse {
+            isExists.addAll(request.favoriteLotIdList.map { id ->
+                lotRepository.existsById_OwnerUserIdAndId_FavoriteLotId(
+                    ownerUserId = request.favoritesOwnerId,
+                    favoriteLotId = id
+                )
+            })
+        }
+
+    override suspend fun getFavoriteLots(request: GetFavoriteLotsRequest): GetFavoriteLotsResponse =
+        getFavoriteLotsResponse {
             favoriteLots.addAll(
                 lotRepository.getAllById_OwnerUserId(request.favoritesOwnerId).map {
-                    favoriteLot { lotId = it.id.favoriteLotId }
+                    favoriteLot { id = it.id.favoriteLotId }
                 })
         }
 
-    override suspend fun getLotFavoritesCounter(request: GetLotFavoritesCounterRequest): GetLotFavoritesCounterResponse =
-        lotCounterRepository.getLotFavoritesStatistics(request.lotId)
-            .let { statistics -> getLotFavoritesCounterResponse { addsToFavoritesCounter = statistics } }
+    override suspend fun getCounter(request: GetLotCounterRequest): GetLotCounterResponse =
+        lotRepository.countAllById_FavoriteLotId(request.id)
+            .let { statistics -> getLotCounterResponse { addsToFavoritesCounter = statistics } }
 
-    @Transactional
-    override suspend fun removeAllLotsByOwner(request: RemoveAllLotsByOwnerRequest): Empty {
-        lotRepository.getAllById_OwnerUserId(request.profileId).forEach {
-            lotCounterRepository.decrementFavoriteCounter(it.id.favoriteLotId, RandomUtils.nextInt(0, SHARDS_NUMBER))
-        }
-        lotRepository.deleteAllById_OwnerUserId(request.profileId)
+    override suspend fun removeAllByOwner(request: RemoveAllLotsByOwnerRequest): Empty =
+        lotRepository.deleteAllById_OwnerUserId(request.id).let { Empty.getDefaultInstance() }
 
-        return Empty.getDefaultInstance()
-    }
-
-    @Transactional
-    override suspend fun removeAllByFavoriteLot(request: RemoveAllByFavoriteLotRequest): Empty {
-        lotRepository.deleteAllById_FavoriteLotId(request.lotId)
-        lotCounterRepository.zeroAllLotShards(request.lotId)
-
-        return Empty.getDefaultInstance()
-    }
-
-    private fun add2FavoritesAndCreateShards(key: LotsFavoritesRecord.LotsFavoritesKey) {
-        lotRepository.save(LotsFavoritesRecord(key))
-        lotCounterRepository.saveAll(List(SHARDS_NUMBER) { i ->
-            LotsFavoritesCounter(
-                LotsFavoritesCounter.LotsFavoritesCounterKey(key.favoriteLotId, i),
-                (i + 1) / SHARDS_NUMBER.toLong()
-            )
-        })
-    }
-
-    private fun add2FavoritesAndIncrementShard(key: LotsFavoritesRecord.LotsFavoritesKey) {
-        lotRepository.save(LotsFavoritesRecord(key))
-        lotCounterRepository.incrementFavoriteCounter(key.favoriteLotId, RandomUtils.nextInt(0, SHARDS_NUMBER))
-    }
-
-    private fun removeFromFavoritesAndDecrementShard(key: LotsFavoritesRecord.LotsFavoritesKey) {
-        lotRepository.delete(LotsFavoritesRecord(key))
-        lotCounterRepository.decrementFavoriteCounter(key.favoriteLotId, RandomUtils.nextInt(0, SHARDS_NUMBER))
-    }
+    override suspend fun removeAllByFavoriteLot(request: RemoveAllByFavoriteLotRequest): Empty =
+        lotRepository.deleteAllById_FavoriteLotId(request.id).let { Empty.getDefaultInstance() }
 }

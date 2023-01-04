@@ -40,7 +40,7 @@ abstract class FavoritesTest {
         val connection = dataSource.connection
         val statement = connection.createStatement()
         statement.execute(
-            "TRUNCATE lots_favorites_record, profiles_favorites_record, lots_favorites_counter"
+            "TRUNCATE lots_favorites_record, profiles_favorites_record"
         )
 
         statement.close()

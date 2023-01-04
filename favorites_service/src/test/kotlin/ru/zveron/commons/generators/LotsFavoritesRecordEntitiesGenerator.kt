@@ -1,12 +1,12 @@
 package ru.zveron.commons.generators
 
-import ru.zveron.addLotToFavoritesRequest
 import ru.zveron.entity.LotsFavoritesRecord
-import ru.zveron.listFavoriteLotsRequest
-import ru.zveron.lotExistsInFavoritesRequest
-import ru.zveron.removeAllByFavoriteLotRequest
-import ru.zveron.removeAllLotsByOwnerRequest
-import ru.zveron.removeLotFromFavoritesRequest
+import ru.zveron.favorites.lot.addLotToFavoritesRequest
+import ru.zveron.favorites.lot.getFavoriteLotsRequest
+import ru.zveron.favorites.lot.lotsExistInFavoritesRequest
+import ru.zveron.favorites.lot.removeAllByFavoriteLotRequest
+import ru.zveron.favorites.lot.removeAllLotsByOwnerRequest
+import ru.zveron.favorites.lot.removeLotFromFavoritesRequest
 
 object LotsFavoritesRecordEntitiesGenerator {
 
@@ -30,18 +30,18 @@ object LotsFavoritesRecordEntitiesGenerator {
             favoriteLotId = favLotId
         }
 
-    fun crateLotExistsInFavoritesRequest(ownerId: Long, favLotId: Long) =
-        lotExistsInFavoritesRequest {
+    fun crateLotExistsInFavoritesRequest(ownerId: Long, favLotsId: List<Long>) =
+        lotsExistInFavoritesRequest {
             favoritesOwnerId = ownerId
-            favoriteLotId = favLotId
+            favoriteLotId.addAll(favLotsId)
         }
 
     fun createListFavoritesLotsRequest(ownerId: Long) =
-        listFavoriteLotsRequest { favoritesOwnerId = ownerId }
+        getFavoriteLotsRequest { favoritesOwnerId = ownerId }
 
     fun createRemoveAllLotsByOwnerRequest(ownerId: Long) =
-        removeAllLotsByOwnerRequest { profileId = ownerId }
+        removeAllLotsByOwnerRequest { id = ownerId }
 
     fun createRemoveAllByFavoriteLotRequest(lotId: Long) =
-        removeAllByFavoriteLotRequest { this.lotId = lotId }
+        removeAllByFavoriteLotRequest { id = lotId }
 }
