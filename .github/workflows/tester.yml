@@ -10,11 +10,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+#      - name: Get changed files
+#        id: changed-files
+#        uses: tj-actions/changed-files@v35
+#        with:
+#          base-sha: ${{ github.event.pull_request.base.sha }}
       - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v35
-        with:
-          base-sha: ${{ github.event.pull_request.base.sha }}
+        run: |
+          (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -37,6 +40,9 @@ jobs:
         run: gradle :address_service:test
 
       - name: Test favorites service
-        if: contains(${{ git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq }}, 'favorites_service')
+        run: |
+          if grep -q "favorites_service" "temp.txt"; then
+            gradle :favorites_service:test
+          fi
         # if: contains(steps.changed-files.outputs.modified_files, 'favorites_service')
-        run: gradle :favorites_service:test
+#        run: gradle :favorites_service:test
