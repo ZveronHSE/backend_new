@@ -18,7 +18,7 @@ jobs:
       - name: Get changed files
         shell: bash
         run: |
-          (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
+          (git diff master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2
