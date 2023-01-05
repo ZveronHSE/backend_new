@@ -20,6 +20,8 @@ val grpcVersion: String by project
 val grpcKotlinVersion: String by project
 val springVersion: String by project
 val kotlinVersion: String by project
+val grpcSpringBootStarter: String by project
+val eurekaVer: String by project
 
 allprojects {
     repositories {
@@ -54,7 +56,7 @@ subprojects {
         } catch (ex: Exception) {
             throw IllegalArgumentException(
                 "Для того, чтобы проект собрался, необходимо иметь файл, " +
-                        "расположенный по пути и иметь настройки для spring: $pathToApplicationYml"
+                        "расположенный по пути и иметь настройки для spring datasource : $projectDir"
             )
         }
 
@@ -86,7 +88,7 @@ subprojects {
         implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
 
         // Grpc корутины, сервисы и клиенты
-        implementation("net.devh:grpc-spring-boot-starter:2.13.1.RELEASE")
+        implementation("net.devh:grpc-spring-boot-starter:$grpcSpringBootStarter")
         implementation("io.grpc:grpc-kotlin-stub:$grpcKotlinVersion")
         implementation("io.grpc:grpc-stub:$grpcVersion")
         implementation("io.grpc:grpc-core:$grpcVersion")
@@ -99,6 +101,17 @@ subprojects {
         implementation("org.postgresql:postgresql:42.3.8")
         implementation("org.liquibase:liquibase-core:4.18.0")
         implementation("org.hibernate:hibernate-core:5.6.7.Final")
+
+        //Eureka
+        implementation("org.springframework.boot:spring-boot-starter-web")
+        implementation("org.springframework:spring-webflux:5.3.24")
+        implementation("io.projectreactor.netty:reactor-netty:1.1.1")
+        if (project.name != "service_registry"){
+            implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$eurekaVer")
+        }
+
+        //Без этой штуки у М1 жопа отваливается с вебфлаксом
+        implementation("io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64")
 
         // Миграции ликвибейза
         liquibaseRuntime("org.springframework.data:spring-data-jpa:$springVersion")

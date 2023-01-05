@@ -20,5 +20,4 @@ include(
     "parameter_service",
     "blacklist_service",
     "service_registry",
-    "apigateway",
 )
