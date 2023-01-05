@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import ru.zveron.entity.LotForm
 
 @Repository
-interface LotFormRepository : JpaRepository<LotForm, Long>
+interface LotFormRepository : JpaRepository<LotForm, Int>

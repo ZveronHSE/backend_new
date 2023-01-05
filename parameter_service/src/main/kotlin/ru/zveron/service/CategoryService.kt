@@ -2,16 +2,31 @@ package ru.zveron.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.zveron.contract.category.CategoryRequest
+import ru.zveron.contract.category.CategoryResponse
+import ru.zveron.contract.category.category
+import ru.zveron.contract.category.categoryResponse
 import ru.zveron.entity.Category
+import ru.zveron.exception.CategoryException
 import ru.zveron.repository.CategoryRepository
 
 @Service
-class CategoryService(val categoryRepository: CategoryRepository) {
+class CategoryService(
+    private val categoryRepository: CategoryRepository
+) {
+    // TODO подключить к контракту ApiGateway /api/categories/{id}
     @Transactional
-    fun getChildByCategory(categoryID: Long): List<Category> {
-        val categoryParent = getCategoryByIDOrThrow(categoryID)
+    fun getChild(request: CategoryRequest): CategoryResponse {
+        val categoryParent = getCategoryByIDOrThrow(request.id)
 
-        return categoryParent.categories.toList()
+        val categories = categoryParent.categories.map {
+            category {
+                id = it.id
+                name = it.name
+            }
+        }
+
+        return categoryResponse { this.categories.addAll(categories) }
     }
 
     /**
@@ -23,12 +38,12 @@ class CategoryService(val categoryRepository: CategoryRepository) {
      * Если на вход подали корней, то штош F
      */
     @Transactional
-    fun getChildOfRootAncestor(categoryID: Long): Category {
-        var category = getCategoryByIDOrThrow(categoryID)
+    fun getChildOfRootAncestor(categoryId: Int): Category {
+        var category = getCategoryByIDOrThrow(categoryId)
 
         // Если подали на вход корня всех категорий(животные или товары для животных) кинем исключение)0)
         if (category.parent == null) {
-//            throw CategoryException("Категория является корневой, она не может быть ребенком по определению.")
+            throw CategoryException("Категория является корневой, она не может быть ребенком по определению.")
         }
 
         // Пример: Собака -> category.parent = Животные
@@ -40,18 +55,7 @@ class CategoryService(val categoryRepository: CategoryRepository) {
         return category
     }
 
-    /**
-     * Возвращает корневую категорию для [category]
-     * Важно: метод должен вызываться внутри активной транзакции
-     */
-    fun getRoot(category: Category): Category {
-        var lastCategory = category
-        while (lastCategory.parent != null) {
-            lastCategory = lastCategory.parent!!
-        }
-        return lastCategory
-    }
 
-    fun getCategoryByIDOrThrow(categoryID: Long): Category = categoryRepository.findById(categoryID)
-        .orElseThrow { Exception("Категории с id=$categoryID не существует") }
+    fun getCategoryByIDOrThrow(categoryId: Int): Category = categoryRepository.findById(categoryId)
+        .orElseThrow { CategoryException("Категории с id=$categoryId не существует") }
 }
