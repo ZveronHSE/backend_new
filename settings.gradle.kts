@@ -19,5 +19,7 @@ include(
     "address_service",
     "parameter_service",
     "blacklist_service",
-    "favorites_service"
+    "favorites_service",
+    "service_registry",
+    "apigateway",
 )
