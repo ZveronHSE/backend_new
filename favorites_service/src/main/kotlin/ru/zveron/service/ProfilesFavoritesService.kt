@@ -1,8 +1,8 @@
 package ru.zveron.service
 
 import com.google.protobuf.Empty
+import net.devh.boot.grpc.server.service.GrpcService
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.stereotype.Service
 import ru.zveron.entity.ProfilesFavoritesRecord
 import ru.zveron.exception.FavoritesException
 import ru.zveron.favorites.profile.AddProfileToFavoritesRequest
@@ -19,7 +19,7 @@ import ru.zveron.favorites.profile.getFavoriteProfilesResponse
 import ru.zveron.favorites.profile.profileExistsInFavoritesResponse
 import ru.zveron.repository.ProfilesFavoritesRecordRepository
 
-@Service
+@GrpcService
 class ProfilesFavoritesService(private val profileRepository: ProfilesFavoritesRecordRepository) :
     ProfileFavoritesServiceGrpcKt.ProfileFavoritesServiceCoroutineImplBase() {
 

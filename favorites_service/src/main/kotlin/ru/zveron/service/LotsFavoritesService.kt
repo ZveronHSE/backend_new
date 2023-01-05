@@ -1,8 +1,8 @@
 package ru.zveron.service
 
 import com.google.protobuf.Empty
+import net.devh.boot.grpc.server.service.GrpcService
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.stereotype.Service
 import ru.zveron.entity.LotsFavoritesRecord
 import ru.zveron.exception.FavoritesException
 import ru.zveron.favorites.lot.AddLotToFavoritesRequest
@@ -22,7 +22,7 @@ import ru.zveron.favorites.lot.getLotCounterResponse
 import ru.zveron.favorites.lot.lotsExistInFavoritesResponse
 import ru.zveron.repository.LotsFavoritesRecordRepository
 
-@Service
+@GrpcService
 class LotsFavoritesService(
     private val lotRepository: LotsFavoritesRecordRepository
 ) : LotFavoritesServiceGrpcKt.LotFavoritesServiceCoroutineImplBase() {
