@@ -1,12 +1,12 @@
 package ru.zveron.commons.generators
 
-import ru.zveron.addProfileToFavoritesRequest
 import ru.zveron.entity.ProfilesFavoritesRecord
-import ru.zveron.listFavoriteProfilesRequest
-import ru.zveron.profileExistsInFavoritesRequest
-import ru.zveron.removeAllByFavoriteProfileRequest
-import ru.zveron.removeAllProfilesByOwnerRequest
-import ru.zveron.removeProfileFromFavoritesRequest
+import ru.zveron.favorites.profile.addProfileToFavoritesRequest
+import ru.zveron.favorites.profile.getFavoriteProfilesRequest
+import ru.zveron.favorites.profile.profileExistsInFavoritesRequest
+import ru.zveron.favorites.profile.removeAllByFavoriteProfileRequest
+import ru.zveron.favorites.profile.removeAllProfilesByOwnerRequest
+import ru.zveron.favorites.profile.removeProfileFromFavoritesRequest
 
 object ProfilesFavoritesRecordEntitiesGenerator {
 
@@ -37,11 +37,11 @@ object ProfilesFavoritesRecordEntitiesGenerator {
         }
 
     fun createListFavoritesProfilesRequest(ownerId: Long) =
-        listFavoriteProfilesRequest { favoritesOwnerId = ownerId }
+        getFavoriteProfilesRequest { id = ownerId }
 
     fun createRemoveAllProfilesByOwnerRequest(ownerId: Long) =
-        removeAllProfilesByOwnerRequest { profileId = ownerId }
+        removeAllProfilesByOwnerRequest { id = ownerId }
 
     fun createRemoveAllByFavoriteProfileRequest(ownerId: Long) =
-        removeAllByFavoriteProfileRequest { profileId = ownerId }
+        removeAllByFavoriteProfileRequest { id = ownerId }
 }

@@ -1,4 +1,4 @@
 
 dependencies {
-    implementation("com.github.zveronHSe.contract:favorites:feature~ZV-189-favorites-microservice-SNAPSHOT")
+    implementation("com.github.zveronHSe.contract:favorites:1.2.0")
 }

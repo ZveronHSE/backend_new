@@ -45,3 +45,19 @@ spring:
 
    Пример запуска:
    `./gradlew -PmigrationName=new_cool_change_set createNextChangeSet`
+
+## CI / CD / Deploy
+### Continuous integration
+1. Пайплайны запускаются при создании PR. `Test affected modules` подготавливает тестовую среду и запускает 
+тесты в тех модулях, файлы которых были изменены.
+2. **Поэтому**, когда вы создаете новый модуль, необходимо в `.github/workflows/tester.yml` добавить обработку 
+изменений этого модуля. Пример:
+```yaml
+      - name: Test <название сервиса>
+        shell: bash
+        run: if grep -q "<название сервиса>" "temp.txt"; then gradle :<название сервиса>:test; fi
+```
+### Continuous delivery
+_In progress..._
+### Deploy
+_In progress..._

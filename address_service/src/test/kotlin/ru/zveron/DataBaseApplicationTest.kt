@@ -11,7 +11,7 @@ import javax.sql.DataSource
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-abstract class FavoritesTest {
+abstract class DataBaseApplicationTest {
     @Autowired
     lateinit var dataSource: DataSource
 
@@ -26,8 +26,8 @@ abstract class FavoritesTest {
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("spring.datasource.url", container::getJdbcUrl)
-            registry.add("spring.datasource.password", container::getPassword)
             registry.add("spring.datasource.username", container::getUsername)
+            registry.add("spring.datasource.password", container::getPassword)
         }
 
         init {
@@ -40,7 +40,7 @@ abstract class FavoritesTest {
         val connection = dataSource.connection
         val statement = connection.createStatement()
         statement.execute(
-            "TRUNCATE lots_favorites_record, profiles_favorites_record"
+            "TRUNCATE address"
         )
 
         statement.close()
