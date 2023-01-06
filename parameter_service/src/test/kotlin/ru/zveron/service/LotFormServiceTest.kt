@@ -32,7 +32,7 @@ internal class LotFormServiceTest : DataBaseApplicationTest() {
 
     @Test
     fun `Dont get lot form by id, if it doesnt exists`() {
-        val mockId = 1
+        val mockId = 100500
 
         shouldThrow<LotException> { lotFormService.getLotFormByIdOrThrow(mockId) }
     }

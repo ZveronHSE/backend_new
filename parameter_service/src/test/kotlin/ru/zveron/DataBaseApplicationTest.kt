@@ -1,20 +1,14 @@
 package ru.zveron
 
-import org.junit.jupiter.api.BeforeEach
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
-import javax.sql.DataSource
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 abstract class DataBaseApplicationTest {
-    @Autowired
-    lateinit var dataSource: DataSource
-
     companion object {
         private val container = PostgreSQLContainer("postgres:13.1-alpine").apply {
             withDatabaseName("test_db")
@@ -33,17 +27,5 @@ abstract class DataBaseApplicationTest {
         init {
             container.start()
         }
-    }
-
-    @BeforeEach
-    fun `Cleaning database`() {
-        val connection = dataSource.connection
-        val statement = connection.createStatement()
-        statement.execute(
-            "TRUNCATE category, lot_form, parameter_from_type, parameter"
-        )
-
-        statement.close()
-        connection.close()
     }
 }
