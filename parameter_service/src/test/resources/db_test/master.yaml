@@ -1,5 +1,5 @@
 databaseChangeLog:
   - includeAll:
-      path: db_test/changelog/
+      path: db/changelog/
   - includeAll:
       path: db_test/data/

@@ -28,7 +28,6 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     lateinit var parameterFromTypeRepository: ParameterFromTypeRepository
 
     companion object {
-        const val CATEGORY_ID_DOG = 3
         const val ID_UNKNOWN = 100500
         const val CATEGORY_ID_CAT = 4
         const val LOT_FORM_ID = 1
@@ -69,5 +68,10 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
         val request = mockParameterRequest(CATEGORY_ID_CAT, ID_UNKNOWN)
 
         shouldThrow<LotException> { parameterService.getParametersByCategory(request) }
+    }
+
+    @Test
+    fun `ValidateValuesForParameter Correct request with all type parameters`(): Unit = runBlocking {
+
     }
 }

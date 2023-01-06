@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 1647803247399-49
+      id: 1647803247499-1
       author: WolfAlm (generated)
       changes:
         - loadData:
@@ -25,7 +25,7 @@ databaseChangeLog:
             separator: ','
             tableName: category
   - changeSet:
-      id: 1647803247399-50
+      id: 1647803247499-2
       author: WolfAlm (generated)
       changes:
         - loadData:
@@ -50,7 +50,7 @@ databaseChangeLog:
             separator: ','
             tableName: lot_form
   - changeSet:
-      id: 1647803247399-51
+      id: 1647803247499-3
       author: WolfAlm (generated)
       changes:
         - loadData:
@@ -83,7 +83,7 @@ databaseChangeLog:
             separator: ';'
             tableName: parameter
   - changeSet:
-      id: 1647803247399-52
+      id: 1647803247499-4
       author: WolfAlm (generated)
       changes:
         - loadData:
@@ -108,7 +108,7 @@ databaseChangeLog:
             separator: ','
             tableName: parameter_from_type
   - changeSet:
-      id: 1647803247399-53
+      id: 1647803247499-5
       author: WolfAlm
       changes:
         - modifyDataType:
