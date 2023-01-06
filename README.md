@@ -53,9 +53,9 @@ spring:
 2. **Поэтому**, когда вы создаете новый модуль, необходимо в `.github/workflows/tester.yml` добавить обработку 
 изменений этого модуля. Пример:
 ```yaml
-      - name: Test <название нового модуля>
-        if: contains(steps.changed-files.outputs.modified_files, '<директория нового модуля>')
-        run: gradle :<директория нового модуля>:test
+      - name: Test <название сервиса>
+        shell: bash
+        run: if grep -q "<название сервиса>" "temp.txt"; then gradle :<название сервиса>:test; fi
 ```
 ### Continuous delivery
 _In progress..._
