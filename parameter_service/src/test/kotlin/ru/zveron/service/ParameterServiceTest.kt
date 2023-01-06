@@ -12,7 +12,7 @@ import ru.zveron.exception.CategoryException
 import ru.zveron.exception.LotException
 import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.repository.ParameterFromTypeRepository
-import ru.zveron.util.CreateEntitiesUtil.mockParameterRequest
+import ru.zveron.util.CreateEntitiesUtils.mockParameterRequest
 
 internal class ParameterServiceTest : DataBaseApplicationTest() {
     @Autowired

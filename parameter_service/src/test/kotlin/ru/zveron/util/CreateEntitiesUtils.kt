@@ -5,8 +5,12 @@ import ru.zveron.contract.category.categoryRequest
 import ru.zveron.contract.category.categoryResponse
 import ru.zveron.contract.parameter.parameterRequest
 import ru.zveron.entity.Category
+import ru.zveron.entity.LotForm
+import ru.zveron.entity.Parameter
+import ru.zveron.entity.ParameterFromType
+import ru.zveron.model.ParameterType
 
-object CreateEntitiesUtil {
+object CreateEntitiesUtils {
     fun mockCategoryWithParent(category: Category) = Category(
         name = "child",
         parent = category
@@ -34,4 +38,23 @@ object CreateEntitiesUtil {
         this.categoryId = categoryId
         this.lotFormId = lotFormId
     }
+
+    fun mockParameterFromType(
+        id: Int,
+        name: String,
+        isRequired: Boolean,
+        listValue: List<String>,
+        type: ParameterType
+    ) = ParameterFromType(
+        ParameterFromType.ParameterFromTypeKey(id, id, id),
+        Category(id, ""),
+        LotForm(id, "", ""),
+        Parameter(
+            id = id,
+            name = name,
+            type = type.name,
+            isRequired = isRequired,
+            list_value = listValue
+        )
+    )
 }

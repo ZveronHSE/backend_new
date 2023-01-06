@@ -10,10 +10,10 @@ import ru.zveron.contract.category.categoryResponse
 import ru.zveron.entity.Category
 import ru.zveron.exception.CategoryException
 import ru.zveron.repository.CategoryRepository
-import ru.zveron.util.CreateEntitiesUtil.mapCategoriesToResponse
-import ru.zveron.util.CreateEntitiesUtil.mockCategoryRequest
-import ru.zveron.util.CreateEntitiesUtil.mockCategoryWithParent
-import ru.zveron.util.CreateEntitiesUtil.mockRootCategory
+import ru.zveron.util.CreateEntitiesUtils.mapCategoriesToResponse
+import ru.zveron.util.CreateEntitiesUtils.mockCategoryRequest
+import ru.zveron.util.CreateEntitiesUtils.mockCategoryWithParent
+import ru.zveron.util.CreateEntitiesUtils.mockRootCategory
 
 internal class CategoryServiceTest : DataBaseApplicationTest() {
 
