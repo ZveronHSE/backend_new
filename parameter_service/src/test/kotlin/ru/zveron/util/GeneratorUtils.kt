@@ -11,6 +11,8 @@ object GeneratorUtils {
 
     fun generateBoolean() = RandomUtils.nextBoolean()
 
+    fun generateInt() = RandomUtils.nextInt()
+
     fun generateParameterFromType(n: Int = 5): List<ParameterFromType> = List(n) {
         mockParameterFromType(
             id = it,

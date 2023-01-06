@@ -34,7 +34,7 @@ class ParameterService(
         val parameters = getAllParametersByCategory(request.categoryId, request.lotFormId)
             .associate { it.parameter.id to it.parameter }
 
-        val sourceParameters = request.parameterValuesMap
+        val sourceParameters = request.parameterValuesMap.toMutableMap()
         for ((id, parameter) in parameters) {
             val parameterValue = sourceParameters[id]
 
@@ -72,27 +72,27 @@ class ParameterService(
     }
 
     private fun Parameter.validateIntegerValueForParameter(valueParameter: String): Boolean {
-        val value = valueParameter.toIntOrNull()
+        valueParameter.toIntOrNull()
             ?: throw ParameterException("Для параметра '${name}', id=${id} значение $valueParameter не является числом")
 
 
-        return checkValueInValues(value)
+        return checkValueInValues(valueParameter)
     }
 
     private fun Parameter.validateDateValueForParameter(valueParameter: String): Boolean {
-        val value = try {
+        try {
             Instant.parse(valueParameter)
         } catch (e: DateTimeParseException) {
             throw ParameterException("Для параметра '${name}', id=${id} значение $valueParameter не является датой")
         }
 
-        return checkValueInValues(value)
+        return checkValueInValues(valueParameter)
     }
 
     /**
      * Проверяет, что значение есть в списке значений
      */
-    private fun Parameter.checkValueInValues(value: Any): Boolean {
+    private fun Parameter.checkValueInValues(value: String): Boolean {
         if (list_value != null) {
             return list_value.any { it == value }
         }
