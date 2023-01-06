@@ -16,7 +16,7 @@ object ParameterMapper {
                 name = parameter.name
                 type = Type.valueOf(parameter.type)
                 isRequired = parameter.isRequired
-                values.addAll(listOf()) // TODO
+                parameter.list_value?.let { listValue -> values.addAll(listValue) }
             }
         }
 

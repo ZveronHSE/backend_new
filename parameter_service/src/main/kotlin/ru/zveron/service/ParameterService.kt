@@ -3,7 +3,7 @@ package ru.zveron.service
 import com.google.protobuf.Empty
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import org.springframework.stereotype.Service
+import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.contract.parameter.ParameterRequest
 import ru.zveron.contract.parameter.ParameterResponse
 import ru.zveron.contract.parameter.ParameterServiceGrpcKt
@@ -17,7 +17,7 @@ import ru.zveron.repository.ParameterFromTypeRepository
 import java.time.Instant
 import java.time.format.DateTimeParseException
 
-@Service
+@GrpcService
 class ParameterService(
     private val parameterFromTypeRepository: ParameterFromTypeRepository,
     private val lotFormService: LotFormService,
@@ -56,7 +56,7 @@ class ParameterService(
             }
 
             if (!success) {
-                throw ParameterException("Для параметра '${parameter.name}', id=${id} значение $parameterValue не подходящее")
+                throw ParameterException("Для параметра '${parameter.name}', id=${id} значение $parameterValue неподходящее")
             }
 
             // Удаляем после всей обработки
@@ -64,11 +64,11 @@ class ParameterService(
         }
 
         // Проверяем, что нет никаких лишних параметров.
-        request.parameterValuesMap.forEach { (id, _) ->
+        sourceParameters.forEach { (id, _) ->
             if (parameters[id] == null) throw ParameterException("Был передан неизвестный параметр id=${id}")
         }
 
-        return super.validateValuesForParameters(request)
+        return Empty.getDefaultInstance()
     }
 
     private fun Parameter.validateIntegerValueForParameter(valueParameter: String): Boolean {
