@@ -8,7 +8,6 @@ import ru.zveron.entity.Category
 import ru.zveron.entity.LotForm
 import ru.zveron.entity.Parameter
 import ru.zveron.entity.ParameterFromType
-import ru.zveron.model.ParameterType
 
 object CreateEntitiesUtils {
     fun mockCategoryWithParent(category: Category) = Category(
@@ -44,7 +43,7 @@ object CreateEntitiesUtils {
         name: String,
         isRequired: Boolean,
         listValue: List<String>,
-        type: ParameterType
+        type: String
     ) = ParameterFromType(
         ParameterFromType.ParameterFromTypeKey(id, id, id),
         Category(id, ""),
@@ -52,7 +51,7 @@ object CreateEntitiesUtils {
         Parameter(
             id = id,
             name = name,
-            type = type.name,
+            type = type,
             isRequired = isRequired,
             list_value = listValue
         )

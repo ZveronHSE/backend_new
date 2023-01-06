@@ -3,17 +3,12 @@ package ru.zveron.entity
 import org.hibernate.Hibernate
 import java.io.Serializable
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Embeddable
-import javax.persistence.EmbeddedId
-import javax.persistence.Entity
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
+import javax.persistence.*
 
 @Entity
 data class ParameterFromType(
     @EmbeddedId
-    val id: ParameterFromTypeKey,
+    var id: ParameterFromTypeKey,
     @ManyToOne
     @JoinColumn(name = "id_category", insertable = false, updatable = false)
     var category: Category,

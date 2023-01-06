@@ -7,9 +7,9 @@ import ru.zveron.model.ParameterType
 import ru.zveron.util.CreateEntitiesUtils.mockParameterFromType
 
 object GeneratorUtils {
-    private fun generateString(size: Int = 10): String = RandomStringUtils.randomAlphanumeric(size)
+    fun generateString(size: Int = 10): String = RandomStringUtils.randomAlphanumeric(size)
 
-    private fun generateBoolean() = RandomUtils.nextBoolean()
+    fun generateBoolean() = RandomUtils.nextBoolean()
 
     fun generateParameterFromType(n: Int = 5): List<ParameterFromType> = List(n) {
         mockParameterFromType(
@@ -17,7 +17,7 @@ object GeneratorUtils {
             name = generateString(),
             isRequired = generateBoolean(),
             listValue = List(it) { generateString() },
-            type = ParameterType.values().random()
+            type = ParameterType.values().random().name
         )
     }
 
