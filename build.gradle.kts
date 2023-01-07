@@ -20,8 +20,9 @@ val grpcVersion: String by project
 val grpcKotlinVersion: String by project
 val springVersion: String by project
 val kotlinVersion: String by project
-val grpcSpringBootStarter: String by project
-val eurekaVer: String by project
+val eurekaVersion: String by project
+val arch = System.getProperty("os.arch")
+
 
 allprojects {
     repositories {
@@ -55,8 +56,7 @@ subprojects {
             }
         } catch (ex: Exception) {
             throw IllegalArgumentException(
-                "Для того, чтобы проект собрался, необходимо иметь файл, " +
-                        "расположенный по пути и иметь настройки для spring datasource : $projectDir"
+                "в проекте по пути $projectDir не хватает файла или настроек datasource в файле $pathToApplicationYml"
             )
         }
 
@@ -69,7 +69,8 @@ subprojects {
                 password = map["password"] as String
             )
         } catch (ex: Exception) {
-            throw IllegalArgumentException("Вероятно, не хватает в application.yml данных про БД: ${ex.message}")
+            throw IllegalArgumentException("Вероятно, не хватает в application.yml " +
+                    "параметров url, username или password: ${ex.message}")
         }
     }
 
@@ -88,7 +89,7 @@ subprojects {
         implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
 
         // Grpc корутины, сервисы и клиенты
-        implementation("net.devh:grpc-spring-boot-starter:$grpcSpringBootStarter")
+        implementation("net.devh:grpc-spring-boot-starter:2.14.0.RELEASE")
         implementation("io.grpc:grpc-kotlin-stub:$grpcKotlinVersion")
         implementation("io.grpc:grpc-stub:$grpcVersion")
         implementation("io.grpc:grpc-core:$grpcVersion")
@@ -106,12 +107,14 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-web")
         implementation("org.springframework:spring-webflux:5.3.24")
         implementation("io.projectreactor.netty:reactor-netty:1.1.1")
-        if (project.name != "service_registry"){
-            implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$eurekaVer")
+        if (project.name != "service_registry") {
+            implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$eurekaVersion")
         }
 
         //Без этой штуки у М1 жопа отваливается с вебфлаксом
-        implementation("io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64")
+        if (arch.equals("aarch64")){
+            implementation("io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64")
+        }
 
         // Миграции ликвибейза
         liquibaseRuntime("org.springframework.data:spring-data-jpa:$springVersion")

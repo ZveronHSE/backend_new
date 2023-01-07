@@ -61,19 +61,3 @@ spring:
 _In progress..._
 ### Deploy
 _In progress..._
-
-## CI / CD / Deploy
-### Continuous integration
-1. Пайплайны запускаются при создании PR. `Test affected modules` подготавливает тестовую среду и запускает 
-тесты в тех модулях, файлы которых были изменены.
-2. **Поэтому**, когда вы создаете новый модуль, необходимо в `.github/workflows/tester.yml` добавить обработку 
-изменений этого модуля. Пример:
-```yaml
-      - name: Test <название нового модуля>
-        if: contains(steps.changed-files.outputs.modified_files, '<директория нового модуля>')
-        run: gradle :<директория нового модуля>:test
-```
-### Continuous delivery
-_In progress..._
-### Deploy
-_In progress..._
