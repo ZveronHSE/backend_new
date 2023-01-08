@@ -7,14 +7,15 @@ import javax.persistence.*
 data class Category(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Int = 0,
+    var id: Int = -1,
+    @Column(length = 100)
     val name: String,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_parent")
     var parent: Category? = null
 ) {
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-    val categories: MutableSet<Category> = mutableSetOf()
+    val subCategories: MutableSet<Category> = mutableSetOf()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

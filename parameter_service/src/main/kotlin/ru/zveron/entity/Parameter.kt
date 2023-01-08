@@ -11,7 +11,8 @@ data class Parameter(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "parameter_id_seq")
     @SequenceGenerator(name = "parameter_id_seq", allocationSize = 1, initialValue = 1)
-    var id: Int = 0,
+    var id: Int = -1,
+    @Column(length = 30)
     val name: String,
     val type: String,
     val isRequired: Boolean,
