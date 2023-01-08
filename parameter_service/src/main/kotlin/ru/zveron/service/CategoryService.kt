@@ -19,7 +19,7 @@ class CategoryService(
     fun getChild(request: CategoryRequest): CategoryResponse {
         val categoryParent = getCategoryByIDOrThrow(request.id)
 
-        val categories = categoryParent.categories.map {
+        val categories = categoryParent.subCategories.map {
             category {
                 id = it.id
                 name = it.name
