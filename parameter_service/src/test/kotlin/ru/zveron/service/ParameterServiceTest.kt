@@ -3,9 +3,12 @@ package ru.zveron.service
 import com.google.protobuf.Empty
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.runBlocking
 import mu.KLogging
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseApplicationTest
 import ru.zveron.contract.parameter.Type
@@ -14,13 +17,12 @@ import ru.zveron.entity.Category
 import ru.zveron.entity.LotForm
 import ru.zveron.exception.CategoryException
 import ru.zveron.exception.LotException
+import ru.zveron.exception.ParameterException
 import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.repository.ParameterFromTypeRepository
 import ru.zveron.util.CreateEntitiesUtils.mockParameterRequest
-import ru.zveron.util.GeneratorUtils.generateInt
-import ru.zveron.util.GeneratorUtils.generateString
-import java.time.Instant
-import java.util.*
+import ru.zveron.util.GeneratorUtils.buildMapParameterValues
+
 
 internal class ParameterServiceTest : DataBaseApplicationTest() {
     @Autowired
@@ -34,6 +36,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
 
     companion object : KLogging() {
         const val ID_UNKNOWN = 100500
+        const val UNKNOWN_VALUE = 124323543
         const val CATEGORY_ID_CAT = 4
         const val LOT_FORM_ID = 1
         const val LOT_FORM_ID_WITHOUT_PARAMETERS = 2
@@ -80,24 +83,9 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
         val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
             Category(CATEGORY_ID_CAT, ""),
             LotForm(LOT_FORM_ID, "", "")
-        ).toResponse()
+        ).toResponse().parametersList
 
-        val parameterValues = mutableMapOf<Int, String>()
-
-        for (parameter in parameters.parametersList) {
-            if (parameter.valuesCount == 0) {
-                val value = when (parameter.type) {
-                    Type.STRING -> generateString()
-                    Type.INT -> generateInt()
-                    Type.DATE -> Date.from(Instant.now()).toInstant()
-                    else -> {}
-                }
-
-                parameterValues[parameter.id] = value.toString()
-            } else {
-                parameterValues[parameter.id] = parameter.valuesList.random()
-            }
-        }
+        val parameterValues = parameters.buildMapParameterValues()
 
         val request = parameterValueRequest {
             categoryId = CATEGORY_ID_CAT
@@ -113,29 +101,86 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     @Test
     fun `ValidateValuesForParameter Should throw exception for a required parameter that has not been filled in`(): Unit =
         runBlocking {
+            val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
+                Category(CATEGORY_ID_CAT, ""),
+                LotForm(LOT_FORM_ID, "", "")
+            ).toResponse().parametersList
 
+            val parameterValues = parameters.buildMapParameterValues()
+
+            var parameterIdWhereShouldBeIncorrect = -1
+            for (parameter in parameters) {
+                if (parameter.isRequired) {
+                    parameterIdWhereShouldBeIncorrect = parameter.id
+                    break;
+                }
+            }
+
+            // Чтобы проверить, что подготовка к тесту прошла успешно, айдишник должен быть инициализирован
+            parameterIdWhereShouldBeIncorrect shouldNotBe -1
+
+            parameterValues.remove(parameterIdWhereShouldBeIncorrect)
+
+            val request = parameterValueRequest {
+                categoryId = CATEGORY_ID_CAT
+                lotFormId = LOT_FORM_ID
+                this.parameterValues.putAll(parameterValues)
+            }
+            shouldThrow<ParameterException> { parameterService.validateValuesForParameters(request) }
         }
 
-    @Test
-    fun `ValidateValuesForParameter Should throw exception for incorrect value for type Int parameter`(): Unit =
+
+    @ParameterizedTest
+    @EnumSource(Type::class, mode = EnumSource.Mode.EXCLUDE, names = ["UNRECOGNIZED"])
+    fun `ValidateValuesForParameter Should throw exception for incorrect value for each type parameter`(type: Type): Unit =
         runBlocking {
+            val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
+                Category(CATEGORY_ID_CAT, ""),
+                LotForm(LOT_FORM_ID, "", "")
+            ).toResponse().parametersList
 
-        }
+            val parameterValues = parameters.buildMapParameterValues()
 
-    @Test
-    fun `ValidateValuesForParameter Should throw exception for incorrect value for type String parameter`(): Unit =
-        runBlocking {
+            var parameterIdWhereShouldBeIncorrect = -1
+            for (parameter in parameters) {
+                when (parameter.type) {
+                    type -> {
+                        parameterIdWhereShouldBeIncorrect = parameter.id
+                        break;
+                    }
+                    else -> {}
+                }
+            }
 
-        }
+            // Чтобы проверить, что подготовка к тесту прошла успешно, айдишник должен быть инициализирован
+            parameterIdWhereShouldBeIncorrect shouldNotBe -1
 
-    @Test
-    fun `ValidateValuesForParameter Should throw exception for incorrect value for type Date parameter`(): Unit =
-        runBlocking {
+            parameterValues[parameterIdWhereShouldBeIncorrect] = UNKNOWN_VALUE.toString()
 
+            val request = parameterValueRequest {
+                categoryId = CATEGORY_ID_CAT
+                lotFormId = LOT_FORM_ID
+                this.parameterValues.putAll(parameterValues)
+            }
+            shouldThrow<ParameterException> { parameterService.validateValuesForParameters(request) }
         }
 
     @Test
     fun `ValidateValuesForParameter Extra parameters, should throw exception`(): Unit = runBlocking {
+        val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
+            Category(CATEGORY_ID_CAT, ""),
+            LotForm(LOT_FORM_ID, "", "")
+        ).toResponse().parametersList
 
+        val parameterValues = parameters.buildMapParameterValues()
+        parameterValues[ID_UNKNOWN] = UNKNOWN_VALUE.toString()
+
+        val request = parameterValueRequest {
+            categoryId = CATEGORY_ID_CAT
+            lotFormId = LOT_FORM_ID
+            this.parameterValues.putAll(parameterValues)
+        }
+
+        shouldThrow<ParameterException> { parameterService.validateValuesForParameters(request) }
     }
 }
