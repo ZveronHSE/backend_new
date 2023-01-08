@@ -1,0 +1,35 @@
+spring:
+  main:
+    banner-mode: off
+  #liquibase not in use
+  datasource:
+    url: jdbc:postgresql://localhost:5555/blacklist
+    password: zveron_password
+    username: zveron_user
+  liquibase:
+    enabled: false
+  #[--------------------------]
+  application:
+    name: zv-eureka-server
+
+eureka:
+  instance:
+    hostname: localhost # should be put into vault
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
+    status-page-url-path: /actuator/info
+    appname: zv-eureka-instance
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    refresh:
+      enable: true
+  server:
+    enable-self-preservation: true
+    registry-sync-retries: 3
+    registry-sync-retry-wait-ms: 300
+
+server:
+  port: 8761
