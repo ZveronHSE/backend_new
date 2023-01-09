@@ -8,7 +8,7 @@ import ru.zveron.entity.ParameterFromType
 import ru.zveron.model.ParameterType
 import ru.zveron.util.CreateEntitiesUtils.mockParameterFromType
 import java.time.Instant
-import java.util.*
+import java.util.Date
 
 object GeneratorUtils {
     fun generateString(size: Int = 10): String = RandomStringUtils.randomAlphanumeric(size)
@@ -34,7 +34,7 @@ object GeneratorUtils {
             if (parameter.valuesCount == 0) {
                 val value = when (parameter.type) {
                     Type.STRING -> generateString()
-                    Type.INT -> generateInt()
+                    Type.INTEGER -> generateInt()
                     Type.DATE -> Date.from(Instant.now()).toInstant()
                     else -> {}
                 }

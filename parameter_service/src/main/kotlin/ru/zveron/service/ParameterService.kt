@@ -50,7 +50,7 @@ class ParameterService(
 
             val success = when (parameter.type) {
                 ParameterType.STRING.type -> parameter.checkValueInValues(parameterValue)
-                ParameterType.INT.type -> parameter.validateIntegerValueForParameter(parameterValue)
+                ParameterType.INTEGER.type -> parameter.validateIntegerValueForParameter(parameterValue)
                 ParameterType.DATE.type -> parameter.validateDateValueForParameter(parameterValue)
                 else -> false
             }
