@@ -146,6 +146,9 @@ subprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
 
     val dataSource = (extra["getDataSource"] as () -> DataSource)()
