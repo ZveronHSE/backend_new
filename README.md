@@ -22,10 +22,18 @@
 
 ```yaml
 spring:
-  datasource:
-    url: URL
-    password: PASSWORD
-    username: USER
+   application:
+      name: name-service
+   datasource:
+      url: URL
+      password: PASSWORD
+      username: USER
+
+server:
+   port: 0
+
+grpc:
+   server: 0 
 ```
 
 Поскольку это влияет на то, чтобы успешно подключаться к собственным БД и генерировать миграции при необходимости.

@@ -3,13 +3,16 @@ package ru.zveron.service.api
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.Mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.contract.profile.LotStatus
@@ -107,7 +110,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         coEvery { blacklistClient.existsInBlacklist(id, authorizedId) } returns false
         val activeLot = LotsGenerator.generateLot(false)
         val closedLot = LotsGenerator.generateLot(false)
-        coEvery { lotClient.getLotsBySellerId(id) } returns profileLotsResponse {
+        coEvery { lotClient.getLotsBySellerId(id, authorizedId) } returns profileLotsResponse {
             activateLots.add(activeLot)
             inactivateLots.add(closedLot)
         }

@@ -23,4 +23,11 @@ class GrpcExceptionAdvice {
 
         return e.status.withDescription(e.message)
     }
+
+    @GrpcExceptionHandler(ParameterException::class)
+    fun handleParameterException(e: ParameterException): Status {
+        logger.error { e.message }
+
+        return e.status.withDescription(e.message)
+    }
 }
