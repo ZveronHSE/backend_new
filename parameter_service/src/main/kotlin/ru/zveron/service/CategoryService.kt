@@ -1,14 +1,14 @@
 package ru.zveron.service
 
 import io.grpc.Status
-import org.springframework.stereotype.Service
+import net.devh.boot.grpc.server.service.GrpcService
 import org.springframework.transaction.annotation.Transactional
 import ru.zveron.contract.category.*
 import ru.zveron.entity.Category
 import ru.zveron.exception.CategoryException
 import ru.zveron.repository.CategoryRepository
 
-@Service
+@GrpcService
 class CategoryService(
     private val categoryRepository: CategoryRepository
 ) : CategoryServiceGrpcKt.CategoryServiceCoroutineImplBase() {
