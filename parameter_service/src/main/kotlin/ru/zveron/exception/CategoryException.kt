@@ -1,3 +1,8 @@
 package ru.zveron.exception
 
-class CategoryException(override val message: String) : RuntimeException(message)
+import io.grpc.Status
+
+class CategoryException(
+    val status: Status,
+    override val message: String
+) : RuntimeException(message)

@@ -2,6 +2,7 @@ package ru.zveron.service
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,6 +27,9 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
     lateinit var rootCategory: Category
     lateinit var childCategory: Category
 
+    companion object {
+        const val UNKNOWN_ID = 100500
+    }
 
     @BeforeEach
     fun `Create default categories`() {
@@ -34,7 +38,7 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
     }
 
     @Test
-    fun `GetChild Get only children of category`() {
+    fun `GetChild Get only children of category`(): Unit = runBlocking {
         val childCategory1 = categoryRepository.save(mockCategoryWithParent(rootCategory))
         categoryRepository.save(mockCategoryWithParent(childCategory))
 
@@ -46,7 +50,16 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
     }
 
     @Test
-    fun `GetChild Dont get children of category, if dont have`() {
+    fun `GetChild Should throw exception if category id not found`(): Unit = runBlocking {
+        shouldThrow<CategoryException> {
+            categoryService.getChild(
+                mockCategoryRequest(UNKNOWN_ID)
+            )
+        }
+    }
+
+    @Test
+    fun `GetChild Dont get children of category, if dont have`(): Unit = runBlocking {
         val response = categoryService.getChild(
             mockCategoryRequest(childCategory.id)
         )
@@ -76,4 +89,18 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
 
         response shouldBe childCategory
     }
+
+    @Test
+    fun `GetFamily Get full family of category`(): Unit =
+        runBlocking {
+            val response = categoryService.getFamily(mockCategoryRequest(rootCategory.id))
+
+            response shouldBe mapCategoriesToResponse(rootCategory, childCategory)
+        }
+
+    @Test
+    fun `GetFamily Should throw exception if category id not found`(): Unit =
+        runBlocking {
+            shouldThrow<CategoryException> { categoryService.getFamily(mockCategoryRequest(UNKNOWN_ID)) }
+        }
 }
