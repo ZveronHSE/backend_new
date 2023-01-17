@@ -2,6 +2,8 @@ package ru.zveron.apigateway.grpc.registry
 
 import com.google.protobuf.DescriptorProtos
 import com.google.protobuf.Descriptors
+import io.grpc.Channel
+import io.grpc.ConnectivityState
 import io.grpc.MethodDescriptor
 import io.grpc.kotlin.ClientCalls
 import io.grpc.protobuf.lite.ProtoLiteUtils
@@ -50,7 +52,15 @@ class ProtoDefinitionRegistry(
             .setFileByFilename(protoFile)
             .build()
 
+
         val channel = channelRegistry.getChannel(serviceName)
+        logger.info { channel.isShutdown }
+        logger.info { channel.isTerminated }
+        logger.info { channel.getState(true) }
+        while (channel.getState(true).equals(ConnectivityState.TRANSIENT_FAILURE)){
+            logger.error{ channel.getState(true) }
+        }
+
         val response = ClientCalls.unaryRpc(channel, reflectionMethodDescr, serverReflectionRequest)
         if (response.hasErrorResponse()) {
             logger.error { response }
