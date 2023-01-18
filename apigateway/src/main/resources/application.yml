@@ -7,11 +7,6 @@ spring:
     username: zveron_user
   main:
     banner-mode: off
-  cloud:
-    loadbalancer:
-      retry:
-        backoff:
-          max-backoff: 100s
 
 eureka:
   client:
@@ -35,16 +30,7 @@ grpc:
       security:
         protocols: PLAINTEXT
       immediate-connect-timeout: 30s
-      full-stream-decompression: true
       shutdown-grace-period: -1
 
   server:
     port: 0
-
-logging:
-  level:
-    kotlinx.coroutines.internal: TRACE
-    org.springframework.web.reactive.function.client: TRACE
-    net.devh.boot.grpc.client: TRACE
-    net.devh.boot.grpc.server: TRACE
-    io.grpc: TRACE

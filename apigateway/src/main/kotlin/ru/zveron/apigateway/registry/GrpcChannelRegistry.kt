@@ -1,9 +1,7 @@
-package ru.zveron.apigateway.grpc.registry
+package ru.zveron.apigateway.registry
 
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import io.grpc.netty.shaded.io.grpc.netty.NegotiationType
-import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import mu.KLogging
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap

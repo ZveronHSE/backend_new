@@ -1,4 +1,4 @@
-package ru.zveron.apigateway.grpc.config
+package ru.zveron.apigateway.config
 
 import io.grpc.NameResolverRegistry
 import net.devh.boot.grpc.client.nameresolver.DiscoveryClientResolverFactory

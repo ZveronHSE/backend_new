@@ -1,11 +1,13 @@
-package ru.zveron.apigateway.grpc.config
+package ru.zveron.apigateway.config
 
+import com.google.protobuf.value
 import io.grpc.Status
 import mu.KLogging
 import net.devh.boot.grpc.server.advice.GrpcAdvice
 import net.devh.boot.grpc.server.advice.GrpcExceptionHandler
 
 @GrpcAdvice
+@Suppress("unused")
 class GrpcExceptionAdvice {
 
     companion object : KLogging()
