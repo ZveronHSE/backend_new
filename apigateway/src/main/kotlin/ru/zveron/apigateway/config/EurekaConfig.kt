@@ -13,5 +13,7 @@ class EurekaConfig(
 
     @PostConstruct
     fun eurekaDiscoveryClientFactory() =
-        NameResolverRegistry.getDefaultRegistry().register(DiscoveryClientResolverFactory(client))
+        NameResolverRegistry
+            .getDefaultRegistry()
+            .register(DiscoveryClientResolverFactory(client))
 }
