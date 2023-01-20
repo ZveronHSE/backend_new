@@ -16,7 +16,6 @@ import ru.zveron.contract.parameter.parameterValueRequest
 import ru.zveron.entity.Category
 import ru.zveron.entity.LotForm
 import ru.zveron.exception.CategoryException
-import ru.zveron.exception.LotException
 import ru.zveron.exception.ParameterException
 import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.repository.ParameterFromTypeRepository
@@ -75,7 +74,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     fun `GetParametersByCategory Should throw exception, if unknown id for lotform`(): Unit = runBlocking {
         val request = mockParameterRequest(CATEGORY_ID_CAT, ID_UNKNOWN)
 
-        shouldThrow<LotException> { parameterService.getParametersByCategory(request) }
+        shouldThrow<CategoryException> { parameterService.getParametersByCategory(request) }
     }
 
     @Test

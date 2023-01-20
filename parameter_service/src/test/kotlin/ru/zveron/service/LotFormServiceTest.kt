@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseApplicationTest
 import ru.zveron.entity.LotForm
-import ru.zveron.exception.LotException
+import ru.zveron.exception.CategoryException
 import ru.zveron.repository.LotFormRepository
 
 internal class LotFormServiceTest : DataBaseApplicationTest() {
@@ -34,6 +34,6 @@ internal class LotFormServiceTest : DataBaseApplicationTest() {
     fun `Dont get lot form by id, if it doesnt exists`() {
         val mockId = 100500
 
-        shouldThrow<LotException> { lotFormService.getLotFormByIdOrThrow(mockId) }
+        shouldThrow<CategoryException> { lotFormService.getLotFormByIdOrThrow(mockId) }
     }
 }
