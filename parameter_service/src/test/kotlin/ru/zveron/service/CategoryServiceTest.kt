@@ -91,16 +91,16 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
     }
 
     @Test
-    fun `GetFamily Get full family of category`(): Unit =
+    fun `GetCategoryTree Get full family of category`(): Unit =
         runBlocking {
-            val response = categoryService.getFamily(mockCategoryRequest(rootCategory.id))
+            val response = categoryService.getCategoryTree(mockCategoryRequest(rootCategory.id))
 
             response shouldBe mapCategoriesToResponse(rootCategory, childCategory)
         }
 
     @Test
-    fun `GetFamily Should throw exception if category id not found`(): Unit =
+    fun `GetCategoryTree Should throw exception if category id not found`(): Unit =
         runBlocking {
-            shouldThrow<CategoryException> { categoryService.getFamily(mockCategoryRequest(UNKNOWN_ID)) }
+            shouldThrow<CategoryException> { categoryService.getCategoryTree(mockCategoryRequest(UNKNOWN_ID)) }
         }
 }

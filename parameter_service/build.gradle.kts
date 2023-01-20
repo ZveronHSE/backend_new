@@ -3,5 +3,5 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
 
     // contract
-    implementation("com.github.zveronHSe:contract:610b82ee44")
+    implementation("com.github.zveronHSe.contract:parameter:1.3.1")
 }

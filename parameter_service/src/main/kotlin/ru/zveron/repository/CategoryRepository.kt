@@ -1,9 +1,12 @@
 package ru.zveron.repository
 
+import io.grpc.Status
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import ru.zveron.entity.Category
+import ru.zveron.exception.CategoryException
 
+@JvmDefaultWithCompatibility
 interface CategoryRepository : JpaRepository<Category, Int> {
     /**
      * Если мы выбираем категорию родительскую, то нужно также выбрать все его дочерние категории,
@@ -28,5 +31,9 @@ interface CategoryRepository : JpaRepository<Category, Int> {
         """,
         nativeQuery = true
     )
-    fun getFamilyById(id: Int): List<Category>
+    fun getTreeById(id: Int): List<Category>
+
+
+    fun getCategoryByIDOrThrow(categoryId: Int): Category = findById(categoryId)
+        .orElseThrow { CategoryException(Status.NOT_FOUND, "Категории с id=$categoryId не существует") }
 }

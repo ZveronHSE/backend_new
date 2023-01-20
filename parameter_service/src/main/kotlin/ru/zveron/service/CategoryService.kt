@@ -3,7 +3,11 @@ package ru.zveron.service
 import io.grpc.Status
 import net.devh.boot.grpc.server.service.GrpcService
 import org.springframework.transaction.annotation.Transactional
-import ru.zveron.contract.category.*
+import ru.zveron.contract.category.CategoryRequest
+import ru.zveron.contract.category.CategoryResponse
+import ru.zveron.contract.category.CategoryServiceGrpcKt
+import ru.zveron.contract.category.category
+import ru.zveron.contract.category.categoryResponse
 import ru.zveron.entity.Category
 import ru.zveron.exception.CategoryException
 import ru.zveron.repository.CategoryRepository
@@ -15,7 +19,7 @@ class CategoryService(
     // TODO подключить к контракту ApiGateway /api/categories/{id}
     @Transactional
     override suspend fun getChild(request: CategoryRequest): CategoryResponse {
-        val categoryParent = getCategoryByIDOrThrow(request.id)
+        val categoryParent = categoryRepository.getCategoryByIDOrThrow(request.id)
 
         val categories = categoryParent.subCategories.map {
             category {
@@ -27,10 +31,10 @@ class CategoryService(
         return categoryResponse { this.categories.addAll(categories) }
     }
 
-    override suspend fun getFamily(request: CategoryRequest): CategoryResponse {
-        val category = getCategoryByIDOrThrow(request.id)
+    override suspend fun getCategoryTree(request: CategoryRequest): CategoryResponse {
+        val category = categoryRepository.getCategoryByIDOrThrow(request.id)
 
-        val categories = categoryRepository.getFamilyById(category.id).map {
+        val categories = categoryRepository.getTreeById(category.id).map {
             category {
                 id = it.id
                 name = it.name
@@ -50,7 +54,7 @@ class CategoryService(
      */
     @Transactional
     fun getChildOfRootAncestor(categoryId: Int): Category {
-        var category = getCategoryByIDOrThrow(categoryId)
+        var category = categoryRepository.getCategoryByIDOrThrow(categoryId)
 
         // Если подали на вход корня всех категорий(животные или товары для животных) кинем исключение)0)
         if (category.parent == null) {
@@ -69,7 +73,4 @@ class CategoryService(
         return category
     }
 
-
-    fun getCategoryByIDOrThrow(categoryId: Int): Category = categoryRepository.findById(categoryId)
-        .orElseThrow { CategoryException(Status.NOT_FOUND, "Категории с id=$categoryId не существует") }
 }

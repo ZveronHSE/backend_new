@@ -20,7 +20,7 @@ class CategoryRepositoryTest : DataBaseApplicationTest() {
         val child1Category = categoryRepository.save(CreateEntitiesUtils.mockCategoryWithParent(rootCategory))
         val childChildCategory = categoryRepository.save(CreateEntitiesUtils.mockCategoryWithParent(childCategory))
 
-        val result = categoryRepository.getFamilyById(rootCategory.id)
+        val result = categoryRepository.getTreeById(rootCategory.id)
 
         result shouldContainExactlyInAnyOrder listOf(rootCategory, childCategory, child1Category, childChildCategory)
     }
@@ -29,7 +29,7 @@ class CategoryRepositoryTest : DataBaseApplicationTest() {
     fun `If category dont have family, return only it`() {
         val rootCategory = categoryRepository.save(CreateEntitiesUtils.mockRootCategory())
 
-        val result = categoryRepository.getFamilyById(rootCategory.id)
+        val result = categoryRepository.getTreeById(rootCategory.id)
 
         result shouldBe listOf(rootCategory)
     }
