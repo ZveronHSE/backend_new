@@ -37,6 +37,15 @@ EXCEPTION
 END
 $$;
 
+DO
+$$
+    BEGIN
+        PERFORM dblink_exec('', 'CREATE DATABASE auth');
+    EXCEPTION
+        WHEN duplicate_database THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
+    END
+$$;
+
 -- сюда добавлять, если нужны новые БД
 
 DROP USER postgres;

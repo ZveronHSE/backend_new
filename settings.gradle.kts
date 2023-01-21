@@ -22,4 +22,5 @@ include(
     "favorites_service",
     "blacklist_service",
     "service_registry",
+    "auth-service",
 )
