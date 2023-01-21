@@ -15,8 +15,7 @@ class ApiGatewayExceptionAdvice {
     @GrpcExceptionHandler(ApiGatewayException::class)
     fun handleApiGatewayException(ex: ApiGatewayException): Status {
         logger.error(ex) { "Failed to handle request" }
-        return Status.fromCode(ex.code
-            ?.let { Status.Code.valueOf(it) } ?: Status.Code.INTERNAL)
+        return Status.fromCode(ex.code ?: Status.Code.INTERNAL)
             .withDescription(ex.message)
     }
 

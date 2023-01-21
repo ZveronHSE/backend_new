@@ -1,12 +1,16 @@
 spring:
   liquibase:
-    enabled: false
+    enabled: true
+    change-log: classpath:db/master.yaml
   datasource:
-    url: jdbc:postgresql://localhost:5555/address
+    url: jdbc:postgresql://localhost:5555/apigateway
     password: zveron_password
     username: zveron_user
   main:
     banner-mode: off
+    web-application-type: reactive
+  application:
+    name: apigateway
 
 eureka:
   client:

@@ -1,4 +1,4 @@
-package ru.zveron.apigateway.registry
+package ru.zveron.apigateway.component
 
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder

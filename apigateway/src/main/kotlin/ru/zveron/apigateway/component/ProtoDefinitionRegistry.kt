@@ -1,4 +1,4 @@
-package ru.zveron.apigateway.registry
+package ru.zveron.apigateway.component
 
 import com.google.protobuf.DescriptorProtos
 import com.google.protobuf.Descriptors.FileDescriptor
@@ -44,26 +44,29 @@ class ProtoDefinitionRegistry(
         )
 
     private suspend fun createProtoFileDescriptor(
-        protoServiceName: String,
+        grpcServiceName: String,
         serviceName: String,
     ): FileDescriptor {
-        val protoFileName = serviceToProtoFile["$protoServiceName-$serviceName"]
+        logger.debug { "Creating new protoFile instance for service=$serviceName and grpc service=$grpcServiceName" }
+        val protoFilePath = serviceToProtoFile["$grpcServiceName-$serviceName"]
             ?: eurekaClient.getInstances(serviceName)
-                .awaitSingle()?.metadata?.get(protoServiceName)
+                .awaitSingle()?.metadata?.get(grpcServiceName)
                 .also {
-                    serviceToProtoFile["$protoServiceName-$serviceName"] = it
+                    serviceToProtoFile["$grpcServiceName-$serviceName"] = it
                 }
             ?: error("No service file provided in metadata")
-        logger.debug { "Proto file path $protoFileName" }
+
+        logger.debug { "Proto file path $protoFilePath" }
 
         val serverReflectionRequest = ServerReflectionRequest.newBuilder()
-            .setFileByFilename(protoFileName)
+            .setFileByFilename(protoFilePath)
             .build()
 
         val channel = channelRegistry.getChannel(serviceName)
 
         val response = ClientCalls.unaryRpc(channel, reflectionMethodDescr, serverReflectionRequest)
-
+        logger.info { response.fileDescriptorResponse.fileDescriptorProtoList[0].toString() }
+        logger.info { response.fileDescriptorResponse.fileDescriptorProtoList[0].toByteArray() }
         if (response.hasErrorResponse()) {
             logger.error { response.errorResponse }
             throw RuntimeException(response.errorResponse.errorMessage)
@@ -78,19 +81,25 @@ class ProtoDefinitionRegistry(
         val nameToProtoFile = fileDescriptorProtos.associateBy { it.name }
 
         fileDescriptorProtos
-            .filter { it.name.equals(protoFileName, true) }
-            .forEach { protoFile ->
-                val dependencies = protoFile.dependencyList.takeUnless { it.isEmpty() }?.let { stringList ->
-                    stringList.asByteStringList().map { nameToProtoFile[it.toStringUtf8()] }
-                }?.map { protoDescr ->
-                    FileDescriptor.buildFrom(protoDescr, arrayOf(), true)
-                }?.toTypedArray() ?: emptyArray()
+            .find { it.name.equals(protoFilePath, true) }
+            ?.let { protoFile ->
+                val dependencies = protoFile.dependencyList.takeUnless { it.isEmpty() }
+                    ?.let { stringList ->
+                        stringList.asByteStringList()
+                            .map { protoFileName ->
+                                nameToProtoFile[protoFileName.toStringUtf8()]
+                            }
+                    }?.map { protoDescr ->
+                        FileDescriptor.buildFrom(protoDescr, arrayOf(), true)
+                    }?.toTypedArray()
+                    ?: emptyArray()
 
                 val fileDescriptor = FileDescriptor.buildFrom(protoFile, dependencies, true)
-                serviceToFileDescriptorMap["$protoServiceName-$serviceName"] = fileDescriptor
+
+                serviceToFileDescriptorMap["$grpcServiceName-$serviceName"] = fileDescriptor
             }
 
-        return serviceToFileDescriptorMap["$protoServiceName-$serviceName"]
-            ?: error("Failed to initialize proto descriptor for $protoServiceName-$serviceName")
+        return serviceToFileDescriptorMap["$grpcServiceName-$serviceName"]
+            ?: error("Failed to initialize proto descriptor for $grpcServiceName-$serviceName")
     }
 }

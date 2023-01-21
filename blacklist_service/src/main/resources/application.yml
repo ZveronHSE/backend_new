@@ -28,4 +28,4 @@ spring:
 eureka:
   instance:
     metadata-map:
-      proto-file-names: 'crud.proto'
+      BlacklistService: 'crud.proto'

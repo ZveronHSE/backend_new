@@ -1,4 +1,6 @@
 package ru.zveron.apigateway.exception
 
-class ApiGatewayException(message: String?, val code: String?) :
-    RuntimeException(message = "Failed with code=$code; message=$message")
+import io.grpc.Status
+
+class ApiGatewayException(override val message: String?, val code: Status.Code?) :
+    RuntimeException("Failed with code=$code; message=$message")

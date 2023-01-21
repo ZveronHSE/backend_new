@@ -94,6 +94,9 @@ subprojects {
         implementation("io.grpc:grpc-stub:$grpcVersion")
         implementation("io.grpc:grpc-core:$grpcVersion")
 
+        //Настоящие корутины
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+
         // Логгирование
         implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
 
@@ -130,6 +133,8 @@ subprojects {
         testImplementation("org.testcontainers:postgresql:1.16.3")
         testImplementation("org.testcontainers:junit-jupiter:1.16.3")
         testImplementation("org.assertj:assertj-core:3.22.0")
+        testImplementation("io.mockk:mockk:1.13.3")
+
     }
 
     group = rootProject.group
