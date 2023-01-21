@@ -34,7 +34,6 @@ grpc:
       security:
         protocols: PLAINTEXT
       immediate-connect-timeout: 30s
-      shutdown-grace-period: -1
 
   server:
     port: 0
