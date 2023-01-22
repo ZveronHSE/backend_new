@@ -1,0 +1,43 @@
+grpc:
+  server:
+    port: 0
+spring:
+  main:
+    banner-mode: off
+    web-application-type: reactive
+  liquibase:
+    change-log: classpath:db/master.yaml
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5555/auth_service
+    password: zveron_password
+    username: zveron_user
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5555/auth-service
+    username: zveron_user
+    password: zveron_password
+    pool:
+      enabled: true
+
+eureka:
+  client:
+    webclient:
+      enabled: true # ?? ????? ?????? ?????? ????????? ??? WebClient
+    register-with-eureka: true # ???? ??? ?????? ????? ?????? ????
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    enabled: true
+server:
+  port: -1
+
+clients:
+  notifier:
+    baseUrl: http://localhost:8080
