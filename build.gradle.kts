@@ -130,6 +130,7 @@ subprojects {
         testImplementation("org.testcontainers:postgresql:1.16.3")
         testImplementation("org.testcontainers:junit-jupiter:1.16.3")
         testImplementation("org.assertj:assertj-core:3.22.0")
+        testImplementation("io.mockk:mockk:1.13.3")
     }
 
     group = rootProject.group

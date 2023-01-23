@@ -39,3 +39,7 @@ jobs:
       - name: Test favorites service
         shell: bash
         run: if grep -q "favorites_service" "temp.txt"; then gradle :favorites_service:test; fi
+
+      - name: Test profile service
+        shell: bash
+        run: if grep -q "profile_service" "temp.txt"; then gradle :profile_service:test; fi
