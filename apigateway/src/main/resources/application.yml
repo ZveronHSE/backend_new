@@ -36,4 +36,4 @@ grpc:
       immediate-connect-timeout: 30s
 
   server:
-    port: 0
+    port: 9091

@@ -21,6 +21,7 @@ val grpcKotlinVersion: String by project
 val springVersion: String by project
 val kotlinVersion: String by project
 val eurekaVersion: String by project
+val kotlinxVersion: String by project
 val arch = System.getProperty("os.arch")
 
 
@@ -95,7 +96,7 @@ subprojects {
         implementation("io.grpc:grpc-core:$grpcVersion")
 
         //Настоящие корутины
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
 
         // Логгирование
         implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
