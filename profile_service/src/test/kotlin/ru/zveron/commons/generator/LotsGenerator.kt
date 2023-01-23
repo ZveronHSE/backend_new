@@ -2,7 +2,7 @@ package ru.zveron.commons.generator
 
 import ru.zveron.commons.generator.PropsGenerator.generateString
 import ru.zveron.commons.generator.PropsGenerator.generateUserId
-import ru.zveron.contract.lot.lot
+import ru.zveron.contract.lot.model.lot
 
 object LotsGenerator {
 
@@ -12,6 +12,6 @@ object LotsGenerator {
         price = generateString(5)
         publicationDate = generateString(5)
         photoId = generateUserId()
-        isFavorite = favorite
+        this.favorite = favorite
     }
 }
