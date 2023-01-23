@@ -140,13 +140,16 @@ subprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
+            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
             jvmTarget = "17"
         }
     }
 
     tasks.withType<Test> {
         useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
 
     val dataSource = (extra["getDataSource"] as () -> DataSource)()
