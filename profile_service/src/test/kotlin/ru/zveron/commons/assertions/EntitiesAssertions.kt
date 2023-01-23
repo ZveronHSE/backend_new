@@ -17,7 +17,7 @@ import ru.zveron.SetProfileInfoRequest
 import ru.zveron.contract.AddressRequest
 import ru.zveron.mapper.ContactsMapper
 import ru.zveron.contract.AddressResponse
-import ru.zveron.contract.lot.Lot
+import ru.zveron.contract.lot.model.Lot
 import ru.zveron.domain.ChannelsDTO
 import ru.zveron.entity.Contact
 import ru.zveron.entity.Profile
@@ -136,7 +136,7 @@ infix fun LotSummary.lotShouldBe(expected: Lot) {
     priceFormatted shouldBe expected.price
     publicationDateFormatted shouldBe expected.publicationDate
     firstImage shouldBe expected.photoId
-    isFavorite shouldBe expected.isFavorite
+    isFavorite shouldBe expected.favorite
 }
 
 infix fun Timestamp.timestampShouldBe(expected: Instant) {
