@@ -5,6 +5,8 @@ import net.devh.boot.grpc.server.service.GrpcService
 import org.springframework.dao.DataIntegrityViolationException
 import ru.zveron.ChannelType
 import ru.zveron.CreateProfileRequest
+import ru.zveron.GetProfileByChannelRequest
+import ru.zveron.GetProfileByChannelResponse
 import ru.zveron.GetProfileRequest
 import ru.zveron.GetProfileResponse
 import ru.zveron.GetProfileWithContactsRequest
@@ -19,10 +21,12 @@ import ru.zveron.entity.Contact
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
 import ru.zveron.exception.ProfileException
+import ru.zveron.getProfileByChannelResponse
 import ru.zveron.getProfileResponse
 import ru.zveron.getProfileWithContactsResponse
 import ru.zveron.service.ContactService
 import ru.zveron.service.ProfileService
+import ru.zveron.validation.ContactsValidator.validateLinks
 import java.time.Instant
 
 @GrpcService
@@ -35,6 +39,7 @@ class ProfileServiceInternal(
         Empty.getDefaultInstance().also {
             val waysOfCommunication = linksModel2DTO(request.links)
             validateNumberOfChannels(waysOfCommunication)
+            validateLinks(request.links)
             val profile = Profile(
                 id = request.authAccountId,
                 name = request.name,
@@ -44,7 +49,9 @@ class ProfileServiceInternal(
             )
             profile.contact = Contact(
                 profile = profile,
+                vkId = request.links.vk.id,
                 vkRef = request.links.vk.ref,
+                gmailId = request.links.gmail.id,
                 gmail = request.links.gmail.email,
                 additionalEmail = request.links.vk.email,
                 phone = request.links.phone.number,
@@ -92,15 +99,28 @@ class ProfileServiceInternal(
                 when (request.type) {
                     ChannelType.PHONE -> phone = request.links.phone.number
                     ChannelType.VK -> {
+                        vkId = request.links.vk.id
                         vkRef = request.links.vk.ref
                         additionalEmail = request.links.vk.email
                     }
 
-                    ChannelType.GOOGLE -> gmail = request.links.gmail.email
+                    ChannelType.GOOGLE -> {
+                        gmailId = request.links.gmail.id
+                        gmail = request.links.gmail.email
+                    }
+
                     ChannelType.CHAT -> throw ProfileException("Chat channel type don't need to be added to contacts")
                     else -> throw ProfileException("Unrecognized channel type: ${request.type}")
                 }
             }
             contactService.save(contact)
+        }
+
+    override suspend fun getProfileByChannel(request: GetProfileByChannelRequest): GetProfileByChannelResponse =
+        getProfileByChannelResponse {
+            val profile = contactService.findByChannelOrThrow(request.type, request.identifier).profile
+            id = profile.id
+            name = profile.name
+            surname = profile.surname
         }
 }

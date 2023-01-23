@@ -23,10 +23,14 @@ object ContactsMapper {
         links {
             phone = phone { number = entity.phone }
             vk = vKLinks {
+                id = entity.vkId
                 ref = entity.vkRef
                 email = entity.additionalEmail
             }
-            gmail = gmail { email = entity.gmail }
+            gmail = gmail {
+                id = entity.gmailId
+                email = entity.gmail
+            }
         }
 
     fun channelsModel2DTO(types: Set<ChannelType>): ChannelsDTO =

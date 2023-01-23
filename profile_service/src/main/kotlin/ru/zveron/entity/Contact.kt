@@ -11,8 +11,10 @@ import javax.persistence.OneToOne
 data class Contact(
     @Id
     @Column(nullable = false)
-    var id: Long = 0,
+    val id: Long = 0,
+    var vkId: String,
     var vkRef: String,
+    var gmailId: String,
     var gmail: String,
     var additionalEmail: String,
     var phone: String,

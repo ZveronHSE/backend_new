@@ -22,10 +22,12 @@ class ContactsMapperTest {
         val expected = links {
             phone = phone { number = PropsGenerator.generateString(10) }
             vk = vKLinks {
+                id = PropsGenerator.generateString(10)
                 ref = PropsGenerator.generateString(10)
                 email = PropsGenerator.generateString(10)
             }
             gmail = gmail {
+                id = PropsGenerator.generateString(10)
                 email = PropsGenerator.generateString(10)
             }
         }

@@ -30,7 +30,7 @@ import ru.zveron.mapper.AddressMapper.toProfileAddress
 import ru.zveron.mapper.ContactsMapper
 import ru.zveron.mapper.ContactsMapper.channelsDTO2Model
 import ru.zveron.mapper.LotsMapper
-import ru.zveron.validation.ContactsValidator.validateLinks
+import ru.zveron.validation.ContactsValidator.validateLinksNotBlank
 import ru.zveron.validation.ContactsValidator.validateNumberOfChannels
 import ru.zveron.contacts
 import ru.zveron.entity.Profile
@@ -160,7 +160,7 @@ class ProfileServiceExternal(
         }
         settings.channels = ContactsMapper.channelsModel2DTO(request.channelsList.toSet())
         validateNumberOfChannels(settings.channels)
-        validateLinks(settings.channels, links)
+        validateLinksNotBlank(settings.channels, links)
         settings.searchAddressId = addressService.saveIfNotExists(AddressMapper.address2Request(request.address)).id
         settingsService.save(settings)
 

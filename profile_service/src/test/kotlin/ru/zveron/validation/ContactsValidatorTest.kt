@@ -55,7 +55,7 @@ class ContactsValidatorTest {
         val links = ContactsGenerator.generateContact(profile, addVk = true, addGmail = true, addPhone = true)
 
         shouldNotThrow<ProfileException> {
-            ContactsValidator.validateLinks(channels, links)
+            ContactsValidator.validateLinksNotBlank(channels, links)
         }
     }
 
@@ -66,7 +66,7 @@ class ContactsValidatorTest {
         val links = ContactsGenerator.generateContact(profile)
 
         val exception = shouldThrow<ProfileException> {
-            ContactsValidator.validateLinks(channels, links)
+            ContactsValidator.validateLinksNotBlank(channels, links)
         }
         exception.message shouldBe "Can't use vk as communication channel because link is missed"
     }
@@ -78,7 +78,7 @@ class ContactsValidatorTest {
         val links = ContactsGenerator.generateContact(profile)
 
         val exception = shouldThrow<ProfileException> {
-            ContactsValidator.validateLinks(channels, links)
+            ContactsValidator.validateLinksNotBlank(channels, links)
         }
         exception.message shouldBe "Can't use gmail as communication channel because link is missed"
     }
@@ -90,8 +90,48 @@ class ContactsValidatorTest {
         val links = ContactsGenerator.generateContact(profile)
 
         val exception = shouldThrow<ProfileException> {
-            ContactsValidator.validateLinks(channels, links)
+            ContactsValidator.validateLinksNotBlank(channels, links)
         }
         exception.message shouldBe "Can't use phone as communication channel because link is missed"
+    }
+
+    @Test
+    fun `Validate links and vk id is missed`() {
+        val links = ContactsGenerator.generateLinks(vkRef = PropsGenerator.generateString(10))
+
+        val exception = shouldThrow<ProfileException> {
+            ContactsValidator.validateLinks(links)
+        }
+        exception.message shouldBe "Vk id and ref should be both present or missed"
+    }
+
+    @Test
+    fun `Validate links and vk ref is missed`() {
+        val links = ContactsGenerator.generateLinks(vkId = PropsGenerator.generateString(10))
+
+        val exception = shouldThrow<ProfileException> {
+            ContactsValidator.validateLinks(links)
+        }
+        exception.message shouldBe "Vk id and ref should be both present or missed"
+    }
+
+    @Test
+    fun `Validate links and gmail id is missed`() {
+        val links = ContactsGenerator.generateLinks(gmail = PropsGenerator.generateString(10))
+
+        val exception = shouldThrow<ProfileException> {
+            ContactsValidator.validateLinks(links)
+        }
+        exception.message shouldBe "Gmail id and email should be both present or missed"
+    }
+
+    @Test
+    fun `Validate links and gmail email is missed`() {
+        val links = ContactsGenerator.generateLinks(gmailId = PropsGenerator.generateString(10))
+
+        val exception = shouldThrow<ProfileException> {
+            ContactsValidator.validateLinks(links)
+        }
+        exception.message shouldBe "Gmail id and email should be both present or missed"
     }
 }

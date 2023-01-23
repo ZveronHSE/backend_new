@@ -5,11 +5,18 @@ import mu.KLogging
 import net.devh.boot.grpc.server.advice.GrpcAdvice
 import net.devh.boot.grpc.server.advice.GrpcExceptionHandler
 import ru.zveron.exception.ProfileException
+import ru.zveron.exception.ProfileNotFoundException
 
 @GrpcAdvice
 class GrpcExceptionAdvice {
 
     companion object : KLogging()
+
+    @GrpcExceptionHandler(ProfileNotFoundException::class)
+    fun handleProfileException(e: ProfileNotFoundException) : Status {
+        logger.info {e.message}
+        return Status.NOT_FOUND.withDescription(e.message).withCause(e)
+    }
 
     @GrpcExceptionHandler(ProfileException::class)
     fun handleProfileException(e: ProfileException) : Status {
