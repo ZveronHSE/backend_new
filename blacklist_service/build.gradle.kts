@@ -1,4 +1,4 @@
 
 dependencies {
-     implementation("com.github.zveronHSe.contract:blacklist:master-SNAPSHOT")
+     implementation("com.github.zveronHSe.contract:blacklist:1.2.0")
 }

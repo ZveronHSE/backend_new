@@ -1,0 +1,118 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1647803247399-49
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: id
+                  name: id
+                  type: NUMERIC
+              - column:
+                  header: name
+                  name: name
+                  type: STRING
+              - column:
+                  header: id_parent
+                  name: id_parent
+                  type: NUMERIC
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: category.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: category
+  - changeSet:
+      id: 1647803247399-50
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: id
+                  name: id
+                  type: NUMERIC
+              - column:
+                  header: form
+                  name: form
+                  type: STRING
+              - column:
+                  header: type
+                  name: type
+                  type: STRING
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: lot_form.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: lot_form
+  - changeSet:
+      id: 1647803247399-51
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: id
+                  name: id
+                  type: NUMERIC
+              - column:
+                  header: is_required
+                  name: is_required
+                  type: BOOLEAN
+              - column:
+                  header: list_value
+                  name: list_value
+                  type: STRING
+              - column:
+                  header: name
+                  name: name
+                  type: STRING
+              - column:
+                  header: type
+                  name: type
+                  type: STRING
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: parameter.csv
+            relativeToChangelogFile: true
+            #            quotchar: '"'
+            separator: ';'
+            tableName: parameter
+  - changeSet:
+      id: 1647803247399-52
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: id_category
+                  name: id_category
+                  type: NUMERIC
+              - column:
+                  header: id_lot_form
+                  name: id_lot_form
+                  type: NUMERIC
+              - column:
+                  header: id_parameter
+                  name: id_parameter
+                  type: NUMERIC
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: parameter_from_type.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: parameter_from_type
+  - changeSet:
+      id: 1647803247399-53
+      author: WolfAlm
+      changes:
+        - modifyDataType:
+            columnName: list_value
+            newDataType: jsonb
+            schemaName: public
+            tableName: parameter
