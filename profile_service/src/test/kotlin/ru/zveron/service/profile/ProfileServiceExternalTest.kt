@@ -23,7 +23,6 @@ import ru.zveron.commons.assertions.lotShouldBe
 import ru.zveron.commons.assertions.profileShouldBe
 import ru.zveron.commons.assertions.responseShouldBe
 import ru.zveron.commons.assertions.responseShouldBeBlockedAnd
-import ru.zveron.commons.generator.AddressGenerator
 import ru.zveron.commons.generator.AddressGenerator.generateAddress
 import ru.zveron.commons.generator.ContactsGenerator
 import ru.zveron.commons.generator.LotsGenerator
@@ -34,6 +33,7 @@ import ru.zveron.contract.addressResponse
 import ru.zveron.contract.lot.profileLotsResponse
 import ru.zveron.deleteProfileRequest
 import ru.zveron.exception.ProfileException
+import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.getChannelTypesRequest
 import ru.zveron.getLinksRequest
 import ru.zveron.getProfileInfoRequest
@@ -94,7 +94,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
     @ParameterizedTest
     @ValueSource(longs = [0, 10])
-    fun `Get profile page`(authorizedId: Long) {
+    fun `getProfilePage when id request is correct`(authorizedId: Long) {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
@@ -138,7 +138,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get profile page if authorized and in blacklist`() {
+    fun `getProfilePage when authorized and in blacklist`() {
         val now = Instant.now()
         val (id, authorizedProfile, addressId) = PropsGenerator.generateNIds(3)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
@@ -164,11 +164,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get profile page if wrong id`() {
+    fun `getProfilePage when id is wrong`() {
         val id = PropsGenerator.generateUserId()
         val request = getProfilePageRequest { requestedProfileId = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.getProfilePage(request)
             }
@@ -177,7 +177,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get profile for owner`() {
+    fun `getProfileInfo when request is correct`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
@@ -200,11 +200,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get profile for owner and id is incorrect`() {
+    fun `getProfileInfo when id is incorrect`() {
         val id = PropsGenerator.generateUserId()
         val request = getProfileInfoRequest { this.id = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.getProfileInfo(request)
             }
@@ -213,7 +213,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Set profile info`() {
+    fun `setProfileInfo when request is correct`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
@@ -243,11 +243,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Set profile info and id is incorrect`() {
+    fun `setProfileInfo when id is incorrect`() {
         val id = PropsGenerator.generateUserId()
         val request = setProfileInfoRequest { this.id = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.setProfileInfo(request)
             }
@@ -256,7 +256,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get channel types`() {
+    fun `getChannelTypes when request is correct`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
@@ -273,11 +273,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get channel types and id is incorrect`() {
+    fun `getChannelTypes when id is incorrect`() {
         val id = PropsGenerator.generateUserId()
         val request = getChannelTypesRequest { this.id = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.getChannelTypes(request)
             }
@@ -286,7 +286,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get links`() {
+    fun `getLinks when request is correct`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
@@ -303,11 +303,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get links and id is incorrect`() {
+    fun `getLinks when id is incorrect`() {
         val id = PropsGenerator.generateUserId()
         val request = getLinksRequest { this.id = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.getLinks(request)
             }
@@ -316,7 +316,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get settings`() {
+    fun `getSettings when request is correct`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -337,11 +337,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get settings and id is incorrect`() {
+    fun `getSettings when id is incorrect`() {
         val id = PropsGenerator.generateUserId()
         val request = getLinksRequest { this.id = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.getLinks(request)
             }
@@ -350,7 +350,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Set settings`() {
+    fun `setSettings when request is correct`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -376,7 +376,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Set settings if channels is missed`() {
+    fun `setSettings when channels is missed`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -398,7 +398,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Set settings if wrong number of channels`() {
+    fun `setSettings when wrong number of channels`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -419,11 +419,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Set settings and id is incorrect`() {
+    fun `setSettings when id is incorrect`() {
         val id = PropsGenerator.generateUserId()
         val request = setSettingsRequest { this.id = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.setSettings(request)
             }
@@ -432,7 +432,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Delete profile`() {
+    fun `deleteProfile when request is correct`() {
         val now = Instant.now()
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)

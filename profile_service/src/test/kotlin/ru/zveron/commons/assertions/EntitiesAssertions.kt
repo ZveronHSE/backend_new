@@ -7,6 +7,7 @@ import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import ru.zveron.Address
 import ru.zveron.ChannelType
+import ru.zveron.GetProfileByChannelResponse
 import ru.zveron.GetProfileInfoResponse
 import ru.zveron.GetProfilePageResponse
 import ru.zveron.GetProfileResponse
@@ -55,8 +56,10 @@ infix fun GetProfileWithContactsResponse.responseShouldBe(expected: Profile) {
 }
 
 infix fun Links.linksShouldBe(expected: Contact) {
+    vk.id shouldBe expected.vkId
     vk.ref shouldBe expected.vkRef
     vk.email shouldBe expected.additionalEmail
+    gmail.id shouldBe expected.gmailId
     gmail.email shouldBe expected.gmail
     phone.number shouldBe expected.phone
 }
@@ -97,7 +100,9 @@ infix fun ChannelsDTO.channelsShouldBe(expected: List<ChannelType>) {
 
 infix fun Contact.contactShouldBe(expected: Contact) {
     id shouldBe expected.id
+    vkId shouldBe expected.vkId
     vkRef shouldBe expected.vkRef
+    gmailId shouldBe expected.gmailId
     gmail shouldBe expected.gmail
     additionalEmail shouldBe expected.additionalEmail
     phone shouldBe expected.phone
@@ -128,6 +133,12 @@ infix fun GetProfilePageResponse.responseShouldBeBlockedAnd(expected: Profile) {
     contacts.channelsList.size shouldBe 0
     contacts.links shouldBe Links.getDefaultInstance()
     lastActivity timestampShouldBe expected.lastSeen
+}
+
+infix fun GetProfileByChannelResponse.responseShouldBe(expected: Profile) {
+    id shouldBe expected.id
+    name shouldBe expected.name
+    surname shouldBe expected.surname
 }
 
 infix fun LotSummary.lotShouldBe(expected: Lot) {

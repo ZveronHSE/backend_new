@@ -12,22 +12,21 @@ import ru.zveron.commons.assertions.profileShouldBe
 import ru.zveron.commons.assertions.responseShouldBe
 import ru.zveron.commons.assertions.settingsShouldBe
 import ru.zveron.commons.generator.ContactsGenerator
+import ru.zveron.commons.generator.ContactsGenerator.generateLinks
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.createProfileRequest
 import ru.zveron.entity.Profile
 import ru.zveron.exception.ProfileException
+import ru.zveron.exception.ProfileNotFoundException
+import ru.zveron.getProfileByChannelRequest
 import ru.zveron.getProfileRequest
 import ru.zveron.getProfileWithContactsRequest
-import ru.zveron.gmail
-import ru.zveron.links
-import ru.zveron.phone
 import ru.zveron.repository.ContactRepository
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.service.api.profile.ProfileServiceInternal
 import ru.zveron.updateContactsRequest
-import ru.zveron.vKLinks
 import java.time.Instant
 
 class ProfileServiceInternalTest : ProfileTest() {
@@ -42,7 +41,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     lateinit var contactRepository: ContactRepository
 
     @Test
-    fun `Create new profile`() {
+    fun `createProfile whe nrequest is correct`() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -61,7 +60,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Create new profile and number of channels is incorrect`() {
+    fun `createProfile when number of channels is incorrect`() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -77,7 +76,25 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Create profile with repeated id`() {
+    fun `createProfile when links are incorrect`() {
+        val now = Instant.now()
+        val id = PropsGenerator.generateUserId()
+        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        SettingsGenerator.generateSettings(expectedProfile, addVk = true, addChat = true)
+        val expectedContact = ContactsGenerator.generateContact(expectedProfile, addVk = true)
+        expectedContact.vkId = ""
+        val request = generateCreateProfileRequest(expectedProfile)
+
+        val exception = shouldThrow<ProfileException> {
+            runBlocking {
+                service.createProfile(request)
+            }
+        }
+        exception.message shouldBe "Vk id and ref should be both present or missed"
+    }
+
+    @Test
+    fun `createProfile when id is duplicated`() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -95,7 +112,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get profile if it exists`() {
+    fun `getProfile when request is correct`() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -112,11 +129,11 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get profile if it does not exist`() {
+    fun `getProfile when it does not exist`() {
         val id = PropsGenerator.generateUserId()
         val request = getProfileRequest { this.id = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.getProfile(request)
             }
@@ -125,7 +142,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get profile with contacts if it exists`() {
+    fun `getProfileWithContacts if it exists`() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -142,11 +159,11 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Get profile with contacts if it does not exist`() {
+    fun `getProfileWithContacts when it does not exist`() {
         val id = PropsGenerator.generateUserId()
         val request = getProfileWithContactsRequest { this.id = id }
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.getProfileWithContacts(request)
             }
@@ -155,7 +172,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Update profile contacts`() {
+    fun `updateContacts when request is correct`() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -163,7 +180,12 @@ class ProfileServiceInternalTest : ProfileTest() {
         ContactsGenerator.generateContact(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request =
-            generateUpdateContactsRequest(id, ChannelType.GOOGLE, gmail = PropsGenerator.generateString(15))
+            generateUpdateContactsRequest(
+                id,
+                ChannelType.GOOGLE,
+                gmailId = PropsGenerator.generateString(15),
+                gmail = PropsGenerator.generateString(15)
+            )
 
         runBlocking {
             service.updateContacts(request)
@@ -173,11 +195,16 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Update profile if it does not exist`() {
+    fun `updateContacts when profile does not exist`() {
         val id = PropsGenerator.generateUserId()
-        val request = generateUpdateContactsRequest(id, ChannelType.GOOGLE, gmail = PropsGenerator.generateString(15))
+        val request = generateUpdateContactsRequest(
+            id,
+            ChannelType.GOOGLE,
+            gmailId = PropsGenerator.generateString(15),
+            gmail = PropsGenerator.generateString(15)
+        )
 
-        val exception = shouldThrow<ProfileException> {
+        val exception = shouldThrow<ProfileNotFoundException> {
             runBlocking {
                 service.updateContacts(request)
             }
@@ -186,7 +213,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `Update profile if chat channel type is selected`() {
+    fun `updateContacts when chat channel type is selected`() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
@@ -204,42 +231,64 @@ class ProfileServiceInternalTest : ProfileTest() {
         exception.message shouldBe "Chat channel type don't need to be added to contacts"
     }
 
+    @Test
+    fun `profileExistsByLink if correct id`() {
+        val now = Instant.now()
+        val id = PropsGenerator.generateUserId()
+        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val contact = ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        profileRepository.save(expectedProfile)
+        val request = getProfileByChannelRequest {
+            type = ChannelType.PHONE
+            identifier = contact.phone
+        }
+
+        runBlocking {
+            val response = service.getProfileByChannel(request)
+
+            response responseShouldBe expectedProfile
+        }
+    }
+
+    @Test
+    fun `profileExistsByLink if wrong id`() {
+        val id = PropsGenerator.generateString(10)
+        val channelType = ChannelType.VK
+        val request = getProfileByChannelRequest {
+            type = channelType
+            identifier = id
+        }
+
+        val exception = shouldThrow<ProfileNotFoundException> {
+            runBlocking {
+                service.getProfileByChannel(request)
+            }
+        }
+        exception.message shouldBe "Can't find profile by channel: $channelType and channel id: $id"
+    }
+
     private fun generateCreateProfileRequest(profile: Profile) = createProfileRequest {
         authAccountId = profile.id
         name = profile.name
         surname = profile.surname
         imageId = profile.imageId
-        links = profile.contact.let { generateLinks(it.phone, it.vkRef, it.additionalEmail, it.gmail) }
+        links =
+            profile.contact.let { generateLinks(it.phone, it.vkId, it.vkRef, it.additionalEmail, it.gmailId, it.gmail) }
     }
 
     private fun generateUpdateContactsRequest(
         id: Long,
         type: ChannelType,
         phone: String = "",
+        vkId: String = "",
         vkRef: String = "",
         additionalEmail: String = "",
+        gmailId: String = "",
         gmail: String = ""
     ) = updateContactsRequest {
         profileId = id
         this.type = type
-        links = generateLinks(phone, vkRef, additionalEmail, gmail)
-    }
-
-    private fun generateLinks(
-        phone: String,
-        vkRef: String,
-        additionalEmail: String,
-        gmail: String
-    ) = links {
-        this.phone = phone {
-            number = phone
-        }
-        vk = vKLinks {
-            ref = vkRef
-            email = additionalEmail
-        }
-        this.gmail = gmail {
-            email = gmail
-        }
+        links = generateLinks(phone, vkId, vkRef, additionalEmail, gmailId, gmail)
     }
 }
