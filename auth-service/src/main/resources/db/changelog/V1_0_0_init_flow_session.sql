@@ -1,12 +1,13 @@
---changelog Schuyweiz:init_flow_state
+--changeset Schuyweiz:init_flow_state
 
-create table if not exists public.flow_state
+create table if not exists public.flow_context
 (
-    id         bigint primary key,
-    session_id varchar(40) not null unique,
-    data      jsonb     not null,
-    created_at timestamp   not null default current_timestamp,
-    updated_at timestamp   not null default current_timestamp,
+    "id"         bigserial primary key,
+    "session_id" uuid      not null unique,
+    "data"       jsonb     not null,
 
-    revision   bigint      not null default 0
+    created_at   timestamp not null default current_timestamp,
+    updated_at   timestamp not null default current_timestamp,
+
+    version     bigint       not null default 0
 );

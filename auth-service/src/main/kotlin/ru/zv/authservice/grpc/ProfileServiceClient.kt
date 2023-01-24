@@ -4,9 +4,11 @@ import io.grpc.Metadata
 import io.grpc.Status
 import io.grpc.StatusException
 import org.apache.commons.lang3.RandomUtils
+import org.springframework.stereotype.Service
 import ru.zveron.ProfileServiceInternalGrpcKt
 import ru.zveron.getProfileRequest
 
+@Service
 class ProfileServiceClient(
     private val profileServiceStub: ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub,
 ) {

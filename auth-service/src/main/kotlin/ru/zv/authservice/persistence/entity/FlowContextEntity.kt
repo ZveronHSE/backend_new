@@ -2,12 +2,12 @@ package ru.zv.authservice.persistence.entity
 
 import io.r2dbc.postgresql.codec.Json
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Version
+import org.springframework.data.relational.core.mapping.Table
 import java.time.Instant
 import java.util.UUID
-import javax.persistence.Id
-import javax.persistence.Table
-import javax.persistence.Version
 
 @Table(name = "flow_context")
 data class FlowContextEntity(
@@ -22,5 +22,5 @@ data class FlowContextEntity(
     val updatedAt: Instant = Instant.now(),
 
     @Version
-    val version: Int = 0,
+    val version: Long = 0,
 )

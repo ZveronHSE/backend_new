@@ -11,10 +11,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     visible = true
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(value = MobilePhoneLoginFlowContext::class, name = MOBILE_PHONE_LOGIN_ALIAS),
-    JsonSubTypes.Type(value = MobilePhoneRegisterFlowContext::class, name = MOBILE_PHONE_REGISTER_ALIAS),
+    JsonSubTypes.Type(value = MobilePhoneLoginStateContext::class, name = MOBILE_PHONE_LOGIN_ALIAS),
+    JsonSubTypes.Type(value = MobilePhoneRegisterStateContext::class, name = MOBILE_PHONE_REGISTER_ALIAS),
 )
-interface FlowContext {
+interface StateContext {
     val type: ContextType
 }
 

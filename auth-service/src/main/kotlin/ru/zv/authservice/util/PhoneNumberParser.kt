@@ -2,7 +2,7 @@ package ru.zv.authservice.util
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import io.grpc.Status
-import ru.zv.authservice.service.AuthException
+import ru.zv.authservice.exceptions.AuthException
 import ru.zv.authservice.service.dto.PhoneNumber
 
 object PhoneNumberParser {

@@ -1,5 +1,6 @@
 package ru.zv.authservice.webclient
 
+import io.grpc.Status
 import kotlinx.coroutines.reactor.awaitSingle
 import mu.KLogging
 import org.springframework.web.reactive.function.client.WebClient
@@ -18,7 +19,7 @@ class NotifierClient(
         .bodyValue(req)
         .exchangeToMono { cr ->
             if (cr.statusCode().isError) {
-                cr.createException().map { NotifierFailure(it.statusCode.value(), it.message) }
+                cr.createException().map { NotifierFailure(Status.Code.UNAVAILABLE, it.message) }
             } else {
                 cr.bodyToMono(NotifierSuccess::class.java)
             }
@@ -27,6 +28,6 @@ class NotifierClient(
 
 sealed class NotifierResponse
 
-data class NotifierFailure(val code: Int, val message: String?) : NotifierResponse()
+data class NotifierFailure(val code: Status.Code, val message: String?) : NotifierResponse()
 
 data class NotifierSuccess(val verificationCode: String)

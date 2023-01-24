@@ -41,3 +41,7 @@ server:
 clients:
   notifier:
     baseUrl: http://localhost:8080
+
+
+logging:
+  org.springframework.http.codec.json: DEBUG

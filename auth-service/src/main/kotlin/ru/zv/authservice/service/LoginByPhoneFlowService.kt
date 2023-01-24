@@ -3,12 +3,17 @@ package ru.zv.authservice.service
 import io.grpc.Status
 import mu.KLogging
 import org.springframework.stereotype.Service
+import ru.zv.authservice.exceptions.AuthException
+import ru.zv.authservice.exceptions.FingerprintException
+import ru.zv.authservice.exceptions.NotifierClientException
+import ru.zv.authservice.exceptions.WrongCodeException
 import ru.zv.authservice.grpc.ProfileFound
 import ru.zv.authservice.grpc.ProfileNotFound
 import ru.zv.authservice.grpc.ProfileServiceClient
 import ru.zv.authservice.grpc.ProfileUnknownFailure
 import ru.zv.authservice.persistence.FlowStateStorage
-import ru.zv.authservice.persistence.model.MobilePhoneLoginFlowContext
+import ru.zv.authservice.persistence.model.MobilePhoneLoginStateContext
+import ru.zv.authservice.persistence.model.MobilePhoneRegisterStateContext
 import ru.zv.authservice.service.dto.LoginByPhoneInitRequest
 import ru.zv.authservice.service.dto.LoginByPhoneVerifyRequest
 import ru.zv.authservice.service.dto.LoginByPhoneVerifyResponse
@@ -30,7 +35,7 @@ class LoginByPhoneFlowService(
     companion object : KLogging()
 
     suspend fun init(request: LoginByPhoneInitRequest): UUID {
-        val phoneVerificationCtx = MobilePhoneLoginFlowContext(
+        val phoneVerificationCtx = MobilePhoneLoginStateContext(
             phoneNumber = request.phoneNumber.toContext(),
             deviceFp = request.deviceFp,
         )
@@ -40,7 +45,7 @@ class LoginByPhoneFlowService(
         when (val clientResponse = notifierClient.initializeVerification(request.toClientRequest())) {
             is NotifierFailure -> {
                 logger.debug { "An error produced in the client, response is $clientResponse" }
-                throw AuthException(clientResponse.message, Status.Code.INTERNAL)
+                throw NotifierClientException(clientResponse.message, Status.Code.INTERNAL)
             }
 
             is NotifierSuccess -> flowStateStorage.updateContext(
@@ -53,14 +58,14 @@ class LoginByPhoneFlowService(
     }
 
     suspend fun verify(request: LoginByPhoneVerifyRequest): LoginByPhoneVerifyResponse {
-        val loginCtx = flowStateStorage.getContext(request.sessionId, MobilePhoneLoginFlowContext::class)
+        val loginCtx = flowStateStorage.getContext(request.sessionId, MobilePhoneLoginStateContext::class)
         val updatedCtx = loginCtx.copy(codeAttempts = loginCtx.codeAttempts.inc(), lastAttemptAt = Instant.now())
 
         if (loginCtx.deviceFp != request.deviceFp) {
-            throw AuthException("Device fp does not match", Status.Code.UNAUTHENTICATED)
+            throw FingerprintException("Device fp does not match", Status.Code.UNAUTHENTICATED)
         }
         if (loginCtx.code != request.code) {
-            throw AuthException("Wrong code", Status.Code.INVALID_ARGUMENT)
+            throw WrongCodeException("Wrong code", Status.Code.INVALID_ARGUMENT)
         }
 
         val validatedCtx =
@@ -79,11 +84,18 @@ class LoginByPhoneFlowService(
 
         return profileData?.let {
             LoginByPhoneVerifyResponse.login(
-                UUID.randomUUID(),
-                accessToken = UUID.randomUUID().toString(),
-                refreshToken = UUID.randomUUID().toString()
+                request.sessionId,
+                accessToken = "mock-access-token-${request.sessionId}",
+                refreshToken = "mock-refresh-token-${request.sessionId}",
             )
-        } ?: LoginByPhoneVerifyResponse.register(request.sessionId)
+        } ?: LoginByPhoneVerifyResponse.register(request.sessionId).also {
+            val registrationContext = MobilePhoneRegisterStateContext(
+                phoneNumber = validatedCtx.phoneNumber,
+                deviceFp = validatedCtx.deviceFp,
+                isChannelVerified = validatedCtx.isVerified,
+            )
+            flowStateStorage.updateContext(request.sessionId, registrationContext)
+        }
     }
 }
 

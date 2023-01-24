@@ -7,4 +7,5 @@ data class PhoneNumber(
     fun toClientPhone() = "$countryCode$phone"
 }
 
-fun PhoneNumber.toContext() = ru.zv.authservice.persistence.model.PhoneNumber(countryCode = countryCode, phone = phone)
+fun PhoneNumber.toContext() =
+    ru.zv.authservice.persistence.model.PhoneNumber(countryCode = countryCode.toString(), phone = phone.toString())

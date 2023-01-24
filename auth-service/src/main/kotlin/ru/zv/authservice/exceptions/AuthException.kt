@@ -1,4 +1,4 @@
-package ru.zv.authservice.service
+package ru.zv.authservice.exceptions
 
 import io.grpc.Status
 
