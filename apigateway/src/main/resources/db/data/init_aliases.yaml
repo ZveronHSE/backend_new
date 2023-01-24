@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: init_aliases
+      author: Schuyweiz
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: alias
+                  name: alias
+                  type: STRING
+              - column:
+                  header: service_name
+                  name: service_name
+                  type: STRING
+              - column:
+                  header: grpc_service_name
+                  name: grpc_service_name
+                  type: STRING
+              - column:
+                  header: grpc_method_name
+                  name: grpc_method_name
+                  type: STRING
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: aliases.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: method_metadata
