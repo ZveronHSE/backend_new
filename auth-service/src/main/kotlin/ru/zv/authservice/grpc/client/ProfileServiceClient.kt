@@ -17,7 +17,7 @@ class ProfileServiceClient(
     suspend fun getAccountByPhone(phoneNumber: ru.zv.authservice.persistence.model.PhoneNumber): ProfileClientResponse {
         //todo implement once the endpoint is ready
         return try {
-            if (phoneNumber.phone == "79257646188") {
+            if (phoneNumber.phone == "9257646188") {
                 throw StatusException(Status.NOT_FOUND)
             }
             return ProfileFound(111, "Kek", "Pikek")
