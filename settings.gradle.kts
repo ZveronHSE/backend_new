@@ -22,5 +22,6 @@ include(
     "favorites_service",
     "blacklist_service",
     "service_registry",
+    "apigateway",
     "auth-service",
 )

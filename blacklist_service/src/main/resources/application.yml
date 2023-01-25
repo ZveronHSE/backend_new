@@ -1,6 +1,12 @@
 grpc:
   server:
-    port: 6566
+    port: 0
+  client:
+    GLOBAL:
+      shutdown-grace-period: -1
+server:
+  port: 0
+
 spring:
   main:
     banner-mode: off
@@ -18,3 +24,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+eureka:
+  instance:
+    metadata-map:
+      BlacklistService: 'crud.proto'
