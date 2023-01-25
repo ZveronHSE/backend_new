@@ -1,6 +1,5 @@
 package ru.zv.authservice.util
 
-import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomStringUtils.randomNumeric
 import org.apache.commons.lang3.RandomUtils
 import ru.zv.authservice.persistence.model.MobilePhoneLoginStateContext
@@ -40,7 +39,7 @@ fun randomLoginVerifyApigRequest(
     this.sessionId = session
 }
 
-fun randomCode() = RandomStringUtils.randomNumeric(4)
+fun randomCode() = randomNumeric(4)
 
 fun randomLoginVerifyRequest() = LoginByPhoneVerifyRequest(
     code = randomCode(),

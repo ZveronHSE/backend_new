@@ -1,6 +1,6 @@
 --changeset Schuyweiz:init_flow_state
 
-create table if not exists public.flow_context
+create table if not exists public.state_context
 (
     "id"         bigserial primary key,
     "session_id" uuid      not null unique,

@@ -17,4 +17,3 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 interface StateContext {
     val type: ContextType
 }
-

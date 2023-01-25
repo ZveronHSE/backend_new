@@ -1,4 +1,4 @@
-package ru.zv.authservice.utils
+package ru.zv.authservice.config
 
 import mu.KLogging
 import org.springframework.test.context.DynamicPropertyRegistry

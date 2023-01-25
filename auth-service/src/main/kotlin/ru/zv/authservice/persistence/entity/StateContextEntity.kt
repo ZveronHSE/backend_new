@@ -9,8 +9,8 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.Instant
 import java.util.UUID
 
-@Table(name = "flow_context")
-data class FlowContextEntity(
+@Table(name = "state_context")
+data class StateContextEntity(
     @Id
     val id: Long? = null,
     val sessionId: UUID,

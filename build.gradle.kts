@@ -123,6 +123,8 @@ subprojects {
         liquibaseRuntime(sourceSets.getByName("main").compileClasspath)
         liquibaseRuntime(sourceSets.getByName("main").output)
 
+        //Jackson
+
         // Тесты
         testImplementation("io.grpc:grpc-testing:$grpcVersion")
         testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
@@ -131,6 +133,8 @@ subprojects {
         testImplementation("org.testcontainers:junit-jupiter:1.16.3")
         testImplementation("org.assertj:assertj-core:3.22.0")
         testImplementation("io.mockk:mockk:1.13.3")
+        testImplementation("org.testcontainers:r2dbc:1.16.3")
+        implementation("com.ninja-squad:springmockk:4.0.0")
 
     }
 

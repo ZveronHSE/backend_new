@@ -1,12 +1,14 @@
-package ru.zv.authservice.grpc
+package ru.zv.authservice.grpc.client
 
-import io.grpc.Metadata
 import io.grpc.Status
 import io.grpc.StatusException
-import org.apache.commons.lang3.RandomUtils
 import org.springframework.stereotype.Service
-import ru.zveron.ProfileServiceInternalGrpcKt
-import ru.zveron.getProfileRequest
+import ru.zv.authservice.grpc.client.dto.ProfileClientResponse
+import ru.zv.authservice.grpc.client.dto.ProfileFound
+import ru.zv.authservice.grpc.client.dto.ProfileNotFound
+import ru.zv.authservice.grpc.client.dto.ProfileUnknownFailure
+import ru.zveron.contract.profile.internal.ProfileServiceInternalGrpcKt
+
 
 @Service
 class ProfileServiceClient(
@@ -15,11 +17,10 @@ class ProfileServiceClient(
     suspend fun getAccountByPhone(phoneNumber: ru.zv.authservice.persistence.model.PhoneNumber): ProfileClientResponse {
         //todo implement once the endpoint is ready
         return try {
-            profileServiceStub.getProfile(getProfileRequest {
-                this.id = RandomUtils.nextLong()
-            }).let {
-                ProfileFound(it.id, it.name, it.surname)
+            if (phoneNumber.phone == "79257646188") {
+                throw StatusException(Status.NOT_FOUND)
             }
+            return ProfileFound(111, "Kek", "Pikek")
         } catch (ex: StatusException) {
             when (val code = ex.status.code) {
                 Status.Code.NOT_FOUND -> ProfileNotFound
@@ -28,19 +29,3 @@ class ProfileServiceClient(
         }
     }
 }
-
-sealed class ProfileClientResponse
-
-data class ProfileFound(
-    val id: Long,
-    val name: String,
-    val surname: String,
-) : ProfileClientResponse()
-
-object ProfileNotFound : ProfileClientResponse()
-
-data class ProfileUnknownFailure(
-    val message: String?,
-    val code: Status.Code,
-    val metadata: Metadata,
-) : ProfileClientResponse()

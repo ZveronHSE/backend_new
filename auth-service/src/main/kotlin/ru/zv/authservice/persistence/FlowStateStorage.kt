@@ -3,35 +3,33 @@ package ru.zv.authservice.persistence
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.grpc.Status
 import io.r2dbc.postgresql.codec.Json
+import mu.KLogging
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import ru.zv.authservice.persistence.entity.FlowContextEntity
+import ru.zv.authservice.exceptions.AuthException
+import ru.zv.authservice.persistence.entity.StateContextEntity
 import ru.zv.authservice.persistence.model.StateContext
 import ru.zv.authservice.persistence.repository.StateRepository
-import ru.zv.authservice.exceptions.AuthException
 import java.util.UUID
 import kotlin.reflect.KClass
-
 @Component
 class FlowStateStorage(
     private val stateRepository: StateRepository,
 ) {
-    companion object {
+    companion object: KLogging() {
         private val objectMapper: ObjectMapper = ObjectMapper().findAndRegisterModules()
     }
 
     @Transactional
     suspend fun <CTX : StateContext> createContext(context: CTX): UUID {
         return stateRepository.save(
-            FlowContextEntity(
+            StateContextEntity(
                 sessionId = UUID.randomUUID(),
                 data = context.toJson(),
             )
         ).sessionId
     }
 
-
-    //todo: maybe return entity type or just session id
     @Transactional
     suspend fun <CTX : StateContext> updateContext(sessionId: UUID, context: CTX): CTX {
         stateRepository.findBySessionId(sessionId)?.let {
@@ -49,4 +47,9 @@ class FlowStateStorage(
 
     private fun <CTX : StateContext> Json.toContext(clazz: KClass<CTX>): CTX =
         objectMapper.readValue(this.asString(), clazz.java)
+//
+//    }catch (ex: Exception){
+//        logger.error { "Failed to parse json data" }
+//    }
 }
+
