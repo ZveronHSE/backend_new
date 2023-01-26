@@ -1,7 +1,7 @@
 package ru.zveron.service
 
 import org.springframework.stereotype.Service
-import ru.zveron.ChannelType
+import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.entity.Contact
 import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException

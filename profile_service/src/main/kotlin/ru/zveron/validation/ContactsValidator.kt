@@ -1,6 +1,6 @@
 package ru.zveron.validation
 
-import ru.zveron.Links
+import ru.zveron.contract.profile.model.Links
 import ru.zveron.domain.ChannelsDTO
 import ru.zveron.entity.Contact
 import ru.zveron.exception.ProfileException

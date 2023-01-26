@@ -1,13 +1,13 @@
 package ru.zveron.mapper
 
-import ru.zveron.ChannelType
-import ru.zveron.Links
+import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.contract.profile.model.Links
 import ru.zveron.domain.ChannelsDTO
 import ru.zveron.entity.Contact
-import ru.zveron.gmail
-import ru.zveron.links
-import ru.zveron.phone
-import ru.zveron.vKLinks
+import ru.zveron.contract.profile.model.gmail
+import ru.zveron.contract.profile.model.links
+import ru.zveron.contract.profile.model.phone
+import ru.zveron.contract.profile.model.vk
 
 object ContactsMapper {
 
@@ -22,7 +22,7 @@ object ContactsMapper {
     fun linksEntity2Model(entity: Contact): Links =
         links {
             phone = phone { number = entity.phone }
-            vk = vKLinks {
+            vk = vk {
                 id = entity.vkId
                 ref = entity.vkRef
                 email = entity.additionalEmail
