@@ -4,10 +4,10 @@ import ru.zv.authservice.service.dto.JwtMobileTokens
 import ru.zv.authservice.service.dto.LoginByPhoneInitRequest
 import ru.zv.authservice.service.dto.LoginByPhoneVerifyRequest
 import ru.zv.authservice.util.PhoneNumberParser
-import ru.zveron.contract.MobileToken
-import ru.zveron.contract.PhoneLoginInitRequest
-import ru.zveron.contract.PhoneLoginVerifyRequest
-import ru.zveron.contract.mobileToken
+import ru.zveron.contract.auth.MobileToken
+import ru.zveron.contract.auth.PhoneLoginInitRequest
+import ru.zveron.contract.auth.PhoneLoginVerifyRequest
+import ru.zveron.contract.auth.mobileToken
 import java.util.UUID
 
 

@@ -28,8 +28,8 @@ import ru.zv.authservice.util.randomPhoneNumber
 import ru.zv.authservice.util.randomSurname
 import ru.zv.authservice.webclient.NotifierSuccess
 import ru.zv.authservice.webclient.dto.GetVerificationCodeRequest
-import ru.zveron.contract.copy
-import ru.zveron.contract.phoneLoginVerifyRequest
+import ru.zveron.contract.auth.copy
+import ru.zveron.contract.auth.phoneLoginVerifyRequest
 
 class AuthLoginFullFlowTest : BaseAuthTest() {
 
@@ -70,7 +70,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.authFlowType shouldBe MOBILE_PHONE_LOGIN_ALIAS
+                verifyResponse.isNewUser shouldBe false
                 verifyResponse.sessionId shouldBe initResponse.sessionId
                 verifyResponse.mobileToken.accessToken.shouldNotBeBlank()
                 verifyResponse.mobileToken.refreshToken.shouldNotBeBlank()
@@ -118,7 +118,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.authFlowType shouldBe MOBILE_PHONE_LOGIN_ALIAS
+                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldBe initResponse.sessionId
                 verifyResponse.mobileToken.accessToken.shouldBeBlank()
                 verifyResponse.mobileToken.refreshToken.shouldBeBlank()
@@ -166,7 +166,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.authFlowType shouldBe MOBILE_PHONE_LOGIN_ALIAS
+                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldBe initResponse.sessionId
                 verifyResponse.mobileToken.accessToken.shouldBeBlank()
                 verifyResponse.mobileToken.refreshToken.shouldBeBlank()

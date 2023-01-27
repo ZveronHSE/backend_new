@@ -18,7 +18,6 @@ import ru.zv.authservice.grpc.client.ProfileServiceClient
 import ru.zv.authservice.grpc.client.dto.ProfileFound
 import ru.zv.authservice.grpc.client.dto.ProfileNotFound
 import ru.zv.authservice.persistence.FlowStateStorage
-import ru.zv.authservice.persistence.model.MOBILE_PHONE_LOGIN_ALIAS
 import ru.zv.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zv.authservice.service.dto.toContext
 import ru.zv.authservice.util.randomCode
@@ -127,7 +126,7 @@ class LoginByPhoneFlowServiceTest {
         verifyResponse.shouldNotBeNull()
 
         assertSoftly {
-            verifyResponse.flowType shouldBe MOBILE_PHONE_LOGIN_ALIAS
+            verifyResponse.isNewUser shouldBe false
             verifyResponse.sessionId shouldBe request.sessionId
         }
 
@@ -166,7 +165,7 @@ class LoginByPhoneFlowServiceTest {
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.flowType shouldBe MOBILE_PHONE_LOGIN_ALIAS
+                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldBe request.sessionId
             }
 

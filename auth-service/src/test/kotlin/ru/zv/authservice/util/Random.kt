@@ -7,8 +7,8 @@ import ru.zv.authservice.service.dto.LoginByPhoneInitRequest
 import ru.zv.authservice.service.dto.LoginByPhoneVerifyRequest
 import ru.zv.authservice.service.dto.PhoneNumber
 import ru.zv.authservice.service.dto.toContext
-import ru.zveron.contract.phoneLoginInitRequest
-import ru.zveron.contract.phoneLoginVerifyRequest
+import ru.zveron.contract.auth.phoneLoginInitRequest
+import ru.zveron.contract.auth.phoneLoginVerifyRequest
 import java.util.UUID
 
 

@@ -23,3 +23,5 @@
 "categoryGetChild","parameter-service","CategoryService","getChild"
 "parameterGet","parameter-service","CategoryService","getParametersByCategory"
 "parameterValidate","parameter-service","CategoryService","validateValuesForParameters"
+"authPhoneLoginInit","auth-service","AuthService","PhoneLoginInit"
+"authPhoneLoginVerify","auth-service","AuthService","PhoneLoginVerify"

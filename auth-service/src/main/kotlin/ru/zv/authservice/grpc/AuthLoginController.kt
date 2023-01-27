@@ -1,14 +1,15 @@
 package ru.zv.authservice.grpc
 
 import net.devh.boot.grpc.server.service.GrpcService
+import ru.zv.authservice.persistence.model.MOBILE_PHONE_REGISTER_ALIAS
 import ru.zv.authservice.service.LoginByPhoneFlowService
-import ru.zveron.contract.AuthServiceGrpcKt
-import ru.zveron.contract.PhoneLoginInitRequest
-import ru.zveron.contract.PhoneLoginInitResponse
-import ru.zveron.contract.PhoneLoginVerifyRequest
-import ru.zveron.contract.PhoneLoginVerifyResponse
-import ru.zveron.contract.phoneLoginInitResponse
-import ru.zveron.contract.phoneLoginVerifyResponse
+import ru.zveron.contract.auth.AuthServiceGrpcKt
+import ru.zveron.contract.auth.PhoneLoginInitRequest
+import ru.zveron.contract.auth.PhoneLoginInitResponse
+import ru.zveron.contract.auth.PhoneLoginVerifyRequest
+import ru.zveron.contract.auth.PhoneLoginVerifyResponse
+import ru.zveron.contract.auth.phoneLoginInitResponse
+import ru.zveron.contract.auth.phoneLoginVerifyResponse
 
 @GrpcService
 class AuthLoginController(
@@ -27,8 +28,8 @@ class AuthLoginController(
         val serviceResponse = loginFlowService.verify(request.toServiceRequest())
         return phoneLoginVerifyResponse {
             this.sessionId = serviceResponse.sessionId.toString()
-            this.authFlowType = serviceResponse.flowType
             this.mobileToken = serviceResponse.tokens.toGrpcToken()
+            this.isNewUser = serviceResponse.isNewUser
         }
     }
 }

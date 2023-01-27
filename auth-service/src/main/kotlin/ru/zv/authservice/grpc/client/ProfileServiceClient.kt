@@ -7,7 +7,7 @@ import ru.zv.authservice.grpc.client.dto.ProfileClientResponse
 import ru.zv.authservice.grpc.client.dto.ProfileFound
 import ru.zv.authservice.grpc.client.dto.ProfileNotFound
 import ru.zv.authservice.grpc.client.dto.ProfileUnknownFailure
-import ru.zveron.contract.profile.internal.ProfileServiceInternalGrpcKt
+import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 
 
 @Service

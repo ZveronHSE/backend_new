@@ -33,7 +33,7 @@ import ru.zv.authservice.util.randomSurname
 import ru.zv.authservice.webclient.NotifierFailure
 import ru.zv.authservice.webclient.NotifierSuccess
 import ru.zv.authservice.webclient.dto.GetVerificationCodeRequest
-import ru.zveron.contract.copy
+import ru.zveron.contract.auth.copy
 import java.util.UUID
 
 internal class AuthLoginControllerTest : BaseAuthTest() {
@@ -104,7 +104,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
         verifyResponse.shouldNotBeNull()
 
         assertSoftly {
-            verifyResponse.authFlowType shouldBe MOBILE_PHONE_LOGIN_ALIAS
+            verifyResponse.isNewUser shouldBe false
             verifyResponse.sessionId shouldBe request.sessionId
         }
 
@@ -136,7 +136,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             val verifyResponse = authLoginController.phoneLoginVerify(request)
             verifyResponse.shouldNotBeNull()
             assertSoftly {
-                verifyResponse.authFlowType shouldBe MOBILE_PHONE_LOGIN_ALIAS
+                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldBe request.sessionId
                 //todo tokens gen
             }

@@ -31,13 +31,14 @@ eureka:
     webclient:
       enabled: true
     register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: false
     enabled: true
+  instance:
+    metadata-map:
+      AuthService: 'auth.proto'
 server:
-  port: -1
+  port: 0
 
 clients:
   notifier:
-    baseUrl: http://localhost:8080
+    baseUrl: http://localhost:8085
