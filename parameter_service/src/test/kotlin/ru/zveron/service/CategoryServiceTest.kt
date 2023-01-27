@@ -65,7 +65,6 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
         )
 
         response shouldBe categoryResponse {
-
         }
     }
 

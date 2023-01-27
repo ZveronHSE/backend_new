@@ -9,7 +9,6 @@ import ru.zveron.util.CreateEntitiesUtils
 
 class CategoryRepositoryTest : DataBaseApplicationTest() {
 
-
     @Autowired
     lateinit var categoryRepository: CategoryRepository
 

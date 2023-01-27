@@ -42,7 +42,7 @@ class ParameterService(
             if (parameterValue == null) {
                 // Но надо сделать атата, если не заполнили, а он то требуется :)
                 if (parameter.isRequired) {
-                    throw ParameterException("Для параметра '${parameter.name}', id=${id} обязательное значение отсутствует")
+                    throw ParameterException("Для параметра '${parameter.name}', id=$id обязательное значение отсутствует")
                 }
 
                 continue
@@ -56,7 +56,7 @@ class ParameterService(
             }
 
             if (!success) {
-                throw ParameterException("Для параметра '${parameter.name}', id=${id} значение $parameterValue неподходящее")
+                throw ParameterException("Для параметра '${parameter.name}', id=$id значение $parameterValue неподходящее")
             }
 
             // Удаляем после всей обработки
@@ -65,7 +65,7 @@ class ParameterService(
 
         // Проверяем, что нет никаких лишних параметров.
         sourceParameters.forEach { (id, _) ->
-            if (parameters[id] == null) throw ParameterException("Был передан неизвестный параметр id=${id}")
+            if (parameters[id] == null) throw ParameterException("Был передан неизвестный параметр id=$id")
         }
 
         return Empty.getDefaultInstance()
@@ -73,8 +73,7 @@ class ParameterService(
 
     private fun Parameter.validateIntegerValueForParameter(valueParameter: String): Boolean {
         valueParameter.toIntOrNull()
-            ?: throw ParameterException("Для параметра '${name}', id=${id} значение $valueParameter не является числом")
-
+            ?: throw ParameterException("Для параметра '$name', id=$id значение $valueParameter не является числом")
 
         return checkValueInValues(valueParameter)
     }
@@ -83,7 +82,7 @@ class ParameterService(
         try {
             Instant.parse(valueParameter)
         } catch (e: DateTimeParseException) {
-            throw ParameterException("Для параметра '${name}', id=${id} значение $valueParameter не является датой")
+            throw ParameterException("Для параметра '$name', id=$id значение $valueParameter не является датой")
         }
 
         return checkValueInValues(valueParameter)

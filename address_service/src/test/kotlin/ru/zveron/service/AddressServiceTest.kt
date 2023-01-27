@@ -43,7 +43,6 @@ class AddressServiceTest : DataBaseApplicationTest() {
         }
     }
 
-
     @Test
     fun `SaveAddressIfNotExists save new address`(): Unit = runBlocking {
         val request = mockAddressRequest()
@@ -63,7 +62,6 @@ class AddressServiceTest : DataBaseApplicationTest() {
         val request1 = mockAddressRequest(region = "region1")
         addressService.saveAddressIfNotExists(request)
         val response = addressService.saveAddressIfNotExists(request1)
-
 
         response.asClue {
             it.house shouldBe request.house

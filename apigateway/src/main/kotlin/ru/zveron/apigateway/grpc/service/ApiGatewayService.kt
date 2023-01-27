@@ -4,11 +4,11 @@ import com.google.protobuf.DynamicMessage
 import io.grpc.Status
 import io.grpc.kotlin.ClientCalls
 import org.springframework.stereotype.Service
+import ru.zveron.apigateway.component.GrpcChannelRegistry
+import ru.zveron.apigateway.component.ProtoDefinitionRegistry
 import ru.zveron.apigateway.exception.ApiGatewayException
 import ru.zveron.apigateway.grpc.service.dto.GatewayServiceRequest
 import ru.zveron.apigateway.persistence.repository.MethodMetadataRepository
-import ru.zveron.apigateway.component.GrpcChannelRegistry
-import ru.zveron.apigateway.component.ProtoDefinitionRegistry
 import ru.zveron.apigateway.utils.DescriptorsUtil.dynamicMessageBuilder
 import ru.zveron.apigateway.utils.DescriptorsUtil.getGrpcMethodDescriptor
 import ru.zveron.apigateway.utils.DescriptorsUtil.getMethodDescriptor

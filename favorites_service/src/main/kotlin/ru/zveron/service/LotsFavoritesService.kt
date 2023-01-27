@@ -51,12 +51,14 @@ class LotsFavoritesService(
 
     override suspend fun existInFavorites(request: LotsExistInFavoritesRequest): LotsExistInFavoritesResponse =
         lotsExistInFavoritesResponse {
-            isExists.addAll(request.favoriteLotIdList.map { id ->
-                lotRepository.existsById_OwnerUserIdAndId_FavoriteLotId(
-                    ownerUserId = request.favoritesOwnerId,
-                    favoriteLotId = id
-                )
-            })
+            isExists.addAll(
+                request.favoriteLotIdList.map { id ->
+                    lotRepository.existsById_OwnerUserIdAndId_FavoriteLotId(
+                        ownerUserId = request.favoritesOwnerId,
+                        favoriteLotId = id
+                    )
+                }
+            )
         }
 
     override suspend fun getFavoriteLots(request: GetFavoriteLotsRequest): GetFavoriteLotsResponse =
@@ -64,7 +66,8 @@ class LotsFavoritesService(
             favoriteLots.addAll(
                 lotRepository.getAllById_OwnerUserId(request.favoritesOwnerId).map {
                     favoriteLot { id = it.id.favoriteLotId }
-                })
+                }
+            )
         }
 
     override suspend fun getCounter(request: GetLotCounterRequest): GetLotCounterResponse =

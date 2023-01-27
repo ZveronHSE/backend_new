@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class ParameterServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<ParameterServiceApplication>(*args)
+    runApplication<ParameterServiceApplication>(*args)
 }

@@ -10,7 +10,6 @@ import ru.zveron.contract.apigateway.ApigatewayResponse
 import ru.zveron.contract.apigateway.ApigatewayServiceGrpcKt
 import ru.zveron.contract.apigateway.apigatewayResponse
 
-
 @GrpcService
 class ApiGatewayController(
     private val service: ApiGatewayService,

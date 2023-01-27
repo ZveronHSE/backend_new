@@ -95,7 +95,7 @@ class BlacklistServiceTest : BlacklistTest() {
     }
 
     @Test
-    fun `AddToBlacklist When add myself to blacklist got exception`(){
+    fun `AddToBlacklist When add myself to blacklist got exception`() {
         val user1Id = generateUserId()
         val exception = shouldThrow<BlacklistException> {
             runBlocking {
@@ -105,7 +105,6 @@ class BlacklistServiceTest : BlacklistTest() {
 
         exception.message shouldBe "Нельзя добавить себя в черный список"
     }
-
 
     @Test
     fun `DeleteFromBlacklist When delete someone from blacklist new record is deleted`() {
@@ -130,11 +129,11 @@ class BlacklistServiceTest : BlacklistTest() {
     }
 
     @Test
-    fun `DeleteFromBlacklist When delete myself from blacklist got exception`(){
+    fun `DeleteFromBlacklist When delete myself from blacklist got exception`() {
         val user1Id = generateUserId()
         val exception = shouldThrow<BlacklistException> {
             runBlocking {
-                    blacklistService.deleteFromBlacklist(createDeleteFromBlacklistRequest(user1Id, user1Id))
+                blacklistService.deleteFromBlacklist(createDeleteFromBlacklistRequest(user1Id, user1Id))
             }
         }
 
@@ -145,7 +144,7 @@ class BlacklistServiceTest : BlacklistTest() {
     fun `DeleteAllRecordsWhereUserIsBlocked When delete all records about user every appropriate record should be deleted`() {
         val (user1Id, user2Id, user3Id) = generateNIds(3)
         runBlocking {
-            val record1= blacklistRepository.save(generateBlacklistRecord(user1Id, user2Id))
+            val record1 = blacklistRepository.save(generateBlacklistRecord(user1Id, user2Id))
             val record2 = blacklistRepository.save(generateBlacklistRecord(user3Id, user1Id))
             blacklistRepository.save(generateBlacklistRecord(user1Id, user3Id))
             blacklistRepository.save(generateBlacklistRecord(user2Id, user3Id))
@@ -153,7 +152,7 @@ class BlacklistServiceTest : BlacklistTest() {
             blacklistService.deleteAllRecordsWhereUserIsBlocked(deleteAllRecordsWhereUserIsBlockedRequest { deletedUserId = user3Id })
 
             val set = blacklistRepository.findAll().toSet()
-            set.map{ it.id }.shouldContainExactlyInAnyOrder(record1.id, record2.id)
+            set.map { it.id }.shouldContainExactlyInAnyOrder(record1.id, record2.id)
         }
     }
 
@@ -169,7 +168,7 @@ class BlacklistServiceTest : BlacklistTest() {
             blacklistService.deleteAllRecordsWhereUserBlocks(deleteAllRecordsWhereUserBlocksRequest { ownerId = user1Id })
 
             val set = blacklistRepository.findAll().toSet()
-            set.map{ it.id }.shouldContainExactlyInAnyOrder(record1.id, record2.id)
+            set.map { it.id }.shouldContainExactlyInAnyOrder(record1.id, record2.id)
         }
     }
 }

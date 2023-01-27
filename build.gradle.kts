@@ -6,6 +6,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     id("org.liquibase.gradle") version "2.1.1"
+    id("org.jlleitschuh.gradle.ktlint")
 
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -23,7 +24,6 @@ val kotlinVersion: String by project
 val eurekaVersion: String by project
 val kotlinxVersion: String by project
 val arch = System.getProperty("os.arch")
-
 
 allprojects {
     repositories {
@@ -70,8 +70,10 @@ subprojects {
                 password = map["password"] as String
             )
         } catch (ex: Exception) {
-            throw IllegalArgumentException("Вероятно, не хватает в application.yml " +
-                    "параметров url, username или password: ${ex.message}")
+            throw IllegalArgumentException(
+                "Вероятно, не хватает в application.yml " +
+                    "параметров url, username или password: ${ex.message}"
+            )
         }
     }
 
@@ -83,6 +85,7 @@ subprojects {
         plugin("org.springframework.boot")
         plugin("io.spring.dependency-management")
         plugin("org.liquibase.gradle")
+        plugin("org.jlleitschuh.gradle.ktlint")
     }
 
     dependencies {
@@ -95,7 +98,7 @@ subprojects {
         implementation("io.grpc:grpc-stub:$grpcVersion")
         implementation("io.grpc:grpc-core:$grpcVersion")
 
-        //Настоящие корутины
+        // Настоящие корутины
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
 
         // Логгирование
@@ -107,7 +110,7 @@ subprojects {
         implementation("org.liquibase:liquibase-core:4.18.0")
         implementation("org.hibernate:hibernate-core:5.6.7.Final")
 
-        //Eureka
+        // Eureka
         implementation("org.springframework.boot:spring-boot-starter-web")
         implementation("org.springframework:spring-webflux:5.3.24")
         implementation("io.projectreactor.netty:reactor-netty:1.1.1")
@@ -115,8 +118,8 @@ subprojects {
             implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:$eurekaVersion")
         }
 
-        //Без этой штуки у М1 жопа отваливается с вебфлаксом
-        if (arch.equals("aarch64")){
+        // Без этой штуки у М1 жопа отваливается с вебфлаксом
+        if (arch.equals("aarch64")) {
             implementation("io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64")
         }
 
@@ -135,13 +138,17 @@ subprojects {
         testImplementation("org.testcontainers:junit-jupiter:1.16.3")
         testImplementation("org.assertj:assertj-core:3.22.0")
         testImplementation("io.mockk:mockk:1.13.3")
-
     }
 
     group = rootProject.group
     version = rootProject.version
 
     java.sourceCompatibility = JavaVersion.VERSION_17
+
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        this.android.set(false)
+        this.debug.set(true)
+    }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
@@ -187,7 +194,7 @@ subprojects {
                     "username" to changeSetUsername,
                     "driver" to changeSetDriver,
                     "referenceUrl" to changeSetReferenceUrl,
-                    "changeLogFile" to "$changeSetsDirectory${changeSetNumber}_${changeSetName}.sql"
+                    "changeLogFile" to "$changeSetsDirectory${changeSetNumber}_$changeSetName.sql"
                 )
             }
             runList = "main"
@@ -198,11 +205,11 @@ subprojects {
 // TODO надо бы все это вынести в отдельный градл скриптик, можно будет сделать отдельный класс и покрыть его тестами
 fun getNextChangeSetNumber(path: String): String {
     val result = (
-            File(path)
-                .listFiles()
-                ?.mapNotNull { file -> file.name.split('_').firstOrNull()?.toIntOrNull() }
-                ?.maxOrNull() ?: 0
-            ) + 1
+        File(path)
+            .listFiles()
+            ?.mapNotNull { file -> file.name.split('_').firstOrNull()?.toIntOrNull() }
+            ?.maxOrNull() ?: 0
+        ) + 1
 
     return result.toString().padStart(2, '0')
 }

@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import ru.zveron.entity.ProfilesFavoritesRecord
 import javax.transaction.Transactional
 
-interface ProfilesFavoritesRecordRepository: JpaRepository<ProfilesFavoritesRecord, ProfilesFavoritesRecord.ProfilesFavoritesKey> {
+interface ProfilesFavoritesRecordRepository : JpaRepository<ProfilesFavoritesRecord, ProfilesFavoritesRecord.ProfilesFavoritesKey> {
 
     fun getAllById_OwnerUserId(ownerUserId: Long): List<ProfilesFavoritesRecord>
 

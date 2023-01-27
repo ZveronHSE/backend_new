@@ -33,7 +33,6 @@ interface CategoryRepository : JpaRepository<Category, Int> {
     )
     fun getTreeById(id: Int): List<Category>
 
-
     fun getCategoryByIDOrThrow(categoryId: Int): Category = findById(categoryId)
         .orElseThrow { CategoryException(Status.NOT_FOUND, "Категории с id=$categoryId не существует") }
 }

@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import ru.zveron.entity.LotsFavoritesRecord
 import javax.transaction.Transactional
 
-interface LotsFavoritesRecordRepository: JpaRepository<LotsFavoritesRecord, LotsFavoritesRecord.LotsFavoritesKey> {
+interface LotsFavoritesRecordRepository : JpaRepository<LotsFavoritesRecord, LotsFavoritesRecord.LotsFavoritesKey> {
 
     fun countAllById_FavoriteLotId(lotId: Long): Long
 

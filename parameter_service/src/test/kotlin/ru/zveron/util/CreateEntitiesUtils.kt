@@ -15,7 +15,6 @@ object CreateEntitiesUtils {
         parent = category
     )
 
-
     fun mockRootCategory() = Category(
         name = "root"
     )

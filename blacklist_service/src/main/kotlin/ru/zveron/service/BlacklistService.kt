@@ -33,7 +33,8 @@ class BlacklistService(private var blacklistRepository: BlacklistRepository) :
     override suspend fun getBlacklist(request: GetBlacklistRequest): GetBlacklistResponse =
         getBlacklistResponse {
             blacklistUsers.addAll(
-                blacklistRepository.getAllById_OwnerUserId(request.id).map { blacklistUser { id = it.id.reportedUserId } })
+                blacklistRepository.getAllById_OwnerUserId(request.id).map { blacklistUser { id = it.id.reportedUserId } }
+            )
         }
 
     override suspend fun addToBlacklist(request: AddToBlacklistRequest): Empty =

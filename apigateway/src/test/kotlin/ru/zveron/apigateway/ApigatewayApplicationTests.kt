@@ -9,5 +9,4 @@ class ApigatewayApplicationTests {
     @Test
     fun contextLoads() {
     }
-
 }

@@ -22,7 +22,6 @@ import ru.zveron.repository.ParameterFromTypeRepository
 import ru.zveron.util.CreateEntitiesUtils.mockParameterRequest
 import ru.zveron.util.GeneratorUtils.buildMapParameterValues
 
-
 internal class ParameterServiceTest : DataBaseApplicationTest() {
     @Autowired
     lateinit var parameterService: ParameterService
@@ -111,7 +110,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
             for (parameter in parameters) {
                 if (parameter.isRequired) {
                     parameterIdWhereShouldBeIncorrect = parameter.id
-                    break;
+                    break
                 }
             }
 
@@ -127,7 +126,6 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
             }
             shouldThrow<ParameterException> { parameterService.validateValuesForParameters(request) }
         }
-
 
     @ParameterizedTest
     @EnumSource(Type::class, mode = EnumSource.Mode.EXCLUDE, names = ["UNRECOGNIZED"])
@@ -145,7 +143,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
                 when (parameter.type) {
                     type -> {
                         parameterIdWhereShouldBeIncorrect = parameter.id
-                        break;
+                        break
                     }
                     else -> {}
                 }

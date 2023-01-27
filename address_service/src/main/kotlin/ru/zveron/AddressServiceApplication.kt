@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class AddressServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<AddressServiceApplication>(*args)
+    runApplication<AddressServiceApplication>(*args)
 }

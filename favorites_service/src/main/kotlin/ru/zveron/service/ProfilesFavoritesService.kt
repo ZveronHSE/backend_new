@@ -67,7 +67,8 @@ class ProfilesFavoritesService(private val profileRepository: ProfilesFavoritesR
             favoriteProfiles.addAll(
                 profileRepository.getAllById_OwnerUserId(request.id).map {
                     favoriteProfile { id = it.id.favoriteUserId }
-                })
+                }
+            )
         }
 
     override suspend fun removeAllByOwner(request: RemoveAllProfilesByOwnerRequest): Empty =

@@ -9,7 +9,7 @@ import javax.persistence.Entity
 @Entity
 data class ProfilesFavoritesRecord(
     @EmbeddedId
-    val id : ProfilesFavoritesKey
+    val id: ProfilesFavoritesKey
 ) {
     @Embeddable
     data class ProfilesFavoritesKey(

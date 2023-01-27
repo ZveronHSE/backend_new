@@ -1,0 +1,8 @@
+[*.{kt,kts}]
+max_line_length = 120
+
+ktlint_code_style=official
+
+[**/test/**.kt]
+# noinspection EditorConfigKeyCorrectness
+ktlint_ignore_back_ticked_identifier = true

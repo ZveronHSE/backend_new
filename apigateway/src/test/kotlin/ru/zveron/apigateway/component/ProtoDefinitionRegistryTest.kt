@@ -36,7 +36,7 @@ class ProtoDefinitionRegistryTest {
     @Test
     fun `when no descriptors are present in the map and channel and client respond, then create new descriptor`() =
         runBlocking {
-            //given
+            // given
             val grpcServiceName = "grpc-service-${RandomUtils.nextLong()}"
             val serviceName = "service-name-${RandomUtils.nextLong()}"
             val protoFileName = "${UUID.randomUUID()}.proto"
