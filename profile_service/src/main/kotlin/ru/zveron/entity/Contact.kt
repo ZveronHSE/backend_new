@@ -17,6 +17,7 @@ data class Contact(
     var gmailId: String,
     var gmail: String,
     var additionalEmail: String,
+    @Column(length = 12)
     var phone: String,
     @OneToOne
     @MapsId

@@ -17,9 +17,9 @@ data class Profile(
     @Id
     @Column(nullable = false)
     val id: Long = 0,
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     var name: String,
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     var surname: String,
     var imageId: Long,
     @Column(nullable = false)
