@@ -1,8 +1,8 @@
 grpc:
   server:
-    port: 6565
+    port: 0
 server:
-  port: 7565
+  port: 0
 spring:
   main:
     banner-mode: off

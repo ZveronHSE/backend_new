@@ -2,7 +2,7 @@ package ru.zveron.domain
 
 import java.io.Serializable
 
-data class ChannelsDTO(
+data class ChannelsDto(
     var phone: Boolean = false,
     var vk: Boolean = false,
     var gmail: Boolean = false,

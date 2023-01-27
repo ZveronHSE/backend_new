@@ -1,4 +1,4 @@
-package ru.zveron.service.profile
+package ru.zveron.service.api
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -11,10 +11,9 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import ru.zveron.ChannelType
-import ru.zveron.LotStatus
+import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.contract.profile.LotStatus
 import ru.zveron.ProfileTest
-import ru.zveron.mapper.AddressMapper
 import ru.zveron.mapper.AddressMapper.toProfileAddress
 import ru.zveron.commons.assertions.addressShouldBe
 import ru.zveron.commons.assertions.channelsShouldBe
@@ -31,24 +30,24 @@ import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.contract.addressResponse
 import ru.zveron.contract.lot.profileLotsResponse
-import ru.zveron.deleteProfileRequest
+import ru.zveron.contract.profile.deleteProfileRequest
 import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
-import ru.zveron.getChannelTypesRequest
-import ru.zveron.getLinksRequest
-import ru.zveron.getProfileInfoRequest
-import ru.zveron.getProfilePageRequest
-import ru.zveron.getSettingsRequest
+import ru.zveron.contract.profile.getChannelTypesRequest
+import ru.zveron.contract.profile.getLinksRequest
+import ru.zveron.contract.profile.getProfileInfoRequest
+import ru.zveron.contract.profile.getProfilePageRequest
+import ru.zveron.contract.profile.getSettingsRequest
 import ru.zveron.repository.ContactRepository
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.repository.SettingsRepository
-import ru.zveron.service.api.address.AddressService
-import ru.zveron.service.api.blakclist.BlacklistService
-import ru.zveron.service.api.lot.LotService
-import ru.zveron.service.api.profile.ProfileServiceExternal
-import ru.zveron.service.api.review.ReviewService
-import ru.zveron.setProfileInfoRequest
-import ru.zveron.setSettingsRequest
+import ru.zveron.service.client.address.AddressClient
+import ru.zveron.service.client.blakclist.BlacklistClient
+import ru.zveron.service.client.lot.LotClient
+import ru.zveron.service.client.review.ReviewClient
+import ru.zveron.contract.profile.setProfileInfoRequest
+import ru.zveron.contract.profile.setSettingsRequest
+import ru.zveron.mapper.AddressMapper.toRequest
 import java.time.Instant
 
 class ProfileServiceExternalTest : ProfileTest() {
@@ -68,29 +67,29 @@ class ProfileServiceExternalTest : ProfileTest() {
     @TestConfiguration
     class ProfileServiceExternalTestConfiguration {
         @Bean
-        fun addressService() = mockk<AddressService>()
+        fun addressClient() = mockk<AddressClient>()
 
         @Bean
-        fun blacklistService() = mockk<BlacklistService>()
+        fun blacklistClient() = mockk<BlacklistClient>()
 
         @Bean
-        fun lotService() = mockk<LotService>()
+        fun lotClient() = mockk<LotClient>()
 
         @Bean
-        fun reviewService() = mockk<ReviewService>()
+        fun reviewClient() = mockk<ReviewClient>()
     }
 
     @Autowired
-    lateinit var addressService: AddressService
+    lateinit var addressClient: AddressClient
 
     @Autowired
-    lateinit var blacklistService: BlacklistService
+    lateinit var blacklistClient: BlacklistClient
 
     @Autowired
-    lateinit var lotService: LotService
+    lateinit var lotClient: LotClient
 
     @Autowired
-    lateinit var reviewService: ReviewService
+    lateinit var reviewClient: ReviewClient
 
     @ParameterizedTest
     @ValueSource(longs = [0, 10])
@@ -105,17 +104,17 @@ class ProfileServiceExternalTest : ProfileTest() {
             requestedProfileId = id
             authorizedProfileId = authorizedId
         }
-        coEvery { blacklistService.existsInBlacklist(id, authorizedId) } returns false
+        coEvery { blacklistClient.existsInBlacklist(id, authorizedId) } returns false
         val activeLot = LotsGenerator.generateLot(false)
         val closedLot = LotsGenerator.generateLot(false)
-        coEvery { lotService.getLotsBySellerId(id) } returns profileLotsResponse {
+        coEvery { lotClient.getLotsBySellerId(id) } returns profileLotsResponse {
             activateLots.add(activeLot)
             inactivateLots.add(closedLot)
         }
         val address = generateAddress(addressId)
-        coEvery { addressService.getById(addressId) } returns address
+        coEvery { addressClient.getById(addressId) } returns address
         val rating = PropsGenerator.generateDouble()
-        coEvery { reviewService.getRating(id) } returns rating
+        coEvery { reviewClient.getRating(id) } returns rating
 
         runBlocking {
             val response = service.getProfilePage(request)
@@ -149,7 +148,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             requestedProfileId = id
             authorizedProfileId = authorizedProfile
         }
-        coEvery { blacklistService.existsInBlacklist(id, authorizedProfile) } returns true
+        coEvery { blacklistClient.existsInBlacklist(id, authorizedProfile) } returns true
 
         runBlocking {
             val response = service.getProfilePage(request)
@@ -186,9 +185,9 @@ class ProfileServiceExternalTest : ProfileTest() {
         profileRepository.save(expectedProfile)
         val request = getProfileInfoRequest { this.id = id }
         val address = generateAddress(addressId)
-        coEvery { addressService.getById(addressId) } returns address
+        coEvery { addressClient.getById(addressId) } returns address
         val rating = PropsGenerator.generateDouble()
-        coEvery { reviewService.getRating(id) } returns rating
+        coEvery { reviewClient.getRating(id) } returns rating
 
         runBlocking {
             val response = service.getProfileInfo(request)
@@ -229,7 +228,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             address = generateAddress()
         }
         val newAddressId = PropsGenerator.generateUserId()
-        coEvery { addressService.saveIfNotExists(AddressMapper.address2Request(request.address)) } returns addressResponse {
+        coEvery { addressClient.saveIfNotExists(request.address.toRequest()) } returns addressResponse {
             this.id = newAddressId
         }
 
@@ -326,7 +325,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         profileRepository.save(expectedProfile)
         val request = getSettingsRequest { this.id = id }
         val address = generateAddress(addressId)
-        coEvery { addressService.getById(addressId) } returns address
+        coEvery { addressClient.getById(addressId) } returns address
 
         runBlocking {
             val response = service.getSettings(request)
@@ -362,7 +361,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             address = generateAddress()
             channels.addAll(listOf(ChannelType.VK, ChannelType.GOOGLE))
         }
-        coEvery { addressService.saveIfNotExists(AddressMapper.address2Request(request.address)) } returns addressResponse {
+        coEvery { addressClient.saveIfNotExists(request.address.toRequest()) } returns addressResponse {
             this.id = addressId
         }
 

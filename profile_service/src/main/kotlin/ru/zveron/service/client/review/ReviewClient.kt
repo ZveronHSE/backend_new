@@ -1,9 +1,9 @@
-package ru.zveron.service.api.review
+package ru.zveron.service.client.review
 
 import org.springframework.stereotype.Service
 
 @Service
-interface ReviewService {
+interface ReviewClient {
 
     suspend fun getRating(id: Long): Double
 }

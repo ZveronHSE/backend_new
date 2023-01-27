@@ -7,8 +7,8 @@ import ru.zveron.contract.profile.lotSummary
 
 object LotsMapper {
 
-    fun lot2Builder(lots: List<Lot>, status: LotStatus): Collection<LotSummary> =
-        lots.map { lot ->
+    fun List<Lot>.toBuilder(status: LotStatus): Collection<LotSummary> =
+        map { lot ->
             lotSummary{
                 id = lot.id
                 title = lot.title

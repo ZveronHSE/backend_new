@@ -1,6 +1,6 @@
-package ru.zveron.service.api.blakclist
+package ru.zveron.service.client.blakclist
 
-interface BlacklistService {
+interface BlacklistClient {
 
     suspend fun existsInBlacklist(ownerId: Long, targetUserId: Long): Boolean
 }

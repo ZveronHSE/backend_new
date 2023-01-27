@@ -1,11 +1,11 @@
-package ru.zveron.service.profile
+package ru.zveron.service.api
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import ru.zveron.ChannelType
+import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.ProfileTest
 import ru.zveron.commons.assertions.contactShouldBe
 import ru.zveron.commons.assertions.profileShouldBe
@@ -16,17 +16,16 @@ import ru.zveron.commons.generator.ContactsGenerator.generateLinks
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
-import ru.zveron.createProfileRequest
+import ru.zveron.contract.profile.createProfileRequest
 import ru.zveron.entity.Profile
 import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
-import ru.zveron.getProfileByChannelRequest
-import ru.zveron.getProfileRequest
-import ru.zveron.getProfileWithContactsRequest
+import ru.zveron.contract.profile.getProfileByChannelRequest
+import ru.zveron.contract.profile.getProfileRequest
+import ru.zveron.contract.profile.getProfileWithContactsRequest
 import ru.zveron.repository.ContactRepository
 import ru.zveron.repository.ProfileRepository
-import ru.zveron.service.api.profile.ProfileServiceInternal
-import ru.zveron.updateContactsRequest
+import ru.zveron.contract.profile.updateContactsRequest
 import java.time.Instant
 
 class ProfileServiceInternalTest : ProfileTest() {

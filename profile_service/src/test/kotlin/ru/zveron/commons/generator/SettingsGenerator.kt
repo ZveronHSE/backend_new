@@ -1,6 +1,6 @@
 package ru.zveron.commons.generator
 
-import ru.zveron.domain.ChannelsDTO
+import ru.zveron.domain.ChannelsDto
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
 
@@ -16,7 +16,7 @@ object SettingsGenerator {
     ) = Settings(
         id = profile.id,
         profile = profile,
-        channels = ChannelsDTO(
+        channels = ChannelsDto(
             vk = addVk,
             gmail = addGmail,
             phone = addPhone,

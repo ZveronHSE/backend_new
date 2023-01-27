@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import ru.zveron.commons.generator.ContactsGenerator
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
-import ru.zveron.domain.ChannelsDTO
+import ru.zveron.domain.ChannelsDto
 import ru.zveron.exception.ProfileException
 import java.time.Instant
 
@@ -19,21 +19,21 @@ class ContactsValidatorTest {
     companion object {
         @JvmStatic
         private fun getCorrectChanelTypes() = listOf(
-            Arguments.of(ChannelsDTO(phone = true)),
-            Arguments.of(ChannelsDTO(vk = true, gmail = true)),
+            Arguments.of(ChannelsDto(phone = true)),
+            Arguments.of(ChannelsDto(vk = true, gmail = true)),
         )
 
         @JvmStatic
         private fun getIncorrectChanelTypes() = listOf(
-            Arguments.of(ChannelsDTO(), 0),
-            Arguments.of(ChannelsDTO(phone = true, vk = true, gmail = true), 3),
-            Arguments.of(ChannelsDTO(phone = true, vk = true, gmail = true, chat = true), 4),
+            Arguments.of(ChannelsDto(), 0),
+            Arguments.of(ChannelsDto(phone = true, vk = true, gmail = true), 3),
+            Arguments.of(ChannelsDto(phone = true, vk = true, gmail = true, chat = true), 4),
         )
     }
 
     @ParameterizedTest
     @MethodSource("getCorrectChanelTypes")
-    fun `Validate correct number of types`(ways: ChannelsDTO) {
+    fun `Validate correct number of types`(ways: ChannelsDto) {
         shouldNotThrow<ProfileException> {
             ContactsValidator.validateNumberOfChannels(ways)
         }
@@ -41,7 +41,7 @@ class ContactsValidatorTest {
 
     @ParameterizedTest
     @MethodSource("getIncorrectChanelTypes")
-    fun `Validate incorrect number of types`(ways: ChannelsDTO, size: Int) {
+    fun `Validate incorrect number of types`(ways: ChannelsDto, size: Int) {
         val exception = shouldThrow<ProfileException> {
             ContactsValidator.validateNumberOfChannels(ways)
         }
@@ -51,7 +51,7 @@ class ContactsValidatorTest {
     @Test
     fun `Validate links and no links are missed`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
-        val channels = ChannelsDTO(phone = true, vk = true, gmail = true, chat = true)
+        val channels = ChannelsDto(phone = true, vk = true, gmail = true, chat = true)
         val links = ContactsGenerator.generateContact(profile, addVk = true, addGmail = true, addPhone = true)
 
         shouldNotThrow<ProfileException> {
@@ -62,7 +62,7 @@ class ContactsValidatorTest {
     @Test
     fun `Validate links and vk is missed`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
-        val channels = ChannelsDTO(vk = true)
+        val channels = ChannelsDto(vk = true)
         val links = ContactsGenerator.generateContact(profile)
 
         val exception = shouldThrow<ProfileException> {
@@ -74,7 +74,7 @@ class ContactsValidatorTest {
     @Test
     fun `Validate links and gmail is missed`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
-        val channels = ChannelsDTO(gmail = true)
+        val channels = ChannelsDto(gmail = true)
         val links = ContactsGenerator.generateContact(profile)
 
         val exception = shouldThrow<ProfileException> {
@@ -86,7 +86,7 @@ class ContactsValidatorTest {
     @Test
     fun `Validate links and phone is missed`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
-        val channels = ChannelsDTO(phone = true)
+        val channels = ChannelsDto(phone = true)
         val links = ContactsGenerator.generateContact(profile)
 
         val exception = shouldThrow<ProfileException> {

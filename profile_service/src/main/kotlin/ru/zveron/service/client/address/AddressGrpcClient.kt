@@ -1,4 +1,4 @@
-package ru.zveron.service.api.address
+package ru.zveron.service.client.address
 
 import net.devh.boot.grpc.client.inject.GrpcClient
 import org.springframework.stereotype.Service
@@ -8,7 +8,7 @@ import ru.zveron.contract.AddressServiceGrpcKt
 import ru.zveron.contract.addressIdRequest
 
 @Service
-class AddressGrpcService: AddressService {
+class AddressGrpcClient: AddressClient {
 
     @GrpcClient("address-service")
     lateinit var service: AddressServiceGrpcKt.AddressServiceCoroutineStub

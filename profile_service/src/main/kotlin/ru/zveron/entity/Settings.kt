@@ -2,7 +2,7 @@ package ru.zveron.entity
 
 import org.hibernate.Hibernate
 import org.hibernate.annotations.Type
-import ru.zveron.domain.ChannelsDTO
+import ru.zveron.domain.ChannelsDto
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -17,7 +17,7 @@ data class Settings(
     var searchAddressId: Long = -1,
     @Type(type = "json")
     @Column(columnDefinition = "jsonb")
-    var channels: ChannelsDTO,
+    var channels: ChannelsDto,
     @OneToOne
     @MapsId
     val profile: Profile,

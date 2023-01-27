@@ -6,7 +6,7 @@ CREATE TABLE public.contact
     additional_email VARCHAR(255),
     gmail            VARCHAR(255),
     gmail_id         VARCHAR(255),
-    phone            VARCHAR(255),
+    phone            VARCHAR(12),
     vk_id            VARCHAR(255),
     vk_ref           VARCHAR(255),
     profile_id       BIGINT NOT NULL,
@@ -20,8 +20,8 @@ CREATE TABLE public.profile
     address_id BIGINT       NOT NULL,
     image_id   BIGINT       NOT NULL,
     last_seen  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    name       VARCHAR(255) NOT NULL,
-    surname    VARCHAR(255) NOT NULL,
+    name       VARCHAR(50) NOT NULL,
+    surname    VARCHAR(50) NOT NULL,
     CONSTRAINT "profilePK" PRIMARY KEY (id)
 );
 

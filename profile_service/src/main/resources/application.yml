@@ -1,6 +1,6 @@
 grpc:
   server:
-    port: 6568
+    port: 0
   client:
     blacklist-service:
       address: 'discovery:///blacklist-service'
@@ -18,7 +18,7 @@ grpc:
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 server:
-  port: 7568
+  port: 0
 spring:
   main:
     banner-mode: off

@@ -1,4 +1,4 @@
-package ru.zveron.service.api.blakclist
+package ru.zveron.service.client.blakclist
 
 import net.devh.boot.grpc.client.inject.GrpcClient
 import org.springframework.stereotype.Service
@@ -6,7 +6,7 @@ import ru.zveron.BlacklistServiceGrpcKt
 import ru.zveron.existInBlacklistRequest
 
 @Service
-class BlacklistGrpsService : BlacklistService {
+class BlacklistGrpsClient : BlacklistClient {
 
     @GrpcClient("blacklist-service")
     lateinit var service: BlacklistServiceGrpcKt.BlacklistServiceCoroutineStub

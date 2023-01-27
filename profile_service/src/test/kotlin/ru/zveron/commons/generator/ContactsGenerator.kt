@@ -1,9 +1,11 @@
 package ru.zveron.commons.generator
 
+import ru.zveron.contract.profile.model.gmail
 import ru.zveron.entity.Contact
 import ru.zveron.entity.Profile
-import ru.zveron.links
-import ru.zveron.vKLinks
+import ru.zveron.contract.profile.model.links
+import ru.zveron.contract.profile.model.phone
+import ru.zveron.contract.profile.model.vk
 
 object ContactsGenerator {
 
@@ -20,7 +22,7 @@ object ContactsGenerator {
         additionalEmail = if (addVk) PropsGenerator.generateString(15) else "",
         gmailId = if (addVk) PropsGenerator.generateString(10) else "",
         gmail = if (addGmail) PropsGenerator.generateString(15) else "",
-        phone = if (addPhone) PropsGenerator.generateString(15) else "",
+        phone = if (addPhone) PropsGenerator.generateString(10) else "",
     ).also { profile.contact = it }
 
     fun generateLinks(
@@ -31,15 +33,15 @@ object ContactsGenerator {
         gmailId: String = "",
         gmail: String = "",
     ) = links {
-        this.phone = ru.zveron.phone {
+        this.phone = phone {
             number = phone
         }
-        vk = vKLinks {
+        vk = vk {
             id = vkId
             ref = vkRef
             email = additionalEmail
         }
-        this.gmail = ru.zveron.gmail {
+        this.gmail = gmail {
             id = gmailId
             email = gmail
         }

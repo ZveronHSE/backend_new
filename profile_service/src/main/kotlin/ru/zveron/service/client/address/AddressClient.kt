@@ -1,9 +1,9 @@
-package ru.zveron.service.api.address
+package ru.zveron.service.client.address
 
 import ru.zveron.contract.AddressRequest
 import ru.zveron.contract.AddressResponse
 
-interface AddressService {
+interface AddressClient {
 
     suspend fun getById(id: Long): AddressResponse
 

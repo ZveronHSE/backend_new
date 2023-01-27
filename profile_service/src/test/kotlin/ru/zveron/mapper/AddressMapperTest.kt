@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test
 import ru.zveron.commons.assertions.addressShouldBe
 import ru.zveron.commons.generator.AddressGenerator
 import ru.zveron.commons.generator.PropsGenerator
+import ru.zveron.mapper.AddressMapper.toAddress
 import ru.zveron.mapper.AddressMapper.toProfileAddress
+import ru.zveron.mapper.AddressMapper.toRequest
 
 class AddressMapperTest {
 
@@ -27,7 +29,7 @@ class AddressMapperTest {
     fun `Map address to address request`() {
         val expectedAddress = AddressGenerator.generateAddress()
 
-        val actualAddress = AddressMapper.address2Request(expectedAddress)
+        val actualAddress = expectedAddress.toRequest()
 
         actualAddress addressShouldBe expectedAddress
     }
@@ -36,7 +38,7 @@ class AddressMapperTest {
     fun `Map address response to address`() {
         val expectedAddress = AddressGenerator.generateAddress(PropsGenerator.generateUserId())
 
-        val actualAddress = AddressMapper.response2Address(expectedAddress)
+        val actualAddress = expectedAddress.toAddress()
 
         actualAddress addressShouldBe expectedAddress
     }

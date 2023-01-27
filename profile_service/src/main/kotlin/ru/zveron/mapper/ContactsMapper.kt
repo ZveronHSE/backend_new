@@ -2,7 +2,7 @@ package ru.zveron.mapper
 
 import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.contract.profile.model.Links
-import ru.zveron.domain.ChannelsDTO
+import ru.zveron.domain.ChannelsDto
 import ru.zveron.entity.Contact
 import ru.zveron.contract.profile.model.gmail
 import ru.zveron.contract.profile.model.links
@@ -11,41 +11,41 @@ import ru.zveron.contract.profile.model.vk
 
 object ContactsMapper {
 
-    fun linksModel2DTO(model: Links): ChannelsDTO =
-        ChannelsDTO(
-            phone = model.phone.number.isNotBlank(),
-            vk = model.vk.ref.isNotBlank(),
-            gmail = model.gmail.email.isNotBlank(),
+    fun Links.toDto(): ChannelsDto =
+        ChannelsDto(
+            phone = phone.number.isNotBlank(),
+            vk = vk.ref.isNotBlank(),
+            gmail = gmail.email.isNotBlank(),
             chat = true
         )
 
-    fun linksEntity2Model(entity: Contact): Links =
+    fun Contact.toModel(): Links =
         links {
-            phone = phone { number = entity.phone }
+            phone = phone { number = this@toModel.phone }
             vk = vk {
-                id = entity.vkId
-                ref = entity.vkRef
-                email = entity.additionalEmail
+                id = this@toModel.vkId
+                ref = this@toModel.vkRef
+                email = this@toModel.additionalEmail
             }
             gmail = gmail {
-                id = entity.gmailId
-                email = entity.gmail
+                id = this@toModel.gmailId
+                email = this@toModel.gmail
             }
         }
 
-    fun channelsModel2DTO(types: Set<ChannelType>): ChannelsDTO =
-        ChannelsDTO(
-            phone = types.contains(ChannelType.PHONE),
-            vk = types.contains(ChannelType.VK),
-            gmail = types.contains(ChannelType.GOOGLE),
-            chat = types.contains(ChannelType.CHAT)
+    fun Set<ChannelType>.toDto(): ChannelsDto =
+        ChannelsDto(
+            phone = contains(ChannelType.PHONE),
+            vk = contains(ChannelType.VK),
+            gmail = contains(ChannelType.GOOGLE),
+            chat = contains(ChannelType.CHAT)
         )
 
-    fun channelsDTO2Model(dto: ChannelsDTO): List<ChannelType> =
+    fun ChannelsDto.toModel(): List<ChannelType> =
         mutableListOf<ChannelType>().apply {
-            if (dto.phone) add(ChannelType.PHONE)
-            if (dto.vk) add(ChannelType.VK)
-            if (dto.gmail) add(ChannelType.GOOGLE)
-            if (dto.chat) add(ChannelType.CHAT)
+            if (phone) add(ChannelType.PHONE)
+            if (vk) add(ChannelType.VK)
+            if (gmail) add(ChannelType.GOOGLE)
+            if (chat) add(ChannelType.CHAT)
         }
 }

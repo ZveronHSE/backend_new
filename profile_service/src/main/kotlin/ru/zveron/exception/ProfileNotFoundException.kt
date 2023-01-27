@@ -1,3 +1,5 @@
 package ru.zveron.exception
 
-class ProfileNotFoundException(override val message: String) : ProfileException(message)
+import io.grpc.Status
+
+class ProfileNotFoundException(override val message: String, code: Status.Code) : ProfileException(message, code)

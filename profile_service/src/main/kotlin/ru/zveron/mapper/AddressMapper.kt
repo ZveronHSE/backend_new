@@ -13,18 +13,18 @@ object AddressMapper {
         "г. $town"
     }
 
-    fun address2Request(address: Address) = addressRequest {
-        region = address.region
-        town = address.town
-        longitude = address.longitude
-        latitude = address.latitude
+    fun Address.toRequest() = addressRequest {
+        region = this@toRequest.region
+        town = this@toRequest.town
+        longitude = this@toRequest.longitude
+        latitude = this@toRequest.latitude
     }
 
-    fun response2Address(response: AddressResponse): Address =
+    fun AddressResponse.toAddress(): Address =
         address {
-            region = response.region
-            town = response.town
-            longitude = response.longitude
-            latitude = response.latitude
+            region = this@toAddress.region
+            town = this@toAddress.town
+            longitude = this@toAddress.longitude
+            latitude = this@toAddress.latitude
         }
 }

@@ -5,24 +5,24 @@ import com.google.protobuf.timestamp
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.shouldBe
-import ru.zveron.Address
-import ru.zveron.ChannelType
-import ru.zveron.GetProfileByChannelResponse
-import ru.zveron.GetProfileInfoResponse
-import ru.zveron.GetProfilePageResponse
-import ru.zveron.GetProfileResponse
-import ru.zveron.GetProfileWithContactsResponse
-import ru.zveron.Links
-import ru.zveron.LotSummary
-import ru.zveron.SetProfileInfoRequest
+import ru.zveron.contract.profile.Address
+import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.contract.profile.GetProfileByChannelResponse
+import ru.zveron.contract.profile.GetProfileInfoResponse
+import ru.zveron.contract.profile.GetProfilePageResponse
+import ru.zveron.contract.profile.GetProfileResponse
+import ru.zveron.contract.profile.GetProfileWithContactsResponse
+import ru.zveron.contract.profile.model.Links
+import ru.zveron.contract.profile.LotSummary
+import ru.zveron.contract.profile.SetProfileInfoRequest
 import ru.zveron.contract.AddressRequest
-import ru.zveron.mapper.ContactsMapper
 import ru.zveron.contract.AddressResponse
 import ru.zveron.contract.lot.model.Lot
-import ru.zveron.domain.ChannelsDTO
+import ru.zveron.domain.ChannelsDto
 import ru.zveron.entity.Contact
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
+import ru.zveron.mapper.ContactsMapper.toModel
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.math.abs
@@ -42,7 +42,7 @@ infix fun GetProfileResponse.responseShouldBe(expected: Profile) {
     surname shouldBe expected.surname
     imageId shouldBe expected.imageId
     addressId shouldBe expected.addressId
-    channelsList shouldBe ContactsMapper.channelsDTO2Model(expected.settings.channels)
+    channelsList shouldBe expected.settings.channels.toModel()
 }
 
 infix fun GetProfileWithContactsResponse.responseShouldBe(expected: Profile) {
@@ -51,8 +51,9 @@ infix fun GetProfileWithContactsResponse.responseShouldBe(expected: Profile) {
     surname shouldBe expected.surname
     imageId shouldBe expected.imageId
     addressId shouldBe expected.addressId
-    channelsList shouldBe ContactsMapper.channelsDTO2Model(expected.settings.channels)
+    channelsList shouldBe expected.settings.channels.toModel()
     links linksShouldBe expected.contact
+    lastSeen timestampShouldBe expected.lastSeen
 }
 
 infix fun Links.linksShouldBe(expected: Contact) {
@@ -70,7 +71,7 @@ infix fun Settings.settingsShouldBe(expected: Settings) {
     channels shouldBe expected.channels
 }
 
-infix fun List<ChannelType>.channelsShouldBe(expected: ChannelsDTO) {
+infix fun List<ChannelType>.channelsShouldBe(expected: ChannelsDto) {
     val set = this.toMutableSet()
     if (expected.vk) {
         set shouldContain ChannelType.VK
@@ -91,7 +92,7 @@ infix fun List<ChannelType>.channelsShouldBe(expected: ChannelsDTO) {
     set.size shouldBe 0
 }
 
-infix fun ChannelsDTO.channelsShouldBe(expected: List<ChannelType>) {
+infix fun ChannelsDto.channelsShouldBe(expected: List<ChannelType>) {
     vk shouldBe expected.contains(ChannelType.VK)
     gmail shouldBe expected.contains(ChannelType.GOOGLE)
     phone shouldBe expected.contains(ChannelType.PHONE)

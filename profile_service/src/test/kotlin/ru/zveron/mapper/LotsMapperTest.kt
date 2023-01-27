@@ -2,9 +2,10 @@ package ru.zveron.mapper
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import ru.zveron.LotStatus
 import ru.zveron.commons.assertions.lotShouldBe
 import ru.zveron.commons.generator.LotsGenerator
+import ru.zveron.contract.profile.LotStatus
+import ru.zveron.mapper.LotsMapper.toBuilder
 
 class LotsMapperTest {
 
@@ -12,7 +13,7 @@ class LotsMapperTest {
     fun `lot2Builder maps correctly active lots`() {
         val expectedActive = LotsGenerator.generateLot(false)
 
-        val actualActive = LotsMapper.lot2Builder(listOf(expectedActive), LotStatus.ACTIVE)
+        val actualActive = listOf(expectedActive).toBuilder(LotStatus.ACTIVE)
 
         actualActive.apply {
             size shouldBe 1
@@ -24,7 +25,7 @@ class LotsMapperTest {
     fun `lot2Builder maps correctly closed lots`() {
         val expectedClosed = LotsGenerator.generateLot(false)
 
-        val actualClosed = LotsMapper.lot2Builder(listOf(expectedClosed), LotStatus.CLOSED)
+        val actualClosed = listOf(expectedClosed).toBuilder(LotStatus.CLOSED)
 
         actualClosed.apply {
             size shouldBe 1

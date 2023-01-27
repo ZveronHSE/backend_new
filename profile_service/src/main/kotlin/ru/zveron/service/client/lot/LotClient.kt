@@ -1,8 +1,8 @@
-package ru.zveron.service.api.lot
+package ru.zveron.service.client.lot
 
 import ru.zveron.contract.lot.ProfileLotsResponse
 
-interface LotService {
+interface LotClient {
 
     suspend fun getLotsBySellerId(profileId: Long): ProfileLotsResponse
 }
