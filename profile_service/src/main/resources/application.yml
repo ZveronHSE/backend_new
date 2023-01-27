@@ -17,6 +17,7 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+
 server:
   port: 0
 spring:
@@ -36,6 +37,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
 eureka:
   client:
     register-with-eureka: true
