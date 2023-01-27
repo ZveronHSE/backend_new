@@ -7,5 +7,6 @@ import org.springframework.boot.runApplication
 class BlacklistServiceApplication
 
 fun main(args: Array<String>) {
+
     runApplication<BlacklistServiceApplication>(*args)
 }
