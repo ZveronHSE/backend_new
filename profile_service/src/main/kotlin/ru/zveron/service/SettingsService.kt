@@ -26,10 +26,6 @@ class SettingsService(
     private val repository: SettingsRepository
 ) {
 
-    private fun findByIdOrThrow(id: Long) =
-        repository.findById(id)
-            .orElseThrow { ProfileNotFoundException("Profile with id: $id doesn't exist", Status.NOT_FOUND.code) }
-
     suspend fun getChannelTypes(request: GetChannelTypesRequest): GetChannelTypesResponse =
         getChannelTypesResponse {
             val settings = findByIdOrThrow(request.id)
@@ -77,4 +73,8 @@ class SettingsService(
 
         repository.save(settings)
     }
+
+    private fun findByIdOrThrow(id: Long) =
+        repository.findById(id)
+            .orElseThrow { ProfileNotFoundException("Profile with id: $id doesn't exist", Status.NOT_FOUND.code) }
 }

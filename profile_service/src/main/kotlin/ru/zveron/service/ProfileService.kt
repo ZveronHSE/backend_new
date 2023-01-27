@@ -6,6 +6,7 @@ import io.grpc.StatusException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import mu.KLogging
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import ru.zveron.contract.profile.CreateProfileRequest
@@ -34,7 +35,6 @@ import ru.zveron.mapper.ContactsMapper.toDto
 import ru.zveron.mapper.ContactsMapper.toModel
 import ru.zveron.mapper.LotsMapper.toBuilder
 import ru.zveron.repository.ProfileRepository
-import ru.zveron.service.api.ProfileServiceExternal
 import ru.zveron.service.client.address.AddressClient
 import ru.zveron.service.client.blakclist.BlacklistClient
 import ru.zveron.service.client.lot.LotClient
@@ -50,6 +50,8 @@ class ProfileService(
     private val profileRepository: ProfileRepository,
     private val reviewClient: ReviewClient,
 ) {
+
+    companion object : KLogging()
 
     fun deleteById(id: Long) = profileRepository.deleteById(id)
 
@@ -93,7 +95,14 @@ class ProfileService(
     }
 
 
-    suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse {
+    suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse = coroutineScope {
+        val blacklistCoroutine = async(CoroutineName("Exists-In-Blacklist-Coroutine")) {
+            if (request.authorizedProfileId != 0L) blacklistClient.existsInBlacklist(
+                ownerId = request.requestedProfileId,
+                targetUserId = request.authorizedProfileId
+            ) else false
+        }
+
         val profile = findByIdOrThrow(request.requestedProfileId)
         val responseBuilder = GetProfilePageResponse.newBuilder().apply {
             id = profile.id
@@ -103,15 +112,15 @@ class ProfileService(
             lastActivity = timestamp { seconds = profile.lastSeen.epochSecond; nanos = profile.lastSeen.nano }
         }
 
-        if (request.authorizedProfileId == 0L || !blacklistClient.existsInBlacklist(
-                ownerId = request.requestedProfileId,
-                targetUserId = request.authorizedProfileId
-            )
-        ) {
-            addAdditionalFields(profile, responseBuilder)
+        try {
+            if (!blacklistCoroutine.await()) {
+                addAdditionalFields(profile, responseBuilder)
+            }
+        } catch (ex: StatusException) {
+            logger.error(ex.message)
         }
 
-        return responseBuilder.build()
+        responseBuilder.build()
     }
 
     suspend fun getProfileInfo(request: GetProfileInfoRequest): GetProfileInfoResponse {
@@ -133,12 +142,12 @@ class ProfileService(
             try {
                 response.rating = reviewCoroutine.await()
             } catch (ex: StatusException) {
-                ProfileServiceExternal.logger.error(ex.message)
+                logger.error(ex.message)
             }
             try {
                 addressCoroutine.await()?.let { response.address = it.toAddress() }
             } catch (ex: StatusException) {
-                ProfileServiceExternal.logger.error(ex.message)
+                logger.error(ex.message)
             }
         }
 
@@ -204,7 +213,7 @@ class ProfileService(
                 val address = addressCoroutine.await()
                 responseBuilder.address = address?.toProfileAddress()
             } catch (ex: StatusException) {
-                ProfileServiceExternal.logger.error(ex.message)
+                logger.error(ex.message)
             }
 
             try {
@@ -220,14 +229,14 @@ class ProfileService(
                     )
                 )
             } catch (ex: StatusException) {
-                ProfileServiceExternal.logger.error(ex.message)
+                logger.error(ex.message)
             }
 
             try {
                 val rating = reviewCoroutine.await()
                 responseBuilder.rating = rating
             } catch (ex: StatusException) {
-                ProfileServiceExternal.logger.error(ex.message)
+                logger.error(ex.message)
             }
         }
 }

@@ -1,7 +1,6 @@
 package ru.zveron.service.api
 
 import com.google.protobuf.Empty
-import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.contract.profile.DeleteProfileRequest
 import ru.zveron.contract.profile.GetChannelTypesRequest
@@ -28,8 +27,6 @@ class ProfileServiceExternal(
     private val profileService: ProfileService,
     private val settingsService: SettingsService,
 ) : ProfileServiceExternalGrpcKt.ProfileServiceExternalCoroutineImplBase() {
-
-    companion object : KLogging()
 
     override suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse =
         profileService.getProfilePage(request)

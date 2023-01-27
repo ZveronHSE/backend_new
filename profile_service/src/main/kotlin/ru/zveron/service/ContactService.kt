@@ -19,18 +19,6 @@ class ContactService(private val repository: ContactRepository) {
         repository.findById(id)
             .orElseThrow { ProfileNotFoundException("Profile with id: $id doesn't exist", Status.NOT_FOUND.code) }
 
-    fun save(contact: Contact) = repository.save(contact)
-
-    fun findByChannelOrThrow(channelType: ChannelType, id: String): Contact = when (channelType) {
-        ChannelType.PHONE -> repository.findByPhone(id)
-        ChannelType.GOOGLE -> repository.findByGmailId(id)
-        ChannelType.VK -> repository.findByVkId(id)
-        else -> throw ProfileException("Profile can't be find by channel $channelType", Status.INVALID_ARGUMENT.code)
-    } ?: throw ProfileNotFoundException(
-        "Can't find profile by channel: $channelType and channel id: $id",
-        Status.NOT_FOUND.code
-    )
-
     suspend fun updateContacts(request: UpdateContactsRequest) {
         val contact = findByIdOrThrow(request.profileId)
         contact.apply {
@@ -58,7 +46,7 @@ class ContactService(private val repository: ContactRepository) {
                 )
             }
         }
-        save(contact)
+        repository.save(contact)
     }
 
     suspend fun getProfileByChannel(request: GetProfileByChannelRequest): GetProfileByChannelResponse =
@@ -68,4 +56,14 @@ class ContactService(private val repository: ContactRepository) {
             name = profile.name
             surname = profile.surname
         }
+
+    private fun findByChannelOrThrow(channelType: ChannelType, id: String): Contact = when (channelType) {
+        ChannelType.PHONE -> repository.findByPhone(id)
+        ChannelType.GOOGLE -> repository.findByGmailId(id)
+        ChannelType.VK -> repository.findByVkId(id)
+        else -> throw ProfileException("Profile can't be find by channel $channelType", Status.INVALID_ARGUMENT.code)
+    } ?: throw ProfileNotFoundException(
+        "Can't find profile by channel: $channelType and channel id: $id",
+        Status.NOT_FOUND.code
+    )
 }

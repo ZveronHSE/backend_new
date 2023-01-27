@@ -43,3 +43,7 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
     enabled: true
+  instance:
+    metadata-map:
+      ProfileServiceInternal: 'profile_internal.proto'
+      ProfileServiceExternal: 'profile_external.proto'
