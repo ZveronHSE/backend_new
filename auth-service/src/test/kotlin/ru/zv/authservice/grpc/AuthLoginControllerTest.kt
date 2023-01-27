@@ -4,7 +4,9 @@ import io.grpc.Status
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.coEvery
+import kotlinx.coroutines.reactive.awaitLast
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -19,8 +21,8 @@ import ru.zv.authservice.grpc.client.dto.ProfileFound
 import ru.zv.authservice.grpc.client.dto.ProfileNotFound
 import ru.zv.authservice.persistence.FlowStateStorage
 import ru.zv.authservice.persistence.entity.StateContextEntity
-import ru.zv.authservice.persistence.model.MOBILE_PHONE_LOGIN_ALIAS
 import ru.zv.authservice.persistence.model.MobilePhoneLoginStateContext
+import ru.zv.authservice.persistence.model.MobilePhoneRegisterStateContext
 import ru.zv.authservice.util.randomCode
 import ru.zv.authservice.util.randomDeviceFp
 import ru.zv.authservice.util.randomId
@@ -137,17 +139,17 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             verifyResponse.shouldNotBeNull()
             assertSoftly {
                 verifyResponse.isNewUser shouldBe true
-                verifyResponse.sessionId shouldBe request.sessionId
+                verifyResponse.sessionId shouldNotBe request.sessionId
                 //todo tokens gen
             }
 
-            val ctxEntity = template.select(StateContextEntity::class.java).all().awaitSingle()
+            val ctxEntity = template.select(StateContextEntity::class.java).all().awaitLast()
             val registerFlowContext =
                 ctxEntity.data.asString()
-                    .let { objectMapper.readValue(it, MobilePhoneLoginStateContext::class.java) }
+                    .let { objectMapper.readValue(it, MobilePhoneRegisterStateContext::class.java) }
             registerFlowContext.shouldNotBeNull()
             assertSoftly {
-                registerFlowContext.isVerified shouldBe true
+                registerFlowContext.isChannelVerified shouldBe true
                 registerFlowContext.phoneNumber shouldBe initialCtx.phoneNumber
                 registerFlowContext.deviceFp shouldBe initialCtx.deviceFp
             }

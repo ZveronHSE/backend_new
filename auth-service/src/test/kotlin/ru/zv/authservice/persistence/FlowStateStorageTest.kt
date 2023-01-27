@@ -67,7 +67,7 @@ class FlowStateStorageTest : ContainerConfigurer() {
         val ctx = randomLoginFlowContext()
         val uuid = flowStateStorage.createContext(ctx)
 
-        val ctxEntity = flowStateStorage.getContext(uuid, MobilePhoneLoginStateContext::class)
+        val ctxEntity = flowStateStorage.getContext<MobilePhoneLoginStateContext>(uuid)
         ctxEntity.shouldNotBeNull()
 
         assertSoftly {

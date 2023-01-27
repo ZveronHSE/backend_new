@@ -10,7 +10,7 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://localhost:5555/auth_service
+    url: jdbc:postgresql://localhost:5555/auth
     password: zveron_password
     username: zveron_user
   jpa:
@@ -36,6 +36,7 @@ eureka:
   instance:
     metadata-map:
       AuthService: 'auth.proto'
+
 server:
   port: 0
 

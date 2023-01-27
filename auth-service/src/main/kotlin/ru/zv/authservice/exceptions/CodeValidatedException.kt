@@ -4,6 +4,5 @@ import io.grpc.Status
 
 class CodeValidatedException(
     message: String = "Code already validated",
-    val code: Status.Code = Status.Code.PERMISSION_DENIED,
-) :
-    RuntimeException("Exception with message=$message and code=$code")
+    code: Status.Code = Status.Code.PERMISSION_DENIED,
+) : AuthException(message, code)

@@ -4,6 +4,7 @@ import io.grpc.Status
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -61,9 +62,8 @@ class LoginByPhoneFlowServiceTest {
 
         val ctxSlot = slot<MobilePhoneLoginStateContext>()
 
-        coEvery { flowStateStorage.createContext(any()) } returns uuid
+        coEvery { flowStateStorage.createContext(capture(ctxSlot)) } returns uuid
         coEvery { notifierClient.initializeVerification(clientRequest) } returns NotifierSuccess(code)
-        coEvery { flowStateStorage.updateContext(uuid, capture(ctxSlot)) } returns ctx.copy(code = code)
 
         val initResponse = service.init(request)
         initResponse.shouldNotBeNull()
@@ -114,7 +114,7 @@ class LoginByPhoneFlowServiceTest {
 
         val ctxSlot = slot<MobilePhoneLoginStateContext>()
 
-        coEvery { flowStateStorage.getContext(eq(uuid), MobilePhoneLoginStateContext::class) } returns initialCtx
+        coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
         coEvery { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) } returns updatedCtx
         coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber) } returns ProfileFound(
             randomId(),
@@ -157,16 +157,17 @@ class LoginByPhoneFlowServiceTest {
 
             val ctxSlot = slot<MobilePhoneLoginStateContext>()
 
-            coEvery { flowStateStorage.getContext(eq(uuid), MobilePhoneLoginStateContext::class) } returns initialCtx
+            coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
             coEvery { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) } returns updatedCtx
             coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber) } returns ProfileNotFound
+            coEvery { flowStateStorage.createContext(any()) } returns UUID.randomUUID()
 
             val verifyResponse = service.verify(request)
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
                 verifyResponse.isNewUser shouldBe true
-                verifyResponse.sessionId shouldBe request.sessionId
+                verifyResponse.sessionId shouldNotBe request.sessionId
             }
 
             coVerify { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) }
@@ -184,7 +185,7 @@ class LoginByPhoneFlowServiceTest {
         )
         val uuid = UUID.randomUUID()
 
-        coEvery { flowStateStorage.getContext(eq(uuid), MobilePhoneLoginStateContext::class) } returns initialCtx
+        coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = differentCode,
@@ -205,7 +206,7 @@ class LoginByPhoneFlowServiceTest {
         )
         val uuid = UUID.randomUUID()
 
-        coEvery { flowStateStorage.getContext(eq(uuid), MobilePhoneLoginStateContext::class) } returns initialCtx
+        coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = initialCtx.code!!,

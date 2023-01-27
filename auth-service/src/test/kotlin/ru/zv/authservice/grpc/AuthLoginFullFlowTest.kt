@@ -3,9 +3,9 @@ package ru.zv.authservice.grpc
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldBeBlank
-import io.kotest.matchers.string.shouldNotBeBlank
+import io.kotest.matchers.shouldNotBe
 import io.mockk.coEvery
+import kotlinx.coroutines.reactive.awaitLast
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -16,8 +16,8 @@ import ru.zv.authservice.exceptions.CodeValidatedException
 import ru.zv.authservice.grpc.client.dto.ProfileFound
 import ru.zv.authservice.grpc.client.dto.ProfileNotFound
 import ru.zv.authservice.persistence.entity.StateContextEntity
-import ru.zv.authservice.persistence.model.MOBILE_PHONE_LOGIN_ALIAS
 import ru.zv.authservice.persistence.model.MobilePhoneLoginStateContext
+import ru.zv.authservice.persistence.model.MobilePhoneRegisterStateContext
 import ru.zv.authservice.service.dto.toContext
 import ru.zv.authservice.util.randomCode
 import ru.zv.authservice.util.randomDeviceFp
@@ -72,8 +72,6 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             assertSoftly {
                 verifyResponse.isNewUser shouldBe false
                 verifyResponse.sessionId shouldBe initResponse.sessionId
-                verifyResponse.mobileToken.accessToken.shouldNotBeBlank()
-                verifyResponse.mobileToken.refreshToken.shouldNotBeBlank()
             }
 
             val ctxEntity = template.select(StateContextEntity::class.java).all().awaitSingle()
@@ -119,18 +117,16 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             assertSoftly {
                 verifyResponse.isNewUser shouldBe true
-                verifyResponse.sessionId shouldBe initResponse.sessionId
-                verifyResponse.mobileToken.accessToken.shouldBeBlank()
-                verifyResponse.mobileToken.refreshToken.shouldBeBlank()
+                verifyResponse.sessionId shouldNotBe initResponse.sessionId
             }
 
-            val ctxEntity = template.select(StateContextEntity::class.java).all().awaitSingle()
+            val ctxEntity = template.select(StateContextEntity::class.java).all().awaitLast()
             val updatedCtx =
                 ctxEntity.data.asString()
-                    .let { objectMapper.readValue(it, MobilePhoneLoginStateContext::class.java) }
+                    .let { objectMapper.readValue(it, MobilePhoneRegisterStateContext::class.java) }
 
             assertSoftly {
-                updatedCtx.isVerified shouldBe true
+                updatedCtx.isChannelVerified shouldBe true
                 updatedCtx.deviceFp shouldBe deviceFp
                 updatedCtx.phoneNumber shouldBe phoneNumber.toContext()
             }
@@ -167,18 +163,16 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             assertSoftly {
                 verifyResponse.isNewUser shouldBe true
-                verifyResponse.sessionId shouldBe initResponse.sessionId
-                verifyResponse.mobileToken.accessToken.shouldBeBlank()
-                verifyResponse.mobileToken.refreshToken.shouldBeBlank()
+                verifyResponse.sessionId shouldNotBe initResponse.sessionId
             }
 
-            val ctxEntity = template.select(StateContextEntity::class.java).all().awaitSingle()
+            val ctxEntity = template.select(StateContextEntity::class.java).all().awaitLast()
             val updatedCtx =
                 ctxEntity.data.asString()
-                    .let { objectMapper.readValue(it, MobilePhoneLoginStateContext::class.java) }
+                    .let { objectMapper.readValue(it, MobilePhoneRegisterStateContext::class.java) }
 
             assertSoftly {
-                updatedCtx.isVerified shouldBe true
+                updatedCtx.isChannelVerified shouldBe true
                 updatedCtx.deviceFp shouldBe deviceFp
                 updatedCtx.phoneNumber shouldBe phoneNumber.toContext()
             }

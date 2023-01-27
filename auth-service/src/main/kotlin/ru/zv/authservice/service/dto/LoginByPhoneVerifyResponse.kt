@@ -1,5 +1,6 @@
 package ru.zv.authservice.service.dto
 
+import java.time.Instant
 import java.util.UUID
 
 data class LoginByPhoneVerifyResponse(
@@ -8,7 +9,7 @@ data class LoginByPhoneVerifyResponse(
     val tokens: JwtMobileTokens,
 ) {
     companion object {
-        fun register(sessionId: UUID) = LoginByPhoneVerifyResponse(
+        fun registration(sessionId: UUID) = LoginByPhoneVerifyResponse(
             sessionId = sessionId,
             isNewUser = true,
             tokens = JwtMobileTokens(
@@ -29,5 +30,7 @@ data class LoginByPhoneVerifyResponse(
 
 data class JwtMobileTokens(
     val accessToken: String,
+    val accessExpiration: Instant = Instant.now(),
     val refreshToken: String,
+    val refreshExpiration: Instant = Instant.now(),
 )
