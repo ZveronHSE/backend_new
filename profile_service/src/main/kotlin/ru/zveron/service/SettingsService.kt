@@ -76,5 +76,5 @@ class SettingsService(
 
     private fun findByIdOrThrow(id: Long) =
         repository.findById(id)
-            .orElseThrow { ProfileNotFoundException("Profile with id: $id doesn't exist", Status.NOT_FOUND.code) }
+            .orElseThrow { ProfileNotFoundException("Profile with id: $id doesn't exist") }
 }

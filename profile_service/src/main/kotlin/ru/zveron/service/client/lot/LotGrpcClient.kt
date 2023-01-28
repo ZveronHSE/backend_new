@@ -6,10 +6,11 @@ import ru.zveron.contract.lot.LotInternalServiceGrpcKt
 import ru.zveron.contract.lot.profileLotsRequest
 
 @Service
-class LotGrpcClient : LotClient{
+class LotGrpcClient : LotClient {
 
     @GrpcClient("lot-service")
     lateinit var service: LotInternalServiceGrpcKt.LotInternalServiceCoroutineStub
 
-    override suspend fun getLotsBySellerId(profileId: Long) = service.getLotsBySellerId(profileLotsRequest { id =  profileId})
+    override suspend fun getLotsBySellerId(profileId: Long) =
+        service.getLotsBySellerId(profileLotsRequest { id = profileId })
 }

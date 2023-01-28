@@ -8,7 +8,7 @@ import ru.zveron.contract.AddressServiceGrpcKt
 import ru.zveron.contract.addressIdRequest
 
 @Service
-class AddressGrpcClient: AddressClient {
+class AddressGrpcClient : AddressClient {
 
     @GrpcClient("address-service")
     lateinit var service: AddressServiceGrpcKt.AddressServiceCoroutineStub

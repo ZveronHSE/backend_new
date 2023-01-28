@@ -45,5 +45,4 @@ eureka:
     enabled: true
   instance:
     metadata-map:
-      ProfileServiceInternal: 'profile_internal.proto'
       ProfileServiceExternal: 'profile_external.proto'

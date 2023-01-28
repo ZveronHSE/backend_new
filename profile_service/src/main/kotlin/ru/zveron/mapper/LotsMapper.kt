@@ -7,9 +7,9 @@ import ru.zveron.contract.profile.lotSummary
 
 object LotsMapper {
 
-    fun List<Lot>.toBuilder(status: LotStatus): Collection<LotSummary> =
+    fun List<Lot>.toBuilder(status: LotStatus): List<LotSummary> =
         map { lot ->
-            lotSummary{
+            lotSummary {
                 id = lot.id
                 title = lot.title
                 priceFormatted = lot.price
