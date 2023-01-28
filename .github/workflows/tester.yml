@@ -43,3 +43,7 @@ jobs:
       - name: Test parameter service
         shell: bash
         run: if grep -q "parameter_service" "temp.txt"; then gradle :parameter_service:test; fi
+
+      - name: Test profile service
+        shell: bash
+        run: if grep -q "profile_service" "temp.txt"; then gradle :profile_service:test; fi

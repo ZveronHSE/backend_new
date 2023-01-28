@@ -23,4 +23,5 @@ include(
     "blacklist_service",
     "service_registry",
     "apigateway",
+    "profile_service",
 )
