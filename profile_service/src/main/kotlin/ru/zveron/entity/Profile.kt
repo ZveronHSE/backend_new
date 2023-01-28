@@ -18,13 +18,13 @@ data class Profile(
     @Column(nullable = false)
     val id: Long = 0,
     @Column(nullable = false, length = 50)
-    var name: String,
+    val name: String,
     @Column(nullable = false, length = 50)
-    var surname: String,
-    var imageId: Long,
+    val surname: String,
+    val imageId: Long,
     @Column(nullable = false)
     val lastSeen: Instant,
-    var addressId: Long = -1,
+    val addressId: Long = -1,
 ) {
     @PrimaryKeyJoinColumn
     @OneToOne(mappedBy = "profile", cascade = [CascadeType.ALL])

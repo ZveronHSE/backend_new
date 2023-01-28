@@ -21,32 +21,34 @@ class ContactService(private val repository: ContactRepository) {
 
     suspend fun updateContacts(request: UpdateContactsRequest) {
         val contact = findByIdOrThrow(request.profileId)
-        contact.apply {
-            when (request.type) {
-                ChannelType.PHONE -> phone = request.links.phone.number
-                ChannelType.VK -> {
-                    vkId = request.links.vk.id
-                    vkRef = request.links.vk.ref
-                    additionalEmail = request.links.vk.email
-                }
-
-                ChannelType.GOOGLE -> {
-                    gmailId = request.links.gmail.id
-                    gmail = request.links.gmail.email
-                }
-
-                ChannelType.CHAT -> throw ProfileException(
-                    "Chat channel type don't need to be added to contacts",
-                    Status.INVALID_ARGUMENT.code
-                )
-
-                else -> throw ProfileException(
-                    "Unrecognized channel type: ${request.type}",
-                    Status.INVALID_ARGUMENT.code
+        val updatedContacts = when (request.type) {
+            ChannelType.PHONE -> contact.copy(phone = request.links.phone.number)
+            ChannelType.VK -> {
+                contact.copy(
+                    vkId = request.links.vk.id,
+                    vkRef = request.links.vk.ref,
+                    additionalEmail = request.links.vk.email,
                 )
             }
+
+            ChannelType.GOOGLE -> {
+                contact.copy(
+                    gmailId = request.links.gmail.id,
+                    gmail = request.links.gmail.email,
+                )
+            }
+
+            ChannelType.CHAT -> throw ProfileException(
+                "Chat channel type don't need to be added to contacts",
+                Status.INVALID_ARGUMENT.code
+            )
+
+            else -> throw ProfileException(
+                "Unrecognized channel type: ${request.type}",
+                Status.INVALID_ARGUMENT.code
+            )
         }
-        repository.save(contact)
+        repository.save(updatedContacts)
     }
 
     suspend fun getProfileByChannel(request: GetProfileByChannelRequest): GetProfileByChannelResponse =

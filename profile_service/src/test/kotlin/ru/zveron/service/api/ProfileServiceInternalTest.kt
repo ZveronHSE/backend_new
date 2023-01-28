@@ -80,8 +80,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addVk = true, addChat = true)
-        val expectedContact = ContactsGenerator.generateContact(expectedProfile, addVk = true)
-        expectedContact.vkId = ""
+        expectedProfile.contact = ContactsGenerator.generateContact(expectedProfile, addVk = true).copy(vkId = "")
         val request = generateCreateProfileRequest(expectedProfile)
 
         val exception = shouldThrow<ProfileException> {

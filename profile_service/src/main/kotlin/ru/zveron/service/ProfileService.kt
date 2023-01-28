@@ -172,14 +172,14 @@ class ProfileService(
     suspend fun setProfileInfo(request: SetProfileInfoRequest) {
         val profile = findByIdOrThrow(request.id)
         val newAddress = addressClient.saveIfNotExists(request.address.toRequest())
-        profile.apply {
-            name = request.name
-            surname = request.surname
-            imageId = request.imageId
-            addressId = newAddress.id
-        }
+        val updatedProfile = profile.copy(
+            name = request.name,
+            surname = request.surname,
+            imageId = request.imageId,
+            addressId = newAddress.id,
+        )
 
-        profileRepository.save(profile)
+        profileRepository.save(updatedProfile)
     }
 
     private fun CoroutineScope.inOwnerBlacklist(

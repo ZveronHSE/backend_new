@@ -48,6 +48,7 @@ class SettingsService(
     suspend fun setSettings(request: SetSettingsRequest) {
         val settings = findByIdOrThrow(request.id)
         val links = settings.profile.contact
+        val channels = request.channelsList.toSet().toDto()
         if (request.channelsList.contains(ChannelType.VK) && links.vkRef.isBlank()) {
             throw ProfileException(
                 "Can't use vk as communication channel because link is missed",
@@ -66,12 +67,15 @@ class SettingsService(
                 Status.INVALID_ARGUMENT.code
             )
         }
-        settings.channels = request.channelsList.toSet().toDto()
-        ContactsValidator.validateNumberOfChannels(settings.channels)
-        ContactsValidator.validateLinksNotBlank(settings.channels, links)
-        settings.searchAddressId = addressClient.saveIfNotExists(request.address.toRequest()).id
+        ContactsValidator.validateNumberOfChannels(channels)
+        ContactsValidator.validateLinksNotBlank(channels, links)
 
-        repository.save(settings)
+        repository.save(
+            settings.copy(
+                channels = channels,
+                searchAddressId = addressClient.saveIfNotExists(request.address.toRequest()).id,
+            )
+        )
     }
 
     private fun findByIdOrThrow(id: Long) =

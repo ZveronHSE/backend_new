@@ -13,11 +13,11 @@ import javax.persistence.OneToOne
 data class Settings(
     @Id
     @Column(nullable = false)
-    var id: Long = 0,
-    var searchAddressId: Long = -1,
+    val id: Long = 0,
+    val searchAddressId: Long = -1,
     @Type(type = "json")
     @Column(columnDefinition = "jsonb")
-    var channels: ChannelsDto,
+    val channels: ChannelsDto,
     @OneToOne
     @MapsId
     val profile: Profile,

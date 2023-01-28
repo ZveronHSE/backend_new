@@ -12,13 +12,13 @@ data class Contact(
     @Id
     @Column(nullable = false)
     val id: Long = 0,
-    var vkId: String,
-    var vkRef: String,
-    var gmailId: String,
-    var gmail: String,
-    var additionalEmail: String,
+    val vkId: String,
+    val vkRef: String,
+    val gmailId: String,
+    val gmail: String,
+    val additionalEmail: String,
     @Column(length = 12)
-    var phone: String,
+    val phone: String,
     @OneToOne
     @MapsId
     val profile: Profile,
