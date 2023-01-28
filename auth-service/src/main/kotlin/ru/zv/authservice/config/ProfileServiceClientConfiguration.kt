@@ -9,6 +9,6 @@ import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 @GrpcClientBean(
     clazz = ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub::class,
     beanName = "profileGrpcClient",
-    client = GrpcClient("test"),
+    client = GrpcClient("profileGrpcClient"),
 )
 class ProfileServiceClientConfiguration

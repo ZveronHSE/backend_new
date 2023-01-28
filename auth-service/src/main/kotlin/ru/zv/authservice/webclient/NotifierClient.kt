@@ -14,9 +14,7 @@ class NotifierClient(
         const val GET_CODE_PATH = ""
     }
 
-    suspend fun initializeVerification(req: GetVerificationCodeRequest): NotifierResponse =
-        if (req.phoneNumber == "79257646188" || req.phoneNumber == "79257646189") NotifierSuccess("1111")
-        else NotifierFailure(code = Status.Code.UNAVAILABLE, null)
+    suspend fun initializeVerification(req: GetVerificationCodeRequest): NotifierResponse = NotifierSuccess("1111")
 
     private suspend fun callClient(req: GetVerificationCodeRequest) = client.post()
         .uri(GET_CODE_PATH)

@@ -12,6 +12,7 @@ import io.mockk.slot
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import ru.zv.authservice.component.auth.Authenticator
 import ru.zv.authservice.exceptions.FingerprintException
 import ru.zv.authservice.exceptions.NotifierClientException
 import ru.zv.authservice.exceptions.WrongCodeException
@@ -20,7 +21,6 @@ import ru.zv.authservice.grpc.client.dto.ProfileFound
 import ru.zv.authservice.grpc.client.dto.ProfileNotFound
 import ru.zv.authservice.persistence.FlowStateStorage
 import ru.zv.authservice.persistence.model.MobilePhoneLoginStateContext
-import ru.zv.authservice.service.dto.toContext
 import ru.zv.authservice.util.randomCode
 import ru.zv.authservice.util.randomDeviceFp
 import ru.zv.authservice.util.randomId
@@ -30,6 +30,7 @@ import ru.zv.authservice.util.randomLoginVerifyRequest
 import ru.zv.authservice.util.randomName
 import ru.zv.authservice.util.randomPhoneNumber
 import ru.zv.authservice.util.randomSurname
+import ru.zv.authservice.util.randomTokens
 import ru.zv.authservice.webclient.NotifierClient
 import ru.zv.authservice.webclient.NotifierFailure
 import ru.zv.authservice.webclient.NotifierSuccess
@@ -44,19 +45,19 @@ class LoginByPhoneFlowServiceTest {
 
     private val profileClient = mockk<ProfileServiceClient>()
 
+    private val authenticator = mockk<Authenticator>()
+
     private val service = LoginByPhoneFlowService(
         notifierClient = notifierClient,
         flowStateStorage = flowStateStorage,
         profileClient = profileClient,
+        authenticator = authenticator,
     )
 
     @Test
     fun `when login by phone init is a success, then returns session id`(): Unit = runBlocking {
         val request = randomLoginInitRequest()
         val clientRequest = GetVerificationCodeRequest(request.phoneNumber.toClientPhone())
-        val ctx = randomLoginFlowContext().copy(
-            phoneNumber = request.phoneNumber.toContext(),
-        )
         val uuid = UUID.randomUUID()
         val code = randomCode()
 
@@ -94,7 +95,6 @@ class LoginByPhoneFlowServiceTest {
             }
         }
 
-
     @Test
     fun `when login by phone verify is a success, and account found, then returns tokens`(): Unit = runBlocking {
         val uuid = UUID.randomUUID()
@@ -121,6 +121,7 @@ class LoginByPhoneFlowServiceTest {
             randomName(),
             randomSurname()
         )
+        coEvery { authenticator.loginUser(eq(initialCtx.deviceFp), any()) } returns randomTokens()
 
         val verifyResponse = service.verify(request)
         verifyResponse.shouldNotBeNull()
@@ -217,5 +218,4 @@ class LoginByPhoneFlowServiceTest {
             service.verify(request)
         }
     }
-
 }

@@ -1,6 +1,12 @@
 grpc:
   server:
     port: 0
+  client:
+    grpc-profile-service:
+      address: 'discovery:///profile-service'
+      enableKeepAlive: true # пока не оч ясно будет ли влиять я бы посмотрел
+      keepAliveWithoutCalls: true # то же самое
+      negotiationType: plaintext # пока что так, потом добавим всякие сертификаты
 spring:
   main:
     banner-mode: off
@@ -43,3 +49,13 @@ server:
 clients:
   notifier:
     baseUrl: http://localhost:8085
+
+
+zv:
+  jwt:
+    #create something legit and put in vault
+    secret: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    accessDurationMs: 600000  # 10 mins
+    refreshDurationMs: 6000000 # 100 mins
+  session:
+    sessionDurationMs: 2629800000 # 1 month

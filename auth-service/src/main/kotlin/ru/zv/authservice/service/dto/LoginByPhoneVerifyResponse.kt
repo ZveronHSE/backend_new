@@ -1,5 +1,7 @@
 package ru.zv.authservice.service.dto
 
+import ru.zv.authservice.component.jwt.JwtMapper.toServiceResponse
+import ru.zv.authservice.component.jwt.MobileTokens
 import java.time.Instant
 import java.util.UUID
 
@@ -18,12 +20,9 @@ data class LoginByPhoneVerifyResponse(
             )
         )
 
-        fun login(sessionId: UUID, accessToken: String, refreshToken: String) = LoginByPhoneVerifyResponse(
+        fun login(sessionId: UUID, tokens: MobileTokens) = LoginByPhoneVerifyResponse(
             sessionId = sessionId,
-            tokens = JwtMobileTokens(
-                accessToken = accessToken,
-                refreshToken = refreshToken,
-            )
+            tokens = tokens.toServiceResponse()
         )
     }
 }

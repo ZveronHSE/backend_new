@@ -3,6 +3,7 @@ package ru.zv.authservice.service
 import io.grpc.Status
 import mu.KLogging
 import org.springframework.stereotype.Service
+import ru.zv.authservice.component.auth.Authenticator
 import ru.zv.authservice.exceptions.CodeValidatedException
 import ru.zv.authservice.exceptions.FingerprintException
 import ru.zv.authservice.exceptions.NotifierClientException
@@ -31,6 +32,7 @@ class LoginByPhoneFlowService(
     private val notifierClient: NotifierClient,
     private val flowStateStorage: FlowStateStorage,
     private val profileClient: ProfileServiceClient,
+    private val authenticator: Authenticator,
 ) {
 
     companion object : KLogging()
@@ -73,11 +75,8 @@ class LoginByPhoneFlowService(
         }
 
         return profileData?.let {
-            LoginByPhoneVerifyResponse.login(
-                request.sessionId,
-                accessToken = "mock-access-token-${request.sessionId}",
-                refreshToken = "mock-refresh-token-${request.sessionId}",
-            )
+            val tokens = authenticator.loginUser(request.deviceFp, it.id)
+            LoginByPhoneVerifyResponse.login(request.sessionId, tokens)
         } ?: flowStateStorage.createContext(
             MobilePhoneRegisterStateContext(
                 phoneNumber = loginCtx.phoneNumber,
