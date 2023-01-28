@@ -46,3 +46,14 @@ eureka:
   instance:
     metadata-map:
       ProfileServiceExternal: 'profile_external.proto'
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 6060
+grpc:
+  server:
+    port: 6061

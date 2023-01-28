@@ -37,3 +37,12 @@ server:
 grpc:
   server:
     port: 0
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+grpc:
+  server:
+    port: 8762

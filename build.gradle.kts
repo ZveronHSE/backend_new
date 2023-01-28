@@ -53,7 +53,9 @@ subprojects {
 
         val applicationYaml = try {
             File(projectDir, pathToApplicationYml).inputStream().use {
-                (org.yaml.snakeyaml.Yaml().load(it) as Map<*, *>)
+                (org.yaml.snakeyaml.Yaml().loadAll(it).first {
+                    ((it as Map<*, *>)["spring"] as Map<*, *>).contains("datasource")
+                } as Map<*, *>)
             }
         } catch (ex: Exception) {
             throw IllegalArgumentException(

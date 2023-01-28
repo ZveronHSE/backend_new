@@ -27,3 +27,14 @@ eureka:
       enabled: false
     webclient:
       enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 6060
+grpc:
+  server:
+    port: 6061
