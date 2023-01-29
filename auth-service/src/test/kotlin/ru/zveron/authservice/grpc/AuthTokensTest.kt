@@ -13,9 +13,9 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.authservice.config.BaseAuthTest
 import ru.zveron.authservice.exception.InvalidTokenException
-import ru.zveron.authservice.grpc.client.dto.ProfileFound
+import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.persistence.entity.StateContextEntity
-import ru.zveron.authservice.service.dto.toContext
+import ru.zveron.authservice.service.ServiceMapper.toContext
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId

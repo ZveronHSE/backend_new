@@ -5,9 +5,9 @@ import ru.zveron.authservice.component.auth.RefreshMobileSessionRequest
 import ru.zveron.authservice.component.jwt.AccessToken
 import ru.zveron.authservice.component.jwt.MobileTokens
 import ru.zveron.authservice.component.jwt.RefreshToken
-import ru.zveron.authservice.service.dto.JwtMobileTokens
-import ru.zveron.authservice.service.dto.LoginByPhoneInitRequest
-import ru.zveron.authservice.service.dto.LoginByPhoneVerifyRequest
+import ru.zveron.authservice.service.model.JwtMobileTokens
+import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
+import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
 import ru.zveron.authservice.util.PhoneNumberParser
 import ru.zveron.contract.auth.IssueNewTokensRequest
 import ru.zveron.contract.auth.MobileToken
@@ -22,7 +22,11 @@ fun PhoneLoginInitRequest.toServiceRequest() =
     LoginByPhoneInitRequest(phoneNumber = PhoneNumberParser.stringToServicePhone(this.phoneNumber), this.deviceFp)
 
 fun PhoneLoginVerifyRequest.toServiceRequest() =
-    LoginByPhoneVerifyRequest(code = this.code, sessionId = UUID.fromString(this.sessionId), deviceFp = this.deviceFp)
+    LoginByPhoneVerifyRequest(
+        code = this.code,
+        sessionId = UUID.fromString(this.sessionId),
+        deviceFingerprint = this.deviceFp
+    )
 
 fun JwtMobileTokens.toGrpcToken(): MobileToken = mobileToken {
     this.accessToken = timedToken {
@@ -40,11 +44,10 @@ fun MobileTokens.toGrpcToken(): MobileToken = mobileToken {
     this.accessToken = this@toGrpcToken.accessToken.toGrpc()
 }
 
-fun IssueNewTokensRequest.toServiceRequest(): RefreshMobileSessionRequest =
-    RefreshMobileSessionRequest(
-        token = this@toServiceRequest.refreshToken,
-        fp = this@toServiceRequest.deviceFp,
-    )
+fun IssueNewTokensRequest.toServiceRequest(): RefreshMobileSessionRequest = RefreshMobileSessionRequest(
+    token = this@toServiceRequest.refreshToken,
+    fp = this@toServiceRequest.deviceFp,
+)
 
 fun AccessToken.toGrpc(): TimedToken = timedToken {
     this.token = this@toGrpc.token

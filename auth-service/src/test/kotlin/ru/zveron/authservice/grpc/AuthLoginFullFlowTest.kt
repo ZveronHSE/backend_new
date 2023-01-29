@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.authservice.config.BaseAuthTest
-import ru.zveron.authservice.grpc.client.dto.ProfileFound
-import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
+import ru.zveron.authservice.grpc.client.model.ProfileFound
+import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.persistence.entity.StateContextEntity
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext

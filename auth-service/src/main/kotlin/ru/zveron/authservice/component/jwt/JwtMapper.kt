@@ -9,7 +9,7 @@ import ru.zveron.authservice.component.jwt.Constants.TOKEN_TYPE
 import ru.zveron.authservice.component.jwt.model.DecodedToken
 import ru.zveron.authservice.component.jwt.model.TokenType
 import ru.zveron.authservice.exception.InvalidTokenException
-import ru.zveron.authservice.service.dto.JwtMobileTokens
+import ru.zveron.authservice.service.model.JwtMobileTokens
 import java.time.Instant
 import java.util.UUID
 

@@ -8,7 +8,7 @@ import ru.zveron.authservice.component.jwt.MobileTokens
 import ru.zveron.authservice.exception.InvalidTokenException
 import ru.zveron.authservice.exception.SessionExpiredException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
-import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
+import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.persistence.SessionStorage
 
 @Component

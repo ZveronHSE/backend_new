@@ -8,14 +8,16 @@ import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.exception.FingerprintException
 import ru.zveron.authservice.exception.NotifierClientException
 import ru.zveron.authservice.exception.WrongCodeException
-import ru.zveron.authservice.grpc.client.dto.ProfileFound
-import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
-import ru.zveron.authservice.grpc.client.dto.ProfileUnknownFailure
+import ru.zveron.authservice.grpc.client.ProfileServiceClient
+import ru.zveron.authservice.grpc.client.model.ProfileFound
+import ru.zveron.authservice.grpc.client.model.ProfileNotFound
+import ru.zveron.authservice.grpc.client.model.ProfileUnknownFailure
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
 import ru.zveron.authservice.service.ServiceMapper.toClientRequest
 import ru.zveron.authservice.service.ServiceMapper.toContext
+import ru.zveron.authservice.service.ServiceMapper.toProfileClientRequest
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyResponse
@@ -49,7 +51,7 @@ class LoginByPhoneFlowService(
             when (val clientResponse = notifierClient.initializeVerification(request.toClientRequest())) {
                 is NotifierFailure -> {
                     logger.error { "An error produced in the client, response is $clientResponse" }
-                    throw ru.zveron.authservice.exception.NotifierClientException()
+                    throw NotifierClientException()
                 }
 
                 is NotifierSuccess -> phoneVerificationCtx.copy(code = clientResponse.verificationCode)
@@ -72,20 +74,20 @@ class LoginByPhoneFlowService(
 
         val updatedCtx = validateCodeAndUpdateContext(loginCtx, request.code, request.sessionId)
 
-        val profileResponse = profileClient.getAccountByPhone(updatedCtx.phoneNumber)
+        val profileResponse = profileClient.getAccountByPhone(updatedCtx.phoneNumber.toProfileClientRequest())
 
         val profileData: ProfileTokenData? = when (profileResponse) {
             is ProfileFound -> ProfileTokenData(profileResponse.id, profileResponse.name, profileResponse.surname)
             is ProfileNotFound -> null
-            is ProfileUnknownFailure -> throw ru.zveron.authservice.exception.NotifierClientException(
+            is ProfileUnknownFailure -> throw NotifierClientException(
                 profileResponse.message ?: "no message",
                 profileResponse.code
             )
         }
 
         return profileData?.let {
-            val tokens = authenticator.loginUser(request.deviceFp, it.id)
-            LoginByPhoneVerifyResponse.login(request.sessionId, tokens)
+            val tokens = authenticator.loginUser(request.deviceFingerprint, it.id)
+            LoginByPhoneVerifyResponse.login(request.sessionId, tokens.accessToken.token, tokens.refreshToken.token)
         } ?: flowStateStorage.createContext(
             MobilePhoneRegisterStateContext(
                 phoneNumber = updatedCtx.phoneNumber,
@@ -99,10 +101,10 @@ class LoginByPhoneFlowService(
 
     private fun validateContext(loginCtx: MobilePhoneLoginStateContext, requestDeviceFp: String) {
         if (loginCtx.isVerified) {
-            throw ru.zveron.authservice.exception.CodeValidatedException()
+            throw CodeValidatedException()
         }
         if (loginCtx.deviceFp != requestDeviceFp) {
-            throw ru.zveron.authservice.exception.FingerprintException(
+            throw FingerprintException(
                 "Device fp does not match",
                 Status.Code.UNAUTHENTICATED
             )
@@ -121,7 +123,7 @@ class LoginByPhoneFlowService(
         val updatedCtx = loginCtx.copy(codeAttempts = loginCtx.codeAttempts.inc(), lastAttemptAt = Instant.now())
 
         if (loginCtx.code != code) {
-            throw ru.zveron.authservice.exception.WrongCodeException("Wrong code", Status.Code.INVALID_ARGUMENT)
+            throw WrongCodeException("Wrong code", Status.Code.INVALID_ARGUMENT)
         }
 
         return flowStateStorage.updateContext(sessionId = sessionId, context = updatedCtx.copy(isVerified = true))

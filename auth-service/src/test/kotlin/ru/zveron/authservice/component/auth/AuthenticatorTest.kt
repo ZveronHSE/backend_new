@@ -11,8 +11,8 @@ import ru.zveron.authservice.component.jwt.JwtManager
 import ru.zveron.authservice.exception.InvalidTokenException
 import ru.zveron.authservice.exception.SessionExpiredException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
-import ru.zveron.authservice.grpc.client.dto.ProfileFound
-import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
+import ru.zveron.authservice.grpc.client.model.ProfileFound
+import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.persistence.SessionStorage
 import ru.zveron.authservice.util.randomDecodedToken
 import ru.zveron.authservice.util.randomDeviceFp

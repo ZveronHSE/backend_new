@@ -12,10 +12,12 @@ import io.mockk.slot
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import ru.zveron.authservice.grpc.client.dto.ProfileFound
-import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
+import ru.zveron.authservice.grpc.client.ProfileServiceClient
+import ru.zveron.authservice.grpc.client.model.ProfileFound
+import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
+import ru.zveron.authservice.service.ServiceMapper.toProfileClientRequest
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId
@@ -25,6 +27,7 @@ import ru.zveron.authservice.util.randomLoginVerifyRequest
 import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPhoneNumber
 import ru.zveron.authservice.util.randomSurname
+import ru.zveron.authservice.util.randomTokens
 import ru.zveron.authservice.webclient.NotifierClient
 import ru.zveron.authservice.webclient.NotifierFailure
 import ru.zveron.authservice.webclient.NotifierSuccess
@@ -110,7 +113,7 @@ class LoginByPhoneFlowServiceTest {
 
         coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
         coEvery { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) } returns updatedCtx
-        coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber) } returns ProfileFound(
+        coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileFound(
             randomId(),
             randomName(),
             randomSurname()
@@ -154,7 +157,7 @@ class LoginByPhoneFlowServiceTest {
 
             coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
             coEvery { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) } returns updatedCtx
-            coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber) } returns ProfileNotFound
+            coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileNotFound
             coEvery { flowStateStorage.createContext(any()) } returns UUID.randomUUID()
 
             val verifyResponse = service.verify(request)

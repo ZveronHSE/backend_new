@@ -7,7 +7,13 @@ import ru.zveron.authservice.webclient.dto.GetVerificationCodeRequest
 object ServiceMapper {
 
     fun PhoneNumber.toContext() =
-        ru.zveron.authservice.persistence.model.PhoneNumber(countryCode = countryCode.toString(), phone = phone.toString())
+        ru.zveron.authservice.persistence.model.PhoneNumber(
+            countryCode = countryCode.toString(),
+            phone = phone.toString()
+        )
 
-    fun LoginByPhoneInitRequest.toClientRequest() = GetVerificationCodeRequest(phoneNumber = phoneNumber.toClientPhone())
+    fun LoginByPhoneInitRequest.toClientRequest() =
+        GetVerificationCodeRequest(phoneNumber = phoneNumber.toClientPhone())
+
+    fun ru.zveron.authservice.persistence.model.PhoneNumber.toProfileClientRequest() = "$countryCode$phone"
 }
