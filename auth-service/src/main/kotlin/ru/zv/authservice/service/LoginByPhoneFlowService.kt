@@ -5,6 +5,7 @@ import mu.KLogging
 import org.springframework.stereotype.Service
 import ru.zv.authservice.component.auth.Authenticator
 import ru.zv.authservice.exceptions.CodeValidatedException
+import ru.zv.authservice.exceptions.ContextExpiredException
 import ru.zv.authservice.exceptions.FingerprintException
 import ru.zv.authservice.exceptions.NotifierClientException
 import ru.zv.authservice.exceptions.WrongCodeException
@@ -37,6 +38,9 @@ class LoginByPhoneFlowService(
 
     companion object : KLogging()
 
+    /**
+     * throws [NotifierClientException]
+     */
     suspend fun init(request: LoginByPhoneInitRequest): UUID {
         val phoneVerificationCtx = MobilePhoneLoginStateContext(
             phoneNumber = request.phoneNumber.toContext(),
@@ -56,6 +60,13 @@ class LoginByPhoneFlowService(
         return flowStateStorage.createContext(verificationContext)
     }
 
+    /**
+     * throws [ContextExpiredException]
+     * throws [WrongCodeException]
+     * throws [NotifierClientException]
+     * throws [CodeValidatedException]
+     * throws [FingerprintException]
+     */
     suspend fun verify(request: LoginByPhoneVerifyRequest): LoginByPhoneVerifyResponse {
         val loginCtx = flowStateStorage.getContext<MobilePhoneLoginStateContext>(request.sessionId)
 
@@ -97,6 +108,10 @@ class LoginByPhoneFlowService(
         }
     }
 
+    /**
+     * throws [WrongCodeException]
+     * throws [ContextExpiredException]
+     */
     private suspend fun validateCodeAndUpdateContext(
         loginCtx: MobilePhoneLoginStateContext,
         code: String,

@@ -6,6 +6,7 @@ import ru.zv.authservice.component.jwt.IssueMobileTokensRequest
 import ru.zv.authservice.component.jwt.JwtManager
 import ru.zv.authservice.component.jwt.MobileTokens
 import ru.zv.authservice.exceptions.InvalidTokenException
+import ru.zv.authservice.exceptions.SessionExpiredException
 import ru.zv.authservice.grpc.client.ProfileServiceClient
 import ru.zv.authservice.grpc.client.dto.ProfileNotFound
 import ru.zv.authservice.persistence.SessionStorage
@@ -35,6 +36,7 @@ class Authenticator(
 
     /**
      * throws [InvalidTokenException]
+     * throws [SessionExpiredException]
      * */
     suspend fun refreshMobileSession(request: RefreshMobileSessionRequest): MobileTokens {
         val decodedToken = jwtManager.decodeRefreshToken(token = request.token)

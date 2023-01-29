@@ -137,7 +137,7 @@ class JwtEncoderDecoderTest {
 
         val id = RandomUtils.nextLong()
         val sessionId = UUID.randomUUID()
-        val claimBuilder = JWTClaimsSet.Builder().issuer("Zveron")
+        val claimBuilder = JWTClaimsSet.Builder().issuer(ZV_ISSUER)
             .subject(id.toString())
             .claim(SESSION_ID, sessionId)
 

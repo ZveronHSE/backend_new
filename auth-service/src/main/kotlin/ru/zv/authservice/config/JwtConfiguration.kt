@@ -19,7 +19,7 @@ class JwtConfiguration(
 ) {
 
     @Bean
-    fun signer() = JwtEncoder(
+    fun encoder() = JwtEncoder(
         signer = MACSigner(properties.secret),
         algorithm = JWSAlgorithm.HS256,
         accessDurationMs = properties.accessDurationMs,
