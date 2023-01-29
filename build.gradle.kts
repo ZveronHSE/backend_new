@@ -22,6 +22,7 @@ val springVersion: String by project
 val kotlinVersion: String by project
 val eurekaVersion: String by project
 val kotlinxVersion: String by project
+val testcontainersVersion: String by project
 val arch = System.getProperty("os.arch")
 
 
@@ -70,8 +71,10 @@ subprojects {
                 password = map["password"] as String
             )
         } catch (ex: Exception) {
-            throw IllegalArgumentException("Вероятно, не хватает в application.yml " +
-                    "параметров url, username или password: ${ex.message}")
+            throw IllegalArgumentException(
+                "Вероятно, не хватает в application.yml " +
+                    "параметров url, username или password: ${ex.message}"
+            )
         }
     }
 
@@ -116,7 +119,7 @@ subprojects {
         }
 
         //Без этой штуки у М1 жопа отваливается с вебфлаксом
-        if (arch.equals("aarch64")){
+        if (arch.equals("aarch64")) {
             implementation("io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64")
         }
 
@@ -130,12 +133,12 @@ subprojects {
         // Тесты
         testImplementation("io.grpc:grpc-testing:$grpcVersion")
         testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
+        testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+        testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
+        testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
         testImplementation("io.kotest:kotest-assertions-core-jvm:5.2.2")
-        testImplementation("org.testcontainers:postgresql:1.16.3")
-        testImplementation("org.testcontainers:junit-jupiter:1.16.3")
         testImplementation("org.assertj:assertj-core:3.22.0")
         testImplementation("io.mockk:mockk:1.13.3")
-        testImplementation("org.testcontainers:r2dbc:1.16.3")
         implementation("com.ninja-squad:springmockk:4.0.0")
 
     }
@@ -200,11 +203,11 @@ subprojects {
 // TODO надо бы все это вынести в отдельный градл скриптик, можно будет сделать отдельный класс и покрыть его тестами
 fun getNextChangeSetNumber(path: String): String {
     val result = (
-            File(path)
-                .listFiles()
-                ?.mapNotNull { file -> file.name.split('_').firstOrNull()?.toIntOrNull() }
-                ?.maxOrNull() ?: 0
-            ) + 1
+        File(path)
+            .listFiles()
+            ?.mapNotNull { file -> file.name.split('_').firstOrNull()?.toIntOrNull() }
+            ?.maxOrNull() ?: 0
+        ) + 1
 
     return result.toString().padStart(2, '0')
 }

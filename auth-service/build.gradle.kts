@@ -15,6 +15,6 @@ dependencies {
 
     implementation("com.googlecode.libphonenumber:libphonenumber:8.13.4")
 
-    implementation("com.github.zveronHSe.contract:profile:feature~ZV-185-profile-service-SNAPSHOT")
-    implementation("com.github.zveronHSe.contract:auth:b338b1f8f4")
+    implementation("com.github.zveronHSe.contract:profile:1.7.0")
+    implementation("com.github.zveronHSe.contract:auth:1.7.0")
 }
