@@ -1,4 +1,4 @@
-package ru.zveron.authservice.service.dto
+package ru.zveron.authservice.service.model
 
 data class ProfileTokenData(
     val id: Long,

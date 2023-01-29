@@ -12,13 +12,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.authservice.config.BaseAuthTest
-import ru.zveron.authservice.exception.CodeValidatedException
 import ru.zveron.authservice.grpc.client.dto.ProfileFound
 import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
 import ru.zveron.authservice.persistence.entity.StateContextEntity
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
-import ru.zveron.authservice.service.dto.toContext
+import ru.zveron.authservice.service.ServiceMapper.toContext
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId
@@ -178,7 +177,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             }
 
             //here throws exception
-            assertThrows<CodeValidatedException> {
+            assertThrows<ru.zveron.authservice.exception.CodeValidatedException> {
                 authLoginController.phoneLoginVerify(verifyRequest)
             }
         }

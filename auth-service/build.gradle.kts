@@ -15,7 +15,6 @@ dependencies {
 
     implementation("com.googlecode.libphonenumber:libphonenumber:8.13.4")
 
-    implementation("com.github.zveronHSe.contract:profile:966fd7effa")
-    implementation("com.github.zveronHSe.contract:auth:a5ff052765")
-    implementation("com.nimbusds:nimbus-jose-jwt:9.29")
+    implementation("com.github.zveronHSe.contract:profile:1.7.0")
+    implementation("com.github.zveronHSe.contract:auth:1.7.0")
 }

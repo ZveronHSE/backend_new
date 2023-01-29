@@ -13,10 +13,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.authservice.config.BaseAuthTest
-import ru.zveron.authservice.exception.CodeValidatedException
-import ru.zveron.authservice.exception.FingerprintException
-import ru.zveron.authservice.exception.NotifierClientException
-import ru.zveron.authservice.exception.WrongCodeException
 import ru.zveron.authservice.grpc.client.dto.ProfileFound
 import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
 import ru.zveron.authservice.persistence.FlowStateStorage
@@ -78,7 +74,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
                 message = "Client failure"
             )
 
-            assertThrows<NotifierClientException> {
+            assertThrows<ru.zveron.authservice.exception.NotifierClientException> {
                 authLoginController.phoneLoginInit(request)
             }
         }
@@ -169,7 +165,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             this.deviceFp = initialCtx.deviceFp
         }
 
-        assertThrows<WrongCodeException> {
+        assertThrows<ru.zveron.authservice.exception.WrongCodeException> {
             authLoginController.phoneLoginVerify(request)
         }
     }
@@ -189,7 +185,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
                 this.deviceFp = initialCtx.deviceFp
             }
 
-            assertThrows<CodeValidatedException> {
+            assertThrows<ru.zveron.authservice.exception.CodeValidatedException> {
                 authLoginController.phoneLoginVerify(request)
             }
         }
@@ -207,7 +203,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             this.code = initialCtx.code!!
             this.deviceFp = differentFp
         }
-        assertThrows<FingerprintException> {
+        assertThrows<ru.zveron.authservice.exception.FingerprintException> {
             authLoginController.phoneLoginVerify(request)
         }
     }

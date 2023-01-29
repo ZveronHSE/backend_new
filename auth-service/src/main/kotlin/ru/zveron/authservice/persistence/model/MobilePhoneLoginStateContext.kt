@@ -16,12 +16,3 @@ data class MobilePhoneLoginStateContext(
 ) : StateContext {
     override val type: ContextType = ContextType.MOBILE_PHONE_LOGIN
 }
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-data class MobilePhoneRegisterStateContext(
-    val phoneNumber: PhoneNumber,
-    val deviceFp: String,
-    val isChannelVerified: Boolean = false,
-) : StateContext {
-    override val type: ContextType = ContextType.MOBILE_PHONE_REGISTER
-}

@@ -12,10 +12,6 @@ import io.mockk.slot
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import ru.zveron.authservice.exception.FingerprintException
-import ru.zveron.authservice.exception.NotifierClientException
-import ru.zveron.authservice.exception.WrongCodeException
-import ru.zveron.authservice.grpc.client.ProfileServiceClient
 import ru.zveron.authservice.grpc.client.dto.ProfileFound
 import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
 import ru.zveron.authservice.persistence.FlowStateStorage
@@ -29,7 +25,6 @@ import ru.zveron.authservice.util.randomLoginVerifyRequest
 import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPhoneNumber
 import ru.zveron.authservice.util.randomSurname
-import ru.zveron.authservice.util.randomTokens
 import ru.zveron.authservice.webclient.NotifierClient
 import ru.zveron.authservice.webclient.NotifierFailure
 import ru.zveron.authservice.webclient.NotifierSuccess
@@ -89,7 +84,7 @@ class LoginByPhoneFlowServiceTest {
                 message = "Client failure"
             )
 
-            assertThrows<NotifierClientException> {
+            assertThrows<ru.zveron.authservice.exception.NotifierClientException> {
                 service.init(request)
             }
         }
@@ -104,7 +99,7 @@ class LoginByPhoneFlowServiceTest {
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = initialCtx.code!!,
-            deviceFp = initialCtx.deviceFp,
+            deviceFingerprint = initialCtx.deviceFp,
         )
         val updatedCtx = initialCtx.copy(
             isVerified = true,
@@ -148,7 +143,7 @@ class LoginByPhoneFlowServiceTest {
             val request = randomLoginVerifyRequest().copy(
                 sessionId = uuid,
                 code = initialCtx.code!!,
-                deviceFp = initialCtx.deviceFp,
+                deviceFingerprint = initialCtx.deviceFp,
             )
             val updatedCtx = initialCtx.copy(
                 isVerified = true,
@@ -189,10 +184,10 @@ class LoginByPhoneFlowServiceTest {
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = differentCode,
-            deviceFp = initialCtx.deviceFp
+            deviceFingerprint = initialCtx.deviceFp
         )
 
-        assertThrows<WrongCodeException> {
+        assertThrows<ru.zveron.authservice.exception.WrongCodeException> {
             service.verify(request)
         }
     }
@@ -210,10 +205,10 @@ class LoginByPhoneFlowServiceTest {
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = initialCtx.code!!,
-            deviceFp = differentFp,
+            deviceFingerprint = differentFp,
         )
 
-        assertThrows<FingerprintException> {
+        assertThrows<ru.zveron.authservice.exception.FingerprintException> {
             service.verify(request)
         }
     }

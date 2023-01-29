@@ -8,19 +8,18 @@ import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.exception.FingerprintException
 import ru.zveron.authservice.exception.NotifierClientException
 import ru.zveron.authservice.exception.WrongCodeException
-import ru.zveron.authservice.grpc.client.ProfileServiceClient
 import ru.zveron.authservice.grpc.client.dto.ProfileFound
 import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
 import ru.zveron.authservice.grpc.client.dto.ProfileUnknownFailure
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
-import ru.zveron.authservice.service.dto.LoginByPhoneInitRequest
-import ru.zveron.authservice.service.dto.LoginByPhoneVerifyRequest
-import ru.zveron.authservice.service.dto.LoginByPhoneVerifyResponse
-import ru.zveron.authservice.service.dto.ProfileTokenData
-import ru.zveron.authservice.service.dto.toClientRequest
-import ru.zveron.authservice.service.dto.toContext
+import ru.zveron.authservice.service.ServiceMapper.toClientRequest
+import ru.zveron.authservice.service.ServiceMapper.toContext
+import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
+import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
+import ru.zveron.authservice.service.model.LoginByPhoneVerifyResponse
+import ru.zveron.authservice.service.model.ProfileTokenData
 import ru.zveron.authservice.webclient.NotifierClient
 import ru.zveron.authservice.webclient.NotifierFailure
 import ru.zveron.authservice.webclient.NotifierSuccess
@@ -43,14 +42,14 @@ class LoginByPhoneFlowService(
     suspend fun init(request: LoginByPhoneInitRequest): UUID {
         val phoneVerificationCtx = MobilePhoneLoginStateContext(
             phoneNumber = request.phoneNumber.toContext(),
-            deviceFp = request.deviceFp,
+            deviceFp = request.deviceFingerprint,
         )
 
         val verificationContext =
             when (val clientResponse = notifierClient.initializeVerification(request.toClientRequest())) {
                 is NotifierFailure -> {
                     logger.error { "An error produced in the client, response is $clientResponse" }
-                    throw NotifierClientException()
+                    throw ru.zveron.authservice.exception.NotifierClientException()
                 }
 
                 is NotifierSuccess -> phoneVerificationCtx.copy(code = clientResponse.verificationCode)
@@ -69,7 +68,7 @@ class LoginByPhoneFlowService(
     suspend fun verify(request: LoginByPhoneVerifyRequest): LoginByPhoneVerifyResponse {
         val loginCtx = flowStateStorage.getContext<MobilePhoneLoginStateContext>(request.sessionId)
 
-        validateContext(loginCtx, request.deviceFp)
+        validateContext(loginCtx, request.deviceFingerprint)
 
         val updatedCtx = validateCodeAndUpdateContext(loginCtx, request.code, request.sessionId)
 
@@ -78,7 +77,7 @@ class LoginByPhoneFlowService(
         val profileData: ProfileTokenData? = when (profileResponse) {
             is ProfileFound -> ProfileTokenData(profileResponse.id, profileResponse.name, profileResponse.surname)
             is ProfileNotFound -> null
-            is ProfileUnknownFailure -> throw NotifierClientException(
+            is ProfileUnknownFailure -> throw ru.zveron.authservice.exception.NotifierClientException(
                 profileResponse.message ?: "no message",
                 profileResponse.code
             )
@@ -89,8 +88,8 @@ class LoginByPhoneFlowService(
             LoginByPhoneVerifyResponse.login(request.sessionId, tokens)
         } ?: flowStateStorage.createContext(
             MobilePhoneRegisterStateContext(
-                phoneNumber = loginCtx.phoneNumber,
-                deviceFp = loginCtx.deviceFp,
+                phoneNumber = updatedCtx.phoneNumber,
+                deviceFp = updatedCtx.deviceFp,
                 isChannelVerified = updatedCtx.isVerified,
             )
         ).let {
@@ -100,10 +99,13 @@ class LoginByPhoneFlowService(
 
     private fun validateContext(loginCtx: MobilePhoneLoginStateContext, requestDeviceFp: String) {
         if (loginCtx.isVerified) {
-            throw CodeValidatedException()
+            throw ru.zveron.authservice.exception.CodeValidatedException()
         }
         if (loginCtx.deviceFp != requestDeviceFp) {
-            throw FingerprintException("Device fp does not match", Status.Code.UNAUTHENTICATED)
+            throw ru.zveron.authservice.exception.FingerprintException(
+                "Device fp does not match",
+                Status.Code.UNAUTHENTICATED
+            )
         }
     }
 
@@ -119,7 +121,7 @@ class LoginByPhoneFlowService(
         val updatedCtx = loginCtx.copy(codeAttempts = loginCtx.codeAttempts.inc(), lastAttemptAt = Instant.now())
 
         if (loginCtx.code != code) {
-            throw WrongCodeException("Wrong code", Status.Code.INVALID_ARGUMENT)
+            throw ru.zveron.authservice.exception.WrongCodeException("Wrong code", Status.Code.INVALID_ARGUMENT)
         }
 
         return flowStateStorage.updateContext(sessionId = sessionId, context = updatedCtx.copy(isVerified = true))

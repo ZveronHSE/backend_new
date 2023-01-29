@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.r2dbc.postgresql.codec.Json
 import mu.KLogging
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.persistence.entity.StateContextEntity
 import ru.zveron.authservice.persistence.model.StateContext
@@ -32,7 +31,6 @@ class FlowStateStorage(
     /**
      * throws [ContextExpiredException]
      */
-    @Transactional
     suspend fun <CTX : StateContext> updateContext(sessionId: UUID, context: CTX): CTX {
         stateRepository.findBySessionId(sessionId)?.let {
             return stateRepository.save(it.copy(data = context.toJson())).data.toContext(context::class)
@@ -48,7 +46,6 @@ class FlowStateStorage(
      */
     final suspend inline fun <reified CTX : StateContext> getContext(sessionId: UUID): CTX =
         getContext(sessionId, CTX::class)
-
 
     private fun StateContext.toJson() = Json.of(objectMapper.writeValueAsBytes(this))
 
