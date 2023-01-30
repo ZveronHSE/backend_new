@@ -69,6 +69,5 @@ spring:
 2. Добавить `application-preprod.yml`, где нужно указать порты для сервера и переопределить адрес registry
 3. Добавить сервис в `docker-compose.yml`
 4. Добавить шаг создания образа в `.github/workflows/builder.yml`
-5. После успешной публикации образа - сделать его публичным ([тут](https://github.com/orgs/ZveronHSE/packages))
 ### Deploy
 _In progress..._
