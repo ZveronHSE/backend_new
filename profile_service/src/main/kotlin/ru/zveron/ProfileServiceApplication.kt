@@ -6,8 +6,8 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient
 
 @SpringBootApplication
 @EnableEurekaClient
-class BlacklistServiceApplication
+class ProfileServiceApplication
 
 fun main(args: Array<String>) {
-    runApplication<BlacklistServiceApplication>(*args)
+    runApplication<ProfileServiceApplication>(*args)
 }
