@@ -29,3 +29,7 @@ eureka:
   instance:
     metadata-map:
       BlacklistService: 'crud.proto'
+  client:
+    register-with-eureka: true
+    tls:
+      enabled: false

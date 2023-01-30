@@ -64,6 +64,9 @@ spring:
         run: if grep -q "<название сервиса>" "temp.txt"; then gradle :<название сервиса>:test; fi
 ```
 ### Continuous delivery
-_In progress..._
+Когда добавляем новый сервис, нужно:
+1. Создать `Dockerfile` по анаогии с теми, что уже есть
+2. Добавить `application-preprod.yml`, где нужно указать порты для сервера и переопределить адрес registry
+3. Добавить сервис в `docker-compose.yml`
 ### Deploy
 _In progress..._
