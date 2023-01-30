@@ -16,6 +16,7 @@ import ru.zveron.contract.auth.PhoneLoginVerifyRequest
 import ru.zveron.contract.auth.TimedToken
 import ru.zveron.contract.auth.mobileToken
 import ru.zveron.contract.auth.timedToken
+import java.time.Instant
 import java.util.UUID
 
 object GrpcMapper {
@@ -32,11 +33,11 @@ object GrpcMapper {
     fun JwtMobileTokens.toGrpcToken(): MobileToken = mobileToken {
         this.accessToken = timedToken {
             this.token = this@toGrpcToken.accessToken
-            this.expiration = toTimeStamp()
+            this.expiration = this@toGrpcToken.accessExpiration.toTimeStamp()
         }
         this.refreshToken = timedToken {
             this.token = this@toGrpcToken.refreshToken
-            this.expiration = toTimeStamp()
+            this.expiration = this@toGrpcToken.refreshExpiration.toTimeStamp()
         }
     }
 
@@ -52,16 +53,16 @@ object GrpcMapper {
 
     private fun AccessToken.toGrpc(): TimedToken = timedToken {
         this.token = this@toGrpc.token
-        this.expiration = toTimeStamp()
+        this.expiration = this@toGrpc.expiresAt.toTimeStamp()
     }
 
     private fun RefreshToken.toGrpc(): TimedToken = timedToken {
         this.token = this@toGrpc.token
-        this.expiration = toTimeStamp()
+        this.expiration = this@toGrpc.expiresAt.toTimeStamp()
     }
 
-    private fun toTimeStamp() = timestamp {
-        this@timestamp.nanos = this.nanos
-        this@timestamp.seconds = this.seconds
+    private fun Instant.toTimeStamp() = timestamp {
+        this@timestamp.nanos = this@toTimeStamp.nano
+        this@timestamp.seconds = this@toTimeStamp.epochSecond
     }
 }
