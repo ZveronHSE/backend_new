@@ -27,7 +27,7 @@ jobs:
           git fetch origin master
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
           while read p; do
-            if p =~ ^[a-zA-Z-]*$; then
+            if $p =~ ^[a-zA-Z-]*$; then
               export "$p"="$p"
               echo "$p CHANGED"
             fi
