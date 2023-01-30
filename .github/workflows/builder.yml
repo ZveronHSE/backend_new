@@ -38,14 +38,14 @@ jobs:
         run: |
           git fetch origin master
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
-#          while read p; do
-#            if "$p" == '${{ matrix.env }}'; then
-#               echo "BUILDING=$p" >> $GITHUB_ENV
-##            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
-##              echo "$p=$p" >> $GITHUB_ENV
-##              echo "$p CHANGED"
-##            fi
-#          done <temp.txt
+          while read p; do
+            if "$p" == '${{ matrix.env }}'; then
+               echo "BUILDING=$p" >> $GITHUB_ENV
+#            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
+#              echo "$p=$p" >> $GITHUB_ENV
+#              echo "$p CHANGED"
+#            fi
+          done <temp.txt
 
 #      - name: Build and push ${{ matrix.name }} image
 #        if: env.BUILDING == ${{ matrix.env }}
