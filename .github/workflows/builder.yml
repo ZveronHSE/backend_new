@@ -28,7 +28,7 @@ jobs:
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
           while read p; do
             if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
-              export "$p"="$p"
+              export "$p"="$p" >> $GITHUB_ENV
               echo "$p CHANGED"
             fi
           done <temp.txt
