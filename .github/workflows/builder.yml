@@ -40,8 +40,11 @@ jobs:
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
           grep '^[a-zA-Z_-]*$' temp.txt >> valid_directories.txt
           (readarray -t ARRAY < valid_directories.txt; IFS=', '; echo "CHANGED=${ARRAY[*]}" >> $GITHUB_ENV)
-          echo "$CHANGED"
 
+      - name: fff
+        if: contains(env.CHANGED, matrix.env)
+        shell: bash
+        run: echo "eeeeee"
 #          while read p; do
 #            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
 #              echo "CHANGED=$p" >> $GITHUB_ENV
