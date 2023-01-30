@@ -40,4 +40,4 @@ jobs:
           context: .
           file: blacklist_service/Dockerfile
           push: true
-          tags: ghcr.io/Zveron/blacklist_service:latest
+          tags: ghcr.io/zveronhse/blacklist_service:latest
