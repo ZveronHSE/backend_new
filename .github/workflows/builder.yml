@@ -2,7 +2,7 @@ name: "Rebuild docker images of affected modules"
 
 on:
   push:
-    branches: [ 'feature/ZV-281-CD' ]
+    branches: [ 'master' ]
 
 jobs:
   test:
