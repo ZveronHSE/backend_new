@@ -61,7 +61,7 @@ class SessionStorage(
 
 @Validated
 @ConstructorBinding
-@ConfigurationProperties("zv.session")
+@ConfigurationProperties("zveron.session")
 class SessionProperties(
     val sessionDurationMs: Long,
 )

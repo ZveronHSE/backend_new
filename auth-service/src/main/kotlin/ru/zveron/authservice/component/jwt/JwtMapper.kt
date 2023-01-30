@@ -9,18 +9,10 @@ import ru.zveron.authservice.component.jwt.Constants.TOKEN_TYPE
 import ru.zveron.authservice.component.jwt.model.DecodedToken
 import ru.zveron.authservice.component.jwt.model.TokenType
 import ru.zveron.authservice.exception.InvalidTokenException
-import ru.zveron.authservice.service.model.JwtMobileTokens
 import java.time.Instant
 import java.util.UUID
 
 object JwtMapper {
-    fun MobileTokens.toServiceResponse() = JwtMobileTokens(
-        accessToken = this.accessToken.token,
-        accessExpiration = this.accessToken.expiresAt,
-        refreshToken = this.refreshToken.token,
-        refreshExpiration = this.refreshToken.expiresAt,
-    )
-
     fun Map<String, Any>.toDecodedToken() = DecodedToken(
         profileId = this[SUBJECT]?.let { (it as String).toLongOrNull() } ?: throw InvalidTokenException(),
         tokenType = this[TOKEN_TYPE]?.let { TokenType.fromName(it as String) } ?: throw InvalidTokenException(),

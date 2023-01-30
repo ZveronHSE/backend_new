@@ -2,10 +2,7 @@ package ru.zveron.authservice.grpc.client
 
 import io.grpc.Status
 import io.grpc.StatusException
-import net.devh.boot.grpc.client.inject.GrpcClient
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.env.Environment
-import org.springframework.stereotype.Service
 import ru.zveron.authservice.grpc.client.model.ProfileClientResponse
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
@@ -15,14 +12,10 @@ import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
 import ru.zveron.contract.profile.model.ChannelType
 
-@Service
-class ProfileServiceClient() {
-
-    @GrpcClient("grpc-profile-client")
-    lateinit var profileGrpcClient: ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub
-
-    @Autowired
-    lateinit var env: Environment
+class ProfileServiceClient(
+    private val profileGrpcClient: ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub,
+    private val env: Environment,
+) {
 
     private val phoneNumberToProfile = mapOf(
         "79257646188" to ProfileFound(123L, "vedro", "pomoyev"),

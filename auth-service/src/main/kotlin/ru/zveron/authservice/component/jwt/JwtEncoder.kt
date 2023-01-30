@@ -7,6 +7,8 @@ import com.nimbusds.jose.JWSSigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import ru.zveron.authservice.component.jwt.Constants.TOKEN_TYPE
+import ru.zveron.authservice.component.jwt.model.AccessToken
+import ru.zveron.authservice.component.jwt.model.RefreshToken
 import ru.zveron.authservice.component.jwt.model.TokenType
 import java.time.Instant
 import java.util.Date
@@ -52,13 +54,3 @@ class JwtEncoder(
         )
     }
 }
-
-data class AccessToken(
-    val token: String,
-    val expiresAt: Instant,
-)
-
-data class RefreshToken(
-    val token: String,
-    val expiresAt: Instant,
-)

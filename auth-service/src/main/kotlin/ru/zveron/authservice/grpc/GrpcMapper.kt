@@ -2,9 +2,9 @@ package ru.zveron.authservice.grpc
 
 import com.google.protobuf.timestamp
 import ru.zveron.authservice.component.auth.RefreshMobileSessionRequest
-import ru.zveron.authservice.component.jwt.AccessToken
-import ru.zveron.authservice.component.jwt.MobileTokens
-import ru.zveron.authservice.component.jwt.RefreshToken
+import ru.zveron.authservice.component.jwt.model.AccessToken
+import ru.zveron.authservice.component.jwt.model.MobileTokens
+import ru.zveron.authservice.component.jwt.model.RefreshToken
 import ru.zveron.authservice.service.model.JwtMobileTokens
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest

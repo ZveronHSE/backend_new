@@ -34,7 +34,7 @@ class JwtConfiguration(
 
 @Validated
 @ConstructorBinding
-@ConfigurationProperties("zv.jwt")
+@ConfigurationProperties("zveron.jwt")
 data class JwtProperties(
 
     val secret: String,

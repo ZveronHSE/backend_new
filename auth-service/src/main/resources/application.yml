@@ -51,7 +51,7 @@ clients:
     baseUrl: http://localhost:8085
 
 
-zv:
+zveron:
   jwt:
     #create something legit and put in vault
     secret: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'

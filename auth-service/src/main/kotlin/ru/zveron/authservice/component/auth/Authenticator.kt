@@ -2,9 +2,9 @@ package ru.zveron.authservice.component.auth
 
 import mu.KLogging
 import org.springframework.stereotype.Component
-import ru.zveron.authservice.component.jwt.IssueMobileTokensRequest
 import ru.zveron.authservice.component.jwt.JwtManager
-import ru.zveron.authservice.component.jwt.MobileTokens
+import ru.zveron.authservice.component.jwt.model.IssueMobileTokensRequest
+import ru.zveron.authservice.component.jwt.model.MobileTokens
 import ru.zveron.authservice.exception.InvalidTokenException
 import ru.zveron.authservice.exception.SessionExpiredException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient

@@ -4,9 +4,12 @@ import com.nimbusds.jwt.JWTClaimsSet
 import org.springframework.stereotype.Component
 import ru.zveron.authservice.component.jwt.Constants.SESSION_ID
 import ru.zveron.authservice.component.jwt.Constants.ZV_ISSUER
+import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.DecodedToken
+import ru.zveron.authservice.component.jwt.model.IssueMobileTokensRequest
+import ru.zveron.authservice.component.jwt.model.MobileTokens
+import ru.zveron.authservice.component.jwt.model.RefreshToken
 import ru.zveron.authservice.exception.InvalidTokenException
-import ru.zveron.authservice.persistence.entity.SessionEntity
 
 @Component
 class JwtManager(
@@ -54,13 +57,3 @@ class JwtManager(
         return jwtDecoder.decodeRefreshToken(token)
     }
 }
-
-data class IssueMobileTokensRequest(
-    val profileId: Long,
-    val session: SessionEntity,
-)
-
-data class MobileTokens(
-    val refreshToken: RefreshToken,
-    val accessToken: AccessToken,
-)

@@ -2,11 +2,11 @@ package ru.zveron.authservice.util
 
 import org.apache.commons.lang3.RandomStringUtils.randomNumeric
 import org.apache.commons.lang3.RandomUtils
-import ru.zveron.authservice.component.jwt.AccessToken
 import ru.zveron.authservice.component.jwt.Constants
-import ru.zveron.authservice.component.jwt.MobileTokens
-import ru.zveron.authservice.component.jwt.RefreshToken
+import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.DecodedToken
+import ru.zveron.authservice.component.jwt.model.MobileTokens
+import ru.zveron.authservice.component.jwt.model.RefreshToken
 import ru.zveron.authservice.persistence.entity.SessionEntity
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.service.ServiceMapper.toContext
