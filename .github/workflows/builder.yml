@@ -39,7 +39,7 @@ jobs:
           git fetch origin master
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
           while read p; do
-            if "$p" == '${{ matrix.env }}'; then
+            if "$p" == "${{ matrix.env }}"; then
                echo "BUILDING=$p" >> $GITHUB_ENV
 #            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
 #              echo "$p=$p" >> $GITHUB_ENV
@@ -47,14 +47,14 @@ jobs:
 #            fi
           done <temp.txt
 
-#      - name: Build and push ${{ matrix.name }} image
-#        if: env.BUILDING == ${{ matrix.env }}
-#        uses: docker/build-push-action@v2
-#        with:
-#          context: .
-#          file: ${{ matrix.dockerfile }}
-#          push: true
-#          tags: ${{ matrix.image }}
+      - name: Build and push ${{ matrix.name }} image
+        if: env.BUILDING == ${{ matrix.env }}
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ matrix.image }}
 
 #      - name: Build and push Address Service image
 #        if: env.address_service == 'address_service'
