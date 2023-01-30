@@ -46,6 +46,12 @@ spring:
    Пример запуска:
    `./gradlew -PmigrationName=new_cool_change_set createNextChangeSet`
 
+### Как пользоваться pgAdmin
+
+1. Переходим по url: `http://localhost:5050/browser/`
+2. Вводим email `ya@frontender.com` и пароль `123`
+3. Добавляем сервер с host name `db`, порт `5432`, юзер `zveron_user`, пароль `zveron_password`
+
 ## CI / CD / Deploy
 ### Continuous integration
 1. Пайплайны запускаются при создании PR. `Test affected modules` подготавливает тестовую среду и запускает 
