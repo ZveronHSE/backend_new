@@ -11,9 +11,11 @@ jobs:
       matrix:
         include:
           - name: Blacklist Service
+            env: blacklist_service
             dockerfile: blacklist_service/Dockerfile
             image: ghcr.io/zveronhse/blacklist_service:latest
           - name: API Gateway
+            env: apigateway
             dockerfile: apigateway/Dockerfile
             image: ghcr.io/zveronhse/apigateway:latest
 
@@ -37,14 +39,16 @@ jobs:
           git fetch origin master
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
           while read p; do
-            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
-              echo "$p=$p" >> $GITHUB_ENV
-              echo "$p CHANGED"
-            fi
+            if "$p" == ${{ matrix.env }}
+               echo "BUILDING=$p" >> $GITHUB_ENV
+#            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
+#              echo "$p=$p" >> $GITHUB_ENV
+#              echo "$p CHANGED"
+#            fi
           done <temp.txt
 
       - name: Build and push ${{ matrix.name }} image
-        if: env.address_service == 'address_service'
+        if: env.BUILDING == ${{ matrix.env }}
         uses: docker/build-push-action@v2
         with:
           context: .
