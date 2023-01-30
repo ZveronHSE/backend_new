@@ -27,8 +27,10 @@ jobs:
           git fetch origin master
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
           while read p; do
-            export "$p"="$p"
-            echo "$p CHANGED" 
+            if "$p" =~ ^[a-zA-Z-]*$; then
+              export "$p"="$p"
+              echo "$p CHANGED"
+            fi
           done <temp.txt
 
       - name: Build and push Docker image
