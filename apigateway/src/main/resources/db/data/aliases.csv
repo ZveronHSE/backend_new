@@ -31,3 +31,5 @@
 "profileGetChannelTypes","profile-service","ProfileServiceExternal","GetChannelTypes"
 "profileGetLinks","profile-service","ProfileServiceExternal","GetLinks"
 "profileDelete","profile-service","ProfileServiceExternal","DeleteProfile"
+"authPhoneLoginInit","auth-service","AuthService","PhoneLoginInit"
+"authPhoneLoginVerify","auth-service","AuthService","PhoneLoginVerify"

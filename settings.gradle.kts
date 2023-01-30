@@ -24,4 +24,5 @@ include(
     "service_registry",
     "apigateway",
     "profile_service",
+    "auth-service",
 )
