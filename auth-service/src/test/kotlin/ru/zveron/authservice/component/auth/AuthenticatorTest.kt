@@ -28,7 +28,7 @@ class AuthenticatorTest {
     private val profileServiceClient = mockk<ProfileServiceClient>()
     private val sessionStorage = mockk<SessionStorage>()
 
-    private val service = ru.zveron.authservice.component.auth.Authenticator(
+    private val service = Authenticator(
         jwtManager = jwtManager,
         sessionStorage = sessionStorage,
         profileServiceClient = profileServiceClient,

@@ -2,7 +2,7 @@ package ru.zveron.authservice.service
 
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.PhoneNumber
-import ru.zveron.authservice.webclient.dto.GetVerificationCodeRequest
+import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
 
 object ServiceMapper {
 

@@ -31,7 +31,7 @@ import ru.zveron.authservice.util.randomTokens
 import ru.zveron.authservice.webclient.NotifierClient
 import ru.zveron.authservice.webclient.NotifierFailure
 import ru.zveron.authservice.webclient.NotifierSuccess
-import ru.zveron.authservice.webclient.dto.GetVerificationCodeRequest
+import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
 import java.util.UUID
 
 class LoginByPhoneFlowServiceTest {

@@ -3,6 +3,8 @@ package ru.zveron.authservice.grpc
 import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.authservice.component.auth.Authenticator
+import ru.zveron.authservice.grpc.GrpcMapper.toGrpcToken
+import ru.zveron.authservice.grpc.GrpcMapper.toServiceRequest
 import ru.zveron.authservice.service.LoginByPhoneFlowService
 import ru.zveron.contract.auth.AuthServiceGrpcKt
 import ru.zveron.contract.auth.IssueNewTokensRequest
