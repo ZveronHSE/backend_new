@@ -28,40 +28,35 @@ services:
   registry:
     restart: always
     container_name: registry
-    build:
-      context: .
-      dockerfile: service_registry/Dockerfile
+    image: ghcr.io/zveronhse/service_registry
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "8081:8761"
+      - "8082:8761"
     depends_on:
       - db
   apigateway:
     restart: always
     container_name: apigateway
-    build:
-      context: .
-      dockerfile: apigateway/Dockerfile
+    image: ghcr.io/zveronhse/apigateway
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/apigateway
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "8080:9091"
+      - "8081:9091"
+      - "8080:8080"
     depends_on:
       - db
       - registry
   address_service:
     restart: always
     container_name: address_service
-    build:
-      context: .
-      dockerfile: address_service/Dockerfile
+    image: ghcr.io/zveronhse/address_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/address
@@ -73,9 +68,7 @@ services:
   blacklist_service:
     restart: always
     container_name: blacklist_service
-    build:
-      context: .
-      dockerfile: blacklist_service/Dockerfile
+    image: ghcr.io/zveronhse/blacklist_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
@@ -87,9 +80,7 @@ services:
   favorites_service:
     restart: always
     container_name: favorites_service
-    build:
-      context: .
-      dockerfile: favorites_service/Dockerfile
+    image: ghcr.io/zveronhse/favorites_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/favorites
@@ -101,9 +92,7 @@ services:
   parameter_service:
     restart: always
     container_name: parameter_service
-    build:
-      context: .
-      dockerfile: parameter_service/Dockerfile
+    image: ghcr.io/zveronhse/parameter_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/parameter
@@ -115,6 +104,7 @@ services:
   profile_service:
     restart: always
     container_name: profile_service
+    image: ghcr.io/zveronhse/profile_service
     build:
       context: .
       dockerfile: profile_service/Dockerfile
