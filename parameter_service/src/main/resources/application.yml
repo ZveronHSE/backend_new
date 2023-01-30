@@ -1,6 +1,13 @@
+grpc:
+  server:
+    port: 0
+server:
+  port: 0
 spring:
   main:
     banner-mode: off
+  application:
+    name: parameter-service
   liquibase:
     change-log: classpath:db/master.yaml
   datasource:
@@ -13,3 +20,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+eureka:
+  client:
+    register-with-eureka: true
+    tls:
+      enabled: false

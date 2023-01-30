@@ -6,8 +6,8 @@ services:
     container_name: db
     image: 'postgres:13.9-alpine'
     environment:
-      - POSTGRES_USER=zveron_user
-      - POSTGRES_PASSWORD=zveron_password
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - TZ=Europe/Moscow
       - PGTZ=Europe/Moscow
     expose:
@@ -25,3 +25,104 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ya@frontender.com
       PGADMIN_DEFAULT_PASSWORD: 123
+  registry:
+    restart: always
+    container_name: registry
+    build:
+      context: .
+      dockerfile: service_registry/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "8081:8761"
+    depends_on:
+      - db
+  apigateway:
+    restart: always
+    container_name: apigateway
+    build:
+      context: .
+      dockerfile: apigateway/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/apigateway
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "8080:9091"
+    depends_on:
+      - db
+      - registry
+  address_service:
+    restart: always
+    container_name: address_service
+    build:
+      context: .
+      dockerfile: address_service/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/address
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  blacklist_service:
+    restart: always
+    container_name: blacklist_service
+    build:
+      context: .
+      dockerfile: blacklist_service/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  favorites_service:
+    restart: always
+    container_name: favorites_service
+    build:
+      context: .
+      dockerfile: favorites_service/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/favorites
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  parameter_service:
+    restart: always
+    container_name: parameter_service
+    build:
+      context: .
+      dockerfile: parameter_service/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/parameter
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  profile_service:
+    restart: always
+    container_name: profile_service
+    build:
+      context: .
+      dockerfile: profile_service/Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/profile
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
