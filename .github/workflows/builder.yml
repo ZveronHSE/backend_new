@@ -38,8 +38,6 @@ jobs:
         run: |
           git fetch origin master
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
-#          echo "CHANGED=$(grep '^[a-zA-Z_-]*$' temp.txt)" >> $GITHUB_ENV
-#          echo "$CHANGED"
           while read p; do
             if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
               echo "CHANGED=$p" >> $GITHUB_ENV
