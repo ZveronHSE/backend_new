@@ -7,11 +7,15 @@ import ru.zveron.authservice.service.model.PhoneNumber
 
 object PhoneNumberParser {
 
+    private const val RU_REGION = "RU"
+
     private val phoneNumberUtils = PhoneNumberUtil.getInstance()
     fun stringToServicePhone(phone: String): PhoneNumber {
-        phone.takeIf { phoneNumberUtils.isPossibleNumber(phone, "RU") }?.let {
-            val parsedPhone = phoneNumberUtils.parse(phone, "RU")
-            return PhoneNumber(parsedPhone.countryCode, parsedPhone.nationalNumber)
-        } ?: throw AuthException("Failed to parse phone number", Status.Code.INVALID_ARGUMENT)
+        phone.takeIf { phoneNumberUtils.isPossibleNumber(phone, RU_REGION) }
+            ?.let {
+                val parsedPhone = phoneNumberUtils.parse(phone, RU_REGION)
+                return PhoneNumber(parsedPhone.countryCode, parsedPhone.nationalNumber)
+            }
+            ?: throw AuthException("Failed to parse phone number", Status.Code.INVALID_ARGUMENT)
     }
 }
