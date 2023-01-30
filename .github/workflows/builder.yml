@@ -42,9 +42,9 @@ jobs:
 #          echo "$CHANGED"
           while read p; do
             if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
-              echo "$p=$p" >> $GITHUB_ENV
-              echo "$p CHANGED"
-          fi
+              echo "CHANGED=$p" >> $GITHUB_ENV
+              echo "$CHANGED"
+            fi
           done <temp.txt
 
 #      - name: Build and push ${{ matrix.name }} image
