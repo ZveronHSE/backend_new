@@ -38,6 +38,7 @@ jobs:
         run: |
           git fetch origin master
           echo "CHANGED=(git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq | grep -o '^[a-zA-Z_-]*$')" >> temp.txt
+          echo "$CHANGED"
 #          while read p; do
 #            if "$p" == ${{ matrix.env }}
 #              echo "BUILDING=$p" >> $GITHUB_ENV
@@ -47,15 +48,15 @@ jobs:
 #          fi
 #          done <temp.txt
 
-      - name: Build and push ${{ matrix.name }} image
-        if: contains(env.CHANGED, matrix.env)
-        #        env.${{ matrix.env }} == ${{ matrix.env }}
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ${{ matrix.dockerfile }}
-          push: true
-          tags: ${{ matrix.image }}
+#      - name: Build and push ${{ matrix.name }} image
+#        if: contains(env.CHANGED, matrix.env)
+#        #        env.${{ matrix.env }} == ${{ matrix.env }}
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: ${{ matrix.dockerfile }}
+#          push: true
+#          tags: ${{ matrix.image }}
 
 #      - name: Build and push Address Service image
 #        if: env.address_service == 'address_service'
