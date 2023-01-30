@@ -2,7 +2,7 @@ name: "Rebuild docker images of affected modules"
 
 on:
   push:
-    branches: ['feature/ZV-281-CD']
+    branches: [ 'feature/ZV-281-CD' ]
 
 jobs:
   test:
@@ -37,20 +37,19 @@ jobs:
         shell: bash
         run: |
           git fetch origin master
-          echo "CHANGED=$(git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq)" >> $GITHUB_ENV
-#          temp.txt
+          echo "CHANGED=(git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq | grep -o '^[a-zA-Z_-]*$')" >> temp.txt
 #          while read p; do
-##            if "$p" == ${{ matrix.env }}
-##               echo "BUILDING=$p" >> $GITHUB_ENV
+#            if "$p" == ${{ matrix.env }}
+#              echo "BUILDING=$p" >> $GITHUB_ENV
 #            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
 #              echo "$p=$p" >> $GITHUB_ENV
 #              echo "$p CHANGED"
-#            fi
+#          fi
 #          done <temp.txt
 
       - name: Build and push ${{ matrix.name }} image
         if: contains(env.CHANGED, matrix.env)
-#        env.${{ matrix.env }} == ${{ matrix.env }}
+        #        env.${{ matrix.env }} == ${{ matrix.env }}
         uses: docker/build-push-action@v2
         with:
           context: .
