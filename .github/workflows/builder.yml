@@ -37,7 +37,7 @@ jobs:
         shell: bash
         run: |
           git fetch origin master
-          echo "CHANGED=(git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq | grep '^[a-zA-Z_-]*$')" >> temp.txt
+          echo "CHANGED=(git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq | grep '^[a-zA-Z_-]*$')" >> $GITHUB_ENV
           echo "$CHANGED"
 #          while read p; do
 #            if "$p" == ${{ matrix.env }}
