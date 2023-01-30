@@ -1,8 +1,8 @@
 package ru.zveron.mapper
 
+import ru.zveron.contract.lot.model.Lot
 import ru.zveron.contract.profile.LotStatus
 import ru.zveron.contract.profile.LotSummary
-import ru.zveron.contract.lot.model.Lot
 import ru.zveron.contract.profile.lotSummary
 
 object LotsMapper {

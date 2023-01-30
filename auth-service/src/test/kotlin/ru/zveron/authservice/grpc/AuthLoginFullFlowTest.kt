@@ -38,7 +38,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
     @Test
     fun `when login by phone init is a success and verify is success and finds account, then returns response with tokens`() =
         runBlocking {
-            //given when init
+            // given when init
             val deviceFp = randomDeviceFp()
             val phoneNumber = randomPhoneNumber()
             val request = randomLoginInitApigRequest().copy {
@@ -50,7 +50,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             coEvery { notifierClient.initializeVerification(clientRequest) } returns NotifierSuccess(code)
 
-            //when
+            // when
             val initResponse = authLoginController.phoneLoginInit(request)
 
             val verifyRequest = phoneLoginVerifyRequest {
@@ -88,7 +88,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
     @Test
     fun `when login by phone init is a success and verify is success and account not found, then returns response with register ctx`() =
         runBlocking {
-            //given when init
+            // given when init
             val deviceFp = randomDeviceFp()
             val phoneNumber = randomPhoneNumber()
             val request = randomLoginInitApigRequest().copy {
@@ -100,7 +100,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             coEvery { notifierClient.initializeVerification(clientRequest) } returns NotifierSuccess(code)
 
-            //when
+            // when
             val initResponse = authLoginController.phoneLoginInit(request)
 
             val verifyRequest = phoneLoginVerifyRequest {
@@ -134,7 +134,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
     @Test
     fun `when login by phone init is a success and verify is success and new verify request, then returns throws CodeVerifiedException`(): Unit =
         runBlocking {
-            //given when init
+            // given when init
             val deviceFp = randomDeviceFp()
             val phoneNumber = randomPhoneNumber()
             val request = randomLoginInitApigRequest().copy {
@@ -146,7 +146,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             coEvery { notifierClient.initializeVerification(clientRequest) } returns NotifierSuccess(code)
 
-            //when
+            // when
             val initResponse = authLoginController.phoneLoginInit(request)
 
             val verifyRequest = phoneLoginVerifyRequest {
@@ -176,7 +176,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
                 updatedCtx.phoneNumber shouldBe phoneNumber.toContext()
             }
 
-            //here throws exception
+            // here throws exception
             assertThrows<ru.zveron.authservice.exception.CodeValidatedException> {
                 authLoginController.phoneLoginVerify(verifyRequest)
             }

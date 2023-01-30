@@ -11,10 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import ru.zveron.contract.profile.model.ChannelType
-import ru.zveron.contract.profile.LotStatus
 import ru.zveron.ProfileTest
-import ru.zveron.mapper.AddressMapper.toProfileAddress
 import ru.zveron.commons.assertions.addressShouldBe
 import ru.zveron.commons.assertions.channelsShouldBe
 import ru.zveron.commons.assertions.linksShouldBe
@@ -30,14 +27,20 @@ import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.contract.addressResponse
 import ru.zveron.contract.lot.profileLotsResponse
+import ru.zveron.contract.profile.LotStatus
 import ru.zveron.contract.profile.deleteProfileRequest
-import ru.zveron.exception.ProfileException
-import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.contract.profile.getChannelTypesRequest
 import ru.zveron.contract.profile.getLinksRequest
 import ru.zveron.contract.profile.getProfileInfoRequest
 import ru.zveron.contract.profile.getProfilePageRequest
 import ru.zveron.contract.profile.getSettingsRequest
+import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.contract.profile.setProfileInfoRequest
+import ru.zveron.contract.profile.setSettingsRequest
+import ru.zveron.exception.ProfileException
+import ru.zveron.exception.ProfileNotFoundException
+import ru.zveron.mapper.AddressMapper.toProfileAddress
+import ru.zveron.mapper.AddressMapper.toRequest
 import ru.zveron.repository.ContactRepository
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.repository.SettingsRepository
@@ -45,9 +48,6 @@ import ru.zveron.service.client.address.AddressClient
 import ru.zveron.service.client.blakclist.BlacklistClient
 import ru.zveron.service.client.lot.LotClient
 import ru.zveron.service.client.review.ReviewClient
-import ru.zveron.contract.profile.setProfileInfoRequest
-import ru.zveron.contract.profile.setSettingsRequest
-import ru.zveron.mapper.AddressMapper.toRequest
 import java.time.Instant
 
 class ProfileServiceExternalTest : ProfileTest() {
@@ -122,7 +122,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             response responseShouldBe expectedProfile
             response.address shouldBe address.toProfileAddress()
             response.rating shouldBe rating
-            //TODO: response.reviewNumber should be (?)
+            // TODO: response.reviewNumber should be (?)
             response.activeLotsList.apply {
                 size shouldBe 1
                 first() lotShouldBe activeLot
@@ -156,7 +156,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             response responseShouldBeBlockedAnd expectedProfile
             response.address shouldBe ""
             response.rating shouldBe 0.0
-            //TODO: response.reviewNumber should be (?)
+            // TODO: response.reviewNumber should be (?)
             response.activeLotsList.size shouldBe 0
             response.closedLotsList.size shouldBe 0
         }

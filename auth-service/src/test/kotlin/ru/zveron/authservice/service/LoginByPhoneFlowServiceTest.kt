@@ -91,7 +91,6 @@ class LoginByPhoneFlowServiceTest {
             }
         }
 
-
     @Test
     fun `when login by phone verify is a success, and account found, then returns tokens`(): Unit = runBlocking {
         val uuid = UUID.randomUUID()
@@ -214,5 +213,4 @@ class LoginByPhoneFlowServiceTest {
             service.verify(request)
         }
     }
-
 }

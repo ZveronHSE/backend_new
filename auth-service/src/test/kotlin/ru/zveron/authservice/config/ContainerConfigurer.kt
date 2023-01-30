@@ -14,7 +14,7 @@ abstract class ContainerConfigurer {
         @JvmStatic
         fun properties(registry: DynamicPropertyRegistry) {
             val r2dbcUrl = "r2dbc:postgresql://${postgreSQLContainer.host}:" +
-                    "${postgreSQLContainer.firstMappedPort}/${postgreSQLContainer.databaseName}"
+                "${postgreSQLContainer.firstMappedPort}/${postgreSQLContainer.databaseName}"
 
             logger.info { "Postgres URL: $r2dbcUrl" }
 

@@ -12,8 +12,10 @@ class BlacklistGrpsClient : BlacklistClient {
     lateinit var service: BlacklistServiceGrpcKt.BlacklistServiceCoroutineStub
 
     override suspend fun existsInBlacklist(ownerId: Long, targetUserId: Long) =
-        service.existInBlacklist(existInBlacklistRequest {
-            this.ownerId = ownerId
-            this.targetUserId = targetUserId
-        }).exists
+        service.existInBlacklist(
+            existInBlacklistRequest {
+                this.ownerId = ownerId
+                this.targetUserId = targetUserId
+            }
+        ).exists
 }

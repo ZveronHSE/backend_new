@@ -12,10 +12,10 @@ import ru.zveron.contract.profile.GetProfilePageRequest
 import ru.zveron.contract.profile.GetProfilePageResponse
 import ru.zveron.contract.profile.GetSettingsRequest
 import ru.zveron.contract.profile.GetSettingsResponse
-import ru.zveron.contract.profile.model.Links
 import ru.zveron.contract.profile.ProfileServiceExternalGrpcKt
 import ru.zveron.contract.profile.SetProfileInfoRequest
 import ru.zveron.contract.profile.SetSettingsRequest
+import ru.zveron.contract.profile.model.Links
 import ru.zveron.mapper.ContactsMapper.toModel
 import ru.zveron.service.ContactService
 import ru.zveron.service.ProfileService

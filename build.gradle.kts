@@ -141,7 +141,6 @@ subprojects {
         testImplementation("org.assertj:assertj-core:3.22.0")
         testImplementation("io.mockk:mockk:1.13.3")
         implementation("com.ninja-squad:springmockk:4.0.0")
-
     }
 
     group = rootProject.group

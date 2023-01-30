@@ -1,11 +1,11 @@
 package ru.zveron.commons.generator
 
 import ru.zveron.contract.profile.model.gmail
-import ru.zveron.entity.Contact
-import ru.zveron.entity.Profile
 import ru.zveron.contract.profile.model.links
 import ru.zveron.contract.profile.model.phone
 import ru.zveron.contract.profile.model.vk
+import ru.zveron.entity.Contact
+import ru.zveron.entity.Profile
 
 object ContactsGenerator {
 

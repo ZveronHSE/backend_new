@@ -9,13 +9,12 @@ import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
 import ru.zveron.authservice.grpc.client.dto.ProfileUnknownFailure
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 
-
 @Service
 class ProfileServiceClient(
     private val profileServiceStub: ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub,
 ) {
     suspend fun getAccountByPhone(phoneNumber: ru.zveron.authservice.persistence.model.PhoneNumber): ProfileClientResponse {
-        //todo implement once the endpoint is ready
+        // todo implement once the endpoint is ready
         return try {
             if (phoneNumber.phone == "9257646188") {
                 throw StatusException(Status.NOT_FOUND)

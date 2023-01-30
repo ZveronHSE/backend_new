@@ -46,4 +46,3 @@ class FlowStateStorage(
     private fun <CTX : StateContext> Json.toContext(clazz: KClass<CTX>): CTX =
         objectMapper.readValue(this.asString(), clazz.java)
 }
-

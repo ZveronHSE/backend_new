@@ -2,12 +2,12 @@ package ru.zveron.mapper
 
 import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.contract.profile.model.Links
-import ru.zveron.domain.ChannelsDto
-import ru.zveron.entity.Contact
 import ru.zveron.contract.profile.model.gmail
 import ru.zveron.contract.profile.model.links
 import ru.zveron.contract.profile.model.phone
 import ru.zveron.contract.profile.model.vk
+import ru.zveron.domain.ChannelsDto
+import ru.zveron.entity.Contact
 
 object ContactsMapper {
 

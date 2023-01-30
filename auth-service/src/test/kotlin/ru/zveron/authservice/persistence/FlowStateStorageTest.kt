@@ -94,5 +94,4 @@ class FlowStateStorageTest : ContainerConfigurer() {
             updatedCtx.isVerified shouldNotBe ctx.isVerified
         }
     }
-
 }

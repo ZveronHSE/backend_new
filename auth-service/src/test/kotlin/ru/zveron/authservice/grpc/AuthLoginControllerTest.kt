@@ -136,7 +136,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             assertSoftly {
                 verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldNotBe request.sessionId
-                //todo tokens gen
+                // todo tokens gen
             }
 
             val ctxEntity = template.select(StateContextEntity::class.java).all().awaitLast()

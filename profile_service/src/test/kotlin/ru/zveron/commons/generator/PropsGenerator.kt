@@ -8,10 +8,12 @@ object PropsGenerator {
 
     fun generateNIds(n: Int) = List(n) { generateUserId() }
 
-    fun generateString(n: Int) = String(CharArray(n) {
-        RandomUtils.nextInt('a'.code, 'z'.code + 1).toChar()
-            .let { if (RandomUtils.nextBoolean()) it.uppercaseChar() else it }
-    })
+    fun generateString(n: Int) = String(
+        CharArray(n) {
+            RandomUtils.nextInt('a'.code, 'z'.code + 1).toChar()
+                .let { if (RandomUtils.nextBoolean()) it.uppercaseChar() else it }
+        }
+    )
 
     fun generateDouble() = RandomUtils.nextDouble(0.0, 180.0) * if (RandomUtils.nextBoolean()) 1 else -1
 }

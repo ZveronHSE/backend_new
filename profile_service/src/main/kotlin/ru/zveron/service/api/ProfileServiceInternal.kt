@@ -28,7 +28,6 @@ class ProfileServiceInternal(
     override suspend fun getProfile(request: GetProfileRequest): GetProfileResponse =
         profileService.getProfile(request)
 
-
     override suspend fun getProfileWithContacts(request: GetProfileWithContactsRequest): GetProfileWithContactsResponse =
         profileService.getProfileWithContacts(request)
 
