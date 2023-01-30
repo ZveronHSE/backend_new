@@ -7,6 +7,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: Blacklist Service
+            dockerfile: blacklist_service/Dockerfile
+            image: ghcr.io/zveronhse/blacklist_service:latest
+          - name: API Gateway
+            dockerfile: apigateway/Dockerfile
+            image: ghcr.io/zveronhse/apigateway:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,65 +43,74 @@ jobs:
             fi
           done <temp.txt
 
-      - name: Build and push Address Service image
+      - name: Build and push ${{ matrix.name }} image
         if: env.address_service == 'address_service'
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: address_service/Dockerfile
+          file: ${{ matrix.dockerfile }}
           push: true
-          tags: ghcr.io/zveronhse/address_service:latest
+          tags: ${{ matrix.image }}
 
-      - name: Build and push API Gateway image
-        if: env.apigateway == 'apigateway'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: apigateway/Dockerfile
-          push: true
-          tags: ghcr.io/zveronhse/apigateway:latest
-
-      - name: Build and push Blacklist Service image
-        if: env.blacklist_service == 'blacklist_service'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: blacklist_service/Dockerfile
-          push: true
-          tags: ghcr.io/zveronhse/blacklist_service:latest
-
-      - name: Build and push Favorites Service image
-        if: env.favorites_service == 'favorites_service'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: favorites_service/Dockerfile
-          push: true
-          tags: ghcr.io/zveronhse/favorites_service:latest
-
-      - name: Build and push Parameter Service image
-        if: env.parameter_service == 'parameter_service'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: parameter_service/Dockerfile
-          push: true
-          tags: ghcr.io/zveronhse/parameter_service:latest
-
-      - name: Build and push Profile Service image
-        if: env.profile_service == 'profile_service'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: profile_service/Dockerfile
-          push: true
-          tags: ghcr.io/zveronhse/profile_service:latest
-
-      - name: Build and push Service Registry image
-        if: env.service_registry == 'service_registry'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: service_registry/Dockerfile
-          push: true
-          tags: ghcr.io/zveronhse/service_registry:latest
+#      - name: Build and push Address Service image
+#        if: env.address_service == 'address_service'
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: address_service/Dockerfile
+#          push: true
+#          tags: ghcr.io/zveronhse/address_service:latest
+#
+#      - name: Build and push API Gateway image
+#        if: env.apigateway == 'apigateway'
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: apigateway/Dockerfile
+#          push: true
+#          tags: ghcr.io/zveronhse/apigateway:latest
+#
+#      - name: Build and push Blacklist Service image
+#        if: env.blacklist_service == 'blacklist_service'
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: blacklist_service/Dockerfile
+#          push: true
+#          tags: ghcr.io/zveronhse/blacklist_service:latest
+#
+#      - name: Build and push Favorites Service image
+#        if: env.favorites_service == 'favorites_service'
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: favorites_service/Dockerfile
+#          push: true
+#          tags: ghcr.io/zveronhse/favorites_service:latest
+#
+#      - name: Build and push Parameter Service image
+#        if: env.parameter_service == 'parameter_service'
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: parameter_service/Dockerfile
+#          push: true
+#          tags: ghcr.io/zveronhse/parameter_service:latest
+#
+#      - name: Build and push Profile Service image
+#        if: env.profile_service == 'profile_service'
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: profile_service/Dockerfile
+#          push: true
+#          tags: ghcr.io/zveronhse/profile_service:latest
+#
+#      - name: Build and push Service Registry image
+#        if: env.service_registry == 'service_registry'
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: service_registry/Dockerfile
+#          push: true
+#          tags: ghcr.io/zveronhse/service_registry:latest
