@@ -38,16 +38,16 @@ jobs:
         run: |
           git fetch origin master
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
-          echo "CHANGED=$(grep '^[a-zA-Z_-]*$' temp.txt)" >> $GITHUB_ENV
-          echo "$CHANGED"
-#          while read p; do
+#          echo "CHANGED=$(grep '^[a-zA-Z_-]*$' temp.txt)" >> $GITHUB_ENV
+#          echo "$CHANGED"
+          while read p; do
 #            if "$p" == ${{ matrix.env }}
 #              echo "BUILDING=$p" >> $GITHUB_ENV
-#            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
-#              echo "$p=$p" >> $GITHUB_ENV
-#              echo "$p CHANGED"
-#          fi
-#          done <temp.txt
+            if [[ "$p" =~ ^[a-zA-Z_-]*$ ]]; then
+              echo "CHANGED=$p" >> $GITHUB_ENV
+              echo "$CHANGED"
+          fi
+          done <temp.txt
 
 #      - name: Build and push ${{ matrix.name }} image
 #        if: contains(env.CHANGED, matrix.env)
