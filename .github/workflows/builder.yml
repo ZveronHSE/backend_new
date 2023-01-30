@@ -39,7 +39,7 @@ jobs:
           git fetch origin master
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
           grep '^[a-zA-Z_-]*$' temp.txt >> valid_directories.txt
-          (readarray -t ARRAY < input.txt; IFS=','; echo "CHANGED=${ARRAY[*]}" >> $GITHUB_ENV)
+          (readarray -t ARRAY < valid_directories.txt; IFS=','; echo "CHANGED=${ARRAY[*]}" >> $GITHUB_ENV)
           echo "$CHANGED"
 
 #          while read p; do
