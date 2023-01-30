@@ -32,7 +32,6 @@ jobs:
               echo "$p CHANGED"
             fi
           done <temp.txt
-          env
 
       - name: Build and push Docker image
         if: env.blacklist_service == 'blacklist_service'
@@ -41,4 +40,4 @@ jobs:
           context: .
           file: blacklist_service/Dockerfile
           push: true
-          tags: zveron/blacklist_service:latest
+          tags: ghcr.io/zveron/blacklist_service:latest
