@@ -135,12 +135,9 @@ subprojects {
         testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
         testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
         testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
-        testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
         testImplementation("io.kotest:kotest-assertions-core-jvm:5.2.2")
         testImplementation("org.assertj:assertj-core:3.22.0")
         testImplementation("io.mockk:mockk:1.13.3")
-        implementation("com.ninja-squad:springmockk:4.0.0")
-
     }
 
     group = rootProject.group
