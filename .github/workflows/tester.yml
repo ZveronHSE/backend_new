@@ -32,7 +32,7 @@ jobs:
 
       - name: Test blacklist service
         shell: bash
-        run: if grep -q "blacklist_service" "temp.txt"; then gradle :blacklist_service:test --stacktrace; fi
+        run: if grep -q "blacklist_service" "temp.txt"; then gradle :blacklist_service:test --stacktrace --warning-mode=all; fi
 
       - name: Test address service
         shell: bash
