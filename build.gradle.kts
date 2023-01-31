@@ -89,6 +89,17 @@ subprojects {
         plugin("org.jlleitschuh.gradle.ktlint")
     }
 
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        this.android.set(false)
+        this.debug.set(true)
+        this.outputToConsole.set(true)
+
+        filter {
+            exclude("**/build/**")
+            exclude("**/generated/**")
+        }
+    }
+
     dependencies {
         // Для компиляции проекта
         implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
@@ -147,11 +158,6 @@ subprojects {
     version = rootProject.version
 
     java.sourceCompatibility = JavaVersion.VERSION_17
-
-    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        this.android.set(false)
-        this.debug.set(true)
-    }
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
