@@ -45,6 +45,11 @@ jobs:
             dockerfile: service_registry/Dockerfile
             image: ghcr.io/zveronhse/service_registry:latest
 
+          - name: Auth Service
+            env: auth-service
+            dockerfile: auth-service/Dockerfile
+            image: ghcr.io/zveronhse/auth-service:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3

@@ -105,12 +105,21 @@ services:
     restart: always
     container_name: profile_service
     image: ghcr.io/zveronhse/profile_service
-    build:
-      context: .
-      dockerfile: profile_service/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/profile
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  auth-service:
+    restart: always
+    container_name: auth-service
+    image: ghcr.io/zveronhse/auth-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/auth
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
