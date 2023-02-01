@@ -9,7 +9,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
 import javax.sql.DataSource
 
-@SpringBootTest
+@SpringBootTest(properties = ["grpc.server.port=0", "eureka.client.enabled=false"])
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 abstract class BlacklistTest {
     @Autowired

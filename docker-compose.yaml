@@ -6,8 +6,8 @@ services:
     container_name: db
     image: 'postgres:13.9-alpine'
     environment:
-      - POSTGRES_USER=zveron_user
-      - POSTGRES_PASSWORD=zveron_password
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - TZ=Europe/Moscow
       - PGTZ=Europe/Moscow
     expose:
@@ -25,3 +25,103 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ya@frontender.com
       PGADMIN_DEFAULT_PASSWORD: 123
+  registry:
+    restart: always
+    container_name: registry
+    image: ghcr.io/zveronhse/service_registry
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "8082:8761"
+    depends_on:
+      - db
+  apigateway:
+    restart: always
+    container_name: apigateway
+    image: ghcr.io/zveronhse/apigateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/apigateway
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "8081:9091"
+      - "8080:8080"
+    depends_on:
+      - db
+      - registry
+  address_service:
+    restart: always
+    container_name: address_service
+    image: ghcr.io/zveronhse/address_service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/address
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  blacklist_service:
+    restart: always
+    container_name: blacklist_service
+    image: ghcr.io/zveronhse/blacklist_service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  favorites_service:
+    restart: always
+    container_name: favorites_service
+    image: ghcr.io/zveronhse/favorites_service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/favorites
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  parameter_service:
+    restart: always
+    container_name: parameter_service
+    image: ghcr.io/zveronhse/parameter_service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/parameter
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  profile_service:
+    restart: always
+    container_name: profile_service
+    image: ghcr.io/zveronhse/profile_service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/profile
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry
+  auth-service:
+    restart: always
+    container_name: auth-service
+    image: ghcr.io/zveronhse/auth-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/auth
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry

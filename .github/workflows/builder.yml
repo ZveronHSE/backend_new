@@ -1,0 +1,82 @@
+name: "Rebuild docker images of affected modules"
+
+on:
+  push:
+    branches: [ 'master' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: Address Service
+            env: address_service
+            dockerfile: address_service/Dockerfile
+            image: ghcr.io/zveronhse/address_service:latest
+
+          - name: API Gateway
+            env: apigateway
+            dockerfile: apigateway/Dockerfile
+            image: ghcr.io/zveronhse/apigateway:latest
+
+          - name: Blacklist Service
+            env: blacklist_service
+            dockerfile: blacklist_service/Dockerfile
+            image: ghcr.io/zveronhse/blacklist_service:latest
+
+          - name: Favorites Service
+            env: favorites_service
+            dockerfile: favorites_service/Dockerfile
+            image: ghcr.io/zveronhse/favorites_service:latest
+
+          - name: Parameter Service
+            env: parameter_service
+            dockerfile: parameter_service/Dockerfile
+            image: ghcr.io/zveronhse/parameter_service:latest
+
+          - name: Profile Service
+            env: profile_service
+            dockerfile: profile_service/Dockerfile
+            image: ghcr.io/zveronhse/profile_service:latest
+
+          - name: Service Registry
+            env: service_registry
+            dockerfile: service_registry/Dockerfile
+            image: ghcr.io/zveronhse/service_registry:latest
+
+          - name: Auth Service
+            env: auth-service
+            dockerfile: auth-service/Dockerfile
+            image: ghcr.io/zveronhse/auth-service:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get changed files
+        shell: bash
+        run: |
+          git fetch origin master
+          (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
+          grep '^[a-zA-Z_-]*$' temp.txt >> valid_directories.txt
+          (readarray -t ARRAY < valid_directories.txt; IFS=', '; echo "CHANGED=${ARRAY[*]}" >> $GITHUB_ENV)
+
+      - name: Build and push ${{ matrix.name }} image
+        if: contains(env.CHANGED, matrix.env)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ matrix.image }}

@@ -111,7 +111,7 @@ subprojects {
         implementation("org.hibernate:hibernate-core:5.6.7.Final")
 
         //Eureka
-        implementation("org.springframework.boot:spring-boot-starter-web")
+        implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
         implementation("org.springframework:spring-webflux:5.3.24")
         implementation("io.projectreactor.netty:reactor-netty:1.1.1")
         if (project.name != "service_registry") {
@@ -156,6 +156,7 @@ subprojects {
         useJUnitPlatform()
         testLogging {
             events("passed", "skipped", "failed")
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
         }
     }
 
