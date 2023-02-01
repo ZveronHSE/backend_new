@@ -1,8 +1,7 @@
 name: "Rebuild docker images of affected modules"
 
 on:
-  push:
-    branches: [ 'master' ]
+  - pull_request
 
 jobs:
   build:
