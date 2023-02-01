@@ -21,6 +21,7 @@ dependencies {
     implementation("com.github.zveronHSe.contract:auth:1.7.0")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
+    testImplementation("com.ninja-squad:springmockk:4.0.0")
     implementation("com.github.zveronHSe.contract:auth:a5ff052765")
     implementation("com.nimbusds:nimbus-jose-jwt:9.29")
 }
