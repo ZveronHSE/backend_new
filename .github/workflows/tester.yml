@@ -5,7 +5,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -17,37 +17,39 @@ jobs:
           (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v2.3.0
 
       - name: Setup JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 17.0.3
           distribution: 'adopt'
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.1
 
       - name: Test blacklist service
         shell: bash
-        run: if grep -q "blacklist_service" "temp.txt"; then gradle :blacklist_service:test; fi
+        run: if grep -q "blacklist_service" "temp.txt"; then gradle :blacklist_service:test --stacktrace; fi
 
       - name: Test address service
         shell: bash
-        run: if grep -q "address_service" "temp.txt"; then gradle :address_service:test; fi
+        run: if grep -q "address_service" "temp.txt"; then gradle :address_service:test --stacktrace; fi
 
       - name: Test favorites service
         shell: bash
-        run: if grep -q "favorites_service" "temp.txt"; then gradle :favorites_service:test; fi
+        run: if grep -q "favorites_service" "temp.txt"; then gradle :favorites_service:test --stacktrace; fi
 
       - name: Test parameter service
         shell: bash
-        run: if grep -q "parameter_service" "temp.txt"; then gradle :parameter_service:test; fi
+        run: if grep -q "parameter_service" "temp.txt"; then gradle :parameter_service:test --stacktrace; fi
 
       - name: Test profile service
         shell: bash
-        run: if grep -q "profile_service" "temp.txt"; then gradle :profile_service:test; fi
+        run: if grep -q "profile_service" "temp.txt"; then gradle :profile_service:test --stacktrace; fi
 
       - name: Test auth service
         shell: bash
-        run: if grep -q "auth-service" "temp.txt"; then gradle :auth-service:test; fi
+        run: if grep -q "auth-service" "temp.txt"; then gradle :auth-service:test --stacktrace; fi

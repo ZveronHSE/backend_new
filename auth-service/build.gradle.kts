@@ -2,6 +2,8 @@ configurations {
     implementation.get().exclude("org.springframework.boot", "spring-boot-starter-tomcat")
 }
 
+val testcontainersVersion: String by rootProject
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jetty:2.7.8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.2")
@@ -16,7 +18,9 @@ dependencies {
     implementation("com.googlecode.libphonenumber:libphonenumber:8.13.4")
 
     implementation("com.github.zveronHSe.contract:profile:1.7.0")
+    implementation("com.github.zveronHSe.contract:auth:1.7.0")
+
+    testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
     implementation("com.github.zveronHSe.contract:auth:a5ff052765")
     implementation("com.nimbusds:nimbus-jose-jwt:9.29")
-
 }
