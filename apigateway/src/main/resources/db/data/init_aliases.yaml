@@ -3,7 +3,7 @@ databaseChangeLog:
       id: init_aliases
       author: Schuyweiz
       changes:
-        - loadData:
+        - loadUpdateData:
             columns:
               - column:
                   header: alias
@@ -21,9 +21,14 @@ databaseChangeLog:
                   header: grpc_method_name
                   name: grpc_method_name
                   type: STRING
+              - column:
+                  header: access_role
+                  name: access_role
+                  type: access_role
             commentLineStartsWith: '#'
             encoding: UTF-8
             file: aliases.csv
+            primaryKey: alias
             relativeToChangelogFile: true
             quotchar: '"'
             separator: ','

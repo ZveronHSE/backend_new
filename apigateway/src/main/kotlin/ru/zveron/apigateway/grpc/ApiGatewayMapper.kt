@@ -1,4 +1,4 @@
-package ru.zveron.apigateway.grpc.mapper
+package ru.zveron.apigateway.grpc
 
 import ru.zveron.apigateway.grpc.service.dto.GatewayServiceRequest
 import ru.zveron.contract.apigateway.ApiGatewayRequest

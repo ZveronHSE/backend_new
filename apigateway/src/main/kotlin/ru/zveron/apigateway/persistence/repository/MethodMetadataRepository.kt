@@ -1,8 +1,8 @@
 package ru.zveron.apigateway.persistence.repository
 
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import ru.zveron.apigateway.persistence.entity.MethodMetadata
 
-interface MethodMetadataRepository: JpaRepository<MethodMetadata, String?> {
-    fun findByAlias(alias: String): MethodMetadata?
+interface MethodMetadataRepository : CoroutineCrudRepository<MethodMetadata, String?> {
+    suspend fun findByAlias(alias: String): MethodMetadata?
 }
