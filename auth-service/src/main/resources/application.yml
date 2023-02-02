@@ -13,6 +13,9 @@ spring:
     web-application-type: reactive
   liquibase:
     change-log: classpath:db/master.yaml
+    url: jdbc:postgresql://localhost:5555/auth
+    user: zveron_user
+    password: zveron_password
   application:
     name: auth-service
   datasource:

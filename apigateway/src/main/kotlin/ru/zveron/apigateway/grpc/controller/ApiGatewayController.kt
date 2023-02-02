@@ -3,7 +3,7 @@ package ru.zveron.apigateway.grpc.controller
 import com.google.protobuf.kotlin.toByteStringUtf8
 import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
-import ru.zveron.apigateway.grpc.mapper.ApiGatewayMapper.toServiceRequest
+import ru.zveron.apigateway.grpc.ApiGatewayMapper.toServiceRequest
 import ru.zveron.apigateway.grpc.service.ApiGatewayService
 import ru.zveron.contract.apigateway.ApiGatewayRequest
 import ru.zveron.contract.apigateway.ApigatewayResponse
