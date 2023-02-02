@@ -2,7 +2,7 @@ grpc:
   server:
     port: 0
   client:
-    grpc-profile-service:
+    profile-service:
       address: 'discovery:///profile-service'
       enableKeepAlive: true # пока не оч ясно будет ли влиять я бы посмотрел
       keepAliveWithoutCalls: true # то же самое
@@ -40,7 +40,7 @@ eureka:
     webclient:
       enabled: true
     register-with-eureka: true
-    fetch-registry: false
+    fetch-registry: true
     enabled: true
   instance:
     metadata-map:
