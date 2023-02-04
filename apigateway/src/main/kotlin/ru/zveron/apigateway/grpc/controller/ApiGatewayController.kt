@@ -1,6 +1,7 @@
 package ru.zveron.apigateway.grpc.controller
 
 import com.google.protobuf.kotlin.toByteStringUtf8
+import com.google.protobuf.util.JsonFormat
 import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.apigateway.grpc.ApiGatewayMapper.toServiceRequest
@@ -9,7 +10,6 @@ import ru.zveron.contract.apigateway.ApiGatewayRequest
 import ru.zveron.contract.apigateway.ApigatewayResponse
 import ru.zveron.contract.apigateway.ApigatewayServiceGrpcKt
 import ru.zveron.contract.apigateway.apigatewayResponse
-
 
 @GrpcService
 class ApiGatewayController(
@@ -26,7 +26,7 @@ class ApiGatewayController(
         logger.debug { "Apigw entrypoint, response $response" }
 
         return apigatewayResponse {
-            this.responseBody = response.toString().toByteStringUtf8()
+            this.responseBody = JsonFormat.printer().print(response).toByteStringUtf8()
         }
     }
 }
