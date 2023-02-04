@@ -1,4 +1,4 @@
 "profile_id","search_address_id","channels"
-"1","-1","{""vk"": false, ""chat"": true, ""email"": false, ""phone"": true, ""facebook"": false}"
-"2","-1","{""vk"": false, ""chat"": true, ""email"": false, ""phone"": true, ""facebook"": false}"
-"3","-1","{""vk"": false, ""chat"": true, ""email"": false, ""phone"": true, ""facebook"": false}"
+"1","-1","{""vk"": false, ""chat"": true, ""gmail"": false, ""phone"": true}"
+"2","-1","{""vk"": false, ""chat"": true, ""gmail"": false, ""phone"": true}"
+"3","-1","{""vk"": false, ""chat"": true, ""gmail"": false, ""phone"": true}"

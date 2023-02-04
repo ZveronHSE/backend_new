@@ -1,8 +1,6 @@
 package ru.zveron.entity
 
-import com.vladmihalcea.hibernate.type.json.JsonType
 import org.hibernate.Hibernate
-import org.hibernate.annotations.TypeDef
 import java.time.Instant
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -12,7 +10,6 @@ import javax.persistence.OneToOne
 import javax.persistence.PrimaryKeyJoinColumn
 
 @Entity
-@TypeDef(name = "json", typeClass = JsonType::class)
 data class Profile(
     @Id
     @Column(nullable = false)
