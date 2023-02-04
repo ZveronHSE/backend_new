@@ -18,10 +18,9 @@ dependencies {
     implementation("com.googlecode.libphonenumber:libphonenumber:8.13.4")
 
     implementation("com.github.zveronHSe.contract:profile:1.7.0")
-    implementation("com.github.zveronHSe.contract:auth:1.7.0")
+    implementation("com.github.zveronHSe.contract:auth:d1389de1ab")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
     testImplementation("com.ninja-squad:springmockk:4.0.0")
-    implementation("com.github.zveronHSe.contract:auth:a5ff052765")
     implementation("com.nimbusds:nimbus-jose-jwt:9.29")
 }

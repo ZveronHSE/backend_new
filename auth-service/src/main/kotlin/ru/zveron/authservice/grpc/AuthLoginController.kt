@@ -1,6 +1,5 @@
 package ru.zveron.authservice.grpc
 
-import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.authservice.component.auth.Authenticator
 import ru.zveron.authservice.grpc.GrpcMapper.toGrpcToken
@@ -13,9 +12,11 @@ import ru.zveron.contract.auth.PhoneLoginInitRequest
 import ru.zveron.contract.auth.PhoneLoginInitResponse
 import ru.zveron.contract.auth.PhoneLoginVerifyRequest
 import ru.zveron.contract.auth.PhoneLoginVerifyResponse
+import ru.zveron.contract.auth.ProfileId
 import ru.zveron.contract.auth.VerifyMobileTokenRequest
 import ru.zveron.contract.auth.phoneLoginInitResponse
 import ru.zveron.contract.auth.phoneLoginVerifyResponse
+import ru.zveron.contract.auth.profileId
 
 @GrpcService
 class AuthLoginController(
@@ -39,10 +40,8 @@ class AuthLoginController(
         }
     }
 
-    override suspend fun verifyToken(request: VerifyMobileTokenRequest): Empty {
-        authenticator.validateAccessToken(request.accessToken)
-        return Empty.getDefaultInstance()
-    }
+    override suspend fun verifyToken(request: VerifyMobileTokenRequest): ProfileId =
+        profileId { this.id = authenticator.validateAccessToken(request.accessToken) }
 
     override suspend fun issueNewTokens(request: IssueNewTokensRequest): MobileToken {
         val mobileTokens = authenticator.refreshMobileSession(request.toServiceRequest())

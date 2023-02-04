@@ -88,7 +88,6 @@ class AuthTokensTest : BaseAuthTest() {
             //access token passes validation
             assertDoesNotThrow {
                 authLoginController.verifyToken(verifyMobileTokenRequest {
-                    this.deviceFp = deviceFp
                     this.accessToken = accessToken.token
                 })
             }
@@ -102,7 +101,6 @@ class AuthTokensTest : BaseAuthTest() {
             //new access token passes validation
             assertDoesNotThrow {
                 authLoginController.verifyToken(verifyMobileTokenRequest {
-                    this.deviceFp = deviceFp
                     this.accessToken = newTokens.accessToken.token
                 })
             }
