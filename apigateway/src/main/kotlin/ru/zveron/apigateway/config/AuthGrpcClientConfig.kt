@@ -17,4 +17,5 @@ class AuthGrpcClientConfig {
 
     @Bean
     fun authClient(authService: AuthServiceGrpcKt.AuthServiceCoroutineStub) = GrpcAuthClient(client = authService)
+
 }

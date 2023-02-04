@@ -20,11 +20,21 @@ dependencies {
     implementation("io.r2dbc:r2dbc-pool:1.0.0.RELEASE")
     implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
 
-    implementation("com.github.zveronHSe.contract:auth:1.7.0")
+    implementation("com.github.zveronHSe.contract:auth:6129953b3f")
     implementation("com.github.zveronHSe.contract:apigateway:1.5.0")
 
-    compileOnly("com.google.protobuf:protobuf-java-util:$protobufVersion")
+    implementation("com.google.protobuf:protobuf-java-util:$protobufVersion")
 
     testImplementation("com.ninja-squad:springmockk:4.0.0")
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
+
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-slf4j
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.4")
+
+    // https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder
+    implementation("net.logstash.logback:logstash-logback-encoder:7.2")
+
+// https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation("com.google.code.gson:gson:2.10.1")
+
 }

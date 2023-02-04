@@ -5,7 +5,9 @@ import io.grpc.ServerCall
 import io.grpc.kotlin.CoroutineContextServerInterceptor
 import mu.KLogging
 import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor
+import net.logstash.logback.marker.Markers.append
 import ru.zveron.apigateway.grpc.context.AuthenticationContext
+import ru.zveron.apigateway.utils.LogstashHelper.toMarker
 import kotlin.coroutines.CoroutineContext
 
 @GrpcGlobalServerInterceptor
@@ -16,9 +18,9 @@ class AuthInterceptor : CoroutineContextServerInterceptor() {
     }
 
     override fun coroutineContext(call: ServerCall<*, *>, headers: Metadata): CoroutineContext {
-        logger.info { "Entered coroutine context in auth interceptor, current service name=${call.methodDescriptor.serviceName}" }
-        logger.info { "Headers=$headers" }
+        logger.debug(append("headers", headers.toMarker())) { "Entered coroutine context in auth interceptor" }
         headers.get(accessTokenKey).let {
+            logger.debug(append("accessToken", it)) { "Access token in interceptor" }
             return AuthenticationContext(it ?: "")
         }
     }

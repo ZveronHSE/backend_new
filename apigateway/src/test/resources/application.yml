@@ -1,14 +1,7 @@
 spring:
   liquibase:
     enabled: true
-    change-log: classpath:db/master.yaml
-    url: jdbc:postgresql://localhost:5555/apigateway
-    user: zveron_user
-    password: zveron_password
-  datasource:
-    url: jdbc:postgresql://localhost:5555/apigateway
-    password: zveron_password
-    username: zveron_user
+    change-log: db/test-master.yml
   main:
     banner-mode: off
     web-application-type: reactive
@@ -46,3 +39,7 @@ grpc:
 
   server:
     port: 9091
+
+logging:
+  level:
+    ru.zveron.apigateway: DEBUG

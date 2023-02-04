@@ -18,13 +18,17 @@ class AuthResolver(
     suspend fun resolveForRole(request: ResolveForRoleRequest) {
         if (request.role == ServiceRole.ANY) {
             return
-        } else {
-            val authClientResponse = authClient.verifyAccessToken(request.token)
-            when (authClientResponse) {
-                is AccessTokenValid -> return
-                is AccessTokenNotValid -> throw StatusException(Status.UNAUTHENTICATED)
-                is AccessTokenUnknown -> throw StatusException(Status.INTERNAL)
-            }
+        }
+
+        if (request.token.isEmpty()) {
+            throw StatusException(Status.DATA_LOSS)
+        }
+
+        val authClientResponse = authClient.verifyAccessToken(request.token)
+        when (authClientResponse) {
+            is AccessTokenValid -> return
+            is AccessTokenNotValid -> throw StatusException(Status.UNAUTHENTICATED, authClientResponse.metadata)
+            is AccessTokenUnknown -> throw StatusException(Status.INTERNAL, authClientResponse.metadata)
         }
     }
 }
