@@ -2,6 +2,7 @@ package ru.zveron.authservice.component.auth
 
 import mu.KLogging
 import org.springframework.stereotype.Component
+import ru.zveron.authservice.component.auth.model.RefreshMobileSessionRequest
 import ru.zveron.authservice.component.jwt.JwtManager
 import ru.zveron.authservice.component.jwt.model.IssueMobileTokensRequest
 import ru.zveron.authservice.component.jwt.model.MobileTokens
@@ -21,10 +22,7 @@ class Authenticator(
     companion object : KLogging()
 
     suspend fun loginUser(fp: String, profileId: Long): MobileTokens {
-        val session = sessionStorage.createSession(
-            fp = fp,
-            profileId = profileId,
-        )
+        val session = sessionStorage.createSession(fingerprint = fp, profileId = profileId)
 
         return jwtManager.issueMobileTokens(
             IssueMobileTokensRequest(
@@ -62,8 +60,3 @@ class Authenticator(
         return decodedToken.profileId
     }
 }
-
-data class RefreshMobileSessionRequest(
-    val token: String,
-    val fp: String,
-)

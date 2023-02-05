@@ -20,12 +20,13 @@ class SessionStorage(
     private val properties: SessionProperties,
 ) {
 
-    suspend fun createSession(fp: String, profileId: Long): SessionEntity {
+    suspend fun createSession(fingerprint: String, profileId: Long): SessionEntity {
         val sessionEntity = SessionEntity(
-            fingerprint = fp,
+            fingerprint = fingerprint,
             profileId = profileId,
-            expiresAt = Instant.now().plusMillis(properties.sessionDurationMs)
+            expiresAt = Instant.now().plusMillis(properties.sessionDurationMs),
         )
+
         return sessionRepository.save(sessionEntity)
     }
 
@@ -34,10 +35,10 @@ class SessionStorage(
      * throws [InvalidTokenException]
      * */
     @Transactional
-    suspend fun updateSession(id: UUID, fp: String, tokenIdentifier: UUID): SessionEntity? {
+    suspend fun updateSession(id: UUID, fingerprint: String, tokenIdentifier: UUID?): SessionEntity? {
         val sessionEntity = sessionRepository.findById(id) ?: throw SessionExpiredException()
 
-        if (sessionEntity.fingerprint != fp || sessionEntity.tokenIdentifier != tokenIdentifier) {
+        if (sessionEntity.fingerprint != fingerprint || sessionEntity.tokenIdentifier != tokenIdentifier) {
             throw InvalidTokenException()
         }
 

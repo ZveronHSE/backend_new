@@ -2,7 +2,6 @@ package ru.zveron.authservice.grpc
 
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.r2dbc.postgresql.codec.Json
 import kotlinx.coroutines.reactive.awaitSingle
@@ -24,6 +23,7 @@ import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPhoneNumber
 import ru.zveron.authservice.util.randomSurname
 import ru.zveron.contract.auth.issueNewTokensRequest
+import ru.zveron.contract.auth.mobileTokenOrNull
 import ru.zveron.contract.auth.phoneLoginVerifyRequest
 import ru.zveron.contract.auth.verifyMobileTokenRequest
 import java.util.UUID
@@ -53,7 +53,7 @@ class AuthTokensTest : BaseAuthTest() {
             val code = randomCode()
 
             val loginStateContext = randomLoginFlowContext().copy(
-                deviceFp = deviceFp,
+                fingerprint = deviceFp,
                 phoneNumber = phoneNumber.toContext(),
                 code = code,
             )
@@ -78,8 +78,7 @@ class AuthTokensTest : BaseAuthTest() {
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.isNewUser shouldBe false
-                verifyResponse.sessionId shouldBe sessionId.toString()
+                verifyResponse.mobileTokenOrNull.shouldNotBeNull()
             }
 
             val refreshToken = verifyResponse.mobileToken.refreshToken

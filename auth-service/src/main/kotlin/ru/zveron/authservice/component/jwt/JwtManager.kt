@@ -3,7 +3,6 @@ package ru.zveron.authservice.component.jwt
 import com.nimbusds.jwt.JWTClaimsSet
 import org.springframework.stereotype.Component
 import ru.zveron.authservice.component.jwt.Constants.SESSION_ID
-import ru.zveron.authservice.component.jwt.Constants.ZV_ISSUER
 import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.DecodedToken
 import ru.zveron.authservice.component.jwt.model.IssueMobileTokensRequest
@@ -25,8 +24,6 @@ class JwtManager(
 
     private fun issueMobileAccessToken(request: IssueMobileTokensRequest): AccessToken {
         val claimsBuilder = JWTClaimsSet.Builder()
-            .jwtID(request.session.tokenIdentifier.toString())
-            .issuer(ZV_ISSUER)
             .claim(SESSION_ID, request.session.id)
             .subject(request.profileId.toString())
 
@@ -36,7 +33,6 @@ class JwtManager(
     private fun issueRefreshToken(request: IssueMobileTokensRequest): RefreshToken {
         val claimsBuilder = JWTClaimsSet.Builder()
             .jwtID(request.session.tokenIdentifier.toString())
-            .issuer(ZV_ISSUER)
             .claim(SESSION_ID, request.session.id)
             .subject(request.profileId.toString())
 

@@ -2,7 +2,6 @@ package ru.zveron.authservice.util
 
 import org.apache.commons.lang3.RandomStringUtils.randomNumeric
 import org.apache.commons.lang3.RandomUtils
-import ru.zveron.authservice.component.jwt.Constants
 import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.DecodedToken
 import ru.zveron.authservice.component.jwt.model.MobileTokens
@@ -27,7 +26,7 @@ fun randomPhoneNumber() = PhoneNumber(
 
 fun randomLoginInitRequest() = LoginByPhoneInitRequest(
     phoneNumber = randomPhoneNumber(),
-    deviceFingerprint = randomDeviceFp(),
+    fingerprint = randomDeviceFp(),
 )
 
 fun randomLoginInitApigRequest() = phoneLoginInitRequest {
@@ -50,13 +49,13 @@ fun randomCode() = randomNumeric(4)
 fun randomLoginVerifyRequest() = LoginByPhoneVerifyRequest(
     code = randomCode(),
     sessionId = UUID.randomUUID(),
-    deviceFingerprint = randomDeviceFp(),
+    fingerprint = randomDeviceFp(),
 )
 
 fun randomLoginFlowContext() = MobilePhoneLoginStateContext(
     phoneNumber = randomPhoneNumber().toContext(),
     code = randomCode(),
-    deviceFp = randomDeviceFp(),
+    fingerprint = randomDeviceFp(),
 )
 
 fun randomApigPhone() = "7${randomNumeric(10)}"
@@ -79,7 +78,6 @@ fun randomAccessToken() = AccessToken(UUID.randomUUID().toString(), Instant.now(
 fun randomDecodedToken() = DecodedToken(
     profileId = randomId(),
     tokenType = randomEnum(),
-    issuer = Constants.ZV_ISSUER,
     expiresAt = Instant.now(),
     sessionId = UUID.randomUUID(),
     tokenIdentifier = UUID.randomUUID(),

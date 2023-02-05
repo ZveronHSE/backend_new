@@ -33,6 +33,7 @@ import ru.zveron.authservice.webclient.NotifierFailure
 import ru.zveron.authservice.webclient.NotifierSuccess
 import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
 import ru.zveron.contract.auth.copy
+import ru.zveron.contract.auth.mobileTokenOrNull
 import java.util.UUID
 
 internal class AuthLoginControllerTest : BaseAuthTest() {
@@ -84,13 +85,13 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
     fun `when login by phone verify is a success, and account found, then returns tokens`(): Unit = runBlocking {
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val uuid = flowStateStorage.createContext(initialCtx)
         val request = randomLoginVerifyApigRequest().copy {
             this.sessionId = uuid.toString()
             this.code = initialCtx.code!!
-            this.deviceFp = initialCtx.deviceFp
+            this.deviceFp = initialCtx.fingerprint
         }
 
         coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileFound(
@@ -103,8 +104,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
         verifyResponse.shouldNotBeNull()
 
         assertSoftly {
-            verifyResponse.isNewUser shouldBe false
-            verifyResponse.sessionId shouldBe request.sessionId
+            verifyResponse.mobileTokenOrNull.shouldNotBeNull()
         }
 
         val ctxEntity = template.select(StateContextEntity::class.java).all().awaitSingle()
@@ -121,13 +121,13 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
         runBlocking {
             val initialCtx = randomLoginFlowContext().copy(
                 code = randomCode(),
-                deviceFp = randomDeviceFp(),
+                fingerprint = randomDeviceFp(),
             )
             val uuid = flowStateStorage.createContext(initialCtx)
             val request = randomLoginVerifyApigRequest().copy {
                 this.sessionId = uuid.toString()
                 this.code = initialCtx.code!!
-                this.deviceFp = initialCtx.deviceFp
+                this.deviceFp = initialCtx.fingerprint
             }
 
             coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileNotFound
@@ -135,9 +135,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             val verifyResponse = authLoginController.phoneLoginVerify(request)
             verifyResponse.shouldNotBeNull()
             assertSoftly {
-                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldNotBe request.sessionId
-                //todo tokens gen
             }
 
             val ctxEntity = template.select(StateContextEntity::class.java).all().awaitLast()
@@ -148,7 +146,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             assertSoftly {
                 registerFlowContext.isChannelVerified shouldBe true
                 registerFlowContext.phoneNumber shouldBe initialCtx.phoneNumber
-                registerFlowContext.deviceFp shouldBe initialCtx.deviceFp
+                registerFlowContext.deviceFp shouldBe initialCtx.fingerprint
             }
         }
 
@@ -157,13 +155,13 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
         val differentCode = randomCode()
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val uuid = flowStateStorage.createContext(initialCtx)
         val request = randomLoginVerifyApigRequest().copy {
             this.sessionId = uuid.toString()
             this.code = differentCode
-            this.deviceFp = initialCtx.deviceFp
+            this.deviceFp = initialCtx.fingerprint
         }
 
         assertThrows<ru.zveron.authservice.exception.WrongCodeException> {
@@ -176,14 +174,14 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
         runBlocking {
             val initialCtx = randomLoginFlowContext().copy(
                 code = randomCode(),
-                deviceFp = randomDeviceFp(),
+                fingerprint = randomDeviceFp(),
                 isVerified = true
             )
             val uuid = flowStateStorage.createContext(initialCtx)
             val request = randomLoginVerifyApigRequest().copy {
                 this.sessionId = uuid.toString()
                 this.code = initialCtx.code!!
-                this.deviceFp = initialCtx.deviceFp
+                this.deviceFp = initialCtx.fingerprint
             }
 
             assertThrows<ru.zveron.authservice.exception.CodeValidatedException> {
@@ -196,7 +194,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
         val differentFp = randomDeviceFp()
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val uuid = flowStateStorage.createContext(initialCtx)
         val request = randomLoginVerifyApigRequest().copy {

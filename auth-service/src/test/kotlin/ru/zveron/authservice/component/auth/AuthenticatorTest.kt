@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import ru.zveron.authservice.component.auth.model.RefreshMobileSessionRequest
 import ru.zveron.authservice.component.jwt.JwtManager
 import ru.zveron.authservice.component.jwt.model.IssueMobileTokensRequest
 import ru.zveron.authservice.exception.InvalidTokenException

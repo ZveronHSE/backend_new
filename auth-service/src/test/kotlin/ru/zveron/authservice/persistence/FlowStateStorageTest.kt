@@ -55,7 +55,7 @@ class FlowStateStorageTest : ContainerConfigurer() {
                 .let { objectMapper.readValue(it, MobilePhoneLoginStateContext::class.java) }
 
         assertSoftly {
-            createdCtx.deviceFp shouldBe ctx.deviceFp
+            createdCtx.fingerprint shouldBe ctx.fingerprint
             createdCtx.phoneNumber shouldBe ctx.phoneNumber
             createdCtx.isVerified shouldBe false
             createdCtx.type shouldBe ctx.type
@@ -74,7 +74,7 @@ class FlowStateStorageTest : ContainerConfigurer() {
             ctxEntity.isVerified shouldBe ctx.isVerified
             ctxEntity.code shouldBe ctx.code
             ctxEntity.codeAttempts shouldBe ctx.codeAttempts
-            ctxEntity.deviceFp shouldBe ctx.deviceFp
+            ctxEntity.fingerprint shouldBe ctx.fingerprint
         }
     }
 

@@ -97,12 +97,12 @@ class LoginByPhoneFlowServiceTest {
         val uuid = UUID.randomUUID()
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = initialCtx.code!!,
-            deviceFingerprint = initialCtx.deviceFp,
+            fingerprint = initialCtx.fingerprint,
         )
         val updatedCtx = initialCtx.copy(
             isVerified = true,
@@ -118,14 +118,13 @@ class LoginByPhoneFlowServiceTest {
             randomName(),
             randomSurname()
         )
-        coEvery { authenticator.loginUser(eq(initialCtx.deviceFp), any()) } returns randomTokens()
+        coEvery { authenticator.loginUser(eq(initialCtx.fingerprint), any()) } returns randomTokens()
 
         val verifyResponse = service.verify(request)
         verifyResponse.shouldNotBeNull()
 
         assertSoftly {
-            verifyResponse.isNewUser shouldBe false
-            verifyResponse.sessionId shouldBe request.sessionId
+            verifyResponse.tokens.shouldNotBeNull()
         }
 
         coVerify { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) }
@@ -140,13 +139,13 @@ class LoginByPhoneFlowServiceTest {
         runBlocking {
             val initialCtx = randomLoginFlowContext().copy(
                 code = randomCode(),
-                deviceFp = randomDeviceFp(),
+                fingerprint = randomDeviceFp(),
             )
             val uuid = UUID.randomUUID()
             val request = randomLoginVerifyRequest().copy(
                 sessionId = uuid,
                 code = initialCtx.code!!,
-                deviceFingerprint = initialCtx.deviceFp,
+                fingerprint = initialCtx.fingerprint,
             )
             val updatedCtx = initialCtx.copy(
                 isVerified = true,
@@ -164,7 +163,6 @@ class LoginByPhoneFlowServiceTest {
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldNotBe request.sessionId
             }
 
@@ -179,7 +177,7 @@ class LoginByPhoneFlowServiceTest {
         val differentCode = randomCode()
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val uuid = UUID.randomUUID()
 
@@ -187,7 +185,7 @@ class LoginByPhoneFlowServiceTest {
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = differentCode,
-            deviceFingerprint = initialCtx.deviceFp
+            fingerprint = initialCtx.fingerprint
         )
 
         assertThrows<ru.zveron.authservice.exception.WrongCodeException> {
@@ -200,7 +198,7 @@ class LoginByPhoneFlowServiceTest {
         val differentFp = randomDeviceFp()
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val uuid = UUID.randomUUID()
 
@@ -208,7 +206,7 @@ class LoginByPhoneFlowServiceTest {
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = initialCtx.code!!,
-            deviceFingerprint = differentFp,
+            fingerprint = differentFp,
         )
 
         assertThrows<ru.zveron.authservice.exception.FingerprintException> {

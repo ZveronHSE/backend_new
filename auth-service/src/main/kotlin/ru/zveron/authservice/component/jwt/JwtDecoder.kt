@@ -37,6 +37,7 @@ class JwtDecoder(
       */
     private fun verifyAndGetPayload(token: String, tokenType: TokenType): MutableMap<String, Any> {
         val jwsObject = JWSObject.parse(token)
+
         if (!jwsObject.verify(verifier)) {
             throw InvalidTokenException()
         }

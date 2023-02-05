@@ -36,28 +36,28 @@ class LoginByPhoneFlowService(
     private val authenticator: ru.zveron.authservice.component.auth.Authenticator,
 ) {
 
-    companion object : KLogging()
-
     /**
      * throws [NotifierClientException]
      */
     suspend fun init(request: LoginByPhoneInitRequest): UUID {
         val phoneVerificationCtx = MobilePhoneLoginStateContext(
             phoneNumber = request.phoneNumber.toContext(),
-            deviceFp = request.deviceFingerprint,
+            fingerprint = request.fingerprint,
         )
 
-        val verificationContext =
-            when (val clientResponse = notifierClient.initializeVerification(request.toClientRequest())) {
+        val notifierResponse = notifierClient.initializeVerification(request.toClientRequest())
+
+        val verificationCtxWithCode =
+            when (notifierResponse) {
                 is NotifierFailure -> {
-                    logger.error { "An error produced in the client, response is $clientResponse" }
+                    logger.error { "An error produced in the client, response is $notifierResponse" }
                     throw NotifierClientException()
                 }
 
-                is NotifierSuccess -> phoneVerificationCtx.copy(code = clientResponse.verificationCode)
+                is NotifierSuccess -> phoneVerificationCtx.copy(code = notifierResponse.verificationCode)
             }
 
-        return flowStateStorage.createContext(verificationContext)
+        return flowStateStorage.createContext(verificationCtxWithCode)
     }
 
     /**
@@ -68,11 +68,11 @@ class LoginByPhoneFlowService(
      * throws [FingerprintException]
      */
     suspend fun verify(request: LoginByPhoneVerifyRequest): LoginByPhoneVerifyResponse {
-        val loginCtx = flowStateStorage.getContext<MobilePhoneLoginStateContext>(request.sessionId)
+        val phoneVerificationCtx = flowStateStorage.getContext<MobilePhoneLoginStateContext>(request.sessionId)
 
-        validateContext(loginCtx, request.deviceFingerprint)
+        validateContext(phoneVerificationCtx, request.fingerprint)
 
-        val updatedCtx = validateCodeAndUpdateContext(loginCtx, request.code, request.sessionId)
+        val updatedCtx = validateCodeAndUpdateContext(phoneVerificationCtx, request.code, request.sessionId)
 
         val profileResponse = profileClient.getAccountByPhone(updatedCtx.phoneNumber.toProfileClientRequest())
 
@@ -86,12 +86,12 @@ class LoginByPhoneFlowService(
         }
 
         return profileData?.let {
-            val tokens = authenticator.loginUser(request.deviceFingerprint, it.id)
-            LoginByPhoneVerifyResponse.login(request.sessionId, tokens.accessToken.token, tokens.refreshToken.token)
+            val tokens = authenticator.loginUser(request.fingerprint, it.id)
+            LoginByPhoneVerifyResponse.login(tokens.accessToken.token, tokens.refreshToken.token)
         } ?: flowStateStorage.createContext(
             MobilePhoneRegisterStateContext(
                 phoneNumber = updatedCtx.phoneNumber,
-                deviceFp = updatedCtx.deviceFp,
+                deviceFp = updatedCtx.fingerprint,
                 isChannelVerified = updatedCtx.isVerified,
             )
         ).let {
@@ -103,9 +103,9 @@ class LoginByPhoneFlowService(
         if (loginCtx.isVerified) {
             throw CodeValidatedException()
         }
-        if (loginCtx.deviceFp != requestDeviceFp) {
+        if (loginCtx.fingerprint != requestDeviceFp) {
             throw FingerprintException(
-                "Device fp does not match",
+                "Device fingerprint does not match",
                 Status.Code.UNAUTHENTICATED
             )
         }
@@ -116,16 +116,19 @@ class LoginByPhoneFlowService(
      * throws [ContextExpiredException]
      */
     private suspend fun validateCodeAndUpdateContext(
-        loginCtx: MobilePhoneLoginStateContext,
+        verifyMobileCtx: MobilePhoneLoginStateContext,
         code: String,
         sessionId: UUID,
     ): MobilePhoneLoginStateContext {
-        val updatedCtx = loginCtx.copy(codeAttempts = loginCtx.codeAttempts.inc(), lastAttemptAt = Instant.now())
+        val updatedCtx =
+            verifyMobileCtx.copy(codeAttempts = verifyMobileCtx.codeAttempts.inc(), lastAttemptAt = Instant.now())
 
-        if (loginCtx.code != code) {
-            throw WrongCodeException("Wrong code", Status.Code.INVALID_ARGUMENT)
+        if (verifyMobileCtx.code != code) {
+            throw WrongCodeException()
         }
 
         return flowStateStorage.updateContext(sessionId = sessionId, context = updatedCtx.copy(isVerified = true))
     }
+
+    companion object : KLogging()
 }

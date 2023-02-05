@@ -6,8 +6,7 @@ import java.util.UUID
 data class DecodedToken(
     val profileId: Long,
     val tokenType: TokenType,
-    val issuer: String,
     val expiresAt: Instant,
     val sessionId: UUID,
-    val tokenIdentifier: UUID,
+    val tokenIdentifier: UUID?,
 )

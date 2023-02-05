@@ -9,7 +9,7 @@ import java.time.Instant
 data class MobilePhoneLoginStateContext(
     val phoneNumber: PhoneNumber,
     val code: String? = null,
-    val deviceFp: String,
+    val fingerprint: String,
     val codeAttempts: Long = 0,
     val lastAttemptAt: Instant = Instant.now(),
     val isVerified: Boolean = false,

@@ -14,8 +14,10 @@ data class SessionEntity(
     @Id
     val id: UUID? = null,
 
+    //key that matches session to refresh token
     val tokenIdentifier: UUID = UUID.randomUUID(),
 
+    //user device fingerprint (unique for each device)
     val fingerprint: String,
 
     val profileId: Long,
