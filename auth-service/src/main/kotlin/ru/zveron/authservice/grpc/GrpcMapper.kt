@@ -54,7 +54,7 @@ object GrpcMapper {
     )
 
     fun LoginByPhoneVerifyResponse.toGrpcContract() = phoneLoginVerifyResponse {
-        this.sessionId = this@toGrpcContract.sessionId.toString()
+        this@toGrpcContract.sessionId?.let { this.sessionId = it.toString() }
         this@toGrpcContract.tokens?.let { this.mobileToken = it.toGrpcToken() }
     }
 
