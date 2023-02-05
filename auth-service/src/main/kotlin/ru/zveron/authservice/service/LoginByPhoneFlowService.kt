@@ -87,7 +87,7 @@ class LoginByPhoneFlowService(
 
         return profileData?.let {
             val tokens = authenticator.loginUser(request.fingerprint, it.id)
-            LoginByPhoneVerifyResponse.login(tokens.accessToken.token, tokens.refreshToken.token)
+            LoginByPhoneVerifyResponse.login(tokens)
         } ?: flowStateStorage.createContext(
             MobilePhoneRegisterStateContext(
                 phoneNumber = updatedCtx.phoneNumber,

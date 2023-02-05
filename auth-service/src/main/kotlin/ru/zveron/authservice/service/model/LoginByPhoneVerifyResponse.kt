@@ -1,5 +1,6 @@
 package ru.zveron.authservice.service.model
 
+import ru.zveron.authservice.component.jwt.model.MobileTokens
 import java.util.UUID
 
 data class LoginByPhoneVerifyResponse(
@@ -11,10 +12,12 @@ data class LoginByPhoneVerifyResponse(
             sessionId = sessionId,
         )
 
-        fun login(accessToken: String, refreshToken: String) = LoginByPhoneVerifyResponse(
+        fun login(tokens: MobileTokens) = LoginByPhoneVerifyResponse(
             tokens = JwtMobileTokens(
-                accessToken = accessToken,
-                refreshToken = refreshToken,
+                accessToken = tokens.accessToken.token,
+                accessExpiration = tokens.accessToken.expiresAt,
+                refreshToken = tokens.refreshToken.token,
+                refreshExpiration = tokens.refreshToken.expiresAt,
             )
         )
     }
