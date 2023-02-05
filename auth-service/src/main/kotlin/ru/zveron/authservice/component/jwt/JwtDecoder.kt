@@ -8,6 +8,7 @@ import ru.zveron.authservice.component.jwt.JwtMapper.toDecodedToken
 import ru.zveron.authservice.component.jwt.model.DecodedToken
 import ru.zveron.authservice.component.jwt.model.TokenType
 import ru.zveron.authservice.exception.InvalidTokenException
+import ru.zveron.authservice.exception.TokenExpiredException
 import java.time.Instant
 
 class JwtDecoder(
@@ -49,7 +50,7 @@ class JwtDecoder(
             ?: throw InvalidTokenException()
 
         jsonObject[EXPIRATION_TIME]?.let { Instant.ofEpochSecond(it as Long) }?.takeIf { it.isAfter(Instant.now()) }
-            ?: throw InvalidTokenException()
+            ?: throw TokenExpiredException()
 
         return jsonObject
     }

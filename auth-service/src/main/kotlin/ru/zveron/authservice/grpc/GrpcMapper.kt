@@ -50,7 +50,7 @@ object GrpcMapper {
 
     fun IssueNewTokensRequest.toServiceRequest(): RefreshMobileSessionRequest = RefreshMobileSessionRequest(
         token = this@toServiceRequest.refreshToken,
-        fp = this@toServiceRequest.deviceFp,
+        fingerprint = this@toServiceRequest.deviceFp,
     )
 
     fun LoginByPhoneVerifyResponse.toGrpcContract() = phoneLoginVerifyResponse {

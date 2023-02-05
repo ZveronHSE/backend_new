@@ -46,7 +46,7 @@ class Authenticator(
         }
 
         val sessionEntity =
-            sessionStorage.updateSession(decodedToken.sessionId, request.fp, decodedToken.tokenIdentifier)
+            sessionStorage.updateSession(decodedToken.sessionId, request.fingerprint, decodedToken.tokenIdentifier)
                 ?: throw InvalidTokenException("No session wss bound to token")
 
         return jwtManager.issueMobileTokens(IssueMobileTokensRequest(decodedToken.profileId, sessionEntity))

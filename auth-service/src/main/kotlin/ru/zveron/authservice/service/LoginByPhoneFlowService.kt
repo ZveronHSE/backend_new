@@ -3,6 +3,7 @@ package ru.zveron.authservice.service
 import io.grpc.Status
 import mu.KLogging
 import org.springframework.stereotype.Service
+import ru.zveron.authservice.component.auth.Authenticator
 import ru.zveron.authservice.exception.CodeValidatedException
 import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.exception.FingerprintException
@@ -33,8 +34,9 @@ class LoginByPhoneFlowService(
     private val notifierClient: NotifierClient,
     private val flowStateStorage: FlowStateStorage,
     private val profileClient: ProfileServiceClient,
-    private val authenticator: ru.zveron.authservice.component.auth.Authenticator,
+    private val authenticator: Authenticator,
 ) {
+    companion object : KLogging()
 
     /**
      * throws [NotifierClientException]
@@ -129,6 +131,4 @@ class LoginByPhoneFlowService(
 
         return flowStateStorage.updateContext(sessionId = sessionId, context = updatedCtx.copy(isVerified = true))
     }
-
-    companion object : KLogging()
 }
