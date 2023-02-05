@@ -8,6 +8,8 @@ import io.grpc.protobuf.lite.ProtoLiteUtils
 
 object DescriptorsUtil {
 
+    private const val PROFILE_ID = "profile_id"
+
     fun Descriptors.MethodDescriptor.getGrpcMethodDescriptor() =
         MethodDescriptor.newBuilder<DynamicMessage, DynamicMessage>()
             .setFullMethodName(MethodDescriptor.generateFullMethodName(this.service.fullName, this.name))
@@ -27,8 +29,16 @@ object DescriptorsUtil {
 
     fun Descriptors.MethodDescriptor.dynamicMessageBuilder(
         json: String,
-    ): DynamicMessage.Builder? =
-        DynamicMessage.newBuilder(this.inputType).apply {
+        id: Long?,
+    ): DynamicMessage.Builder? {
+        val builder = DynamicMessage.newBuilder(this.inputType).apply {
             JsonFormat.parser().merge(json, this)
         }
+
+        this.inputType.fields.find { it.name== PROFILE_ID }?.let {descriptor ->
+            id?.let { builder.setField(descriptor, it) }
+        }
+
+        return builder
+    }
 }

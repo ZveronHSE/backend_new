@@ -3,7 +3,6 @@ package ru.zveron.apigateway.grpc.service
 import com.google.protobuf.Descriptors
 import com.google.protobuf.DynamicMessage
 import io.grpc.Status
-import io.grpc.StatusException
 import io.grpc.kotlin.ClientCalls
 import mu.KLogging
 import net.logstash.logback.marker.Markers.append
@@ -13,11 +12,11 @@ import ru.zveron.apigateway.component.GrpcChannelRegistry
 import ru.zveron.apigateway.component.ProtoDefinitionRegistry
 import ru.zveron.apigateway.component.model.ResolveForRoleRequest
 import ru.zveron.apigateway.exception.ApiGatewayException
+import ru.zveron.apigateway.grpc.ApiGatewayMapper.toScope
 import ru.zveron.apigateway.grpc.context.AuthenticationContext
 import ru.zveron.apigateway.grpc.service.dto.GatewayServiceRequest
 import ru.zveron.apigateway.persistence.entity.AccessRole
 import ru.zveron.apigateway.persistence.entity.MethodMetadata
-import ru.zveron.apigateway.persistence.entity.toServiceRole
 import ru.zveron.apigateway.persistence.repository.MethodMetadataRepository
 import ru.zveron.apigateway.utils.DescriptorsUtil.dynamicMessageBuilder
 import ru.zveron.apigateway.utils.DescriptorsUtil.getGrpcMethodDescriptor
@@ -39,16 +38,11 @@ class ApiGatewayService(
         val metadata = methodMetadataRepository.findByAlias(request.alias)
             ?: throw ApiGatewayException(message = "Non existent method alias", code = Status.Code.INVALID_ARGUMENT)
 
-        verifyUserAccess(metadata.accessRole)
-
-        //todo: lookup  on how to provide channels as beans
+        val profileId = verifyUserAccess(metadata.accessRole)
         val channel = managedChannelRegistry.getChannel(metadata.serviceName)
-
         val protoMethodDescriptor = getProtoMethodDescriptor(metadata)
-
         val grpcMethodDescriptor = protoMethodDescriptor.getGrpcMethodDescriptor()
-
-        val grpcMessage = protoMethodDescriptor.dynamicMessageBuilder(request.requestBody)?.build()
+        val grpcMessage = protoMethodDescriptor.dynamicMessageBuilder(request.requestBody, profileId)?.build()
 
         logger.debug(
             append("grpcRequest", grpcMessage?.allFields?.toJson()).and(append("grpcService", metadata.serviceName)),
@@ -57,11 +51,11 @@ class ApiGatewayService(
         return ClientCalls.unaryRpc(channel, grpcMethodDescriptor, grpcMessage)
     }
 
-    private suspend fun verifyUserAccess(accessRole: AccessRole) {
-        val accessToken = AuthenticationContext.current() ?: throw StatusException(Status.DATA_LOSS)
+    private suspend fun verifyUserAccess(accessRole: AccessRole): Long? {
+        val accessToken = AuthenticationContext.current()
         logger.debug(append("accessToken", accessToken), "Access token in the context")
 
-        authResolver.resolveForRole(ResolveForRoleRequest(accessRole.toServiceRole(), accessToken))
+        return authResolver.resolveForScope(ResolveForRoleRequest(accessRole.toScope(), accessToken))
     }
 
     private suspend fun getProtoMethodDescriptor(metadata: MethodMetadata): Descriptors.MethodDescriptor {

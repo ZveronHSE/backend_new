@@ -5,6 +5,7 @@ import io.grpc.Metadata
 import io.grpc.Metadata.ASCII_STRING_MARSHALLER
 import net.logstash.logback.marker.LogstashMarker
 import net.logstash.logback.marker.Markers
+import ru.zveron.contract.apigateway.ApiGatewayRequest
 
 object LogstashHelper {
     val mapper: Gson = Gson().newBuilder().setPrettyPrinting().create()
@@ -21,4 +22,9 @@ object LogstashHelper {
         }
         return marker
     }
+
+    fun ApiGatewayRequest.toMarker(): LogstashMarker =
+        Markers.append("alias", this.methodAlias).apply {
+            add(Markers.append("requestBody", this@toMarker.requestBody.toStringUtf8()))
+        }
 }

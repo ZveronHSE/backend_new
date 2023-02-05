@@ -1,6 +1,5 @@
 package ru.zveron.apigateway.grpc.client
 
-import io.grpc.Metadata
 import io.grpc.Status.Code
 import io.grpc.StatusException
 import mu.KLogging
@@ -16,12 +15,11 @@ class GrpcAuthClient(
 
     suspend fun verifyAccessToken(token: String): GrpcAuthClientResponse {
         return try {
-            client.verifyToken(verifyMobileTokenRequest {
-                this.accessToken = token
-            })
-            AccessTokenValid
+            val response = client.verifyToken(verifyMobileTokenRequest { accessToken = token })
+            AccessTokenValid(response.id)
         } catch (ex: StatusException) {
             logger.error(append("status", ex.status)) { "Auth client request failed" }
+
             when (val code = ex.status.code) {
                 Code.UNAUTHENTICATED -> AccessTokenNotValid(message = ex.message, code = code, metadata = ex.trailers)
                 else -> AccessTokenUnknown(message = ex.message, code = code, metadata = ex.trailers)
@@ -30,18 +28,3 @@ class GrpcAuthClient(
     }
 }
 
-sealed class GrpcAuthClientResponse
-
-object AccessTokenValid : GrpcAuthClientResponse()
-
-data class AccessTokenNotValid(
-    val message: String?,
-    val code: Code,
-    val metadata: Metadata,
-) : GrpcAuthClientResponse()
-
-data class AccessTokenUnknown(
-    val message: String?,
-    val code: Code,
-    val metadata: Metadata,
-) : GrpcAuthClientResponse()

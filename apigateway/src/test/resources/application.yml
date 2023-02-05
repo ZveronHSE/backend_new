@@ -29,17 +29,6 @@ management:
     serviceregistry:
       enabled: true
 
-grpc:
-  client:
-    auth-service:
-      address: 'discovery:///auth-service'
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
-      negotiationType: plaintext
-
-  server:
-    port: 9091
-
 logging:
   level:
     ru.zveron.apigateway: DEBUG

@@ -1,6 +1,6 @@
 package ru.zveron.apigateway.component.model
 
-enum class ServiceRole {
+enum class ServiceScope {
     ANY,
     BUYER,
     ;
