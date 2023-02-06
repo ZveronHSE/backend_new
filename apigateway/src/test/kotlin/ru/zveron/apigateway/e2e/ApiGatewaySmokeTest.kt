@@ -36,6 +36,7 @@ import java.util.UUID
         "grpc.client.apigw-client-no-header.address=in-process:test",
         "grpc.client.auth-service.address=in-process:test",
         "spring.main.allow-bean-definition-overriding=true",
+        "logging.level.ru.zveron.apigateway=DEBUG",
         "grpc.server.port=0",
     ],
     classes = [ApigatewayApplication::class, AuthServiceDummyImpl::class]
