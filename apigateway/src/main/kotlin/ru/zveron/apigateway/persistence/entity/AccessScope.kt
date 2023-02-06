@@ -1,6 +1,6 @@
 package ru.zveron.apigateway.persistence.entity
 
-enum class AccessRole {
+enum class AccessScope {
     ANY,
     BUYER,
 }

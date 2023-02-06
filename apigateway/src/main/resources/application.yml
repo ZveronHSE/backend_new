@@ -46,3 +46,12 @@ grpc:
 
   server:
     port: 9091
+
+logging:
+  level:
+    kotlinx.coroutines.internal: TRACE
+    org.springframework.web.reactive.function.client: TRACE
+    net.devh.boot.grpc.client: TRACE
+    net.devh.boot.grpc.server: TRACE
+    io.grpc: TRACE
+    io.grpc.netty.shaded: TRACE

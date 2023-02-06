@@ -15,6 +15,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import ru.zveron.apigateway.ApigatewayApplication
 import ru.zveron.apigateway.component.GrpcChannelRegistry
@@ -35,12 +36,13 @@ import java.util.UUID
         "grpc.client.apigw-client-no-header.address=in-process:test",
         "grpc.client.auth-service.address=in-process:test",
         "spring.main.allow-bean-definition-overriding=true",
-        "grpc.server.port=9090",
+        "grpc.server.port=0",
     ],
     classes = [ApigatewayApplication::class, AuthServiceDummyImpl::class]
 )
 @SpringJUnitConfig(GrpcServiceTestConfig::class)
-class ApiGatewayE2eTest : ContainerConfigurer() {
+@DirtiesContext
+class ApiGatewaySmokeTest : ContainerConfigurer() {
 
     @Test
     fun contextLoads() {
@@ -73,7 +75,7 @@ class ApiGatewayE2eTest : ContainerConfigurer() {
         coEvery {
             protoDefinitionRegistry.getProtoFileDescriptor(
                 any(),
-                any()
+                any(),
             )
         } returns Descriptors.FileDescriptor.buildFrom(TestRequest.getDescriptor().file.toProto(), emptyArray())
 
@@ -107,7 +109,7 @@ class ApiGatewayE2eTest : ContainerConfigurer() {
     }
 
     @Test
-    fun `verify when no access token can still access methods for ANY`() = runBlocking {
+    fun `verify when no access token can still access methods for ANY`() {
         coEvery { grpcChannelRegistry.getChannel(any()) } returns ManagedChannelBuilder.forTarget(
             "self:///auth-service"
         ).usePlaintext()
@@ -125,10 +127,12 @@ class ApiGatewayE2eTest : ContainerConfigurer() {
             )
         } returns Descriptors.FileDescriptor.buildFrom(TestRequest.getDescriptor().file.toProto(), emptyArray())
 
-        val response = grpcNoHeader.callApiGateway(apiGatewayRequest {
-            this.methodAlias = "testAny"
-            this.requestBody = jsonRequest.toByteStringUtf8()
-        })
+        val response = runBlocking {
+            grpcNoHeader.callApiGateway(apiGatewayRequest {
+                this.methodAlias = "testAny"
+                this.requestBody = jsonRequest.toByteStringUtf8()
+            })
+        }
 
         response.responseBody.toStringUtf8() shouldBe JsonFormat.printer()
             .print(testResponse { this.response = "buyer response" })

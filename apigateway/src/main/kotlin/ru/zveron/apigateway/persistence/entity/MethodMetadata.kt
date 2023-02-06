@@ -12,6 +12,5 @@ data class MethodMetadata(
     val grpcServiceName: String,
     val grpcMethodName: String,
 
-    val accessRole: AccessRole,
+    val accessScope: AccessScope,
 )
-

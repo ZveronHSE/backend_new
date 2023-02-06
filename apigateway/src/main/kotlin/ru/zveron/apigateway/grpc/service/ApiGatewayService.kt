@@ -15,7 +15,7 @@ import ru.zveron.apigateway.exception.ApiGatewayException
 import ru.zveron.apigateway.grpc.ApiGatewayMapper.toScope
 import ru.zveron.apigateway.grpc.context.AuthenticationContext
 import ru.zveron.apigateway.grpc.service.dto.GatewayServiceRequest
-import ru.zveron.apigateway.persistence.entity.AccessRole
+import ru.zveron.apigateway.persistence.entity.AccessScope
 import ru.zveron.apigateway.persistence.entity.MethodMetadata
 import ru.zveron.apigateway.persistence.repository.MethodMetadataRepository
 import ru.zveron.apigateway.utils.DescriptorsUtil.dynamicMessageBuilder
@@ -38,7 +38,7 @@ class ApiGatewayService(
         val metadata = methodMetadataRepository.findByAlias(request.alias)
             ?: throw ApiGatewayException(message = "Non existent method alias", code = Status.Code.INVALID_ARGUMENT)
 
-        val profileId = verifyUserAccess(metadata.accessRole)
+        val profileId = verifyUserAccess(metadata.accessScope)
         val channel = managedChannelRegistry.getChannel(metadata.serviceName)
         val protoMethodDescriptor = getProtoMethodDescriptor(metadata)
         val grpcMethodDescriptor = protoMethodDescriptor.getGrpcMethodDescriptor()
@@ -51,11 +51,11 @@ class ApiGatewayService(
         return ClientCalls.unaryRpc(channel, grpcMethodDescriptor, grpcMessage)
     }
 
-    private suspend fun verifyUserAccess(accessRole: AccessRole): Long? {
+    private suspend fun verifyUserAccess(accessScope: AccessScope): Long? {
         val accessToken = AuthenticationContext.current()
         logger.debug(append("accessToken", accessToken), "Access token in the context")
 
-        return authResolver.resolveForScope(ResolveForRoleRequest(accessRole.toScope(), accessToken))
+        return authResolver.resolveForScope(ResolveForRoleRequest(accessScope.toScope(), accessToken))
     }
 
     private suspend fun getProtoMethodDescriptor(metadata: MethodMetadata): Descriptors.MethodDescriptor {

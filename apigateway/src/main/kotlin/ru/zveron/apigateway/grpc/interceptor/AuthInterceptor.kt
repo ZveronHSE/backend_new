@@ -21,7 +21,7 @@ class AuthInterceptor : CoroutineContextServerInterceptor() {
         logger.debug(append("headers", headers.toMarker())) { "Entered coroutine context in auth interceptor" }
         headers.get(accessTokenKey).let {
             logger.debug(append("accessToken", it)) { "Access token in interceptor" }
-            return AuthenticationContext(it ?: "")
+            return AuthenticationContext(it)
         }
     }
 }

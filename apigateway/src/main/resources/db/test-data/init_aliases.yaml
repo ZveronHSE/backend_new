@@ -22,9 +22,9 @@ databaseChangeLog:
                   name: grpc_method_name
                   type: STRING
               - column:
-                  header: access_role
-                  name: access_role
-                  type: access_role
+                  header: access_scope
+                  name: access_scope
+                  type: access_scope
             commentLineStartsWith: '#'
             encoding: UTF-8
             file: aliases.csv
