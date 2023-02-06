@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
 import mu.KLogging
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
@@ -102,7 +102,7 @@ class ProfileService(
         }
     }
 
-    suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse = coroutineScope {
+    suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse = supervisorScope {
         val blacklistCoroutine = inOwnerBlacklist(request.requestedProfileId, request.authorizedProfileId)
         val profile = findByIdOrThrow(request.requestedProfileId)
 
@@ -127,7 +127,7 @@ class ProfileService(
         }
     }
 
-    suspend fun getProfileInfo(request: GetProfileInfoRequest): GetProfileInfoResponse = coroutineScope {
+    suspend fun getProfileInfo(request: GetProfileInfoRequest): GetProfileInfoResponse = supervisorScope {
         val profile = findByIdOrThrow(request.id)
         val addressCoroutine = getAddressById(profile.addressId)
         val reviewCoroutine = getRatingByProfileId(profile.id)
