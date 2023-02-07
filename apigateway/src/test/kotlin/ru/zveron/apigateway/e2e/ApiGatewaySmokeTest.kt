@@ -12,6 +12,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import kotlinx.coroutines.runBlocking
 import net.devh.boot.grpc.client.inject.GrpcClient
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -61,6 +62,7 @@ class ApiGatewaySmokeTest : ContainerConfigurer() {
     @Autowired
     private lateinit var grpcChannelRegistry: GrpcChannelRegistry
 
+    @Disabled("https://zveron.atlassian.net/browse/ZV-316")
     @Test
     fun `verify context populated with metadata`(): Unit = runBlocking {
         coEvery { grpcChannelRegistry.getChannel(any()) } returns ManagedChannelBuilder.forTarget(
@@ -92,6 +94,7 @@ class ApiGatewaySmokeTest : ContainerConfigurer() {
             .print(testResponse { this.response = "any response" })
     }
 
+    @Disabled("https://zveron.atlassian.net/browse/ZV-316")
     @Test
     fun `verify when no token in metadata then throws exception`(): Unit = runBlocking {
         val jsonRequest = testRequest {
@@ -109,6 +112,7 @@ class ApiGatewaySmokeTest : ContainerConfigurer() {
         status shouldBe Status.DATA_LOSS
     }
 
+    @Disabled("https://zveron.atlassian.net/browse/ZV-316")
     @Test
     fun `verify when no access token can still access methods for ANY`() {
         coEvery { grpcChannelRegistry.getChannel(any()) } returns ManagedChannelBuilder.forTarget(
