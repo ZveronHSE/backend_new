@@ -23,7 +23,7 @@ import ru.zveron.commons.assertions.profileShouldBe
 import ru.zveron.commons.assertions.responseShouldBe
 import ru.zveron.commons.assertions.responseShouldBeBlockedAnd
 import ru.zveron.commons.generator.AddressGenerator.generateAddress
-import ru.zveron.commons.generator.ContactsGenerator
+import ru.zveron.commons.generator.CommunicationLinksGenerator
 import ru.zveron.commons.generator.LotsGenerator
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
@@ -38,7 +38,6 @@ import ru.zveron.contract.profile.getLinksRequest
 import ru.zveron.contract.profile.getProfileInfoRequest
 import ru.zveron.contract.profile.getProfilePageRequest
 import ru.zveron.contract.profile.getSettingsRequest
-import ru.zveron.repository.ContactRepository
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.repository.SettingsRepository
 import ru.zveron.service.client.address.AddressClient
@@ -48,6 +47,7 @@ import ru.zveron.service.client.review.ReviewClient
 import ru.zveron.contract.profile.setProfileInfoRequest
 import ru.zveron.contract.profile.setSettingsRequest
 import ru.zveron.mapper.AddressMapper.toRequest
+import ru.zveron.repository.CommunicationLinkRepository
 import java.time.Instant
 
 class ProfileServiceExternalTest : ProfileTest() {
@@ -62,7 +62,7 @@ class ProfileServiceExternalTest : ProfileTest() {
     lateinit var settingsRepository: SettingsRepository
 
     @Autowired
-    lateinit var contactRepository: ContactRepository
+    lateinit var communicationLinkRepository: CommunicationLinkRepository
 
     @TestConfiguration
     class ProfileServiceExternalTestConfiguration {
@@ -98,7 +98,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getProfilePageRequest {
             requestedProfileId = id
@@ -142,7 +142,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, authorizedProfile, addressId) = PropsGenerator.generateNIds(3)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getProfilePageRequest {
             requestedProfileId = id
@@ -181,7 +181,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getProfileInfoRequest { this.id = id }
         val address = generateAddress(addressId)
@@ -217,7 +217,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
 
         val request = setProfileInfoRequest {
@@ -260,7 +260,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
         val settings = SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getChannelTypesRequest { this.id = id }
 
@@ -290,7 +290,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        val contacts = ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        val contacts = CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getLinksRequest { this.id = id }
 
@@ -321,7 +321,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         val settings =
             SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getSettingsRequest { this.id = id }
         val address = generateAddress(addressId)
@@ -354,7 +354,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true, addVk = true, addGmail = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true, addGmail = true)
         profileRepository.save(expectedProfile)
         val request = setSettingsRequest {
             this.id = id
@@ -380,7 +380,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true, addVk = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
         profileRepository.save(expectedProfile)
         val request = setSettingsRequest {
             this.id = id
@@ -402,7 +402,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true, addVk = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
         profileRepository.save(expectedProfile)
         val request = setSettingsRequest {
             this.id = id
@@ -436,7 +436,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val (id, addressId) = PropsGenerator.generateNIds(2)
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true, addVk = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
         profileRepository.save(expectedProfile)
         val request = deleteProfileRequest { this.id = id }
 
@@ -446,7 +446,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
         profileRepository.findById(id).isPresent shouldBe false
         settingsRepository.findById(id).isPresent shouldBe false
-        contactRepository.findById(id).isPresent shouldBe false
+        communicationLinkRepository.findAllByProfileId(id).size shouldBe 0
 
         // TODO: service should write to kafka
     }

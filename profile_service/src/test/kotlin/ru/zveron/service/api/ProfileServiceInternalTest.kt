@@ -7,12 +7,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.ProfileTest
-import ru.zveron.commons.assertions.contactShouldBe
+import ru.zveron.commons.assertions.linksShouldBe
 import ru.zveron.commons.assertions.profileShouldBe
 import ru.zveron.commons.assertions.responseShouldBe
 import ru.zveron.commons.assertions.settingsShouldBe
-import ru.zveron.commons.generator.ContactsGenerator
-import ru.zveron.commons.generator.ContactsGenerator.generateLinks
+import ru.zveron.commons.generator.CommunicationLinksGenerator.generateLinks
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
@@ -23,9 +22,13 @@ import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
 import ru.zveron.contract.profile.getProfileWithContactsRequest
-import ru.zveron.repository.ContactRepository
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.contract.profile.updateContactsRequest
+import ru.zveron.domain.link.GmailData
+import ru.zveron.domain.link.VkData
+import ru.zveron.mapper.ContactsMapper.toDto
+import ru.zveron.mapper.ContactsMapper.toLinks
+import ru.zveron.repository.CommunicationLinkRepository
 import java.time.Instant
 
 class ProfileServiceInternalTest : ProfileTest() {
@@ -37,7 +40,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     lateinit var profileRepository: ProfileRepository
 
     @Autowired
-    lateinit var contactRepository: ContactRepository
+    lateinit var communicationLinkRepository: CommunicationLinkRepository
 
     @Test
     fun `createProfile whe nrequest is correct`() {
@@ -45,16 +48,17 @@ class ProfileServiceInternalTest : ProfileTest() {
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         val expectedSettings = SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        val expectedContact = ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        val expectedLinks = generateLinks(expectedProfile, addPhone = true)
         val request = generateCreateProfileRequest(expectedProfile)
 
         runBlocking {
             service.createProfile(request)
 
             val actualProfile = profileRepository.findById(id).get()
+            val actualCommunicationLinks = communicationLinkRepository.findAllByProfileId(id)
             actualProfile profileShouldBe expectedProfile
             actualProfile.settings settingsShouldBe expectedSettings
-            actualProfile.contact contactShouldBe expectedContact
+            actualCommunicationLinks.toDto() linksShouldBe expectedLinks
         }
     }
 
@@ -63,7 +67,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true, addVk = true)
+        generateLinks(expectedProfile, addPhone = true, addVk = true)
         val request = generateCreateProfileRequest(expectedProfile)
 
         val exception = shouldThrow<ProfileException> {
@@ -80,7 +84,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addVk = true, addChat = true)
-        expectedProfile.contact = ContactsGenerator.generateContact(expectedProfile, addVk = true).copy(vkId = "")
+        generateLinks(expectedProfile, addVk = true, skipVkRef = true)
         val request = generateCreateProfileRequest(expectedProfile)
 
         val exception = shouldThrow<ProfileException> {
@@ -97,7 +101,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = generateCreateProfileRequest(expectedProfile)
 
@@ -115,7 +119,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getProfileRequest { this.id = id }
 
@@ -145,7 +149,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getProfileWithContactsRequest { this.id = id }
 
@@ -170,12 +174,12 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `updateContacts when request is correct`() {
+    fun `updateContacts when request is correct and add new link`() {
         val now = Instant.now()
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request =
             generateUpdateContactsRequest(
@@ -189,7 +193,39 @@ class ProfileServiceInternalTest : ProfileTest() {
             service.updateContacts(request)
         }
 
-        contactRepository.findById(id).get().gmail shouldBe request.links.gmail.email
+        val gmail = communicationLinkRepository.findAllByProfileId(id).toDto().gmailLink!!
+        gmail.communicationLinkId shouldBe request.links.gmail.id
+        (gmail.data as GmailData)
+            .email shouldBe request.links.gmail.email
+    }
+
+    @Test
+    fun `updateContacts when request is correct and edit existed link`() {
+        val now = Instant.now()
+        val id = PropsGenerator.generateUserId()
+        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        generateLinks(expectedProfile, addVk = true)
+        profileRepository.save(expectedProfile)
+        val request =
+            generateUpdateContactsRequest(
+                id,
+                ChannelType.VK,
+                vkId = PropsGenerator.generateString(15),
+                vkRef = PropsGenerator.generateString(15),
+                additionalEmail = PropsGenerator.generateString(15),
+            )
+
+        runBlocking {
+            service.updateContacts(request)
+        }
+
+        val vk = communicationLinkRepository.findAllByProfileId(id).toDto().vkLink!!
+        vk.communicationLinkId shouldBe request.links.vk.id
+        (vk.data as VkData).apply {
+            ref shouldBe request.links.vk.ref
+            email shouldBe request.links.vk.email
+        }
     }
 
     @Test
@@ -216,7 +252,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request =
             generateUpdateContactsRequest(id, ChannelType.CHAT)
@@ -235,11 +271,11 @@ class ProfileServiceInternalTest : ProfileTest() {
         val id = PropsGenerator.generateUserId()
         val expectedProfile = ProfileGenerator.generateProfile(id, now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        val contact = ContactsGenerator.generateContact(expectedProfile, addPhone = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = getProfileByChannelRequest {
             type = ChannelType.PHONE
-            identifier = contact.phone
+            identifier = linksDto.phoneLink!!.communicationLinkId
         }
 
         runBlocking {
@@ -271,8 +307,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         name = profile.name
         surname = profile.surname
         imageId = profile.imageId
-        links =
-            profile.contact.let { generateLinks(it.phone, it.vkId, it.vkRef, it.additionalEmail, it.gmailId, it.gmail) }
+        links = profile.communicationLinks.toDto().toLinks()
     }
 
     private fun generateUpdateContactsRequest(

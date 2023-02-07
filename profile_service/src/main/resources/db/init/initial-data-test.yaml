@@ -68,37 +68,25 @@ databaseChangeLog:
         - loadData:
             columns:
               - column:
-                  header: additional_email
-                  name: additional_email
-                  type: STRING
-              - column:
-                  header: gmail
-                  name: gmail
-                  type: STRING
-              - column:
-                  header: gmail_id
-                  name: gmail_id
-                  type: STRING
-              - column:
-                  header: phone
-                  name: phone
-                  type: STRING
-              - column:
-                  header: vk_id
-                  name: vk_id
-                  type: STRING
-              - column:
-                  header: vk_ref
-                  name: vk_ref
-                  type: STRING
-              - column:
                   header: profile_id
                   name: profile_id
                   type: NUMERIC
+              - column:
+                  header: data
+                  name: data
+                  type: STRING
+              - column:
+                  header: communication_link_id
+                  name: communication_link_id
+                  type: STRING
+              - column:
+                  header: id
+                  name: id
+                  type: NUMERIC
             commentLineStartsWith: '#'
             encoding: UTF-8
-            file: data/contact.csv
+            file: data/links.csv
             relativeToChangelogFile: true
             quotchar: '"'
             separator: ','
-            tableName: contact
+            tableName: communication_link

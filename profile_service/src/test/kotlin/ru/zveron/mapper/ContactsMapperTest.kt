@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import ru.zveron.commons.assertions.channelsShouldBe
 import ru.zveron.commons.assertions.linksShouldBe
-import ru.zveron.commons.generator.ContactsGenerator
+import ru.zveron.commons.generator.CommunicationLinksGenerator
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.contract.profile.model.ChannelType
@@ -12,8 +12,13 @@ import ru.zveron.contract.profile.model.gmail
 import ru.zveron.contract.profile.model.links
 import ru.zveron.contract.profile.model.phone
 import ru.zveron.contract.profile.model.vk
-import ru.zveron.domain.ChannelsDto
+import ru.zveron.domain.channel.ChannelsDto
+import ru.zveron.domain.link.GmailData
+import ru.zveron.domain.link.PhoneData
+import ru.zveron.domain.link.VkData
+import ru.zveron.entity.CommunicationLink
 import ru.zveron.mapper.ContactsMapper.toDto
+import ru.zveron.mapper.ContactsMapper.toLinks
 import ru.zveron.mapper.ContactsMapper.toModel
 import java.time.Instant
 
@@ -43,11 +48,44 @@ class ContactsMapperTest {
     }
 
     @Test
-    fun `linksEntity2Model maps correctly`() {
+    fun `linksList2Dto maps correctly`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
-        val expected = ContactsGenerator.generateContact(profile, addVk = true, addGmail = true, addPhone = true)
+        val vk = CommunicationLink(
+            communicationLinkId = PropsGenerator.generateString(10),
+            data = VkData(
+                ref = PropsGenerator.generateString(10),
+                email = ""
+            ),
+            profile = profile
+        )
+        val gmail = CommunicationLink(
+            communicationLinkId = PropsGenerator.generateString(10),
+            data = GmailData(
+                email = PropsGenerator.generateString(10),
+            ),
+            profile = profile
+        )
+        val phone = CommunicationLink(
+            communicationLinkId = PropsGenerator.generateString(10),
+            data = PhoneData(),
+            profile = profile
+        )
+        val list = listOf(vk, gmail, phone)
 
-        val actual = expected.toModel()
+        val dto = list.toDto()
+
+        dto.vkLink shouldBe vk
+        dto.gmailLink shouldBe gmail
+        dto.phoneLink shouldBe phone
+    }
+
+    @Test
+    fun `linksDto2Model maps correctly`() {
+        val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
+        val expected =
+            CommunicationLinksGenerator.generateLinks(profile, addVk = true, addGmail = true, addPhone = true)
+
+        val actual = expected.toLinks()
 
         actual linksShouldBe expected
     }
