@@ -1,24 +1,26 @@
-package ru.zveron.authservice.config
+package ru.zveron.authservice.exception.advice
 
 import io.grpc.Status
 import mu.KLogging
 import net.devh.boot.grpc.server.advice.GrpcAdvice
 import net.devh.boot.grpc.server.advice.GrpcExceptionHandler
+import ru.zveron.authservice.exception.AuthException
 
+@Suppress("unused")
 @GrpcAdvice
 class AuthExceptionAdvice {
 
     companion object : KLogging()
 
-    @GrpcExceptionHandler(ru.zveron.authservice.exception.AuthException::class)
-    fun handleAuthException(e: ru.zveron.authservice.exception.AuthException): Status {
-        logger.error { e.message }
-        return Status.fromCode(e.code).withDescription(e.message)
+    @GrpcExceptionHandler(AuthException::class)
+    fun handleAuthException(e: AuthException): Status {
+        logger.error(e) { e.message }
+        return Status.fromCode(e.code).withDescription(e.message).withCause(e)
     }
 
     @GrpcExceptionHandler
     fun handleAny(e: Exception): Status {
-        logger.error { e.message }
+        logger.error(e) { e.message }
         return Status.INTERNAL.withDescription("Exception: ${e.message}")
     }
 }

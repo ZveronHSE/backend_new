@@ -1,12 +1,21 @@
 grpc:
   server:
     port: 0
+  client:
+    profile-service:
+      address: 'discovery:///profile-service'
+      enableKeepAlive: true # пока не оч ясно будет ли влиять я бы посмотрел
+      keepAliveWithoutCalls: true # то же самое
+      negotiationType: plaintext # пока что так, потом добавим всякие сертификаты
 spring:
   main:
     banner-mode: off
     web-application-type: reactive
   liquibase:
     change-log: classpath:db/master.yaml
+    url: jdbc:postgresql://localhost:5555/auth
+    user: zveron_user
+    password: zveron_password
   application:
     name: auth-service
   datasource:
@@ -31,7 +40,7 @@ eureka:
     webclient:
       enabled: true
     register-with-eureka: true
-    fetch-registry: false
+    fetch-registry: true
     enabled: true
   instance:
     metadata-map:
@@ -43,3 +52,13 @@ server:
 clients:
   notifier:
     baseUrl: http://localhost:8085
+
+
+zveron:
+  jwt:
+    #create something legit and put in vault
+    secret: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    accessDurationMs: 600000  # 10 mins
+    refreshDurationMs: 2629800000 # 100 mins
+  session:
+    sessionDurationMs: 2629800000 # 1 month
