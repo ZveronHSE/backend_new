@@ -1,8 +1,10 @@
 package ru.zveron.service
 
+import io.kotest.assertions.asClue
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.date.shouldBeAfter
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -10,8 +12,11 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseTest
 import ru.zveron.exception.LotException
+import ru.zveron.model.constant.LotStatus
 import ru.zveron.repository.LotRepository
 import ru.zveron.test.util.GeneratorUtils
+import ru.zveron.test.util.GeneratorUtils.generateIds
+import ru.zveron.test.util.generator.ProfileGenerator.generateSellerProfile
 import ru.zveron.test.util.model.LotEntities
 import java.time.Instant
 
@@ -82,7 +87,25 @@ class LotServiceTest : DataBaseTest() {
 
 
     @Test
-    fun `CreateLot`() {
-       // TODO TODO("creating lot, editing lot, closing lot")
+    fun `CreateLot correct creating lot`() {
+        val request = LotEntities.mockCreateLot()
+        val (sellerId, addressId) = generateIds(2)
+        val lot = lotService.createLot(request, generateSellerProfile(sellerId), addressId)
+
+        lot.asClue {
+            it.dateCreation.shouldBeAfter(Instant.now().minusSeconds(3))
+            it.lotFormId shouldBe request.lotFormId
+            it.categoryId shouldBe request.categoryId
+            it.title shouldBe request.title
+            it.description shouldBe request.description
+            it.addressId shouldBe addressId
+            it.sellerId shouldBe sellerId
+            it.price shouldBe request.price
+            it.status shouldBe LotStatus.ACTIVE
+            it.gender?.name shouldBe request.gender.name
+            // TODO parameters
+            // TODO statistics
+            // TODO photo
+        }
     }
 }

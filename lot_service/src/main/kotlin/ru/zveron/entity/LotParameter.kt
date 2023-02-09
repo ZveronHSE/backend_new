@@ -24,7 +24,7 @@ data class LotParameter(
     data class LotParameterKey(
         @Column(name = "parameter_id", nullable = false)
         val parameter: Int,
-        @Column(name = "lot_id", nullable = false)
+        @Column(name = "lot_id", nullable = false, insertable = false, updatable = false)
         val lot: Long,
     ) : Serializable
 

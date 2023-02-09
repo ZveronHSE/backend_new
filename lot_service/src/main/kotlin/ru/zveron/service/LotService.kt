@@ -22,6 +22,7 @@ import ru.zveron.mapper.SellerMapper.toChannelType
 import ru.zveron.model.SellerProfile
 import ru.zveron.model.SummaryLot
 import ru.zveron.model.constant.LotStatus
+import ru.zveron.repository.LotParameterRepository
 import ru.zveron.repository.LotRepository
 import ru.zveron.repository.WaterfallRepository
 import ru.zveron.util.LotValidation.validate
@@ -34,6 +35,7 @@ class LotService(
     private val lotRepository: LotRepository,
     private val waterfallRepository: WaterfallRepository,
     private val parameterClient: ParameterClient,
+    private val lotParameterRepository: LotParameterRepository
 ) {
     fun getLotById(id: Long): Lot {
         id.validatePositive("lotId")
@@ -73,7 +75,7 @@ class LotService(
     fun createLot(request: CreateLotRequest, seller: SellerProfile, addressId: Long): Lot {
         validateLotProperties(request.photosList, request.communicationChannelList, seller)
 
-        val lot = with(request) {
+        var lot = with(request) {
             Lot(
                 title = title,
                 description = description,
@@ -93,17 +95,24 @@ class LotService(
             // Инициализируем по умолчанию статистику с нулевыми параметрами
             statistics = LotStatistics(lot = lot)
             photos = request.photosList
-                .map { LotPhoto(lot = lot, imageId = it.id, order = it.order) }
-            parameters = request.parametersMap.map {
-                LotParameter(
-                    id = LotParameter.LotParameterKey(it.key, lot.id),
-                    value = it.value,
-                    lot = lot
-                )
-            }
+                .map { LotPhoto(lot = lot, imageId = it.id, orderPhoto = it.order) }
         }
 
-        return lotRepository.save(lot)
+        // Здесь сохраняем и фотографии, и статистику
+        lot = lotRepository.save(lot)
+
+        // Такой отдельный маневр пришлось совершить, поскольку мне нужно знать id для лота :(
+        lot.parameters = request.parametersMap.map {
+            LotParameter(
+                id = LotParameter.LotParameterKey(it.key, lot.id),
+                value = it.value,
+                lot = lot
+            )
+        }
+
+        lotParameterRepository.saveAll(lot.parameters)
+
+        return lot
     }
 
 
@@ -127,7 +136,7 @@ class LotService(
                 LotPhoto(
                     lot = lot,
                     imageId = it.id,
-                    order = it.order
+                    orderPhoto = it.order
                 )
             }
         }

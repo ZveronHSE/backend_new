@@ -52,7 +52,7 @@ class CardLotBuilder(
             photos.addAll(lot.photos.map {
                 photo {
                     id = it.id
-                    order = it.order
+                    order = it.orderPhoto
                 }
             })
             lot.gender?.let { gender = it.toContract() }

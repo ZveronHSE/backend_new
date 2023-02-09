@@ -21,8 +21,8 @@ data class LotPhoto(
     val lot: Lot,
     @Column(name = "image_id")
     val imageId: Long,
-    @Column(name = "order")
-    val order: Int
+    @Column(name = "order_photo")
+    val orderPhoto: Int
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -36,6 +36,6 @@ data class LotPhoto(
 
     @Override
     override fun toString(): String {
-        return "LotPhoto(id = $id, imageId=$imageId, order_photo = $order )"
+        return "LotPhoto(id = $id, imageId=$imageId, order_photo = $orderPhoto )"
     }
 }

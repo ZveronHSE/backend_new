@@ -2,12 +2,16 @@ package ru.zveron.mapper
 
 import io.kotest.assertions.asClue
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import org.jooq.impl.DSL
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import ru.zveron.contract.lot.TypeSort
+import ru.zveron.contract.lot.model.parameter
 import ru.zveron.model.search.table.LOT
 import ru.zveron.test.util.GeneratorUtils
 import ru.zveron.test.util.model.WaterfallEntities
@@ -80,5 +84,48 @@ class ConditionsMapperTest {
         val conditionsSearch = ConditionsMapper.parse(waterfallRequest, categories = null, sellerId = sellerId)
 
         conditionsSearch.conditions shouldContainExactly listOf(LOT.SELLER_ID.notEqual(sellerId))
+    }
+
+    @Test
+    fun `If pass parameters to parser, build only conditions for filter by parameters`() {
+        val parameters = listOf(1, 5, 7, 8, 9).map {
+            parameter {
+                id = it
+                value = it.toString()
+            }
+        }
+        val waterfallRequest = WaterfallEntities.mockWaterfallRequest(parameters = parameters)
+
+        val conditionsSearch = ConditionsMapper.parse(waterfallRequest, categories = null, sellerId = null)
+
+        val rowParameters = parameters.map { DSL.row(it.id, it.value) }
+
+        conditionsSearch.parameters.shouldNotBeNull()
+        conditionsSearch.parameters!!.asClue {
+            it.countOfFilters shouldBe parameters.size
+            it.parameters shouldContainExactlyInAnyOrder rowParameters
+        }
+    }
+
+    @Test
+    fun `If pass repetitions of identifiers of parameters to parser, quantitoy of filters should be eq quantity unique id`() {
+        val parameters = listOf(1, 1, 2, 2, 2).map {
+            parameter {
+                id = it
+                value = GeneratorUtils.generateString(4)
+            }
+        }
+
+        val waterfallRequest = WaterfallEntities.mockWaterfallRequest(parameters = parameters)
+
+        val conditionsSearch = ConditionsMapper.parse(waterfallRequest, categories = null, sellerId = null)
+
+        val rowParameters = parameters.map { DSL.row(it.id, it.value) }
+
+        conditionsSearch.parameters.shouldNotBeNull()
+        conditionsSearch.parameters!!.asClue {
+            it.countOfFilters shouldBe 2
+            it.parameters shouldContainExactlyInAnyOrder rowParameters
+        }
     }
 }

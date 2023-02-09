@@ -51,6 +51,7 @@ class LotExternalController(
                     seller = profileClient.getProfileWithContacts(userId)
                 },
                 async {
+                    // TODO validating that category should not has children
                     parameterClient.validateParameters(
                         categoryId = request.categoryId,
                         lotFormId = request.lotFormId,

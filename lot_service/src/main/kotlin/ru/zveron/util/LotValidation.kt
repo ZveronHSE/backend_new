@@ -38,7 +38,9 @@ object LotValidation {
             throw LotException(Status.INVALID_ARGUMENT, "Necessary more than zero photo must be specified for lot")
         }
 
+        val uniqueId = mutableSetOf<Long>()
         for ((index, photo) in this.withIndex()) {
+            uniqueId.add(photo.id)
             // Проверяем, что порядок фотографий всегда начинается с 0 и увеличивается константно на +1. К примеру: 1, 2, 3
             if (index != photo.order) {
                 throw LotException(Status.INVALID_ARGUMENT, "Order photos should sequential growth by 1: 0, 1, 2...")
@@ -47,6 +49,10 @@ object LotValidation {
             if (photo.id == DEFAULT_ID_FOR_PHOTO) {
                 throw LotException(Status.INVALID_ARGUMENT, "None of the photos should be a default photo")
             }
+        }
+
+        if (uniqueId.size != this.size) {
+            throw LotException(Status.INVALID_ARGUMENT, "User cant select same photos several time")
         }
     }
 }

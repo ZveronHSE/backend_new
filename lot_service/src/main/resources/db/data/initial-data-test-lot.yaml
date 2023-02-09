@@ -52,7 +52,7 @@ databaseChangeLog:
               - column:
                   header: gender
                   name: gender
-                  type: NUMERIC
+                  type: STRING
             commentLineStartsWith: '#'
             encoding: UTF-8
             file: lot.csv
@@ -96,8 +96,8 @@ databaseChangeLog:
                   name: id
                   type: NUMERIC
               - column:
-                  header: order
-                  name: order
+                  header: order_photo
+                  name: order_photo
                   type: NUMERIC
               - column:
                   header: lot_id
