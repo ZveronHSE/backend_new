@@ -1,4 +1,3 @@
-# syntax = docker/dockerfile:experimental
 FROM  gradle:7.3.2-jdk17-alpine AS build
 COPY --chown=gradle:gradle / /app/
 WORKDIR /app
