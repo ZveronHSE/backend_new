@@ -4,7 +4,7 @@ import io.grpc.Status
 import io.grpc.StatusException
 import org.springframework.stereotype.Component
 import ru.zveron.apigateway.component.model.ResolveForRoleRequest
-import ru.zveron.apigateway.component.model.ServiceScope
+import ru.zveron.apigateway.component.constant.ServiceScope
 import ru.zveron.apigateway.exception.ApiGatewayException
 import ru.zveron.apigateway.exception.AuthTokenNotValidException
 import ru.zveron.apigateway.grpc.client.AccessTokenNotValid

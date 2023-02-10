@@ -1,8 +1,8 @@
 package ru.zveron.apigateway.grpc
 
-import ru.zveron.apigateway.component.model.ServiceScope
+import ru.zveron.apigateway.component.constant.ServiceScope
 import ru.zveron.apigateway.grpc.service.dto.GatewayServiceRequest
-import ru.zveron.apigateway.persistence.entity.AccessScope
+import ru.zveron.apigateway.persistence.constant.AccessScope
 import ru.zveron.contract.apigateway.ApiGatewayRequest
 
 object ApiGatewayMapper {

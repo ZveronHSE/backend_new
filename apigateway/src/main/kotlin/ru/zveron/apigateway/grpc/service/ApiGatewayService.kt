@@ -15,7 +15,7 @@ import ru.zveron.apigateway.exception.ApiGatewayException
 import ru.zveron.apigateway.grpc.ApiGatewayMapper.toScope
 import ru.zveron.apigateway.grpc.context.AuthenticationContext
 import ru.zveron.apigateway.grpc.service.dto.GatewayServiceRequest
-import ru.zveron.apigateway.persistence.entity.AccessScope
+import ru.zveron.apigateway.persistence.constant.AccessScope
 import ru.zveron.apigateway.persistence.entity.MethodMetadata
 import ru.zveron.apigateway.persistence.repository.MethodMetadataRepository
 import ru.zveron.apigateway.utils.DescriptorsUtil.dynamicMessageBuilder

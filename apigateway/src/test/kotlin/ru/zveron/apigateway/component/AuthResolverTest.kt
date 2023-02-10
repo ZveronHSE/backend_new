@@ -11,7 +11,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import ru.zveron.apigateway.component.model.ResolveForRoleRequest
-import ru.zveron.apigateway.component.model.ServiceScope
+import ru.zveron.apigateway.component.constant.ServiceScope
 import ru.zveron.apigateway.exception.ApiGatewayException
 import ru.zveron.apigateway.grpc.client.AccessTokenNotValid
 import ru.zveron.apigateway.grpc.client.AccessTokenValid

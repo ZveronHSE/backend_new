@@ -2,6 +2,7 @@ package ru.zveron.apigateway.persistence.entity
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import ru.zveron.apigateway.persistence.constant.AccessScope
 
 @Table("method_metadata")
 data class MethodMetadata(
