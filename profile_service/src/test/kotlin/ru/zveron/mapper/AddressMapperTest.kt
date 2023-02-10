@@ -13,14 +13,14 @@ class AddressMapperTest {
 
     @Test
     fun `Map to profile address if town not blank`() {
-        val address = AddressGenerator.generateAddress(PropsGenerator.generateUserId())
+        val address = AddressGenerator.generateAddress(PropsGenerator.generateLongId())
 
         address.toProfileAddress() shouldBe "г. ${address.town}"
     }
 
     @Test
     fun `Map to profile address if town is blank`() {
-        val address = AddressGenerator.generateAddress(PropsGenerator.generateUserId(), blankTown = true)
+        val address = AddressGenerator.generateAddress(PropsGenerator.generateLongId(), blankTown = true)
 
         address.toProfileAddress() shouldBe address.region
     }
@@ -36,7 +36,7 @@ class AddressMapperTest {
 
     @Test
     fun `Map address response to address`() {
-        val expectedAddress = AddressGenerator.generateAddress(PropsGenerator.generateUserId())
+        val expectedAddress = AddressGenerator.generateAddress(PropsGenerator.generateLongId())
 
         val actualAddress = expectedAddress.toAddress()
 

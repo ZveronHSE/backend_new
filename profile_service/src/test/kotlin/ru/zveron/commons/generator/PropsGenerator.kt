@@ -4,9 +4,9 @@ import org.apache.commons.lang3.RandomUtils
 
 object PropsGenerator {
 
-    fun generateUserId() = RandomUtils.nextLong()
+    fun generateLongId() = RandomUtils.nextLong()
 
-    fun generateNIds(n: Int) = List(n) { generateUserId() }
+    fun generateNIds(n: Int) = List(n) { generateLongId() }
 
     fun generateString(n: Int) = String(CharArray(n) {
         RandomUtils.nextInt('a'.code, 'z'.code + 1).toChar()

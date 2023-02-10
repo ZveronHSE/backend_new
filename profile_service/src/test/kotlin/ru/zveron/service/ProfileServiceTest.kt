@@ -28,11 +28,11 @@ class ProfileServiceTest : ProfileTest() {
     @Test
     fun `findByIdOrThrow should load communication links if specified correct type`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
 
         shouldNotThrow<LazyInitializationException> {
             runBlocking {
@@ -46,11 +46,11 @@ class ProfileServiceTest : ProfileTest() {
     @Test
     fun `findByIdOrThrow should throw if specified incorrect type`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
 
         shouldThrow<LazyInitializationException> {
             runBlocking {
