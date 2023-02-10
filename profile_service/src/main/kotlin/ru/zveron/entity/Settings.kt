@@ -4,7 +4,7 @@ import com.vladmihalcea.hibernate.type.json.JsonType
 import org.hibernate.Hibernate
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
-import ru.zveron.domain.ChannelsDto
+import ru.zveron.domain.channel.ChannelsDto
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id

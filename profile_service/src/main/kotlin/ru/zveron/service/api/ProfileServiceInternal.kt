@@ -11,12 +11,12 @@ import ru.zveron.contract.profile.GetProfileWithContactsRequest
 import ru.zveron.contract.profile.GetProfileWithContactsResponse
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.UpdateContactsRequest
-import ru.zveron.service.ContactService
+import ru.zveron.service.CommunicationLinkService
 import ru.zveron.service.ProfileService
 
 @GrpcService
 class ProfileServiceInternal(
-    private val contactService: ContactService,
+    private val communicationLinkService: CommunicationLinkService,
     private val profileService: ProfileService,
 ) : ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineImplBase() {
 
@@ -33,10 +33,10 @@ class ProfileServiceInternal(
         profileService.getProfileWithContacts(request)
 
     override suspend fun updateContacts(request: UpdateContactsRequest): Empty {
-        contactService.updateContacts(request)
+        communicationLinkService.updateContacts(request)
         return Empty.getDefaultInstance()
     }
 
     override suspend fun getProfileByChannel(request: GetProfileByChannelRequest): GetProfileByChannelResponse =
-        contactService.getProfileByChannel(request)
+        communicationLinkService.getProfileByChannel(request)
 }

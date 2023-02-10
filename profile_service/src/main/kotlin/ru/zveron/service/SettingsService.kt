@@ -11,6 +11,7 @@ import ru.zveron.contract.profile.address
 import ru.zveron.contract.profile.getChannelTypesResponse
 import ru.zveron.contract.profile.getSettingsResponse
 import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.domain.profile.ProfileInitializationType
 import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.mapper.AddressMapper.toRequest
@@ -23,7 +24,8 @@ import ru.zveron.validation.ContactsValidator
 @Service
 class SettingsService(
     private val addressClient: AddressClient,
-    private val repository: SettingsRepository
+    private val profileService: ProfileService,
+    private val repository: SettingsRepository,
 ) {
 
     suspend fun getChannelTypes(request: GetChannelTypesRequest): GetChannelTypesResponse =
@@ -46,22 +48,23 @@ class SettingsService(
         }
 
     suspend fun setSettings(request: SetSettingsRequest) {
-        val settings = findByIdOrThrow(request.id)
-        val links = settings.profile.contact
+        val profile = profileService.findByIdOrThrow(request.id, ProfileInitializationType.COMMUNICATION_LINKS)
+        val settings = profile.settings
+        val links = profile.communicationLinks.toDto()
         val channels = request.channelsList.toSet().toDto()
-        if (request.channelsList.contains(ChannelType.VK) && links.vkRef.isBlank()) {
+        if (request.channelsList.contains(ChannelType.VK) && links.vkLink == null) {
             throw ProfileException(
                 "Can't use vk as communication channel because link is missed",
                 Status.INVALID_ARGUMENT.code
             )
         }
-        if (request.channelsList.contains(ChannelType.GOOGLE) && links.gmail.isBlank()) {
+        if (request.channelsList.contains(ChannelType.GOOGLE) && links.gmailLink == null) {
             throw ProfileException(
                 "Can't use gmail as communication channel because link is missed",
                 Status.INVALID_ARGUMENT.code
             )
         }
-        if (request.channelsList.contains(ChannelType.PHONE) && links.phone.isBlank()) {
+        if (request.channelsList.contains(ChannelType.PHONE) && links.phoneLink == null) {
             throw ProfileException(
                 "Can't use phone as communication channel because link is missed",
                 Status.INVALID_ARGUMENT.code

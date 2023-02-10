@@ -1,4 +1,4 @@
-package ru.zveron.domain
+package ru.zveron.domain.channel
 
 import java.io.Serializable
 

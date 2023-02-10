@@ -2,8 +2,8 @@ package ru.zveron.validation
 
 import io.grpc.Status
 import ru.zveron.contract.profile.model.Links
-import ru.zveron.domain.ChannelsDto
-import ru.zveron.entity.Contact
+import ru.zveron.domain.channel.ChannelsDto
+import ru.zveron.domain.link.LinksDto
 import ru.zveron.exception.ProfileException
 
 object ContactsValidator {
@@ -12,19 +12,31 @@ object ContactsValidator {
         val numberOfSelectedChannels = arrayOf(phone, vk, gmail, chat).count { it }
 
         if (numberOfSelectedChannels !in 1..2) {
-            throw ProfileException("Invalid number of communication ways. Expected 1 or 2, but was: $numberOfSelectedChannels", Status.INVALID_ARGUMENT.code)
+            throw ProfileException(
+                "Invalid number of communication ways. Expected 1 or 2, but was: $numberOfSelectedChannels",
+                Status.INVALID_ARGUMENT.code
+            )
         }
     }
 
-    fun validateLinksNotBlank(ways: ChannelsDto, links: Contact) = ways.run {
-        if (vk && links.vkRef.isBlank()) {
-            throw ProfileException("Can't use vk as communication channel because link is missed", Status.INVALID_ARGUMENT.code)
+    fun validateLinksNotBlank(ways: ChannelsDto, linksDto: LinksDto) = ways.run {
+        if (vk && linksDto.vkLink == null) {
+            throw ProfileException(
+                "Can't use vk as communication channel because link is missed",
+                Status.INVALID_ARGUMENT.code
+            )
         }
-        if (gmail && links.gmail.isBlank()) {
-            throw ProfileException("Can't use gmail as communication channel because link is missed", Status.INVALID_ARGUMENT.code)
+        if (gmail && linksDto.gmailLink == null) {
+            throw ProfileException(
+                "Can't use gmail as communication channel because link is missed",
+                Status.INVALID_ARGUMENT.code
+            )
         }
-        if (phone && links.phone.isBlank()) {
-            throw ProfileException("Can't use phone as communication channel because link is missed", Status.INVALID_ARGUMENT.code)
+        if (phone && linksDto.phoneLink == null) {
+            throw ProfileException(
+                "Can't use phone as communication channel because link is missed",
+                Status.INVALID_ARGUMENT.code
+            )
         }
     }
 
