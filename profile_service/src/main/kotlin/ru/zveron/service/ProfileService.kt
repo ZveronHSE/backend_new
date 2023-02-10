@@ -1,7 +1,6 @@
 package ru.zveron.service
 
 import com.google.protobuf.timestamp
-import io.grpc.Status
 import io.grpc.StatusException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +9,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import mu.KLogging
 import org.hibernate.jpa.QueryHints
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import ru.zveron.contract.AddressResponse
 import ru.zveron.contract.lot.ProfileLotsResponse
@@ -35,7 +33,6 @@ import ru.zveron.contract.profile.getProfileWithContactsResponse
 import ru.zveron.domain.profile.ProfileInitializationType
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
-import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.mapper.AddressMapper.toAddress
 import ru.zveron.mapper.AddressMapper.toProfileAddress
@@ -52,7 +49,6 @@ import ru.zveron.service.client.lot.LotClient
 import ru.zveron.service.client.review.ReviewClient
 import ru.zveron.validation.ContactsValidator
 import java.time.Instant
-import javax.persistence.EntityExistsException
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -80,12 +76,11 @@ class ProfileService(
             ?: throw ProfileNotFoundException("Profile with id: $id doesn't exist")
     }
 
-    suspend fun createProfile(request: CreateProfileRequest) {
+    suspend fun createProfile(request: CreateProfileRequest): Long {
         val waysOfCommunication = request.links.toDto()
         ContactsValidator.validateNumberOfChannels(waysOfCommunication)
         ContactsValidator.validateLinks(request.links)
         val profile = Profile(
-            id = request.authAccountId,
             name = request.name,
             surname = request.surname,
             imageId = request.imageId,
@@ -97,17 +92,7 @@ class ProfileService(
             channels = waysOfCommunication,
         )
 
-        try {
-            profileRepository.save(profile)
-        } catch (e: DataIntegrityViolationException) {
-            if (e.rootCause is EntityExistsException) {
-                throw ProfileException(
-                    "Profile with id: ${request.authAccountId} already exists",
-                    Status.INVALID_ARGUMENT.code
-                )
-            }
-            throw e
-        }
+        return profileRepository.save(profile).id
     }
 
     suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse = supervisorScope {

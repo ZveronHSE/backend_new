@@ -13,6 +13,9 @@ import javax.persistence.NamedEntityGraphs
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.PrimaryKeyJoinColumn
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.SequenceGenerator
 
 @Entity
 @NamedEntityGraphs(
@@ -23,7 +26,8 @@ import javax.persistence.PrimaryKeyJoinColumn
 )
 data class Profile(
     @Id
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profile_id_seq")
+    @SequenceGenerator(name = "profile_id_seq", allocationSize = 1, initialValue = 10)
     val id: Long = 0,
     @Column(nullable = false, length = 50)
     val name: String,

@@ -3,6 +3,8 @@ package ru.zveron.service.api
 import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.contract.profile.CreateProfileRequest
+import ru.zveron.contract.profile.CreateProfileResponse
+import ru.zveron.contract.profile.createProfileResponse
 import ru.zveron.contract.profile.GetProfileByChannelRequest
 import ru.zveron.contract.profile.GetProfileByChannelResponse
 import ru.zveron.contract.profile.GetProfileRequest
@@ -20,10 +22,10 @@ class ProfileServiceInternal(
     private val profileService: ProfileService,
 ) : ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineImplBase() {
 
-    override suspend fun createProfile(request: CreateProfileRequest): Empty {
-        profileService.createProfile(request)
-        return Empty.getDefaultInstance()
-    }
+    override suspend fun createProfile(request: CreateProfileRequest): CreateProfileResponse =
+        createProfileResponse {
+            id = profileService.createProfile(request)
+        }
 
     override suspend fun getProfile(request: GetProfileRequest): GetProfileResponse =
         profileService.getProfile(request)

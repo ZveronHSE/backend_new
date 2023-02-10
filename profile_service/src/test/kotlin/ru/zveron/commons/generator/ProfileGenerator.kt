@@ -1,17 +1,16 @@
 package ru.zveron.commons.generator
 
 import ru.zveron.commons.generator.PropsGenerator.generateString
-import ru.zveron.commons.generator.PropsGenerator.generateUserId
+import ru.zveron.commons.generator.PropsGenerator.generateLongId
 import ru.zveron.entity.Profile
 import java.time.Instant
 
 object ProfileGenerator {
 
-    fun generateProfile(profileId: Long, lastSeen: Instant, addressId: Long = -1) = Profile(
-        id = profileId,
+    fun generateProfile(lastSeen: Instant, addressId: Long = -1) = Profile(
         name = generateString(20),
         surname = generateString(20),
-        imageId = generateUserId(),
+        imageId = generateLongId(),
         lastSeen = lastSeen,
         addressId = addressId,
     )

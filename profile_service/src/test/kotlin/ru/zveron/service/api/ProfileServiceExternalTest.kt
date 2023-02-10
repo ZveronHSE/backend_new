@@ -95,11 +95,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @ValueSource(longs = [0, 10])
     fun `getProfilePage when id request is correct`(authorizedId: Long) {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = getProfilePageRequest {
             requestedProfileId = id
             authorizedProfileId = authorizedId
@@ -139,11 +139,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `getProfilePage when authorized and in blacklist`() {
         val now = Instant.now()
-        val (id, authorizedProfile, addressId) = PropsGenerator.generateNIds(3)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
+        val (authorizedProfile, addressId) = PropsGenerator.generateNIds(2)
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = getProfilePageRequest {
             requestedProfileId = id
             authorizedProfileId = authorizedProfile
@@ -164,7 +164,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
     @Test
     fun `getProfilePage when id is wrong`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = getProfilePageRequest { requestedProfileId = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -178,11 +178,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `getProfileInfo when request is correct`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = getProfileInfoRequest { this.id = id }
         val address = generateAddress(addressId)
         coEvery { addressClient.getById(addressId) } returns address
@@ -200,7 +200,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
     @Test
     fun `getProfileInfo when id is incorrect`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = getProfileInfoRequest { this.id = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -214,20 +214,20 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `setProfileInfo when request is correct`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
 
         val request = setProfileInfoRequest {
             this.id = id
             name = PropsGenerator.generateString(10)
             surname = PropsGenerator.generateString(10)
-            imageId = PropsGenerator.generateUserId()
+            imageId = PropsGenerator.generateLongId()
             address = generateAddress()
         }
-        val newAddressId = PropsGenerator.generateUserId()
+        val newAddressId = PropsGenerator.generateLongId()
         coEvery { addressClient.saveIfNotExists(request.address.toRequest()) } returns addressResponse {
             this.id = newAddressId
         }
@@ -243,7 +243,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
     @Test
     fun `setProfileInfo when id is incorrect`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = setProfileInfoRequest { this.id = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -257,11 +257,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `getChannelTypes when request is correct`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
         val settings = SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = getChannelTypesRequest { this.id = id }
 
         runBlocking {
@@ -273,7 +273,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
     @Test
     fun `getChannelTypes when id is incorrect`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = getChannelTypesRequest { this.id = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -287,11 +287,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `getLinks when request is correct`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now, addressId)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         val contacts = CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = getLinksRequest { this.id = id }
 
         runBlocking {
@@ -303,7 +303,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
     @Test
     fun `getLinks when id is incorrect`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = getLinksRequest { this.id = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -317,12 +317,12 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `getSettings when request is correct`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         val settings =
             SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = getSettingsRequest { this.id = id }
         val address = generateAddress(addressId)
         coEvery { addressClient.getById(addressId) } returns address
@@ -337,7 +337,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
     @Test
     fun `getSettings when id is incorrect`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = getLinksRequest { this.id = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -351,11 +351,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `setSettings when request is correct`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true, addGmail = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = setSettingsRequest {
             this.id = id
             address = generateAddress()
@@ -377,11 +377,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `setSettings when channels is missed`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = setSettingsRequest {
             this.id = id
             address = generateAddress()
@@ -399,11 +399,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `setSettings when wrong number of channels`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = setSettingsRequest {
             this.id = id
             address = generateAddress()
@@ -419,7 +419,7 @@ class ProfileServiceExternalTest : ProfileTest() {
 
     @Test
     fun `setSettings when id is incorrect`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = setSettingsRequest { this.id = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -433,11 +433,11 @@ class ProfileServiceExternalTest : ProfileTest() {
     @Test
     fun `deleteProfile when request is correct`() {
         val now = Instant.now()
-        val (id, addressId) = PropsGenerator.generateNIds(2)
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = deleteProfileRequest { this.id = id }
 
         runBlocking {

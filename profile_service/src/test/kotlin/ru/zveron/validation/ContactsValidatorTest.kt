@@ -50,7 +50,7 @@ class ContactsValidatorTest {
 
     @Test
     fun `Validate links and no links are missed`() {
-        val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
+        val profile = ProfileGenerator.generateProfile(Instant.now())
         val channels = ChannelsDto(phone = true, vk = true, gmail = true, chat = true)
         val links = CommunicationLinksGenerator.generateLinks(profile, addVk = true, addGmail = true, addPhone = true)
 
@@ -61,7 +61,7 @@ class ContactsValidatorTest {
 
     @Test
     fun `Validate links and vk is missed`() {
-        val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
+        val profile = ProfileGenerator.generateProfile(Instant.now())
         val channels = ChannelsDto(vk = true)
         val links = CommunicationLinksGenerator.generateLinks(profile)
 
@@ -73,7 +73,7 @@ class ContactsValidatorTest {
 
     @Test
     fun `Validate links and gmail is missed`() {
-        val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
+        val profile = ProfileGenerator.generateProfile(Instant.now())
         val channels = ChannelsDto(gmail = true)
         val links = CommunicationLinksGenerator.generateLinks(profile)
 
@@ -85,7 +85,7 @@ class ContactsValidatorTest {
 
     @Test
     fun `Validate links and phone is missed`() {
-        val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
+        val profile = ProfileGenerator.generateProfile(Instant.now())
         val channels = ChannelsDto(phone = true)
         val links = CommunicationLinksGenerator.generateLinks(profile)
 

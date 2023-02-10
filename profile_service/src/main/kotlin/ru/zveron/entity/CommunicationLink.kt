@@ -9,7 +9,7 @@ import javax.persistence.*
 data class CommunicationLink(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "communication_link_id_seq")
-    @SequenceGenerator(name = "communication_link_id_seq", allocationSize = 1, initialValue = 1)
+    @SequenceGenerator(name = "communication_link_id_seq", allocationSize = 1, initialValue = 10)
     val id: Long = 0,
     @Column(nullable = false)
     val communicationLinkId: String,

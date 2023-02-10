@@ -127,7 +127,6 @@ infix fun CommunicationLink?.linkShouldBe(expected: CommunicationLink) {
     }
     communicationLinkId shouldBe expected.communicationLinkId
     data shouldBe expected.data
-    profile shouldBe expected.profile
 }
 
 infix fun GetProfilePageResponse.responseShouldBe(expected: Profile) {
