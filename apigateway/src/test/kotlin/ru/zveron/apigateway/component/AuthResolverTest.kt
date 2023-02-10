@@ -25,8 +25,14 @@ class AuthResolverTest {
     private val authResolver = AuthResolver(authClient)
 
     @Test
-    fun `when scope is ANY, then return null`() = runBlocking {
+    fun `when scope is ANY and token not valid, then return null`() = runBlocking {
         val request = ResolveForRoleRequest(ServiceScope.ANY, "")
+
+        coEvery { authClient.verifyAccessToken(any()) } returns AccessTokenNotValid(
+            message = "Invalid token",
+            Status.Code.UNAUTHENTICATED,
+            Metadata()
+        )
 
         val serviceResponse = authResolver.resolveForScope(request)
         serviceResponse shouldBe null

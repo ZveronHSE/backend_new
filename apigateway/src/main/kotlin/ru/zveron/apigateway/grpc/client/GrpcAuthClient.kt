@@ -13,9 +13,9 @@ class GrpcAuthClient(
 
     companion object : KLogging()
 
-    suspend fun verifyAccessToken(token: String): GrpcAuthClientResponse {
+    suspend fun verifyAccessToken(token: String?): GrpcAuthClientResponse {
         return try {
-            val response = client.verifyToken(verifyMobileTokenRequest { accessToken = token })
+            val response = client.verifyToken(verifyMobileTokenRequest { accessToken = token?: "" })
             AccessTokenValid(response.id)
         } catch (ex: StatusException) {
             logger.error(append("status", ex.status)) { "Auth client request failed" }

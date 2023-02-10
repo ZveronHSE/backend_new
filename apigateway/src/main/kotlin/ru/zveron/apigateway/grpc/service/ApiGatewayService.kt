@@ -2,6 +2,7 @@ package ru.zveron.apigateway.grpc.service
 
 import com.google.protobuf.Descriptors
 import com.google.protobuf.DynamicMessage
+import io.grpc.Metadata
 import io.grpc.Status
 import io.grpc.kotlin.ClientCalls
 import mu.KLogging
@@ -31,7 +32,9 @@ class ApiGatewayService(
     private val authResolver: AuthResolver,
 ) {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val profileIdKey = Metadata.Key.of("profile_id", Metadata.ASCII_STRING_MARSHALLER)
+    }
 
     suspend fun handleGatewayCall(request: GatewayServiceRequest): DynamicMessage {
         logger.debug(append("requestAlias", request.alias)) { "Handling gateway call request" }
@@ -42,13 +45,25 @@ class ApiGatewayService(
         val channel = managedChannelRegistry.getChannel(metadata.serviceName)
         val protoMethodDescriptor = getProtoMethodDescriptor(metadata)
         val grpcMethodDescriptor = protoMethodDescriptor.getGrpcMethodDescriptor()
-        val grpcMessage = protoMethodDescriptor.dynamicMessageBuilder(request.requestBody, profileId)?.build()
+        val grpcMessage = protoMethodDescriptor.dynamicMessageBuilder(request.requestBody)?.build()
 
         logger.debug(
             append("grpcRequest", grpcMessage?.allFields?.toJson()).and(append("grpcService", metadata.serviceName)),
             "Calling grpc service"
         )
-        return ClientCalls.unaryRpc(channel, grpcMethodDescriptor, grpcMessage)
+        try {
+            return ClientCalls.unaryRpc(
+                channel = channel,
+                method = grpcMethodDescriptor,
+                request = grpcMessage,
+                headers = Metadata().apply {
+                    this.put(profileIdKey, profileId.toString())
+                }
+            )
+        } catch (e: Exception) {
+            logger.error(e) { "Failed service request $e" }
+            throw e
+        }
     }
 
     private suspend fun verifyUserAccess(accessScope: AccessScope): Long? {
