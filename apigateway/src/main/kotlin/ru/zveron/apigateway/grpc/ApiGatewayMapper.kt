@@ -8,9 +8,9 @@ import ru.zveron.contract.apigateway.ApiGatewayRequest
 object ApiGatewayMapper {
     fun ApiGatewayRequest.toServiceRequest() = GatewayServiceRequest(this.methodAlias, this.requestBody.toStringUtf8())
 
-    fun AccessScope.toScope() = when {
-        this == AccessScope.ANY -> ServiceScope.ANY
-        this == AccessScope.BUYER -> ServiceScope.BUYER
+    fun AccessScope.toScope() = when(this) {
+        AccessScope.ANY -> ServiceScope.ANY
+        AccessScope.BUYER -> ServiceScope.BUYER
         else -> error("Unknown access role type")
     }
 }
