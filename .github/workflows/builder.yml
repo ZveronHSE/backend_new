@@ -85,3 +85,6 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ matrix.image }}
+          platforms:
+            - linux/amd64
+            - linux/arm64
