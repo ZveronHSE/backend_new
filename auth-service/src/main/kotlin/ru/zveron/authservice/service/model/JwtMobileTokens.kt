@@ -4,7 +4,7 @@ import java.time.Instant
 
 data class JwtMobileTokens(
     val accessToken: String,
-    val accessExpiration: Instant = Instant.now(),
+    val accessExpiration: Instant,
     val refreshToken: String,
-    val refreshExpiration: Instant = Instant.now(),
+    val refreshExpiration: Instant,
 )

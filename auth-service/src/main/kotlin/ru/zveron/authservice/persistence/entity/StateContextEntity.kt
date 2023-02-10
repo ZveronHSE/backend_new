@@ -14,6 +14,8 @@ data class StateContextEntity(
     @Id
     val id: Long? = null,
     val sessionId: UUID,
+
+    //state context description
     val data: Json,
 
     @CreatedDate

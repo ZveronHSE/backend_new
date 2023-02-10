@@ -1,4 +1,4 @@
-package ru.zveron.authservice.grpc.client.dto
+package ru.zveron.authservice.grpc.client.model
 
 import io.grpc.Metadata
 import io.grpc.Status

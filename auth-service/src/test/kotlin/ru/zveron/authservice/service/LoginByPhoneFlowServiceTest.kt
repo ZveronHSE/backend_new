@@ -13,11 +13,11 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
-import ru.zveron.authservice.grpc.client.dto.ProfileFound
-import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
+import ru.zveron.authservice.grpc.client.model.ProfileFound
+import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
-import ru.zveron.authservice.service.ServiceMapper.toContext
+import ru.zveron.authservice.service.ServiceMapper.toProfileClientRequest
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId
@@ -27,10 +27,11 @@ import ru.zveron.authservice.util.randomLoginVerifyRequest
 import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPhoneNumber
 import ru.zveron.authservice.util.randomSurname
+import ru.zveron.authservice.util.randomTokens
 import ru.zveron.authservice.webclient.NotifierClient
 import ru.zveron.authservice.webclient.NotifierFailure
 import ru.zveron.authservice.webclient.NotifierSuccess
-import ru.zveron.authservice.webclient.dto.GetVerificationCodeRequest
+import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
 import java.util.UUID
 
 class LoginByPhoneFlowServiceTest {
@@ -41,19 +42,19 @@ class LoginByPhoneFlowServiceTest {
 
     private val profileClient = mockk<ProfileServiceClient>()
 
+    private val authenticator = mockk<ru.zveron.authservice.component.auth.Authenticator>()
+
     private val service = LoginByPhoneFlowService(
         notifierClient = notifierClient,
         flowStateStorage = flowStateStorage,
         profileClient = profileClient,
+        authenticator = authenticator,
     )
 
     @Test
     fun `when login by phone init is a success, then returns session id`(): Unit = runBlocking {
         val request = randomLoginInitRequest()
         val clientRequest = GetVerificationCodeRequest(request.phoneNumber.toClientPhone())
-        val ctx = randomLoginFlowContext().copy(
-            phoneNumber = request.phoneNumber.toContext(),
-        )
         val uuid = UUID.randomUUID()
         val code = randomCode()
 
@@ -91,18 +92,17 @@ class LoginByPhoneFlowServiceTest {
             }
         }
 
-
     @Test
     fun `when login by phone verify is a success, and account found, then returns tokens`(): Unit = runBlocking {
         val uuid = UUID.randomUUID()
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = initialCtx.code!!,
-            deviceFingerprint = initialCtx.deviceFp,
+            fingerprint = initialCtx.fingerprint,
         )
         val updatedCtx = initialCtx.copy(
             isVerified = true,
@@ -113,18 +113,18 @@ class LoginByPhoneFlowServiceTest {
 
         coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
         coEvery { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) } returns updatedCtx
-        coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber) } returns ProfileFound(
+        coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileFound(
             randomId(),
             randomName(),
             randomSurname()
         )
+        coEvery { authenticator.loginUser(eq(initialCtx.fingerprint), any()) } returns randomTokens()
 
         val verifyResponse = service.verify(request)
         verifyResponse.shouldNotBeNull()
 
         assertSoftly {
-            verifyResponse.isNewUser shouldBe false
-            verifyResponse.sessionId shouldBe request.sessionId
+            verifyResponse.tokens.shouldNotBeNull()
         }
 
         coVerify { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) }
@@ -139,13 +139,13 @@ class LoginByPhoneFlowServiceTest {
         runBlocking {
             val initialCtx = randomLoginFlowContext().copy(
                 code = randomCode(),
-                deviceFp = randomDeviceFp(),
+                fingerprint = randomDeviceFp(),
             )
             val uuid = UUID.randomUUID()
             val request = randomLoginVerifyRequest().copy(
                 sessionId = uuid,
                 code = initialCtx.code!!,
-                deviceFingerprint = initialCtx.deviceFp,
+                fingerprint = initialCtx.fingerprint,
             )
             val updatedCtx = initialCtx.copy(
                 isVerified = true,
@@ -156,14 +156,13 @@ class LoginByPhoneFlowServiceTest {
 
             coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
             coEvery { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) } returns updatedCtx
-            coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber) } returns ProfileNotFound
+            coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileNotFound
             coEvery { flowStateStorage.createContext(any()) } returns UUID.randomUUID()
 
             val verifyResponse = service.verify(request)
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldNotBe request.sessionId
             }
 
@@ -178,7 +177,7 @@ class LoginByPhoneFlowServiceTest {
         val differentCode = randomCode()
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val uuid = UUID.randomUUID()
 
@@ -186,7 +185,7 @@ class LoginByPhoneFlowServiceTest {
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = differentCode,
-            deviceFingerprint = initialCtx.deviceFp
+            fingerprint = initialCtx.fingerprint
         )
 
         assertThrows<ru.zveron.authservice.exception.WrongCodeException> {
@@ -199,7 +198,7 @@ class LoginByPhoneFlowServiceTest {
         val differentFp = randomDeviceFp()
         val initialCtx = randomLoginFlowContext().copy(
             code = randomCode(),
-            deviceFp = randomDeviceFp(),
+            fingerprint = randomDeviceFp(),
         )
         val uuid = UUID.randomUUID()
 
@@ -207,12 +206,11 @@ class LoginByPhoneFlowServiceTest {
         val request = randomLoginVerifyRequest().copy(
             sessionId = uuid,
             code = initialCtx.code!!,
-            deviceFingerprint = differentFp,
+            fingerprint = differentFp,
         )
 
         assertThrows<ru.zveron.authservice.exception.FingerprintException> {
             service.verify(request)
         }
     }
-
 }

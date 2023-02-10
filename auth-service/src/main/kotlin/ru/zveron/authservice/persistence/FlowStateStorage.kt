@@ -28,6 +28,9 @@ class FlowStateStorage(
         ).sessionId
     }
 
+    /**
+     * throws [ContextExpiredException]
+     */
     suspend fun <CTX : StateContext> updateContext(sessionId: UUID, context: CTX): CTX {
         stateRepository.findBySessionId(sessionId)?.let {
             return stateRepository.save(it.copy(data = context.toJson())).data.toContext(context::class)
@@ -38,6 +41,9 @@ class FlowStateStorage(
         stateRepository.findBySessionId(sessionId)?.data?.toContext(clazz)
             ?: throw ContextExpiredException()
 
+    /**
+     * throws [ContextExpiredException]
+     */
     final suspend inline fun <reified CTX : StateContext> getContext(sessionId: UUID): CTX =
         getContext(sessionId, CTX::class)
 

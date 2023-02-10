@@ -1,4 +1,4 @@
-package ru.zveron.authservice.webclient.dto
+package ru.zveron.authservice.webclient.model
 
 data class GetVerificationCodeRequest(
     val phoneNumber: String,
