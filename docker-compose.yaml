@@ -28,6 +28,7 @@ services:
   registry:
     restart: always
     container_name: registry
+    platform: linux/amd64
     image: ghcr.io/zveronhse/service_registry
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -41,6 +42,7 @@ services:
   apigateway:
     restart: always
     container_name: apigateway
+    platform: linux/amd64
     image: ghcr.io/zveronhse/apigateway
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -56,6 +58,7 @@ services:
   address_service:
     restart: always
     container_name: address_service
+    platform: linux/amd64
     image: ghcr.io/zveronhse/address_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -68,6 +71,7 @@ services:
   blacklist_service:
     restart: always
     container_name: blacklist_service
+    platform: linux/amd64
     image: ghcr.io/zveronhse/blacklist_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -80,6 +84,7 @@ services:
   favorites_service:
     restart: always
     container_name: favorites_service
+    platform: linux/amd64
     image: ghcr.io/zveronhse/favorites_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -92,6 +97,7 @@ services:
   parameter_service:
     restart: always
     container_name: parameter_service
+    platform: linux/amd64
     image: ghcr.io/zveronhse/parameter_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -104,6 +110,7 @@ services:
   profile_service:
     restart: always
     container_name: profile_service
+    platform: linux/amd64
     image: ghcr.io/zveronhse/profile_service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
@@ -116,6 +123,7 @@ services:
   auth-service:
     restart: always
     container_name: auth-service
+    platform: linux/amd64
     image: ghcr.io/zveronhse/auth-service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
