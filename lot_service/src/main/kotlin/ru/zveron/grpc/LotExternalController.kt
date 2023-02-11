@@ -151,25 +151,26 @@ class LotExternalController(
             launch {
                 lotStatisticsService.incrementViewCounter(lotId)
             }
+
+            val clients = mutableListOf(
+                async {
+                    seller = profileClient.getProfileWithContacts(userId)
+                },
+                async {
+                    address = addressClient.getAddressById(lot.addressId)
+                }
+            )
+
             // Если пользователь авторизован:
             if (userId != 0L) {
                 isOwnLot = lot.sellerId == userId
 
-
-                val clients = mutableListOf(
-                    async {
-                        isFavoriteLot = lotFavoriteClient.checkLotIsFavorite(lotId, userId)
-                    },
-                    async {
-                        seller = profileClient.getProfileWithContacts(userId)
-                    },
-                    async {
-                        address = addressClient.getAddressById(lot.addressId)
-                    }
-                )
-
-                clients.awaitAll()
+                clients.add(async {
+                    isFavoriteLot = lotFavoriteClient.checkLotIsFavorite(lotId, userId)
+                })
             }
+
+            clients.awaitAll()
         }
 
         return buildCardLot {

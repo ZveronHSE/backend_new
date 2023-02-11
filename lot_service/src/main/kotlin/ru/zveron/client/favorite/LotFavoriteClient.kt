@@ -46,7 +46,7 @@ class LotFavoriteClient(
             if (response.isExistsCount != request.favoriteLotIdCount) {
                 throw LotException(
                     Status.INTERNAL,
-                    "Количество объявлений не совпадает с количеством избранных, " +
+                    "Quantity of lots not same with quantity of favorites: " +
                             "${response.isExistsCount} != ${request.favoriteLotIdCount}"
                 )
             } else {
@@ -55,8 +55,8 @@ class LotFavoriteClient(
         } catch (ex: StatusException) {
             throw LotException(
                 Status.INTERNAL,
-                "Не удалось получить ответ от LotFavorite для user=${request.favoritesOwnerId}, " +
-                        "первый lotId=${request.favoriteLotIdList[0]}. Status: ${ex.status.description}"
+                "Can't get answer from favorites for userId=${request.favoritesOwnerId}, " +
+                        "lotId=${request.favoriteLotIdList[0]}. Status: ${ex.status.description}"
             )
         }
     }
