@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseTest
+import ru.zveron.contract.lot.model.CommunicationChannel
 import ru.zveron.exception.LotException
 import ru.zveron.model.enum.LotStatus
 import ru.zveron.repository.LotRepository
@@ -103,9 +104,48 @@ class LotServiceTest : DataBaseTest() {
             it.price shouldBe request.price
             it.status shouldBe LotStatus.ACTIVE
             it.gender?.name shouldBe request.gender.name
-            // TODO parameters
-            // TODO statistics
-            // TODO photo
+            it.photos.size shouldBe request.photosCount
+            it.statistics.quantityView shouldBe 0
+            it.parameters.size shouldBe request.parametersCount
+        }
+    }
+
+    @Test
+    fun `EditLot correct editing lot`() {
+        // Creating lot
+        val (sellerId, addressId) = generateIds(2)
+        val seller = generateSellerProfile(sellerId, isChat = true)
+        val saveLot = lotService.createLot(
+            LotEntities.mockCreateLot(
+                communicationChannel = CommunicationChannel.CHAT,
+                title = "title",
+                description = "description",
+                price = 5
+            ), seller, addressId
+        )
+
+        // Editing lot
+        val request = LotEntities.mockEditLotRequest(
+            communicationChannel = CommunicationChannel.VK,
+            title = "title1",
+            description = "description1",
+            price = 6
+        )
+        val seller1 = generateSellerProfile(sellerId, isVk = true)
+        val actualLot = lotService.editLot(saveLot, request, seller1)
+
+        actualLot.asClue {
+            it.lotFormId shouldBe saveLot.lotFormId
+            it.categoryId shouldBe saveLot.categoryId
+            it.title shouldBe request.title
+            it.description shouldBe request.description
+            it.addressId shouldBe addressId
+            it.sellerId shouldBe sellerId
+            it.price shouldBe request.price
+            it.status shouldBe LotStatus.ACTIVE
+            it.gender?.name shouldBe saveLot.gender?.name
+            it.photos.size shouldBe request.photosCount
+            it.parameters.size shouldBe request.parametersCount
         }
     }
 }

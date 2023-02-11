@@ -1,6 +1,7 @@
 package ru.zveron.service
 
 import io.grpc.Status
+import org.hibernate.Hibernate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.zveron.client.parameter.ParameterClient
@@ -23,6 +24,7 @@ import ru.zveron.model.SellerProfile
 import ru.zveron.model.SummaryLot
 import ru.zveron.model.enum.LotStatus
 import ru.zveron.repository.LotParameterRepository
+import ru.zveron.repository.LotPhotoRepository
 import ru.zveron.repository.LotRepository
 import ru.zveron.repository.WaterfallRepository
 import ru.zveron.util.LotValidation.validate
@@ -35,7 +37,8 @@ class LotService(
     private val lotRepository: LotRepository,
     private val waterfallRepository: WaterfallRepository,
     private val parameterClient: ParameterClient,
-    private val lotParameterRepository: LotParameterRepository
+    private val lotParameterRepository: LotParameterRepository,
+    private val lotPhotoRepository: LotPhotoRepository
 ) {
     fun getLotById(id: Long): Lot {
         id.validatePositive("lotId")
@@ -119,6 +122,9 @@ class LotService(
     fun editLot(lot: Lot, request: EditLotRequest, seller: SellerProfile): Lot {
         validateLotProperties(request.photosList, request.communicationChannelList, seller)
 
+        lotParameterRepository.deleteByLot_Id(lot.id)
+        lotPhotoRepository.deleteAllByLot_Id(lot.id)
+
         with(lot) {
             title = request.title
             description = request.description
@@ -140,7 +146,13 @@ class LotService(
             }
         }
 
-        return lotRepository.save(lot)
+        val lotEntity = lotRepository.save(lot)
+
+        Hibernate.initialize(lotEntity.photos)
+        Hibernate.initialize(lotEntity.statistics)
+        Hibernate.initialize(lotEntity.parameters)
+
+        return lotEntity
     }
 
     fun closeLot(lot: Lot, request: CloseLotRequest) {

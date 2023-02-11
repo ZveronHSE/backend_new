@@ -40,6 +40,6 @@ data class LotParameter(
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(EmbeddedId = $id , value = $value , lot = $lot )"
+        return this::class.simpleName + "(EmbeddedId = $id , value = $value )"
     }
 }

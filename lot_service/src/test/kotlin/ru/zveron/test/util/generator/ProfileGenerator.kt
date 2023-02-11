@@ -20,13 +20,24 @@ object ProfileGenerator {
         }
     }
 
-    fun generateSellerProfile(id: Long) = SellerProfile(
-        id = id,
-        name = GeneratorUtils.generateString(10),
-        surname = GeneratorUtils.generateString(10),
-        imageId = GeneratorUtils.generateLong(),
-        contact = ru.zveron.model.ChannelType(isChat = true),
-        channelLink = ChannelLink(),
-        isOnline = GeneratorUtils.generateBoolean()
-    )
+    fun generateSellerProfile(
+        id: Long,
+        isChat: Boolean = true,
+        isVk: Boolean = false,
+        isEmail: Boolean = false,
+        isPhone: Boolean = false
+    ) =
+        SellerProfile(
+            id = id,
+            name = GeneratorUtils.generateString(10),
+            surname = GeneratorUtils.generateString(10),
+            imageId = GeneratorUtils.generateLong(),
+            contact = ru.zveron.model.ChannelType(isChat = isChat, isVk = isVk, isEmail = isEmail, isPhone = isPhone),
+            channelLink = ChannelLink(
+                vk = if (isVk) GeneratorUtils.generateString(10) else null,
+                email = if (isEmail) GeneratorUtils.generateString(10) else null,
+                phone = if (isPhone) GeneratorUtils.generateString(10) else null
+            ),
+            isOnline = GeneratorUtils.generateBoolean()
+        )
 }

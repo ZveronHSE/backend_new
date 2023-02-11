@@ -41,15 +41,15 @@ data class Lot(
     @Column(name = "address_id")
     val addressId: Long
 ) {
-    @OneToMany(mappedBy = "lot", cascade = [CascadeType.ALL])
-    var photos: List<LotPhoto> = listOf()
+    @OneToMany(mappedBy = "lot", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    lateinit var photos: List<LotPhoto>
 
     @PrimaryKeyJoinColumn
-    @OneToOne(mappedBy = "lot", cascade = [CascadeType.ALL])
+    @OneToOne(mappedBy = "lot", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     lateinit var statistics: LotStatistics
 
-    @OneToMany(mappedBy = "lot", cascade = [CascadeType.REMOVE])
-    var parameters: List<LotParameter> = listOf()
+    @OneToMany(mappedBy = "lot", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    lateinit var parameters: List<LotParameter>
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
