@@ -5,8 +5,8 @@ import ru.zveron.authservice.component.auth.model.RefreshMobileSessionRequest
 import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.MobileTokens
 import ru.zveron.authservice.component.jwt.model.RefreshToken
-import ru.zveron.authservice.grpc.client.PhoneNumber
-import ru.zveron.authservice.grpc.client.RegisterProfileByPhone
+import ru.zveron.authservice.grpc.client.model.PhoneNumber
+import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.service.model.JwtMobileTokens
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest

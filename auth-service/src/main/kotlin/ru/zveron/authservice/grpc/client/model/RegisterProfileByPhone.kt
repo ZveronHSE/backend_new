@@ -1,4 +1,4 @@
-package ru.zveron.authservice.grpc.client
+package ru.zveron.authservice.grpc.client.model
 
 data class RegisterProfileByPhone(
     val name: String,

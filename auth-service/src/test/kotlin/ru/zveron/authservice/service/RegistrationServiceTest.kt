@@ -14,9 +14,9 @@ import ru.zveron.authservice.exception.ChannelNotValidatedException
 import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.exception.FingerprintException
 import ru.zveron.authservice.exception.RegistrationException
-import ru.zveron.authservice.grpc.client.PhoneNumber
+import ru.zveron.authservice.grpc.client.model.PhoneNumber
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
-import ru.zveron.authservice.grpc.client.RegisterProfileByPhone
+import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
 import ru.zveron.authservice.persistence.FlowStateStorage

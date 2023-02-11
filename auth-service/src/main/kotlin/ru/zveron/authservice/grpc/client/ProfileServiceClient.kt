@@ -9,6 +9,7 @@ import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.grpc.client.model.ProfileUnknownFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
+import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.grpc.client.model.RegisterProfileFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileResponse
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
@@ -29,6 +30,11 @@ class ProfileServiceClient(
         "79996662233" to ProfileFound(124L, "player", "two")
     )
 
+    private val registerPhoneNumberToProfile = mapOf(
+        "79993332211" to ProfileFound(1L, "vedro", "pomoyev"),
+        "79996662233" to ProfileFound(124L, "player", "two")
+    )
+
     private val idToProfile = mapOf(
         123L to ProfileFound(123L, "vedro", "pomoyev"),
         124L to ProfileFound(124L, "player", "two")
@@ -46,7 +52,8 @@ class ProfileServiceClient(
 
     suspend fun registerProfileByPhone(request: RegisterProfileByPhone) =
         env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
-            phoneNumberToProfile[request.phone.toRequest()] ?: RegisterProfileAlreadyExists
+            registerPhoneNumberToProfile[request.phone.toRequest()]?.id?.let { RegisterProfileSuccess(it) }
+                ?: RegisterProfileAlreadyExists
         } ?: registerProfileByPhoneFromClient(request)
 
     suspend fun registerProfileByPhoneFromClient(request: RegisterProfileByPhone): RegisterProfileResponse = try {

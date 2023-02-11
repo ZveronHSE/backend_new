@@ -1,4 +1,4 @@
-package ru.zveron.authservice.grpc.client
+package ru.zveron.authservice.grpc.client.model
 
 data class PhoneNumber(
     val countryCode: String,
