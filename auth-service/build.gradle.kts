@@ -23,8 +23,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:profile:1.7.0")
-    implementation("com.github.zveronHSe.contract:auth:4cd5dfb91f")
+    implementation("com.github.zveronHSe.contract:profile:7a97f5d244")
+    implementation("com.github.zveronHSe.contract:auth:7a97f5d244")
 
     //testing
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")

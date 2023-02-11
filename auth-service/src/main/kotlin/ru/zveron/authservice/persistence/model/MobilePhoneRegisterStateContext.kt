@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class MobilePhoneRegisterStateContext(
     val phoneNumber: PhoneNumber,
-    val deviceFp: String,
+    val fingerprint: String,
     val isChannelVerified: Boolean = false,
 ) : StateContext {
     override val type: ContextType = ContextType.MOBILE_PHONE_REGISTER

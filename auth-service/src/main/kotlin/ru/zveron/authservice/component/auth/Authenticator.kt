@@ -21,8 +21,8 @@ class Authenticator(
 
     companion object : KLogging()
 
-    suspend fun loginUser(fp: String, profileId: Long): MobileTokens {
-        val session = sessionStorage.createSession(fingerprint = fp, profileId = profileId)
+    suspend fun loginUser(fingerprint: String, profileId: Long): MobileTokens {
+        val session = sessionStorage.createSession(fingerprint = fingerprint, profileId = profileId)
 
         return jwtManager.issueMobileTokens(
             IssueMobileTokensRequest(

@@ -14,7 +14,7 @@ class AuthExceptionAdvice {
 
     @GrpcExceptionHandler(AuthException::class)
     fun handleAuthException(e: AuthException): Status {
-        logger.error(e) { e.message }
+        logger.error(e) { "Message=${e.message}, metadata=${e.metadata}" }
         return Status.fromCode(e.code).withDescription(e.message).withCause(e)
     }
 
