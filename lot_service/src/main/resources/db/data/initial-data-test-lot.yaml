@@ -10,8 +10,8 @@ databaseChangeLog:
                   name: id
                   type: NUMERIC
               - column:
-                  header: date_creation
-                  name: date_creation
+                  header: created_at
+                  name: created_at
                   type: DATE
               - column:
                   header: description
@@ -46,8 +46,8 @@ databaseChangeLog:
                   name: seller_id
                   type: NUMERIC
               - column:
-                  header: date_creation
-                  name: date_creation
+                  header: created_at
+                  name: created_at
                   type: STRING
               - column:
                   header: gender

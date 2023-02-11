@@ -7,25 +7,25 @@ import ru.zveron.contract.lot.model.photo
 import ru.zveron.entity.Lot
 import ru.zveron.entity.LotStatistics
 import ru.zveron.model.ChannelType
-import ru.zveron.model.constant.Gender
-import ru.zveron.model.constant.LotStatus
+import ru.zveron.model.enum.Gender
+import ru.zveron.model.enum.LotStatus
 import java.time.Instant
 
 object LotEntities {
 
     fun mockLotEntity(
         sellerId: Long = 1L,
-        dateCreation: Instant = Instant.now()
+        createdAt: Instant = Instant.now()
     ) = Lot(
         title = "title",
         description = "description",
         price = 3,
         lotFormId = 1,
-        dateCreation = dateCreation,
+        createdAt = createdAt,
         status = LotStatus.ACTIVE,
         gender = Gender.MALE,
         sellerId = sellerId,
-        channelType = ChannelType(chat = true),
+        channelType = ChannelType(isChat = true),
         addressId = 1L,
         categoryId = 1
     )

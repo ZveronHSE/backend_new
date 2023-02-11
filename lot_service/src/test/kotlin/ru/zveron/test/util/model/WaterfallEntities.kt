@@ -67,7 +67,7 @@ object WaterfallEntities {
 
         if (waterfall.sortCase == WaterfallRequest.SortCase.SORT_BY_DATE) {
             isAscendingOrder = waterfall.sortByDate.typeSort == TypeSort.ASC
-            fieldName = LOT.DATE_CREATION
+            fieldName = LOT.CREATED_AT
             conditionsSeek.addAll(
                 listOf(
                     waterfall.sortByDate.lastLot.id,

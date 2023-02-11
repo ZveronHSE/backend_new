@@ -87,7 +87,7 @@ class LotInternalControllerTest : DataBaseTest() {
     fun `GetLotsBySellerId get response for correct request without user`(): Unit = runBlocking {
         val sellerId = generateLong(start = 1)
         val lots = lotRepository.saveAll(List(QUANTITY_OF_LOTS) { LotEntities.mockLotEntity(sellerId = sellerId) })
-            .sortedByDescending { it.dateCreation }
+            .sortedByDescending { it.createdAt }
 
         val expectedResponse = LotMapper.buildProfileLotsResponse(lots, favorites = null)
         val actualResponse = lotInternalController.getLotsBySellerId(profileLotsRequest { this.sellerId = sellerId })
@@ -101,7 +101,7 @@ class LotInternalControllerTest : DataBaseTest() {
     fun `GetLotsBySellerId get response for correct request with user`(): Unit = runBlocking {
         val (sellerId, userId) = generateIds(2)
         val lots = lotRepository.saveAll(List(QUANTITY_OF_LOTS) { LotEntities.mockLotEntity(sellerId = sellerId) })
-            .sortedByDescending { it.dateCreation }
+            .sortedByDescending { it.createdAt }
         val mockFavoritesRequest = generateBooleans(QUANTITY_OF_LOTS)
 
         coEvery {

@@ -35,10 +35,10 @@ object SellerMapper {
 
         for (channel in this) {
             when (channel) {
-                ChannelType.VK -> channelType.vk = true
-                ChannelType.CHAT -> channelType.chat = true
-                ChannelType.GOOGLE -> channelType.email = true
-                ChannelType.PHONE -> channelType.phone = true
+                ChannelType.VK -> channelType.isVk = true
+                ChannelType.CHAT -> channelType.isChat = true
+                ChannelType.GOOGLE -> channelType.isEmail = true
+                ChannelType.PHONE -> channelType.isPhone = true
                 else -> {}
             }
         }
@@ -51,10 +51,10 @@ object SellerMapper {
 
         for (channel in this) {
             when (channel) {
-                CommunicationChannel.VK -> channelType.vk = true
-                CommunicationChannel.CHAT -> channelType.chat = true
-                CommunicationChannel.EMAIL -> channelType.email = true
-                CommunicationChannel.PHONE -> channelType.phone = true
+                CommunicationChannel.VK -> channelType.isVk = true
+                CommunicationChannel.CHAT -> channelType.isChat = true
+                CommunicationChannel.EMAIL -> channelType.isEmail = true
+                CommunicationChannel.PHONE -> channelType.isPhone = true
                 else -> {}
             }
         }
@@ -65,19 +65,19 @@ object SellerMapper {
     fun ru.zveron.model.ChannelType.toCommunicationChannels(): List<CommunicationChannel> {
         val communicationChannels = mutableListOf<CommunicationChannel>()
 
-        if (vk) {
+        if (isVk) {
             communicationChannels.add(CommunicationChannel.VK)
         }
 
-        if (chat) {
+        if (isChat) {
             communicationChannels.add(CommunicationChannel.CHAT)
         }
 
-        if (email) {
+        if (isEmail) {
             communicationChannels.add(CommunicationChannel.EMAIL)
         }
 
-        if (phone) {
+        if (isPhone) {
             communicationChannels.add(CommunicationChannel.PHONE)
         }
 

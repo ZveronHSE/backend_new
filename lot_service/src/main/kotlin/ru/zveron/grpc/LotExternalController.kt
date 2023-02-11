@@ -21,7 +21,7 @@ import ru.zveron.contract.lot.LotExternalProtoServiceGrpcKt
 import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.WaterfallResponse
 import ru.zveron.exception.LotException
-import ru.zveron.mapper.CardLotBuilder.Companion.cardLotBuilder
+import ru.zveron.mapper.CardLotBuilder.Companion.buildCardLot
 import ru.zveron.mapper.LotMapper
 import ru.zveron.model.Address
 import ru.zveron.model.SellerProfile
@@ -69,7 +69,7 @@ class LotExternalController(
 
         val lot = lotService.createLot(request, seller!!, address!!.id)
 
-        return cardLotBuilder {
+        return buildCardLot {
             this.lot = lot
             this.seller = seller!!
             isOwnLot = true
@@ -112,7 +112,7 @@ class LotExternalController(
 
         lot = lotService.editLot(lot, request, seller!!)
 
-        return cardLotBuilder {
+        return buildCardLot {
             this.lot = lot
             this.seller = seller!!
             isOwnLot = true
@@ -172,7 +172,7 @@ class LotExternalController(
             }
         }
 
-        return cardLotBuilder {
+        return buildCardLot {
             this.lot = lot
             this.seller = seller!!
             this.isOwnLot = isOwnLot

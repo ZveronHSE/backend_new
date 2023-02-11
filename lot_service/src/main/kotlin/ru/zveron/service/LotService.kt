@@ -21,7 +21,7 @@ import ru.zveron.mapper.LotMapper.toGender
 import ru.zveron.mapper.SellerMapper.toChannelType
 import ru.zveron.model.SellerProfile
 import ru.zveron.model.SummaryLot
-import ru.zveron.model.constant.LotStatus
+import ru.zveron.model.enum.LotStatus
 import ru.zveron.repository.LotParameterRepository
 import ru.zveron.repository.LotRepository
 import ru.zveron.repository.WaterfallRepository
@@ -56,7 +56,7 @@ class LotService(
     fun getLotsBySellerId(sellerId: Long): List<Lot> {
         sellerId.validatePositive("sellerId")
 
-        return lotRepository.findAllBySellerIdOrderByDateCreationDesc(sellerId)
+        return lotRepository.findAllBySellerIdOrderByCreatedAtDesc(sellerId)
     }
 
     suspend fun getWaterfall(request: WaterfallRequest, sellerId: Long?): List<SummaryLot> {
@@ -71,7 +71,6 @@ class LotService(
         return waterfallRepository.findAll(conditions)
     }
 
-    @Transactional
     fun createLot(request: CreateLotRequest, seller: SellerProfile, addressId: Long): Lot {
         validateLotProperties(request.photosList, request.communicationChannelList, seller)
 
@@ -81,7 +80,7 @@ class LotService(
                 description = description,
                 price = price,
                 lotFormId = lotFormId,
-                dateCreation = Instant.now(),
+                createdAt = Instant.now(),
                 status = LotStatus.ACTIVE,
                 gender = gender.toGender(),
                 sellerId = seller.id,
@@ -141,7 +140,7 @@ class LotService(
             }
         }
 
-        return lotRepository.saveAndFlush(lot)
+        return lotRepository.save(lot)
     }
 
     fun closeLot(lot: Lot, request: CloseLotRequest) {

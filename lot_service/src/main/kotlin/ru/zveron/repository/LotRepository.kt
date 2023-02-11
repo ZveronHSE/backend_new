@@ -7,7 +7,7 @@ import ru.zveron.exception.LotException
 
 @JvmDefaultWithCompatibility
 interface LotRepository : JpaRepository<Lot, Long> {
-    fun findAllBySellerIdOrderByDateCreationDesc(id: Long): List<Lot>
+    fun findAllBySellerIdOrderByCreatedAtDesc(id: Long): List<Lot>
 
     fun findByIdOrThrow(id: Long): Lot =
         findById(id).orElseThrow { LotException(Status.NOT_FOUND, "Объявления с id=$id не существует") }

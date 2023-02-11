@@ -5,8 +5,8 @@ import org.hibernate.Hibernate
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import ru.zveron.model.ChannelType
-import ru.zveron.model.constant.Gender
-import ru.zveron.model.constant.LotStatus
+import ru.zveron.model.enum.Gender
+import ru.zveron.model.enum.LotStatus
 import java.time.Instant
 import javax.persistence.*
 
@@ -22,8 +22,8 @@ data class Lot(
     var price: Int,
     @Column(name = "lot_form_id")
     val lotFormId: Int,
-    @Column(name = "date_creation")
-    val dateCreation: Instant,
+    @Column(name = "created_at")
+    val createdAt: Instant,
     @Enumerated(EnumType.STRING)
     var status: LotStatus,
     @Enumerated(EnumType.STRING)
@@ -63,7 +63,7 @@ data class Lot(
 
     override fun toString(): String {
         return """
-            Lot(id = $id , title = $title , description = $description , price = $price, dateCreation = $dateCreation)
+            Lot(id = $id , title = $title , description = $description , price = $price, createdAt = $createdAt)
                 """
     }
 }

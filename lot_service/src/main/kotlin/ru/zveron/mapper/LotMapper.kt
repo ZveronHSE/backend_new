@@ -15,7 +15,7 @@ import ru.zveron.entity.Lot
 import ru.zveron.exception.LotException
 import ru.zveron.model.Address
 import ru.zveron.model.SummaryLot
-import ru.zveron.model.constant.Gender
+import ru.zveron.model.enum.Gender
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Date
@@ -42,7 +42,7 @@ object LotMapper {
                 id = summaryLot.id
                 title = summaryLot.title
                 price = summaryLot.price.toFormattingPrice()
-                publicationDate = summaryLot.dateCreation.toFormattingDate()
+                publicationDate = summaryLot.createdAt.toFormattingDate()
                 favorites?.let { favorite = it[index] }
             }
         }
@@ -55,7 +55,7 @@ object LotMapper {
 
             dataFilter = dataFilter {
                 price = lastLot.price
-                date = Timestamps.fromMillis(lastLot.dateCreation.toEpochMilli())
+                date = Timestamps.fromMillis(lastLot.createdAt.toEpochMilli())
             }
         }
     }
@@ -90,7 +90,7 @@ object LotMapper {
             .filter { !it.isNullOrBlank() }
             .joinToString()
 
-        return Address(id, address)
+        return Address(id, address, latitude, longitude)
     }
 
     fun ru.zveron.contract.lot.model.Gender.toGender(): Gender {
@@ -110,7 +110,7 @@ object LotMapper {
                 id = lot.id
                 title = lot.title
                 price = lot.price.toFormattingPrice()
-                publicationDate = lot.dateCreation.toFormattingDate()
+                publicationDate = lot.createdAt.toFormattingDate()
                 favorites?.let { favorite = it[index] }
                 status = Status.forNumber(lot.status.ordinal)
             }

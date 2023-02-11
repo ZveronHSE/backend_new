@@ -1,4 +1,4 @@
-"id","date_creation","description","price","status","title","address_id","category_id","lot_form_id","seller_id","channel_type",gender
+"id","created_at","description","price","status","title","address_id","category_id","lot_form_id","seller_id","channel_type",gender
 "1","2021-02-21 22:20:17.555976","Милая, прекрасная и чудесная","5000","ACTIVE","Продаю собаку",1,"3","1","2","{""vk"": false, ""chat"": true, ""email"": false, ""phone"": true, ""facebook"": false}",FEMALE
 "2","2021-02-22 22:20:17.555976","Лучшие щенки Аляскинского Маламута. Последний щенок ждёт своих родителей","25000","ACTIVE","Шикарный малыш готов к переезду",2,"3","1","1","{""vk"": false, ""chat"": false, ""email"": false, ""phone"": true, ""facebook"": false}",FEMALE
 "3","2021-02-23 22:21:01.942452","Лучшие щенки Аляскинского Маламута. Последний щенок ждёт своих родителей","10000","ACTIVE","Шикарный маламутик",3,"3","1","1","{""vk"": false, ""chat"": false, ""email"": false, ""phone"": true, ""facebook"": false}",FEMALE

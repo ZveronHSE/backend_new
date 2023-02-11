@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseTest
 import ru.zveron.exception.LotException
-import ru.zveron.model.constant.LotStatus
+import ru.zveron.model.enum.LotStatus
 import ru.zveron.repository.LotRepository
 import ru.zveron.test.util.GeneratorUtils
 import ru.zveron.test.util.GeneratorUtils.generateIds
@@ -68,7 +68,7 @@ class LotServiceTest : DataBaseTest() {
         val lot1 = lotRepository.save(
             LotEntities.mockLotEntity(
                 sellerId = sellerId,
-                dateCreation = Instant.now().minusSeconds(500L)
+                createdAt = Instant.now().minusSeconds(500L)
             )
         )
         lotRepository.save(LotEntities.mockLotEntity(sellerId = GeneratorUtils.generateLong(1)))
@@ -93,7 +93,7 @@ class LotServiceTest : DataBaseTest() {
         val lot = lotService.createLot(request, generateSellerProfile(sellerId), addressId)
 
         lot.asClue {
-            it.dateCreation.shouldBeAfter(Instant.now().minusSeconds(3))
+            it.createdAt.shouldBeAfter(Instant.now().minusSeconds(3))
             it.lotFormId shouldBe request.lotFormId
             it.categoryId shouldBe request.categoryId
             it.title shouldBe request.title

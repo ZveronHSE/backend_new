@@ -17,9 +17,9 @@ object LotValidation {
 
         for (channel in communicationChannel) {
             val exists = when (channel) {
-                CommunicationChannel.VK -> contact.vk
-                CommunicationChannel.EMAIL -> contact.email
-                CommunicationChannel.PHONE -> contact.phone
+                CommunicationChannel.VK -> contact.isVk
+                CommunicationChannel.EMAIL -> contact.isEmail
+                CommunicationChannel.PHONE -> contact.isPhone
                 CommunicationChannel.CHAT -> true
                 else -> false
             }

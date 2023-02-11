@@ -17,9 +17,9 @@ object LOT : TableImpl<Record>(DSL.name("lot"), null) {
     val ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false), this, "")
 
     /**
-     * The column `public.lot.date_creation`.
+     * The column `public.lot.created_at`.
      */
-    val DATE_CREATION = createField(DSL.name("date_creation"), SQLDataType.LOCALDATETIME(6), this, "")
+    val CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6), this, "")
 
     /**
      * The column `public.lot.description`.

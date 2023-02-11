@@ -2,6 +2,8 @@ package ru.zveron.mapper
 
 import io.grpc.Status
 import ru.zveron.contract.lot.CardLot
+import ru.zveron.contract.lot.Contact
+import ru.zveron.contract.lot.Seller
 import ru.zveron.contract.lot.cardLot
 import ru.zveron.contract.lot.channelLink
 import ru.zveron.contract.lot.contact
@@ -24,7 +26,7 @@ class CardLotBuilder(
     var address: Address? = null
 ) {
     companion object {
-        inline fun cardLotBuilder(init: CardLotBuilder.() -> Unit) =
+        inline fun buildCardLot(init: CardLotBuilder.() -> Unit) =
             CardLotBuilder()
                 .apply(init)
                 .build()
@@ -39,12 +41,10 @@ class CardLotBuilder(
         if (seller == null) {
             throw LotException(Status.INVALID_ARGUMENT, "Don't get seller for building CardLot")
         }
-        val seller = seller!!
 
         if (address == null) {
             throw LotException(Status.INVALID_ARGUMENT, "Don't get address for building CardLot")
         }
-        val address = address!!
 
         return cardLot {
             id = lot.id
@@ -56,7 +56,7 @@ class CardLotBuilder(
                 }
             })
             lot.gender?.let { gender = it.toContract() }
-//            address
+            this.address = buildAddress()
             parameters.addAll(lot.parameters.map {
                 parameter {
                     id = it.id.parameter
@@ -68,22 +68,45 @@ class CardLotBuilder(
             favorite = isFavoriteLot
             own = isOwnLot
             // TODO canAddReview ZV-300
-            contact = contact {
-                communicationChannel.addAll(seller.contact.toCommunicationChannels())
-                channelLink = channelLink {
-                    seller.channelLink.vk?.let { vk = it }
-                    seller.channelLink.email?.let { email = it }
-                    seller.channelLink.phone?.let { phone = it }
-                }
-            }
-            this.seller = seller {
-                id = seller.id
-                name = seller.name
-                surname = seller.surname
-//           TODO     rating = seller ZV-304
-                online = seller.isOnline
-                photoId = seller.imageId
+            contact = buildContact()
+            this.seller = buildSeller()
+        }
+    }
+
+    private fun buildAddress(): ru.zveron.contract.lot.model.Address {
+        val address = address!!
+
+        return ru.zveron.contract.lot.model.address {
+            this.address = address.address
+            latitude = address.latitude
+            longitude = address.longitude
+        }
+    }
+
+    private fun buildContact(): Contact {
+        val seller = seller!!
+
+        return contact {
+            communicationChannel.addAll(seller.contact.toCommunicationChannels())
+            channelLink = channelLink {
+                seller.channelLink.vk?.let { vk = it }
+                seller.channelLink.email?.let { email = it }
+                seller.channelLink.phone?.let { phone = it }
             }
         }
     }
+
+    private fun buildSeller(): Seller {
+        val seller = seller!!
+
+        return seller {
+            id = seller.id
+            name = seller.name
+            surname = seller.surname
+//           TODO     rating = seller ZV-304
+            online = seller.isOnline
+            photoId = seller.imageId
+        }
+    }
+
 }

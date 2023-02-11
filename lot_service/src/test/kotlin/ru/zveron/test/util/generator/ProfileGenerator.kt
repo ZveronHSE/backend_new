@@ -25,7 +25,7 @@ object ProfileGenerator {
         name = GeneratorUtils.generateString(10),
         surname = GeneratorUtils.generateString(10),
         imageId = GeneratorUtils.generateLong(),
-        contact = ru.zveron.model.ChannelType(chat = true),
+        contact = ru.zveron.model.ChannelType(isChat = true),
         channelLink = ChannelLink(),
         isOnline = GeneratorUtils.generateBoolean()
     )

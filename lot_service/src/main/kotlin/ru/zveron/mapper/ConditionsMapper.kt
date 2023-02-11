@@ -11,7 +11,7 @@ import ru.zveron.contract.lot.Operation
 import ru.zveron.contract.lot.TypeSort
 import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.model.Parameter
-import ru.zveron.model.constant.Gender
+import ru.zveron.model.enum.Gender
 import ru.zveron.model.search.ConditionsSearch
 import ru.zveron.model.search.ParametersSearch
 import ru.zveron.model.search.ParametersSeekMethod
@@ -122,7 +122,7 @@ object ConditionsMapper {
 
         if (waterfallRequest.sortCase == WaterfallRequest.SortCase.SORT_BY_DATE) {
             isAscendingOrder = waterfallRequest.sortByDate.typeSort == TypeSort.ASC
-            fieldName = LOT.DATE_CREATION
+            fieldName = LOT.CREATED_AT
 
             if (waterfallRequest.sortByDate.hasLastLot()) {
 
