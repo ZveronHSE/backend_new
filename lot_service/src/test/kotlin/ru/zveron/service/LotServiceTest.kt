@@ -8,9 +8,12 @@ import io.kotest.matchers.date.shouldBeAfter
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseTest
+import ru.zveron.contract.lot.ClosingLotReason
+import ru.zveron.contract.lot.closeLotRequest
 import ru.zveron.contract.lot.model.CommunicationChannel
 import ru.zveron.exception.LotException
 import ru.zveron.model.enum.LotStatus
@@ -147,5 +150,61 @@ class LotServiceTest : DataBaseTest() {
             it.photos.size shouldBe request.photosCount
             it.parameters.size shouldBe request.parametersCount
         }
+    }
+
+    @ParameterizedTest
+    @EnumSource(mode = EnumSource.Mode.EXCLUDE, names = ["SOLD", "UNRECOGNIZED"], value = ClosingLotReason::class)
+    fun `CloseLot closing lot because other reasons that not sold on our platform`(reason: ClosingLotReason) {
+        val lot = lotRepository.save(LotEntities.mockLotEntity())
+
+        val request = closeLotRequest {
+            closingLotReason = reason
+        }
+
+        lotService.closeLot(lot, request)
+
+
+        val closedLot = lotRepository.findById(lot.id).get()
+
+        closedLot.status shouldBe LotStatus.CANCELED
+    }
+
+    @Test
+    fun `CloseLot correct closing lot because of sold on our platform`() {
+        val lot = lotRepository.save(LotEntities.mockLotEntity())
+
+        val request = closeLotRequest {
+            closingLotReason = ClosingLotReason.SOLD
+            customerId = lot.sellerId!! + 1
+        }
+
+        lotService.closeLot(lot, request)
+
+        val closedLot = lotRepository.findById(lot.id).get()
+
+        closedLot.status shouldBe LotStatus.CLOSED
+    }
+
+    @Test
+    fun `CloseLot should throw after closing lot because of sold on our platform without customer id`() {
+        val lot = lotRepository.save(LotEntities.mockLotEntity())
+
+        val request = closeLotRequest {
+            closingLotReason = ClosingLotReason.SOLD
+        }
+
+        shouldThrow<LotException> { lotService.closeLot(lot, request) }
+    }
+
+    @Test
+    fun `CloseLot should throw after closing lot because of sold on our platform with same customer id as seller id`() {
+        val lot = lotRepository.save(LotEntities.mockLotEntity())
+
+        val request = closeLotRequest {
+            closingLotReason = ClosingLotReason.SOLD
+            customerId = lot.sellerId!!
+        }
+
+        shouldThrow<LotException> { lotService.closeLot(lot, request) }
     }
 }

@@ -22,6 +22,14 @@ class WaterfallRepositoryImpl(
     }
 
     override fun findAll(conditionsSearch: ConditionsSearch): List<SummaryLot> {
+        val whereConditions = conditionsSearch.conditions
+        if (!conditionsSearch.categories.isNullOrEmpty()) {
+            whereConditions.add(LOT.CATEGORY_ID.`in`(conditionsSearch.categories))
+        }
+
+        // Искать только активные объявления
+        whereConditions.add(LOT.STATUS.eq("ACTIVE"))
+
         // Алиасы тут, поскольку из-за джойна были конфликты и скрипт не понимал, по какому столбцу нужно выполнять.
         var sql = context
             .select(
@@ -34,7 +42,7 @@ class WaterfallRepositoryImpl(
             .from(LOT)
             .join(LOT_PHOTO)
             .on(LOT_PHOTO.ID_LOT.eq(LOT.ID)).and(LOT_PHOTO.ORDER_PHOTO.eq(FIRST_IMAGE_ORDER))
-            .where(*conditionsSearch.conditions.toTypedArray()).and(LOT.CATEGORY_ID.`in`(conditionsSearch.categories))
+            .where(*whereConditions.toTypedArray())
 
         if (conditionsSearch.parameters != null) {
             sql = sql.and(LOT.ID.`in`(createSelectParameters(conditionsSearch.parameters!!)))

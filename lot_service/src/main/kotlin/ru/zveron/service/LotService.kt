@@ -172,7 +172,8 @@ class LotService(
                 // TODO add logic for possible customers -> add reviews ZV-300
                 lot.status = LotStatus.CLOSED
             }
-            else ->   lot.status = LotStatus.CANCELED
+
+            else -> lot.status = LotStatus.CANCELED
         }
 
 
