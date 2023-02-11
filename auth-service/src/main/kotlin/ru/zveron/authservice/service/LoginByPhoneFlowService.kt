@@ -12,7 +12,7 @@ import ru.zveron.authservice.exception.WrongCodeException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
-import ru.zveron.authservice.grpc.client.model.ProfileUnknownFailure
+import ru.zveron.authservice.grpc.client.model.FindProfileUnknownFailure
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
@@ -81,7 +81,7 @@ class LoginByPhoneFlowService(
         val profileData: ProfileTokenData? = when (profileResponse) {
             is ProfileFound -> ProfileTokenData(profileResponse.id, profileResponse.name, profileResponse.surname)
             is ProfileNotFound -> null
-            is ProfileUnknownFailure -> throw NotifierClientException(
+            is FindProfileUnknownFailure -> throw NotifierClientException(
                 profileResponse.message ?: "no message",
                 profileResponse.code
             )

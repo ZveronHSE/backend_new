@@ -9,7 +9,7 @@ import ru.zveron.authservice.component.jwt.model.MobileTokens
 import ru.zveron.authservice.exception.InvalidTokenException
 import ru.zveron.authservice.exception.SessionExpiredException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
-import ru.zveron.authservice.grpc.client.model.ProfileNotFound
+import ru.zveron.authservice.grpc.client.model.ValidatePasswordProfileNotFound
 import ru.zveron.authservice.persistence.SessionStorage
 
 @Component
@@ -41,7 +41,7 @@ class Authenticator(
 
         val profileResponse = profileServiceClient.getProfileById(decodedToken.profileId)
 
-        if (profileResponse is ProfileNotFound) {
+        if (profileResponse is ValidatePasswordProfileNotFound) {
             throw InvalidTokenException("Profile not found")
         }
 

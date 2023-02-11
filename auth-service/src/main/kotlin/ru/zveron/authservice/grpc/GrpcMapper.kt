@@ -11,6 +11,7 @@ import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyResponse
 import ru.zveron.authservice.util.PhoneNumberParser
 import ru.zveron.contract.auth.IssueNewTokensRequest
+import ru.zveron.contract.auth.LoginByPasswordRequest
 import ru.zveron.contract.auth.MobileToken
 import ru.zveron.contract.auth.PhoneLoginInitRequest
 import ru.zveron.contract.auth.PhoneLoginVerifyRequest
@@ -57,6 +58,12 @@ object GrpcMapper {
         this@toGrpcContract.sessionId?.let { this.sessionId = it.toString() }
         this@toGrpcContract.tokens?.let { this.mobileToken = it.toGrpcToken() }
     }
+
+    fun LoginByPasswordRequest.toServiceRequest() = ru.zveron.authservice.service.model.LoginByPasswordRequest(
+        loginPhone = PhoneNumberParser.stringToServicePhone(this.phoneNumber),
+        password = this.password.toByteArray(),
+        fingerprint = this.deviceFp
+    )
 
     private fun AccessToken.toGrpc(): TimedToken = timedToken {
         this.token = this@toGrpc.token
