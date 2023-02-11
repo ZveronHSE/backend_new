@@ -28,4 +28,5 @@ dependencies {
 
     //testing
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
+    testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
 }

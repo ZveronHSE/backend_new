@@ -21,4 +21,6 @@ interface SessionRepository : CoroutineCrudRepository<SessionEntity, UUID> {
     )
     @Modifying
     suspend fun updateSession(sessionId: UUID, tokenIdentifier: UUID, expiresAt: Instant): Long
+
+    suspend fun deleteAllByExpiresAtBefore(expiresAtBefore: Instant): Long
 }
