@@ -74,7 +74,7 @@ grpc:
 ### Continuous delivery
 Когда добавляем новый сервис, нужно:
 1. Создать в новом модуле `Dockerfile` по анаогии с теми, что уже есть
-2. Добавить `application-preprod.yml`, где нужно указать порты для сервера и переопределить адрес registry
+2. Добавить `application-prod.yml`, где нужно указать порты для сервера и переопределить адрес registry
 3. Добавить сервис в `docker-compose.yml`
 4. Добавить шаг создания образа в `.github/workflows/builder.yml`
 ### Deploy
