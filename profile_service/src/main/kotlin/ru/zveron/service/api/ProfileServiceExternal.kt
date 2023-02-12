@@ -27,7 +27,7 @@ class ProfileServiceExternal(
 ) : ProfileServiceExternalGrpcKt.ProfileServiceExternalCoroutineImplBase() {
 
     override suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse =
-        profileService.getProfilePage(request, getAuthorizedProfileId())
+        profileService.getProfilePage(request, getAuthorizedProfileId() ?: 0)
 
     override suspend fun getProfileInfo(request: Empty): GetProfileInfoResponse =
         profileService.getProfileInfo(
@@ -78,5 +78,5 @@ class ProfileServiceExternal(
         return Empty.getDefaultInstance()
     }
 
-    suspend fun getAuthorizedProfileId() = coroutineContext[AuthorizedProfileElement]?.id
+    private suspend fun getAuthorizedProfileId() = coroutineContext[AuthorizedProfileElement]?.id
 }

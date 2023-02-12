@@ -108,14 +108,14 @@ class ProfileService(
         }
     }
 
-    suspend fun getProfilePage(request: GetProfilePageRequest, authorizedProfileId: Long?): GetProfilePageResponse =
+    suspend fun getProfilePage(request: GetProfilePageRequest, authorizedProfileId: Long): GetProfilePageResponse =
         supervisorScope {
-            val blacklistCoroutine = inOwnerBlacklist(request.requestedProfileId, authorizedProfileId ?: 0L)
+            val blacklistCoroutine = inOwnerBlacklist(request.requestedProfileId, authorizedProfileId)
             val profile = findByIdOrThrow(request.requestedProfileId, ProfileInitializationType.COMMUNICATION_LINKS)
 
             val addExtraFields = !blacklistCoroutine.awaitBlacklistResponse()
             val addressCoroutine = getAddressById(profile.addressId, addExtraFields)
-            val lotsCoroutine = getLotsBySellerId(profile.id, authorizedProfileId addExtraFields)
+            val lotsCoroutine = getLotsBySellerId(profile.id, authorizedProfileId, addExtraFields)
             val ratingCoroutine = getRatingByProfileId(profile.id, addExtraFields)
 
             getProfilePageResponse {
