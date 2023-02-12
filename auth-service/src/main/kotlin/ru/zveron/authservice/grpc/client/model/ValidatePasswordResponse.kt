@@ -14,6 +14,3 @@ data class PasswordValidationFailure(
     val status: Status,
     val metadata: Metadata?,
 ) : ValidatePasswordResponse()
-
-
-object ValidatePasswordProfileNotFound : ValidatePasswordResponse()

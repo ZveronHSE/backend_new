@@ -12,7 +12,6 @@ import ru.zveron.authservice.grpc.client.model.PasswordIsValid
 import ru.zveron.authservice.grpc.client.model.PasswordValidationFailure
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
-import ru.zveron.authservice.grpc.client.model.ValidatePasswordProfileNotFound
 import ru.zveron.authservice.service.mapper.ServiceMapper.toClientRequest
 import ru.zveron.authservice.service.model.LoginByPasswordRequest
 
@@ -31,7 +30,6 @@ class LoginByPasswordFlowService(
         when (validatePwdResponse) {
             PasswordIsValid -> {}
 
-            ValidatePasswordProfileNotFound -> throw PasswordValidationException("Account not found by phone=${request.loginPhone}")
             PasswordIsInvalid -> throw PasswordValidationException()
             is PasswordValidationFailure -> throw PasswordValidationException(
                 validatePwdResponse.message,

@@ -16,7 +16,6 @@ import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.grpc.client.model.RegisterProfileFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileResponse
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
-import ru.zveron.authservice.grpc.client.model.ValidatePasswordProfileNotFound
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordRequest
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordResponse
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toClientRequest
@@ -97,11 +96,7 @@ class ProfileServiceClient(
 
             if (response.isValidRequest) PasswordIsValid else PasswordIsInvalid
         } catch (ex: StatusException) {
-            if (ex.status == Status.NOT_FOUND) {
-                ValidatePasswordProfileNotFound
-            } else {
-                PasswordValidationFailure(ex.message, ex.status, ex.trailers)
-            }
+            PasswordValidationFailure(ex.message, ex.status, ex.trailers)
         }
     }
 
