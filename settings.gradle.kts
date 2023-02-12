@@ -26,4 +26,5 @@ include(
     "lot_service",
     "profile_service",
     "auth-service",
+    "object-storage",
 )

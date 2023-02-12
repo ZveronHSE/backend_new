@@ -60,6 +60,11 @@ jobs:
             dockerfile: auth-service/Dockerfile
             image: ghcr.io/zveronhse/auth-service:latest
 
+          - name: Object Storage
+            env: object-storage
+            dockerfile: object-storage/Dockerfile
+            image: ghcr.io/zveronhse/object-storage:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3

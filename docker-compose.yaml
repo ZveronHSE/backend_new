@@ -146,3 +146,12 @@ services:
     depends_on:
       - db
       - registry
+  object-storage:
+    restart: always
+    container_name: object-storage
+    platform: linux/amd64
+    image: ghcr.io/zveronhse/object-storage
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - registry

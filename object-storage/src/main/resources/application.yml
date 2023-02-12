@@ -1,0 +1,33 @@
+spring:
+  main:
+    banner-mode: off
+    web-application-type: reactive
+
+  liquibase:
+    enabled: false
+
+  application:
+    name: object-storage
+
+  datasource:
+    url: jdbc:postgresql://localhost:5555/object-storage
+    password: zveron_password
+    username: zveron_user
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration, org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration, org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+
+grpc:
+  server:
+    port: 0
+
+eureka:
+  client:
+    webclient:
+      enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    enabled: true
+
+  instance:
+    metadata-map:
+      AuthService: 'ObjectStorage.proto'
