@@ -22,3 +22,7 @@ DROP INDEX communication_link_context_id_index;
 
 -- changeset Dmitry.Kochik:1676061781084-7
 CREATE INDEX communication_link_context_id_type_index ON public.communication_link (communication_link_id, type);
+
+-- changeset Dmitry.Kochik:1676061781084-8
+ALTER TABLE public.profile
+    ADD password_hash VARCHAR(32);

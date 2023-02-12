@@ -76,7 +76,11 @@ class CommunicationLinkService(
     suspend fun isPasswordHashValid(request: VerifyProfileHashRequest): Boolean {
         val link = repository.findByCommunicationLinkIdAndType(request.phoneNumber, CommunicationLinkType.PHONE)
             ?: return false
-        return (link.data as PhoneData).passwordHash == request.passwordHash
+        link.profile.passwordHash ?: throw ProfileException(
+            "Password hasn't been set yet for this profile",
+            Status.FAILED_PRECONDITION.code
+        )
+        return link.profile.passwordHash == request.passwordHash
     }
 
     private fun createOrUpdatePhone(

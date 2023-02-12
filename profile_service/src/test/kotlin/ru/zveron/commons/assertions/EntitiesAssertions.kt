@@ -3,7 +3,6 @@ package ru.zveron.commons.assertions
 import com.google.protobuf.Timestamp
 import com.google.protobuf.timestamp
 import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -24,7 +23,6 @@ import ru.zveron.contract.lot.model.Lot
 import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.LinksDto
-import ru.zveron.domain.link.PhoneData
 import ru.zveron.domain.link.VkData
 import ru.zveron.entity.CommunicationLink
 import ru.zveron.entity.Profile
@@ -41,6 +39,7 @@ infix fun Profile.profileShouldBe(expected: Profile) {
     surname shouldBe expected.surname
     imageId shouldBe expected.imageId
     addressId shouldBe expected.addressId
+    passwordHash shouldBe expected.passwordHash
     ChronoUnit.MINUTES.between(expected.lastSeen, lastSeen) shouldBe 0
 }
 
@@ -128,7 +127,7 @@ infix fun CommunicationLink?.linkShouldBe(expected: CommunicationLink) {
         id shouldBe expected.id
     }
     communicationLinkId shouldBe expected.communicationLinkId
-    data.shouldBeEqualToIgnoringFields(expected.data, PhoneData::passwordHash)
+    data shouldBe expected.data
 }
 
 infix fun GetProfilePageResponse.responseShouldBe(expected: Profile) {

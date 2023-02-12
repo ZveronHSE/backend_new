@@ -37,6 +37,7 @@ data class Profile(
     @Column(nullable = false)
     val lastSeen: Instant,
     val addressId: Long = -1,
+    val passwordHash: String? = null,
 ) {
 
     @PrimaryKeyJoinColumn

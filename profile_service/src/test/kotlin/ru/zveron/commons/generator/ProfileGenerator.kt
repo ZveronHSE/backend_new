@@ -7,11 +7,12 @@ import java.time.Instant
 
 object ProfileGenerator {
 
-    fun generateProfile(lastSeen: Instant, addressId: Long = -1) = Profile(
+    fun generateProfile(lastSeen: Instant, addressId: Long = -1, addPassword: Boolean = false) = Profile(
         name = generateString(20),
         surname = generateString(20),
         imageId = generateLongId(),
         lastSeen = lastSeen,
         addressId = addressId,
+        passwordHash = if (addPassword) generateString(32) else null
     )
 }

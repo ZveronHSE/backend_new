@@ -88,8 +88,9 @@ class ProfileService(
             surname = request.surname,
             imageId = request.imageId,
             lastSeen = Instant.now(),
+            passwordHash = request.passwordHash.takeIf { it != "" }
         )
-        profile.communicationLinks.addAll(request.links.toCommunicationLinks(profile, request.passwordHash))
+        profile.communicationLinks.addAll(request.links.toCommunicationLinks(profile))
         profile.settings = Settings(
             profile = profile,
             channels = waysOfCommunication,

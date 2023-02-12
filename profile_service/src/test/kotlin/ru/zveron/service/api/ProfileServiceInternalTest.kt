@@ -28,7 +28,6 @@ import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.domain.link.GmailData
-import ru.zveron.domain.link.PhoneData
 import ru.zveron.domain.link.VkData
 import ru.zveron.mapper.ContactsMapper.toDto
 import ru.zveron.mapper.ContactsMapper.toLinks
@@ -49,7 +48,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `createProfile whe request is correct`() {
         val now = Instant.now()
-        val expectedProfile = ProfileGenerator.generateProfile(now)
+        val expectedProfile = ProfileGenerator.generateProfile(now, addPassword = true)
         val expectedSettings = SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         val expectedLinks = generateLinks(expectedProfile, addPhone = true)
         val request = generateCreateProfileRequest(expectedProfile)
@@ -307,13 +306,13 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `verifyProfileHash if hash is valid`() {
         val now = Instant.now()
-        val expectedProfile = ProfileGenerator.generateProfile(now)
+        val expectedProfile = ProfileGenerator.generateProfile(now, addPassword = true)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         val linksDto = generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
         val request = verifyProfileHashRequest {
             phoneNumber = linksDto.phoneLink!!.communicationLinkId
-            passwordHash = (linksDto.phoneLink!!.data as PhoneData).passwordHash
+            passwordHash = expectedProfile.passwordHash!!
         }
 
         runBlocking {
@@ -326,7 +325,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `verifyProfileHash if hash is invalid`() {
         val now = Instant.now()
-        val expectedProfile = ProfileGenerator.generateProfile(now)
+        val expectedProfile = ProfileGenerator.generateProfile(now, addPassword = true)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         val linksDto = generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
@@ -360,11 +359,32 @@ class ProfileServiceInternalTest : ProfileTest() {
         }
     }
 
+    @Test
+    fun `verifyProfileHash if profile does not have a password`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        profileRepository.save(expectedProfile)
+        val request = verifyProfileHashRequest {
+            phoneNumber = linksDto.phoneLink!!.communicationLinkId
+            passwordHash = "123"
+        }
+
+        val exception = shouldThrow<ProfileException> {
+            runBlocking {
+                service.verifyProfileHash(request)
+            }
+        }
+        exception.message shouldBe "Password hasn't been set yet for this profile"
+    }
+
     private fun generateCreateProfileRequest(profile: Profile) = createProfileRequest {
         name = profile.name
         surname = profile.surname
         imageId = profile.imageId
         links = profile.communicationLinks.toDto().toLinks()
+        passwordHash = profile.passwordHash ?: ""
     }
 
     private fun generateUpdateContactsRequest(
