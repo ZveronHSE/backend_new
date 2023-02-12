@@ -33,3 +33,4 @@
 "profileDelete","profile-service","ProfileServiceExternal","DeleteProfile"
 "authPhoneLoginInit","auth-service","AuthService","PhoneLoginInit"
 "authPhoneLoginVerify","auth-service","AuthService","PhoneLoginVerify"
+"authLoginByPassword","auth-service","AuthService","LoginByPassword"

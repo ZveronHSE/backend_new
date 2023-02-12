@@ -24,7 +24,7 @@ dependencies {
 
     //contracts
     implementation("com.github.zveronHSe.contract:profile:bb650395f8")
-    implementation("com.github.zveronHSe.contract:auth:3afe479236")
+    implementation("com.github.zveronHSe.contract:auth:1.8.3")
 
     //testing
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
