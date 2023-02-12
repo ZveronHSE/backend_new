@@ -2,14 +2,12 @@ grpc:
   server:
     port: 0
 
-
   client:
     profile-service:
       address: 'discovery:///profile-service'
       enableKeepAlive: true # пока не оч ясно будет ли влиять я бы посмотрел
       keepAliveWithoutCalls: true # то же самое
       negotiationType: plaintext # пока что так, потом добавим всякие сертификаты
-
 
 spring:
   main:
