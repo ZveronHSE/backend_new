@@ -17,7 +17,7 @@ import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
-import ru.zveron.authservice.service.ServiceMapper.toProfileClientRequest
+import ru.zveron.authservice.service.mapper.ServiceMapper.toProfileClientRequest
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId
@@ -113,7 +113,7 @@ class LoginByPhoneFlowServiceTest {
 
         coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
         coEvery { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) } returns updatedCtx
-        coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileFound(
+        coEvery { profileClient.getProfileByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileFound(
             randomId(),
             randomName(),
             randomSurname()
@@ -156,7 +156,7 @@ class LoginByPhoneFlowServiceTest {
 
             coEvery { flowStateStorage.getContext<MobilePhoneLoginStateContext>(eq(uuid)) } returns initialCtx
             coEvery { flowStateStorage.updateContext(eq(uuid), capture(ctxSlot)) } returns updatedCtx
-            coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileNotFound
+            coEvery { profileClient.getProfileByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileNotFound
             coEvery { flowStateStorage.createContext(any()) } returns UUID.randomUUID()
 
             val verifyResponse = service.verify(request)

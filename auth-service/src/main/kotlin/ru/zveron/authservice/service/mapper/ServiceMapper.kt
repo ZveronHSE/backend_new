@@ -1,4 +1,4 @@
-package ru.zveron.authservice.service
+package ru.zveron.authservice.service.mapper
 
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordRequest
 import ru.zveron.authservice.service.model.LoginByPasswordRequest

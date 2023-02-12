@@ -65,8 +65,7 @@ class ProtoDefinitionRegistry(
         val channel = channelRegistry.getChannel(serviceName)
 
         val response = ClientCalls.unaryRpc(channel, reflectionMethodDescr, serverReflectionRequest)
-        logger.info { response.fileDescriptorResponse.fileDescriptorProtoList[0].toString() }
-        logger.info { response.fileDescriptorResponse.fileDescriptorProtoList[0].toByteArray() }
+
         if (response.hasErrorResponse()) {
             logger.error { response.errorResponse }
             throw RuntimeException(response.errorResponse.errorMessage)

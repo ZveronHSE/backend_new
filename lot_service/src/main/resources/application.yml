@@ -1,0 +1,47 @@
+spring:
+  liquibase:
+    change-log: classpath:db/master.yaml
+  datasource:
+    url: jdbc:postgresql://localhost:5555/lot
+    password: zveron_password
+    username: zveron_user
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  application:
+    name: lot-service
+  main:
+    allow-bean-definition-overriding: true
+
+eureka:
+  client:
+    webclient:
+      enabled: true # но нужно своими руками инжектить бин WebClient
+    register-with-eureka: true # если сам сервис нужно регать тоже
+    fetch-registry: true
+    service-url:
+      defaultZone: localhost:8761/eureka/
+    enabled: true
+
+server:
+  port: 0
+
+grpc:
+  server:
+    port: 0
+  client:
+    parameter:
+      address: 'discovery:///parameter-service'
+      negotiationType: plaintext
+    favorites:
+      address: 'discovery:///favorites-service'
+      negotiationType: plaintext
+    profile:
+      address: 'discovery:///profile-service'
+      negotiationType: plaintext
+    address:
+      address: 'discovery:///address-service'
+      negotiationType: plaintext

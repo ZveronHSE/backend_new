@@ -45,6 +45,11 @@ jobs:
             dockerfile: profile_service/Dockerfile
             image: ghcr.io/zveronhse/profile_service:latest
 
+          - name: Lot Service
+            env: lot_service
+            dockerfile: lot_service/Dockerfile
+            image: ghcr.io/zveronhse/lot_service:latest
+
           - name: Service Registry
             env: service_registry
             dockerfile: service_registry/Dockerfile
@@ -79,7 +84,7 @@ jobs:
 
       - name: Build and push ${{ matrix.name }} image
         if: github.event.inputs.target == 'all' || github.event.inputs.target == matrix.env || contains(env.CHANGED, matrix.env)
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ${{ matrix.dockerfile }}

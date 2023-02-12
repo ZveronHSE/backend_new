@@ -1,5 +1,6 @@
 package ru.zveron.authservice.util
 
+import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.apache.commons.lang3.RandomStringUtils.randomNumeric
 import org.apache.commons.lang3.RandomUtils
@@ -9,7 +10,7 @@ import ru.zveron.authservice.component.jwt.model.MobileTokens
 import ru.zveron.authservice.component.jwt.model.RefreshToken
 import ru.zveron.authservice.persistence.entity.SessionEntity
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
-import ru.zveron.authservice.service.ServiceMapper.toContext
+import ru.zveron.authservice.service.mapper.ServiceMapper.toContext
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
 import ru.zveron.authservice.service.model.PhoneNumber
@@ -67,6 +68,10 @@ fun randomName() = "name-${UUID.randomUUID()}"
 
 fun randomSurname() = "surname-${UUID.randomUUID()}"
 
+fun randomPassword(): String = randomAlphabetic(10)
+
+fun randomHash() = randomAlphanumeric(32)
+
 fun randomTokens() = MobileTokens(
     refreshToken = randomRefreshToken(),
     accessToken = randomAccessToken(),
@@ -95,5 +100,7 @@ fun randomSessionEntity() = SessionEntity(
 fun randomPassword() = randomAlphanumeric(10).toByteArray()
 
 fun randomHash(): String = randomAlphanumeric(32)
+
+fun randomPersistencePhone() = ru.zveron.authservice.persistence.model.PhoneNumber(countryCode = "7", randomNumeric(10))
 
 inline fun <reified T : Enum<T>> randomEnum() = enumValues<T>().random()
