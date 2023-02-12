@@ -11,6 +11,9 @@ class LotGrpcClient : LotClient {
     @GrpcClient("lot-service")
     lateinit var service: LotInternalServiceGrpcKt.LotInternalServiceCoroutineStub
 
-    override suspend fun getLotsBySellerId(profileId: Long) =
-        service.getLotsBySellerId(profileLotsRequest { id = profileId })
+    override suspend fun getLotsBySellerId(sellerId: Long, userId: Long) =
+        service.getLotsBySellerId(profileLotsRequest {
+            this.sellerId = sellerId
+            this.userId = userId
+        })
 }

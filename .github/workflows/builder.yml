@@ -45,6 +45,11 @@ jobs:
             dockerfile: profile_service/Dockerfile
             image: ghcr.io/zveronhse/profile_service:latest
 
+          - name: Lot Service
+            env: lot_service
+            dockerfile: lot_service/Dockerfile
+            image: ghcr.io/zveronhse/lot_service:latest
+
           - name: Service Registry
             env: service_registry
             dockerfile: service_registry/Dockerfile

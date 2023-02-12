@@ -57,3 +57,7 @@ jobs:
       - name: Test apigateway service
         shell: bash
         run: if grep -q "apigateway" "temp.txt"; then gradle :apigateway:test --stacktrace; fi
+
+      - name: Test lot service
+        shell: bash
+        run: if grep -q "lot_service" "temp.txt"; then gradle :lot_service:test --stacktrace; fi

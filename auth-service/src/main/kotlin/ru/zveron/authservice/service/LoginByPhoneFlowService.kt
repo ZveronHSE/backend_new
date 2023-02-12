@@ -16,9 +16,9 @@ import ru.zveron.authservice.grpc.client.model.ProfileUnknownFailure
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
-import ru.zveron.authservice.service.ServiceMapper.toClientRequest
-import ru.zveron.authservice.service.ServiceMapper.toContext
-import ru.zveron.authservice.service.ServiceMapper.toProfileClientRequest
+import ru.zveron.authservice.service.mapper.ServiceMapper.toClientRequest
+import ru.zveron.authservice.service.mapper.ServiceMapper.toContext
+import ru.zveron.authservice.service.mapper.ServiceMapper.toProfileClientRequest
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyResponse
@@ -76,7 +76,7 @@ class LoginByPhoneFlowService(
 
         val updatedCtx = validateCodeAndUpdateContext(phoneVerificationCtx, request.code, request.sessionId)
 
-        val profileResponse = profileClient.getAccountByPhone(updatedCtx.phoneNumber.toProfileClientRequest())
+        val profileResponse = profileClient.getProfileByPhone(updatedCtx.phoneNumber.toProfileClientRequest())
 
         val profileData: ProfileTokenData? = when (profileResponse) {
             is ProfileFound -> ProfileTokenData(profileResponse.id, profileResponse.name, profileResponse.surname)
@@ -93,7 +93,7 @@ class LoginByPhoneFlowService(
         } ?: flowStateStorage.createContext(
             MobilePhoneRegisterStateContext(
                 phoneNumber = updatedCtx.phoneNumber,
-                deviceFp = updatedCtx.fingerprint,
+                fingerprint = updatedCtx.fingerprint,
                 isChannelVerified = updatedCtx.isVerified,
             )
         ).let {

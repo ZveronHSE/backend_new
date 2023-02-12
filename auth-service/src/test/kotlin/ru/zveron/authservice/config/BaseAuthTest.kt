@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.await
 import ru.zveron.authservice.cron.SessionCronScheduler
@@ -44,6 +43,6 @@ class BaseAuthTest : ContainerConfigurer() {
 
     @BeforeEach
     fun cleanDb() = runBlocking {
-        template.databaseClient.sql("TRUNCATE state_context").await()
+        template.databaseClient.sql("TRUNCATE state_context, session").await()
     }
 }

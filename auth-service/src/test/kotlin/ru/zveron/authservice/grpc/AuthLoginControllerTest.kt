@@ -19,7 +19,7 @@ import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.entity.StateContextEntity
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
-import ru.zveron.authservice.service.ServiceMapper.toProfileClientRequest
+import ru.zveron.authservice.service.mapper.ServiceMapper.toProfileClientRequest
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId
@@ -94,7 +94,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             this.deviceFp = initialCtx.fingerprint
         }
 
-        coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileFound(
+        coEvery { profileClient.getProfileByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileFound(
             randomId(),
             randomName(),
             randomSurname()
@@ -130,7 +130,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
                 this.deviceFp = initialCtx.fingerprint
             }
 
-            coEvery { profileClient.getAccountByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileNotFound
+            coEvery { profileClient.getProfileByPhone(phoneNumber = initialCtx.phoneNumber.toProfileClientRequest()) } returns ProfileNotFound
 
             val verifyResponse = authLoginController.phoneLoginVerify(request)
             verifyResponse.shouldNotBeNull()
@@ -146,7 +146,7 @@ internal class AuthLoginControllerTest : BaseAuthTest() {
             assertSoftly {
                 registerFlowContext.isChannelVerified shouldBe true
                 registerFlowContext.phoneNumber shouldBe initialCtx.phoneNumber
-                registerFlowContext.deviceFp shouldBe initialCtx.fingerprint
+                registerFlowContext.fingerprint shouldBe initialCtx.fingerprint
             }
         }
 

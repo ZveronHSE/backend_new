@@ -4,5 +4,5 @@ import ru.zveron.contract.lot.ProfileLotsResponse
 
 interface LotClient {
 
-    suspend fun getLotsBySellerId(profileId: Long): ProfileLotsResponse
+    suspend fun getLotsBySellerId(sellerId: Long, userId: Long): ProfileLotsResponse
 }

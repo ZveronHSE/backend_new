@@ -14,7 +14,7 @@ import ru.zveron.authservice.config.BaseAuthTest
 import ru.zveron.authservice.exception.InvalidTokenException
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.persistence.entity.StateContextEntity
-import ru.zveron.authservice.service.ServiceMapper.toContext
+import ru.zveron.authservice.service.mapper.ServiceMapper.toContext
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId
@@ -65,7 +65,7 @@ class AuthTokensTest : BaseAuthTest() {
 
             template.insert(entity).awaitSingle()
 
-            coEvery { profileClient.getAccountByPhone(any()) } returns profileFoundResponse
+            coEvery { profileClient.getProfileByPhone(any()) } returns profileFoundResponse
             coEvery { profileClient.getProfileById(eq(profileId)) } returns profileFoundResponse
 
             val verifyRequest = phoneLoginVerifyRequest {

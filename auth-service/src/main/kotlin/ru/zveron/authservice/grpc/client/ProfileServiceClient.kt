@@ -1,12 +1,20 @@
 package ru.zveron.authservice.grpc.client
 
 import io.grpc.Status
+import io.grpc.Status.Code
 import io.grpc.StatusException
 import org.springframework.core.env.Environment
 import ru.zveron.authservice.grpc.client.model.ProfileClientResponse
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.grpc.client.model.ProfileUnknownFailure
+import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
+import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
+import ru.zveron.authservice.grpc.client.model.RegisterProfileFailure
+import ru.zveron.authservice.grpc.client.model.RegisterProfileResponse
+import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
+import ru.zveron.authservice.grpc.mapper.GrpcMapper.toClientRequest
+import ru.zveron.authservice.grpc.mapper.GrpcMapper.toRequest
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
@@ -22,15 +30,41 @@ class ProfileServiceClient(
         "79996662233" to ProfileFound(124L, "player", "two")
     )
 
+    private val registerPhoneNumberToProfile = mapOf(
+        "79993332211" to ProfileFound(1L, "vedro", "pomoyev"),
+        "79996662233" to ProfileFound(124L, "player", "two")
+    )
+
     private val idToProfile = mapOf(
         123L to ProfileFound(123L, "vedro", "pomoyev"),
         124L to ProfileFound(124L, "player", "two")
     )
 
-    suspend fun getAccountByPhone(phoneNumber: String) =
+    suspend fun getProfileByPhone(phoneNumber: String) =
         env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
             phoneNumberToProfile[phoneNumber] ?: ProfileNotFound
         } ?: getAccountByPhoneFromClient(phoneNumber)
+
+    suspend fun getProfileById(id: Long) =
+        env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
+            idToProfile[id] ?: ProfileNotFound
+        } ?: getAccountByIdFromClient(id)
+
+    suspend fun registerProfileByPhone(request: RegisterProfileByPhone) =
+        env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
+            registerPhoneNumberToProfile[request.phone.toRequest()]?.id?.let { RegisterProfileSuccess(it) }
+                ?: RegisterProfileAlreadyExists
+        } ?: registerProfileByPhoneFromClient(request)
+
+    suspend fun registerProfileByPhoneFromClient(request: RegisterProfileByPhone): RegisterProfileResponse = try {
+        val response = profileGrpcClient.createProfile(request.toClientRequest())
+        RegisterProfileSuccess(response.id)
+    } catch (e: StatusException) {
+        when (e.status.code) {
+            Code.ALREADY_EXISTS -> RegisterProfileAlreadyExists
+            else -> RegisterProfileFailure(e.message, e.status, e.trailers)
+        }
+    }
 
     suspend fun getAccountByPhoneFromClient(phoneNumber: String): ProfileClientResponse {
         return try {
@@ -47,11 +81,6 @@ class ProfileServiceClient(
         }
     }
 
-    suspend fun getProfileById(id: Long) =
-        env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
-            idToProfile[id] ?: ProfileNotFound
-        } ?: getAccountByIdFromClient(id)
-
     suspend fun getAccountByIdFromClient(id: Long): ProfileClientResponse {
         return try {
             val response = profileGrpcClient.getProfile(getProfileRequest { this.id = id })
@@ -64,3 +93,4 @@ class ProfileServiceClient(
         }
     }
 }
+
