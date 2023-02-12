@@ -1,5 +1,6 @@
 package ru.zveron.service.api
 
+import com.google.protobuf.Empty
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -28,16 +29,13 @@ import ru.zveron.commons.generator.LotsGenerator
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
+import ru.zveron.config.AuthorizedProfileElement
 import ru.zveron.contract.addressResponse
 import ru.zveron.contract.lot.profileLotsResponse
-import ru.zveron.contract.profile.deleteProfileRequest
+import ru.zveron.contract.profile.SetSettingsRequest
 import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
-import ru.zveron.contract.profile.getChannelTypesRequest
-import ru.zveron.contract.profile.getLinksRequest
-import ru.zveron.contract.profile.getProfileInfoRequest
 import ru.zveron.contract.profile.getProfilePageRequest
-import ru.zveron.contract.profile.getSettingsRequest
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.repository.SettingsRepository
 import ru.zveron.service.client.address.AddressClient
@@ -46,6 +44,7 @@ import ru.zveron.service.client.lot.LotClient
 import ru.zveron.service.client.review.ReviewClient
 import ru.zveron.contract.profile.setProfileInfoRequest
 import ru.zveron.contract.profile.setSettingsRequest
+import ru.zveron.exception.ProfileUnauthenticated
 import ru.zveron.mapper.AddressMapper.toRequest
 import ru.zveron.repository.CommunicationLinkRepository
 import java.time.Instant
@@ -102,7 +101,6 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
         val request = getProfilePageRequest {
             requestedProfileId = id
-            authorizedProfileId = authorizedId
         }
         coEvery { blacklistClient.existsInBlacklist(id, authorizedId) } returns false
         val activeLot = LotsGenerator.generateLot(false)
@@ -116,7 +114,49 @@ class ProfileServiceExternalTest : ProfileTest() {
         val rating = PropsGenerator.generateDouble()
         coEvery { reviewClient.getRating(id) } returns rating
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(authorizedId)) {
+            val response = service.getProfilePage(request)
+
+            response responseShouldBe expectedProfile
+            response.address shouldBe address.toProfileAddress()
+            response.rating shouldBe rating
+            //TODO: response.reviewNumber should be (?)
+            response.activeLotsList.apply {
+                size shouldBe 1
+                first() lotShouldBe activeLot
+                first().status shouldBe LotStatus.ACTIVE
+            }
+            response.closedLotsList.apply {
+                size shouldBe 1
+                first() lotShouldBe closedLot
+                first().status shouldBe LotStatus.CLOSED
+            }
+        }
+    }
+
+    @Test
+    fun `getProfilePage when authorized profile page requested`() {
+        val now = Instant.now()
+        val addressId = PropsGenerator.generateLongId()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addressId)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
+        val id = profileRepository.save(expectedProfile).id
+        val request = getProfilePageRequest {
+            requestedProfileId = id
+        }
+        val activeLot = LotsGenerator.generateLot(false)
+        val closedLot = LotsGenerator.generateLot(false)
+        coEvery { lotClient.getLotsBySellerId(id) } returns profileLotsResponse {
+            activateLots.add(activeLot)
+            inactivateLots.add(closedLot)
+        }
+        val address = generateAddress(addressId)
+        coEvery { addressClient.getById(addressId) } returns address
+        val rating = PropsGenerator.generateDouble()
+        coEvery { reviewClient.getRating(id) } returns rating
+
+        runBlocking(AuthorizedProfileElement(id)) {
             val response = service.getProfilePage(request)
 
             response responseShouldBe expectedProfile
@@ -146,11 +186,10 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
         val request = getProfilePageRequest {
             requestedProfileId = id
-            authorizedProfileId = authorizedProfile
         }
         coEvery { blacklistClient.existsInBlacklist(id, authorizedProfile) } returns true
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(authorizedProfile)) {
             val response = service.getProfilePage(request)
 
             response responseShouldBeBlockedAnd expectedProfile
@@ -183,13 +222,13 @@ class ProfileServiceExternalTest : ProfileTest() {
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         val id = profileRepository.save(expectedProfile).id
-        val request = getProfileInfoRequest { this.id = id }
+        val request = Empty.getDefaultInstance()
         val address = generateAddress(addressId)
         coEvery { addressClient.getById(addressId) } returns address
         val rating = PropsGenerator.generateDouble()
         coEvery { reviewClient.getRating(id) } returns rating
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(id)) {
             val response = service.getProfileInfo(request)
 
             response responseShouldBe expectedProfile
@@ -199,16 +238,15 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `getProfileInfo when id is incorrect`() {
-        val id = PropsGenerator.generateLongId()
-        val request = getProfileInfoRequest { this.id = id }
+    fun `getProfileInfo when unauthenticated`() {
+        val request = Empty.getDefaultInstance()
 
-        val exception = shouldThrow<ProfileNotFoundException> {
+        val exception = shouldThrow<ProfileUnauthenticated> {
             runBlocking {
                 service.getProfileInfo(request)
             }
         }
-        exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.message shouldBe "Authentication required"
     }
 
     @Test
@@ -221,7 +259,6 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
 
         val request = setProfileInfoRequest {
-            this.id = id
             name = PropsGenerator.generateString(10)
             surname = PropsGenerator.generateString(10)
             imageId = PropsGenerator.generateLongId()
@@ -232,7 +269,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             this.id = newAddressId
         }
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(id)) {
             service.setProfileInfo(request)
         }
 
@@ -242,16 +279,15 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `setProfileInfo when id is incorrect`() {
-        val id = PropsGenerator.generateLongId()
-        val request = setProfileInfoRequest { this.id = id }
+    fun `setProfileInfo when unauthenticated`() {
+        val request = setProfileInfoRequest { }
 
-        val exception = shouldThrow<ProfileNotFoundException> {
+        val exception = shouldThrow<ProfileUnauthenticated> {
             runBlocking {
                 service.setProfileInfo(request)
             }
         }
-        exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.message shouldBe "Authentication required"
     }
 
     @Test
@@ -262,9 +298,9 @@ class ProfileServiceExternalTest : ProfileTest() {
         val settings = SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         val id = profileRepository.save(expectedProfile).id
-        val request = getChannelTypesRequest { this.id = id }
+        val request = Empty.getDefaultInstance()
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(id)) {
             val response = service.getChannelTypes(request)
 
             response.channelsList channelsShouldBe settings.channels
@@ -272,16 +308,15 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `getChannelTypes when id is incorrect`() {
-        val id = PropsGenerator.generateLongId()
-        val request = getChannelTypesRequest { this.id = id }
+    fun `getChannelTypes when unauthenticated`() {
+        val request = Empty.getDefaultInstance()
 
-        val exception = shouldThrow<ProfileNotFoundException> {
+        val exception = shouldThrow<ProfileUnauthenticated> {
             runBlocking {
                 service.getChannelTypes(request)
             }
         }
-        exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.message shouldBe "Authentication required"
     }
 
     @Test
@@ -292,9 +327,9 @@ class ProfileServiceExternalTest : ProfileTest() {
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         val contacts = CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         val id = profileRepository.save(expectedProfile).id
-        val request = getLinksRequest { this.id = id }
+        val request = Empty.getDefaultInstance()
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(id)) {
             val links = service.getLinks(request)
 
             links linksShouldBe contacts
@@ -302,16 +337,15 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `getLinks when id is incorrect`() {
-        val id = PropsGenerator.generateLongId()
-        val request = getLinksRequest { this.id = id }
+    fun `getLinks when unauthenticated`() {
+        val request = Empty.getDefaultInstance()
 
-        val exception = shouldThrow<ProfileNotFoundException> {
+        val exception = shouldThrow<ProfileUnauthenticated> {
             runBlocking {
                 service.getLinks(request)
             }
         }
-        exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.message shouldBe "Authentication required"
     }
 
     @Test
@@ -323,11 +357,11 @@ class ProfileServiceExternalTest : ProfileTest() {
             SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true)
         val id = profileRepository.save(expectedProfile).id
-        val request = getSettingsRequest { this.id = id }
+        val request = Empty.getDefaultInstance()
         val address = generateAddress(addressId)
         coEvery { addressClient.getById(addressId) } returns address
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(id)) {
             val response = service.getSettings(request)
 
             response.channelsList channelsShouldBe settings.channels
@@ -336,16 +370,15 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `getSettings when id is incorrect`() {
-        val id = PropsGenerator.generateLongId()
-        val request = getLinksRequest { this.id = id }
+    fun `getSettings when unauthenticated`() {
+        val request = Empty.getDefaultInstance()
 
-        val exception = shouldThrow<ProfileNotFoundException> {
+        val exception = shouldThrow<ProfileUnauthenticated> {
             runBlocking {
                 service.getLinks(request)
             }
         }
-        exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.message shouldBe "Authentication required"
     }
 
     @Test
@@ -357,7 +390,6 @@ class ProfileServiceExternalTest : ProfileTest() {
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true, addGmail = true)
         val id = profileRepository.save(expectedProfile).id
         val request = setSettingsRequest {
-            this.id = id
             address = generateAddress()
             channels.addAll(listOf(ChannelType.VK, ChannelType.GOOGLE))
         }
@@ -365,7 +397,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             this.id = addressId
         }
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(id)) {
             service.setSettings(request)
 
             val actualSettings = settingsRepository.findById(id).get()
@@ -383,13 +415,12 @@ class ProfileServiceExternalTest : ProfileTest() {
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
         val id = profileRepository.save(expectedProfile).id
         val request = setSettingsRequest {
-            this.id = id
             address = generateAddress()
             channels.addAll(listOf(ChannelType.VK, ChannelType.GOOGLE))
         }
 
         val exception = shouldThrow<ProfileException> {
-            runBlocking {
+            runBlocking(AuthorizedProfileElement(id)) {
                 service.setSettings(request)
             }
         }
@@ -405,12 +436,11 @@ class ProfileServiceExternalTest : ProfileTest() {
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
         val id = profileRepository.save(expectedProfile).id
         val request = setSettingsRequest {
-            this.id = id
             address = generateAddress()
         }
 
         val exception = shouldThrow<ProfileException> {
-            runBlocking {
+            runBlocking(AuthorizedProfileElement(id)) {
                 service.setSettings(request)
             }
         }
@@ -418,16 +448,15 @@ class ProfileServiceExternalTest : ProfileTest() {
     }
 
     @Test
-    fun `setSettings when id is incorrect`() {
-        val id = PropsGenerator.generateLongId()
-        val request = setSettingsRequest { this.id = id }
+    fun `setSettings when unauthenticated`() {
+        val request = SetSettingsRequest.getDefaultInstance()
 
-        val exception = shouldThrow<ProfileNotFoundException> {
+        val exception = shouldThrow<ProfileUnauthenticated> {
             runBlocking {
                 service.setSettings(request)
             }
         }
-        exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.message shouldBe "Authentication required"
     }
 
     @Test
@@ -438,9 +467,9 @@ class ProfileServiceExternalTest : ProfileTest() {
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
         CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
         val id = profileRepository.save(expectedProfile).id
-        val request = deleteProfileRequest { this.id = id }
+        val request = Empty.getDefaultInstance()
 
-        runBlocking {
+        runBlocking(AuthorizedProfileElement(id)) {
             service.deleteProfile(request)
         }
 
@@ -449,5 +478,17 @@ class ProfileServiceExternalTest : ProfileTest() {
         communicationLinkRepository.findAllByProfileId(id).size shouldBe 0
 
         // TODO: service should write to kafka
+    }
+
+    @Test
+    fun `deleteProfile when unauthenticated`() {
+        val request = Empty.getDefaultInstance()
+
+        val exception = shouldThrow<ProfileUnauthenticated> {
+            runBlocking {
+                service.deleteProfile(request)
+            }
+        }
+        exception.message shouldBe "Authentication required"
     }
 }

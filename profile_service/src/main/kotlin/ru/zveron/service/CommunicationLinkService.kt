@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service
 import ru.zveron.contract.profile.GetProfileByChannelRequest
 import ru.zveron.contract.profile.GetProfileByChannelResponse
 import ru.zveron.contract.profile.UpdateContactsRequest
+import ru.zveron.contract.profile.VerifyProfileHashRequest
 import ru.zveron.contract.profile.getProfileByChannelResponse
 import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.domain.link.CommunicationLinkType
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.LinksDto
 import ru.zveron.domain.link.PhoneData
@@ -43,7 +45,13 @@ class CommunicationLinkService(
                 profile
             )
 
-            ChannelType.GOOGLE -> createOrUpdateGmail(linksDto, request.links.gmail.id, request.links.gmail.email, profile)
+            ChannelType.GOOGLE -> createOrUpdateGmail(
+                linksDto,
+                request.links.gmail.id,
+                request.links.gmail.email,
+                profile,
+            )
+
             ChannelType.CHAT -> throw ProfileException(
                 "Chat channel type don't need to be added to contacts",
                 Status.INVALID_ARGUMENT.code
@@ -64,6 +72,12 @@ class CommunicationLinkService(
             name = profile.name
             surname = profile.surname
         }
+
+    suspend fun isPasswordHashValid(request: VerifyProfileHashRequest): Boolean {
+        val link = repository.findByCommunicationLinkIdAndType(request.phoneNumber, CommunicationLinkType.PHONE)
+            ?: return false
+        return (link.data as PhoneData).passwordHash == request.passwordHash
+    }
 
     private fun createOrUpdatePhone(
         links: LinksDto,
@@ -118,9 +132,9 @@ class CommunicationLinkService(
     }
 
     private fun findByChannelOrThrow(channelType: ChannelType, id: String): CommunicationLink = when (channelType) {
-        ChannelType.PHONE -> repository.findByCommunicationLinkId(id)
-        ChannelType.GOOGLE -> repository.findByCommunicationLinkId(id)
-        ChannelType.VK -> repository.findByCommunicationLinkId(id)
+        ChannelType.PHONE -> repository.findByCommunicationLinkIdAndType(id, CommunicationLinkType.PHONE)
+        ChannelType.GOOGLE -> repository.findByCommunicationLinkIdAndType(id, CommunicationLinkType.GMAIL)
+        ChannelType.VK -> repository.findByCommunicationLinkIdAndType(id, CommunicationLinkType.VK)
         else -> throw ProfileException("Profile can't be find by channel $channelType", Status.INVALID_ARGUMENT.code)
     } ?: throw ProfileNotFoundException("Can't find profile by channel: $channelType and channel id: $id")
 }

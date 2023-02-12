@@ -4,6 +4,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.ProfileTest
@@ -16,15 +18,17 @@ import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.contract.profile.createProfileRequest
-import ru.zveron.entity.Profile
-import ru.zveron.exception.ProfileException
-import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
 import ru.zveron.contract.profile.getProfileWithContactsRequest
-import ru.zveron.repository.ProfileRepository
 import ru.zveron.contract.profile.updateContactsRequest
+import ru.zveron.contract.profile.verifyProfileHashRequest
+import ru.zveron.entity.Profile
+import ru.zveron.exception.ProfileException
+import ru.zveron.exception.ProfileNotFoundException
+import ru.zveron.repository.ProfileRepository
 import ru.zveron.domain.link.GmailData
+import ru.zveron.domain.link.PhoneData
 import ru.zveron.domain.link.VkData
 import ru.zveron.mapper.ContactsMapper.toDto
 import ru.zveron.mapper.ContactsMapper.toLinks
@@ -43,7 +47,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     lateinit var communicationLinkRepository: CommunicationLinkRepository
 
     @Test
-    fun `createProfile whe nrequest is correct`() {
+    fun `createProfile whe request is correct`() {
         val now = Instant.now()
         val expectedProfile = ProfileGenerator.generateProfile(now)
         val expectedSettings = SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
@@ -82,6 +86,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addVk = true, addChat = true)
         generateLinks(expectedProfile, addVk = true, skipVkRef = true)
+        profileRepository.save(expectedProfile)
         val request = generateCreateProfileRequest(expectedProfile)
 
         val exception = shouldThrow<ProfileException> {
@@ -90,6 +95,30 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Vk id and ref should be both present or missed"
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = ["true,false,false", "false,true,false", "false,false,true"])
+    fun `createProfile when links are not unique`(vk: Boolean, gmail: Boolean, phone: Boolean) {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(
+            expectedProfile,
+            addVk = vk,
+            addGmail = gmail,
+            addPhone = phone,
+            addChat = true
+        )
+        generateLinks(expectedProfile, addVk = vk, addGmail = gmail, addPhone = phone)
+        profileRepository.save(expectedProfile)
+        val request = generateCreateProfileRequest(expectedProfile)
+
+        val exception = shouldThrow<ProfileException> {
+            runBlocking {
+                service.createProfile(request)
+            }
+        }
+        exception.message shouldBe "Specified communication link is already used"
     }
 
     @Test
@@ -273,6 +302,62 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Can't find profile by channel: $channelType and channel id: $id"
+    }
+
+    @Test
+    fun `verifyProfileHash if hash is valid`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        profileRepository.save(expectedProfile)
+        val request = verifyProfileHashRequest {
+            phoneNumber = linksDto.phoneLink!!.communicationLinkId
+            passwordHash = (linksDto.phoneLink!!.data as PhoneData).passwordHash
+        }
+
+        runBlocking {
+            val response = service.verifyProfileHash(request)
+
+            response.isValidRequest shouldBe true
+        }
+    }
+
+    @Test
+    fun `verifyProfileHash if hash is invalid`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        profileRepository.save(expectedProfile)
+        val request = verifyProfileHashRequest {
+            phoneNumber = linksDto.phoneLink!!.communicationLinkId
+            passwordHash = "123"
+        }
+
+        runBlocking {
+            val response = service.verifyProfileHash(request)
+
+            response.isValidRequest shouldBe false
+        }
+    }
+
+    @Test
+    fun `verifyProfileHash if profile does not exist`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        val request = verifyProfileHashRequest {
+            phoneNumber = linksDto.phoneLink!!.communicationLinkId
+            passwordHash = "123"
+        }
+
+        runBlocking {
+            val response = service.verifyProfileHash(request)
+
+            response.isValidRequest shouldBe false
+        }
     }
 
     private fun generateCreateProfileRequest(profile: Profile) = createProfileRequest {

@@ -21,7 +21,7 @@ object ContactsMapper {
             chat = true
         )
 
-    fun Links.toCommunicationLinks(profile: Profile): List<CommunicationLink> {
+    fun Links.toCommunicationLinks(profile: Profile, passwordHash: String = ""): List<CommunicationLink> {
         val result = mutableListOf<CommunicationLink>()
         if (vk.id.isNotBlank()) {
             result.add(
@@ -50,7 +50,9 @@ object ContactsMapper {
             result.add(
                 CommunicationLink(
                     communicationLinkId = phone.number,
-                    data = PhoneData(),
+                    data = PhoneData(
+                        passwordHash = passwordHash
+                    ),
                     profile = profile
                 )
             )

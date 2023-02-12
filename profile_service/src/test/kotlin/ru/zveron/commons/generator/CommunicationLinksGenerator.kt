@@ -49,7 +49,9 @@ object CommunicationLinksGenerator {
             result.add(
                 CommunicationLink(
                     communicationLinkId = PropsGenerator.generateString(10),
-                    data = PhoneData(),
+                    data = PhoneData(
+                        passwordHash = PropsGenerator.generateString(15)
+                    ),
                     profile = profile,
                 )
             )

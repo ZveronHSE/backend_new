@@ -83,6 +83,10 @@ databaseChangeLog:
                   header: id
                   name: id
                   type: NUMERIC
+              - column:
+                  header: type
+                  name: type
+                  type: NUMERIC
             commentLineStartsWith: '#'
             encoding: UTF-8
             file: data/links.csv
