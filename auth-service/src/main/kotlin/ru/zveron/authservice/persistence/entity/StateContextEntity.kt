@@ -14,12 +14,16 @@ data class StateContextEntity(
     @Id
     val id: Long? = null,
     val sessionId: UUID,
+
+    //state context description
     val data: Json,
 
     @CreatedDate
     val createdAt: Instant = Instant.now(),
     @LastModifiedDate
     val updatedAt: Instant = Instant.now(),
+
+    val expiresAt: Instant = Instant.now(),
 
     @Version
     val version: Long = 0,

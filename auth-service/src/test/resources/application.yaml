@@ -3,3 +3,12 @@ spring:
     name: auth-service
   main:
     banner-mode: off
+
+zveron:
+  jwt:
+    #create something legit and put in vault
+    secret: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    accessDurationMs: 600000  # 10 mins
+    refreshDurationMs: 6000000 # 100 mins
+  session:
+    sessionDurationMs: 2629800000 # 1 month

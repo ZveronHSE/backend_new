@@ -4,6 +4,8 @@ import com.google.protobuf.Timestamp
 import com.google.protobuf.timestamp
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.ints.shouldBeLessThan
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import ru.zveron.contract.profile.Address
 import ru.zveron.contract.profile.model.ChannelType
@@ -18,10 +20,14 @@ import ru.zveron.contract.profile.SetProfileInfoRequest
 import ru.zveron.contract.AddressRequest
 import ru.zveron.contract.AddressResponse
 import ru.zveron.contract.lot.model.Lot
-import ru.zveron.domain.ChannelsDto
-import ru.zveron.entity.Contact
+import ru.zveron.domain.channel.ChannelsDto
+import ru.zveron.domain.link.GmailData
+import ru.zveron.domain.link.LinksDto
+import ru.zveron.domain.link.VkData
+import ru.zveron.entity.CommunicationLink
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
+import ru.zveron.mapper.ContactsMapper.toDto
 import ru.zveron.mapper.ContactsMapper.toModel
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -52,17 +58,17 @@ infix fun GetProfileWithContactsResponse.responseShouldBe(expected: Profile) {
     imageId shouldBe expected.imageId
     addressId shouldBe expected.addressId
     channelsList shouldBe expected.settings.channels.toModel()
-    links linksShouldBe expected.contact
+    links linksShouldBe expected.communicationLinks.toDto()
     lastSeen timestampShouldBe expected.lastSeen
 }
 
-infix fun Links.linksShouldBe(expected: Contact) {
-    vk.id shouldBe expected.vkId
-    vk.ref shouldBe expected.vkRef
-    vk.email shouldBe expected.additionalEmail
-    gmail.id shouldBe expected.gmailId
-    gmail.email shouldBe expected.gmail
-    phone.number shouldBe expected.phone
+infix fun Links.linksShouldBe(expected: LinksDto) {
+    vk.id shouldBe (expected.vkLink?.communicationLinkId ?: "")
+    vk.ref shouldBe ((expected.vkLink?.data as? VkData)?.ref ?: "")
+    vk.email shouldBe ((expected.vkLink?.data as? VkData)?.email ?: "")
+    gmail.id shouldBe (expected.gmailLink?.communicationLinkId ?: "")
+    gmail.email shouldBe ((expected.gmailLink?.data as? GmailData)?.email ?: "")
+    phone.number shouldBe (expected.phoneLink?.communicationLinkId ?: "")
 }
 
 infix fun Settings.settingsShouldBe(expected: Settings) {
@@ -99,14 +105,29 @@ infix fun ChannelsDto.channelsShouldBe(expected: List<ChannelType>) {
     chat shouldBe expected.contains(ChannelType.CHAT)
 }
 
-infix fun Contact.contactShouldBe(expected: Contact) {
-    id shouldBe expected.id
-    vkId shouldBe expected.vkId
-    vkRef shouldBe expected.vkRef
-    gmailId shouldBe expected.gmailId
-    gmail shouldBe expected.gmail
-    additionalEmail shouldBe expected.additionalEmail
-    phone shouldBe expected.phone
+infix fun LinksDto.linksShouldBe(expected: LinksDto) {
+    when (expected.vkLink) {
+        null -> vkLink?.shouldBeNull()
+        else -> vkLink linkShouldBe expected.vkLink!!
+    }
+    when (expected.gmailLink) {
+        null -> gmailLink?.shouldBeNull()
+        else -> gmailLink linkShouldBe expected.gmailLink!!
+    }
+    when (expected.phoneLink) {
+        null -> phoneLink?.shouldBeNull()
+        else -> phoneLink linkShouldBe expected.phoneLink!!
+    }
+}
+
+infix fun CommunicationLink?.linkShouldBe(expected: CommunicationLink) {
+    shouldNotBeNull()
+    if (id != 0L && expected.id != 0L) {
+        id shouldBe expected.id
+    }
+    communicationLinkId shouldBe expected.communicationLinkId
+    data shouldBe expected.data
+    profile shouldBe expected.profile
 }
 
 infix fun GetProfilePageResponse.responseShouldBe(expected: Profile) {
@@ -115,7 +136,7 @@ infix fun GetProfilePageResponse.responseShouldBe(expected: Profile) {
     surname shouldBe expected.surname
     imageId shouldBe expected.imageId
     contacts.channelsList channelsShouldBe expected.settings.channels
-    contacts.links linksShouldBe expected.contact
+    contacts.links linksShouldBe expected.communicationLinks.toDto()
     lastActivity timestampShouldBe expected.lastSeen
 }
 

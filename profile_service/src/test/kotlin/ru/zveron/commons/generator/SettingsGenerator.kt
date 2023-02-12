@@ -1,6 +1,6 @@
 package ru.zveron.commons.generator
 
-import ru.zveron.domain.ChannelsDto
+import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
 

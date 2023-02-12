@@ -23,6 +23,7 @@ include(
     "blacklist_service",
     "service_registry",
     "apigateway",
+    "lot_service",
     "profile_service",
     "auth-service",
 )

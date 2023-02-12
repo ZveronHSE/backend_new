@@ -30,11 +30,20 @@ $$;
 
 DO
 $$
-BEGIN
+    BEGIN
         PERFORM dblink_exec('', 'CREATE DATABASE favorites');
-EXCEPTION
+    EXCEPTION
         WHEN duplicate_database THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
-END
+    END
+$$;
+
+DO
+$$
+    BEGIN
+        PERFORM dblink_exec('', 'CREATE DATABASE lot');
+    EXCEPTION
+        WHEN duplicate_database THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
+    END
 $$;
 
 DO

@@ -2,12 +2,14 @@ package ru.zveron.mapper
 
 import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.contract.profile.model.Links
-import ru.zveron.domain.ChannelsDto
-import ru.zveron.entity.Contact
+import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.contract.profile.model.gmail
 import ru.zveron.contract.profile.model.links
 import ru.zveron.contract.profile.model.phone
 import ru.zveron.contract.profile.model.vk
+import ru.zveron.domain.link.*
+import ru.zveron.entity.CommunicationLink
+import ru.zveron.entity.Profile
 
 object ContactsMapper {
 
@@ -19,17 +21,70 @@ object ContactsMapper {
             chat = true
         )
 
-    fun Contact.toModel(): Links =
+    fun Links.toCommunicationLinks(profile: Profile): List<CommunicationLink> {
+        val result = mutableListOf<CommunicationLink>()
+        if (vk.id.isNotBlank()) {
+            result.add(
+                CommunicationLink(
+                    communicationLinkId = vk.id,
+                    data = VkData(
+                        ref = vk.ref,
+                        email = vk.email,
+                    ),
+                    profile = profile
+                )
+            )
+        }
+        if (gmail.id.isNotBlank()) {
+            result.add(
+                CommunicationLink(
+                    communicationLinkId = gmail.id,
+                    data = GmailData(
+                        email = gmail.email,
+                    ),
+                    profile = profile
+                )
+            )
+        }
+        if (phone.number.isNotBlank()) {
+            result.add(
+                CommunicationLink(
+                    communicationLinkId = phone.number,
+                    data = PhoneData(),
+                    profile = profile
+                )
+            )
+        }
+        return result
+    }
+
+    fun List<CommunicationLink>.toDto(): LinksDto {
+        val map = this.associateBy { it.data.type }
+
+        return LinksDto(
+            phoneLink = map[CommunicationLinkType.PHONE],
+            vkLink = map[CommunicationLinkType.VK],
+            gmailLink = map[CommunicationLinkType.GMAIL],
+        )
+    }
+
+    fun LinksDto.toLinks(): Links =
         links {
-            phone = phone { number = this@toModel.phone }
-            vk = vk {
-                id = this@toModel.vkId
-                ref = this@toModel.vkRef
-                email = this@toModel.additionalEmail
+            phoneLink?.apply {
+                phone = phone { number = this@apply.communicationLinkId }
             }
-            gmail = gmail {
-                id = this@toModel.gmailId
-                email = this@toModel.gmail
+            gmailLink?.apply {
+                gmail = gmail {
+                    id = this@apply.communicationLinkId
+                    email = (this@apply.data as GmailData).email
+                }
+            }
+            vkLink?.apply {
+                vk = vk {
+                    id = this@apply.communicationLinkId
+                    ref = (this@apply.data as VkData).ref
+                    email = this@apply.data.email
+                }
             }
         }
 

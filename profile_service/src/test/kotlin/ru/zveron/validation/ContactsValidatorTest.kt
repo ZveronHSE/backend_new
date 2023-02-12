@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import ru.zveron.commons.generator.ContactsGenerator
+import ru.zveron.commons.generator.CommunicationLinksGenerator
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
-import ru.zveron.domain.ChannelsDto
+import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.exception.ProfileException
 import java.time.Instant
 
@@ -52,7 +52,7 @@ class ContactsValidatorTest {
     fun `Validate links and no links are missed`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
         val channels = ChannelsDto(phone = true, vk = true, gmail = true, chat = true)
-        val links = ContactsGenerator.generateContact(profile, addVk = true, addGmail = true, addPhone = true)
+        val links = CommunicationLinksGenerator.generateLinks(profile, addVk = true, addGmail = true, addPhone = true)
 
         shouldNotThrow<ProfileException> {
             ContactsValidator.validateLinksNotBlank(channels, links)
@@ -63,7 +63,7 @@ class ContactsValidatorTest {
     fun `Validate links and vk is missed`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
         val channels = ChannelsDto(vk = true)
-        val links = ContactsGenerator.generateContact(profile)
+        val links = CommunicationLinksGenerator.generateLinks(profile)
 
         val exception = shouldThrow<ProfileException> {
             ContactsValidator.validateLinksNotBlank(channels, links)
@@ -75,7 +75,7 @@ class ContactsValidatorTest {
     fun `Validate links and gmail is missed`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
         val channels = ChannelsDto(gmail = true)
-        val links = ContactsGenerator.generateContact(profile)
+        val links = CommunicationLinksGenerator.generateLinks(profile)
 
         val exception = shouldThrow<ProfileException> {
             ContactsValidator.validateLinksNotBlank(channels, links)
@@ -87,7 +87,7 @@ class ContactsValidatorTest {
     fun `Validate links and phone is missed`() {
         val profile = ProfileGenerator.generateProfile(PropsGenerator.generateUserId(), Instant.now())
         val channels = ChannelsDto(phone = true)
-        val links = ContactsGenerator.generateContact(profile)
+        val links = CommunicationLinksGenerator.generateLinks(profile)
 
         val exception = shouldThrow<ProfileException> {
             ContactsValidator.validateLinksNotBlank(channels, links)
@@ -97,7 +97,7 @@ class ContactsValidatorTest {
 
     @Test
     fun `Validate links and vk id is missed`() {
-        val links = ContactsGenerator.generateLinks(vkRef = PropsGenerator.generateString(10))
+        val links = CommunicationLinksGenerator.generateLinks(vkRef = PropsGenerator.generateString(10))
 
         val exception = shouldThrow<ProfileException> {
             ContactsValidator.validateLinks(links)
@@ -107,7 +107,7 @@ class ContactsValidatorTest {
 
     @Test
     fun `Validate links and vk ref is missed`() {
-        val links = ContactsGenerator.generateLinks(vkId = PropsGenerator.generateString(10))
+        val links = CommunicationLinksGenerator.generateLinks(vkId = PropsGenerator.generateString(10))
 
         val exception = shouldThrow<ProfileException> {
             ContactsValidator.validateLinks(links)
@@ -117,7 +117,7 @@ class ContactsValidatorTest {
 
     @Test
     fun `Validate links and gmail id is missed`() {
-        val links = ContactsGenerator.generateLinks(gmail = PropsGenerator.generateString(10))
+        val links = CommunicationLinksGenerator.generateLinks(gmail = PropsGenerator.generateString(10))
 
         val exception = shouldThrow<ProfileException> {
             ContactsValidator.validateLinks(links)
@@ -127,7 +127,7 @@ class ContactsValidatorTest {
 
     @Test
     fun `Validate links and gmail email is missed`() {
-        val links = ContactsGenerator.generateLinks(gmailId = PropsGenerator.generateString(10))
+        val links = CommunicationLinksGenerator.generateLinks(gmailId = PropsGenerator.generateString(10))
 
         val exception = shouldThrow<ProfileException> {
             ContactsValidator.validateLinks(links)

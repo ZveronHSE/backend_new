@@ -1,15 +1,26 @@
 package ru.zveron.entity
 
 import org.hibernate.Hibernate
+import ru.zveron.domain.profile.COMMUNICATION_LINKS_INITIALIZATION_TYPE
 import java.time.Instant
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.NamedAttributeNode
+import javax.persistence.NamedEntityGraph
+import javax.persistence.NamedEntityGraphs
+import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.PrimaryKeyJoinColumn
 
 @Entity
+@NamedEntityGraphs(
+    NamedEntityGraph(
+        name = COMMUNICATION_LINKS_INITIALIZATION_TYPE,
+        attributeNodes = [NamedAttributeNode(value = "communicationLinks")]
+    )
+)
 data class Profile(
     @Id
     @Column(nullable = false)
@@ -23,13 +34,13 @@ data class Profile(
     val lastSeen: Instant,
     val addressId: Long = -1,
 ) {
-    @PrimaryKeyJoinColumn
-    @OneToOne(mappedBy = "profile", cascade = [CascadeType.ALL])
-    lateinit var contact: Contact
 
     @PrimaryKeyJoinColumn
     @OneToOne(mappedBy = "profile", cascade = [CascadeType.ALL])
     lateinit var settings: Settings
+
+    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "profile")
+    val communicationLinks: MutableList<CommunicationLink> = mutableListOf()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

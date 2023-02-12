@@ -16,14 +16,14 @@ import ru.zveron.contract.profile.model.Links
 import ru.zveron.contract.profile.ProfileServiceExternalGrpcKt
 import ru.zveron.contract.profile.SetProfileInfoRequest
 import ru.zveron.contract.profile.SetSettingsRequest
-import ru.zveron.mapper.ContactsMapper.toModel
-import ru.zveron.service.ContactService
+import ru.zveron.mapper.ContactsMapper.toLinks
+import ru.zveron.service.CommunicationLinkService
 import ru.zveron.service.ProfileService
 import ru.zveron.service.SettingsService
 
 @GrpcService
 class ProfileServiceExternal(
-    private val contactService: ContactService,
+    private val communicationLinkService: CommunicationLinkService,
     private val profileService: ProfileService,
     private val settingsService: SettingsService,
 ) : ProfileServiceExternalGrpcKt.ProfileServiceExternalCoroutineImplBase() {
@@ -43,7 +43,7 @@ class ProfileServiceExternal(
         settingsService.getChannelTypes(request)
 
     override suspend fun getLinks(request: GetLinksRequest): Links =
-        contactService.findByIdOrThrow(request.id).toModel()
+        communicationLinkService.findByIdOrThrow(request.id).toLinks()
 
     override suspend fun getSettings(request: GetSettingsRequest): GetSettingsResponse =
         settingsService.getSettings(request)

@@ -12,12 +12,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.authservice.config.BaseAuthTest
-import ru.zveron.authservice.grpc.client.dto.ProfileFound
-import ru.zveron.authservice.grpc.client.dto.ProfileNotFound
+import ru.zveron.authservice.grpc.client.model.ProfileFound
+import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.persistence.entity.StateContextEntity
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
-import ru.zveron.authservice.service.ServiceMapper.toContext
+import ru.zveron.authservice.service.mapper.ServiceMapper.toContext
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId
@@ -26,8 +26,9 @@ import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPhoneNumber
 import ru.zveron.authservice.util.randomSurname
 import ru.zveron.authservice.webclient.NotifierSuccess
-import ru.zveron.authservice.webclient.dto.GetVerificationCodeRequest
+import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
 import ru.zveron.contract.auth.copy
+import ru.zveron.contract.auth.mobileTokenOrNull
 import ru.zveron.contract.auth.phoneLoginVerifyRequest
 
 class AuthLoginFullFlowTest : BaseAuthTest() {
@@ -59,7 +60,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
                 this.sessionId = initResponse.sessionId
             }
 
-            coEvery { profileClient.getAccountByPhone(any()) } returns ProfileFound(
+            coEvery { profileClient.getProfileByPhone(any()) } returns ProfileFound(
                 randomId(),
                 randomName(),
                 randomSurname()
@@ -69,8 +70,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.isNewUser shouldBe false
-                verifyResponse.sessionId shouldBe initResponse.sessionId
+                verifyResponse.mobileTokenOrNull.shouldNotBeNull()
             }
 
             val ctxEntity = template.select(StateContextEntity::class.java).all().awaitSingle()
@@ -80,7 +80,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             assertSoftly {
                 updatedCtx.isVerified shouldBe true
                 updatedCtx.codeAttempts shouldBe 1
-                updatedCtx.deviceFp shouldBe deviceFp
+                updatedCtx.fingerprint shouldBe deviceFp
                 updatedCtx.phoneNumber shouldBe phoneNumber.toContext()
             }
         }
@@ -109,13 +109,12 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
                 this.sessionId = initResponse.sessionId
             }
 
-            coEvery { profileClient.getAccountByPhone(any()) } returns ProfileNotFound
+            coEvery { profileClient.getProfileByPhone(any()) } returns ProfileNotFound
 
             val verifyResponse = authLoginController.phoneLoginVerify(verifyRequest)
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldNotBe initResponse.sessionId
             }
 
@@ -126,7 +125,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             assertSoftly {
                 updatedCtx.isChannelVerified shouldBe true
-                updatedCtx.deviceFp shouldBe deviceFp
+                updatedCtx.fingerprint shouldBe deviceFp
                 updatedCtx.phoneNumber shouldBe phoneNumber.toContext()
             }
         }
@@ -155,13 +154,12 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
                 this.sessionId = initResponse.sessionId
             }
 
-            coEvery { profileClient.getAccountByPhone(any()) } returns ProfileNotFound
+            coEvery { profileClient.getProfileByPhone(any()) } returns ProfileNotFound
 
             val verifyResponse = authLoginController.phoneLoginVerify(verifyRequest)
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
-                verifyResponse.isNewUser shouldBe true
                 verifyResponse.sessionId shouldNotBe initResponse.sessionId
             }
 
@@ -172,7 +170,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             assertSoftly {
                 updatedCtx.isChannelVerified shouldBe true
-                updatedCtx.deviceFp shouldBe deviceFp
+                updatedCtx.fingerprint shouldBe deviceFp
                 updatedCtx.phoneNumber shouldBe phoneNumber.toContext()
             }
 

@@ -2,6 +2,9 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/master.yaml
+    url: jdbc:postgresql://localhost:5555/apigateway
+    user: zveron_user
+    password: zveron_password
   datasource:
     url: jdbc:postgresql://localhost:5555/apigateway
     password: zveron_password
@@ -11,7 +14,12 @@ spring:
     web-application-type: reactive
   application:
     name: apigateway
-
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5555/apigateway
+    username: zveron_user
+    password: zveron_password
+    pool:
+      enabled: true
 eureka:
   client:
     enabled: true
@@ -30,10 +38,11 @@ management:
 
 grpc:
   client:
-    GLOBAL:
-      security:
-        protocols: PLAINTEXT
-      immediate-connect-timeout: 30s
+    auth-service:
+      address: 'discovery:///auth-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
   server:
     port: 9091

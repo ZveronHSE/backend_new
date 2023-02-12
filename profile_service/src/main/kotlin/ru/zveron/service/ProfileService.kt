@@ -9,6 +9,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import mu.KLogging
+import org.hibernate.jpa.QueryHints
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import ru.zveron.contract.AddressResponse
@@ -31,7 +32,7 @@ import ru.zveron.contract.profile.getProfileInfoResponse
 import ru.zveron.contract.profile.getProfilePageResponse
 import ru.zveron.contract.profile.getProfileResponse
 import ru.zveron.contract.profile.getProfileWithContactsResponse
-import ru.zveron.entity.Contact
+import ru.zveron.domain.profile.ProfileInitializationType
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
 import ru.zveron.exception.ProfileException
@@ -39,8 +40,10 @@ import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.mapper.AddressMapper.toAddress
 import ru.zveron.mapper.AddressMapper.toProfileAddress
 import ru.zveron.mapper.AddressMapper.toRequest
+import ru.zveron.mapper.ContactsMapper.toCommunicationLinks
 import ru.zveron.mapper.ContactsMapper.toDto
 import ru.zveron.mapper.ContactsMapper.toModel
+import ru.zveron.mapper.ContactsMapper.toLinks
 import ru.zveron.mapper.LotsMapper.toBuilder
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.service.client.address.AddressClient
@@ -49,11 +52,16 @@ import ru.zveron.service.client.lot.LotClient
 import ru.zveron.service.client.review.ReviewClient
 import ru.zveron.validation.ContactsValidator
 import java.time.Instant
+import javax.persistence.EntityExistsException
+import javax.persistence.EntityManager
+import javax.persistence.PersistenceContext
 
 @Service
 class ProfileService(
     private val addressClient: AddressClient,
     private val blacklistClient: BlacklistClient,
+    @PersistenceContext
+    private val entityManager: EntityManager,
     private val lotClient: LotClient,
     private val profileRepository: ProfileRepository,
     private val reviewClient: ReviewClient,
@@ -63,9 +71,14 @@ class ProfileService(
 
     fun deleteById(id: Long) = profileRepository.deleteById(id)
 
-    suspend fun findByIdOrThrow(id: Long): Profile = profileRepository
-        .findById(id)
-        .orElseThrow { ProfileNotFoundException("Profile with id: $id doesn't exist") }
+    suspend fun findByIdOrThrow(id: Long, initType: ProfileInitializationType): Profile {
+        val properties = initType.graphName?.let {
+            mapOf(QueryHints.HINT_LOADGRAPH to entityManager.getEntityGraph(it))
+        } ?: emptyMap()
+
+        return entityManager.find(Profile::class.java, id, properties)
+            ?: throw ProfileNotFoundException("Profile with id: $id doesn't exist")
+    }
 
     suspend fun createProfile(request: CreateProfileRequest) {
         val waysOfCommunication = request.links.toDto()
@@ -78,15 +91,7 @@ class ProfileService(
             imageId = request.imageId,
             lastSeen = Instant.now(),
         )
-        profile.contact = Contact(
-            profile = profile,
-            vkId = request.links.vk.id,
-            vkRef = request.links.vk.ref,
-            gmailId = request.links.gmail.id,
-            gmail = request.links.gmail.email,
-            additionalEmail = request.links.vk.email,
-            phone = request.links.phone.number,
-        )
+        profile.communicationLinks.addAll(request.links.toCommunicationLinks(profile))
         profile.settings = Settings(
             profile = profile,
             channels = waysOfCommunication,
@@ -95,20 +100,23 @@ class ProfileService(
         try {
             profileRepository.save(profile)
         } catch (e: DataIntegrityViolationException) {
-            throw ProfileException(
-                "Profile with id: ${request.authAccountId} already exists",
-                Status.INVALID_ARGUMENT.code
-            )
+            if (e.rootCause is EntityExistsException) {
+                throw ProfileException(
+                    "Profile with id: ${request.authAccountId} already exists",
+                    Status.INVALID_ARGUMENT.code
+                )
+            }
+            throw e
         }
     }
 
     suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse = supervisorScope {
         val blacklistCoroutine = inOwnerBlacklist(request.requestedProfileId, request.authorizedProfileId)
-        val profile = findByIdOrThrow(request.requestedProfileId)
+        val profile = findByIdOrThrow(request.requestedProfileId, ProfileInitializationType.COMMUNICATION_LINKS)
 
         val addExtraFields = !blacklistCoroutine.awaitBlacklistResponse()
         val addressCoroutine = getAddressById(profile.addressId, addExtraFields)
-        val lotsCoroutine = getLotsBySellerId(profile.id, addExtraFields)
+        val lotsCoroutine = getLotsBySellerId(profile.id, request.authorizedProfileId, addExtraFields)
         val ratingCoroutine = getRatingByProfileId(profile.id, addExtraFields)
 
         getProfilePageResponse {
@@ -128,7 +136,7 @@ class ProfileService(
     }
 
     suspend fun getProfileInfo(request: GetProfileInfoRequest): GetProfileInfoResponse = supervisorScope {
-        val profile = findByIdOrThrow(request.id)
+        val profile = findByIdOrThrow(request.id, ProfileInitializationType.DEFAULT)
         val addressCoroutine = getAddressById(profile.addressId)
         val reviewCoroutine = getRatingByProfileId(profile.id)
 
@@ -144,7 +152,7 @@ class ProfileService(
 
     suspend fun getProfile(request: GetProfileRequest): GetProfileResponse =
         getProfileResponse {
-            val profile = findByIdOrThrow(request.id)
+            val profile = findByIdOrThrow(request.id, ProfileInitializationType.DEFAULT)
             id = request.id
             name = profile.name
             surname = profile.surname
@@ -155,14 +163,14 @@ class ProfileService(
 
     suspend fun getProfileWithContacts(request: GetProfileWithContactsRequest): GetProfileWithContactsResponse =
         getProfileWithContactsResponse {
-            val profile = findByIdOrThrow(request.id)
+            val profile = findByIdOrThrow(request.id, ProfileInitializationType.COMMUNICATION_LINKS)
             id = request.id
             name = profile.name
             surname = profile.surname
             imageId = profile.imageId
             addressId = profile.addressId
             channels.addAll(profile.settings.channels.toModel())
-            links = profile.contact.toModel()
+            links = profile.communicationLinks.toDto().toLinks()
             lastSeen = timestamp {
                 seconds = profile.lastSeen.epochSecond
                 nanos = profile.lastSeen.nano
@@ -170,7 +178,7 @@ class ProfileService(
         }
 
     suspend fun setProfileInfo(request: SetProfileInfoRequest) {
-        val profile = findByIdOrThrow(request.id)
+        val profile = findByIdOrThrow(request.id, ProfileInitializationType.DEFAULT)
         val newAddress = addressClient.saveIfNotExists(request.address.toRequest())
         val updatedProfile = profile.copy(
             name = request.name,
@@ -193,9 +201,9 @@ class ProfileService(
             ) else false
         }
 
-    private fun CoroutineScope.getLotsBySellerId(id: Long, condition: Boolean = true): Deferred<ProfileLotsResponse> =
+    private fun CoroutineScope.getLotsBySellerId(sellerId: Long, userId: Long, condition: Boolean = true): Deferred<ProfileLotsResponse> =
         async(CoroutineName("Get-Lots-Coroutine")) {
-            if (condition) lotClient.getLotsBySellerId(id) else ProfileLotsResponse.getDefaultInstance()
+            if (condition) lotClient.getLotsBySellerId(sellerId, userId) else ProfileLotsResponse.getDefaultInstance()
         }
 
     private fun CoroutineScope.getAddressById(id: Long, condition: Boolean = true): Deferred<AddressResponse> =
@@ -247,7 +255,7 @@ class ProfileService(
 
     private fun getContacts(profile: Profile, condition: Boolean) =
         if (condition) contacts {
-            links = profile.contact.toModel()
+            links = profile.communicationLinks.toDto().toLinks()
             channels.addAll(profile.settings.channels.toModel())
         } else Contacts.getDefaultInstance()
 }

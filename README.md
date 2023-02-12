@@ -22,10 +22,18 @@
 
 ```yaml
 spring:
-  datasource:
-    url: URL
-    password: PASSWORD
-    username: USER
+   application:
+      name: name-service
+   datasource:
+      url: URL
+      password: PASSWORD
+      username: USER
+
+server:
+   port: 0
+
+grpc:
+   server: 0 
 ```
 
 Поскольку это влияет на то, чтобы успешно подключаться к собственным БД и генерировать миграции при необходимости.
@@ -66,7 +74,7 @@ spring:
 ### Continuous delivery
 Когда добавляем новый сервис, нужно:
 1. Создать в новом модуле `Dockerfile` по анаогии с теми, что уже есть
-2. Добавить `application-preprod.yml`, где нужно указать порты для сервера и переопределить адрес registry
+2. Добавить `application-prod.yml`, где нужно указать порты для сервера и переопределить адрес registry
 3. Добавить сервис в `docker-compose.yml`
 4. Добавить шаг создания образа в `.github/workflows/builder.yml`
 ### Deploy

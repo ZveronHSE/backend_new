@@ -5,5 +5,5 @@ import java.util.UUID
 data class LoginByPhoneVerifyRequest(
     val code: String,
     val sessionId: UUID,
-    val deviceFingerprint: String,
+    val fingerprint: String,
 )
