@@ -32,3 +32,8 @@
 "authPhoneLoginInit","auth-service","AuthService","PhoneLoginInit","ANY"
 "authPhoneLoginVerify","auth-service","AuthService","PhoneLoginVerify","ANY"
 "authIssueNewTokens","auth-service","AuthService","IssueNewTokens","ANY"
+"cardLotGet","lot-service","LotService","GetCardLot","ANY"
+"lotClose","lot-service","LotService","CloseLot","BUYER"
+"lotCreate","lot-service","LotService","CreateLot","BUYER"
+"lotEdit","lot-service","LotService","EditLot","BUYER"
+"waterfallGet","lot-service","LotService","GetWaterfall","ANY"
