@@ -83,6 +83,12 @@ object GrpcMapper {
         }
     }
 
+    fun LoginByPasswordRequest.toServiceRequest() = ru.zveron.authservice.service.model.LoginByPasswordRequest(
+        loginPhone = PhoneNumberParser.stringToServicePhone(this.phoneNumber),
+        password = this.password.toByteArray(),
+        fingerprint = this.deviceFp
+    )
+
     fun PhoneNumber.toRequest() = "$countryCode$phone"
 
     private fun AccessToken.toGrpc(): TimedToken = timedToken {

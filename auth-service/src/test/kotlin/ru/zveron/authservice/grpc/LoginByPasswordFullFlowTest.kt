@@ -65,7 +65,7 @@ class LoginByPasswordFullFlowTest : BaseAuthTest() {
         coEvery { profileClient.validatePassword(capture(requestSlot)) } returns PasswordIsValid
 
         //can find profile
-        coEvery { profileClient.getAccountByPhone(any()) } returns ProfileFound(profileId, name, surname)
+        coEvery { profileClient.getProfileByPhone(any()) } returns ProfileFound(profileId, name, surname)
 
         //when
         val loginByPasswordResponse = controller.loginByPassword(request)
@@ -124,7 +124,7 @@ class LoginByPasswordFullFlowTest : BaseAuthTest() {
         coEvery { profileClient.validatePassword(any()) } returns PasswordIsValid
 
         //but cant find profile afterwards == Illegal state for our system
-        coEvery { profileClient.getAccountByPhone(any()) } returns ProfileNotFound
+        coEvery { profileClient.getProfileByPhone(any()) } returns ProfileNotFound
 
         assertThrows<IllegalStateException> {
             controller.loginByPassword(request)

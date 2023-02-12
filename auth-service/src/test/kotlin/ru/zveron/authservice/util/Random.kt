@@ -1,6 +1,5 @@
 package ru.zveron.authservice.util
 
-import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.apache.commons.lang3.RandomStringUtils.randomNumeric
 import org.apache.commons.lang3.RandomUtils
@@ -67,10 +66,6 @@ fun randomId() = RandomUtils.nextLong()
 fun randomName() = "name-${UUID.randomUUID()}"
 
 fun randomSurname() = "surname-${UUID.randomUUID()}"
-
-fun randomPassword(): String = randomAlphabetic(10)
-
-fun randomHash() = randomAlphanumeric(32)
 
 fun randomTokens() = MobileTokens(
     refreshToken = randomRefreshToken(),

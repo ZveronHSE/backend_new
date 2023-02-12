@@ -13,7 +13,7 @@ import ru.zveron.authservice.grpc.client.model.PasswordValidationFailure
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordProfileNotFound
-import ru.zveron.authservice.service.ServiceMapper.toClientRequest
+import ru.zveron.authservice.service.mapper.ServiceMapper.toClientRequest
 import ru.zveron.authservice.service.model.LoginByPasswordRequest
 
 @Service
@@ -40,7 +40,7 @@ class LoginByPasswordFlowService(
             )
         }
 
-        val findProfileResponse = profileClient.getAccountByPhone(request.loginPhone.toClientPhone())
+        val findProfileResponse = profileClient.getProfileByPhone(request.loginPhone.toClientPhone())
 
         val profileId: Long = when (findProfileResponse) {
             is ProfileFound -> findProfileResponse.id
@@ -53,6 +53,6 @@ class LoginByPasswordFlowService(
             )
         }
 
-        return authenticator.loginUser(profileId = profileId, fp = request.fingerprint)
+        return authenticator.loginUser(profileId = profileId, fingerprint = request.fingerprint)
     }
 }

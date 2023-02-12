@@ -4,24 +4,23 @@ import io.grpc.Status
 import io.grpc.Status.Code
 import io.grpc.StatusException
 import org.springframework.core.env.Environment
+import ru.zveron.authservice.grpc.client.model.FindProfileResponse
+import ru.zveron.authservice.grpc.client.model.FindProfileUnknownFailure
 import ru.zveron.authservice.grpc.client.model.PasswordIsInvalid
 import ru.zveron.authservice.grpc.client.model.PasswordIsValid
 import ru.zveron.authservice.grpc.client.model.PasswordValidationFailure
-import ru.zveron.authservice.grpc.client.model.FindProfileResponse
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
-import ru.zveron.authservice.grpc.client.model.ProfileUnknownFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
 import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.grpc.client.model.RegisterProfileFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileResponse
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
-import ru.zveron.authservice.grpc.mapper.GrpcMapper.toClientRequest
-import ru.zveron.authservice.grpc.mapper.GrpcMapper.toRequest
-import ru.zveron.authservice.grpc.client.model.FindProfileUnknownFailure
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordProfileNotFound
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordRequest
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordResponse
+import ru.zveron.authservice.grpc.mapper.GrpcMapper.toClientRequest
+import ru.zveron.authservice.grpc.mapper.GrpcMapper.toRequest
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
@@ -105,11 +104,6 @@ class ProfileServiceClient(
             }
         }
     }
-
-    suspend fun getProfileById(id: Long) =
-        env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
-            idToProfile[id] ?: ValidatePasswordProfileNotFound
-        } ?: getAccountByIdFromClient(id)
 
     suspend fun getAccountByIdFromClient(id: Long): FindProfileResponse {
         return try {

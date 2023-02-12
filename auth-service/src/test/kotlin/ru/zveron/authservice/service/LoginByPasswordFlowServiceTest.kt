@@ -61,7 +61,7 @@ class LoginByPasswordFlowServiceTest {
             ValidatePasswordRequest(phoneNumber = loginPhone.toClientPhone(), passwordHash = passwordHash)
 
         coEvery { profileServiceClient.validatePassword(validatePwdRequest) } returns PasswordIsValid
-        coEvery { profileServiceClient.getAccountByPhone(loginPhone.toClientPhone()) } returns ProfileFound(
+        coEvery { profileServiceClient.getProfileByPhone(loginPhone.toClientPhone()) } returns ProfileFound(
             profileId,
             randomName(),
             randomSurname()
@@ -129,7 +129,7 @@ class LoginByPasswordFlowServiceTest {
             ValidatePasswordRequest(phoneNumber = loginPhone.toClientPhone(), passwordHash = passwordHash)
 
         coEvery { profileServiceClient.validatePassword(validatePwdRequest) } returns PasswordIsValid
-        coEvery { profileServiceClient.getAccountByPhone(loginPhone.toClientPhone()) } returns ProfileNotFound
+        coEvery { profileServiceClient.getProfileByPhone(loginPhone.toClientPhone()) } returns ProfileNotFound
         coEvery { argon2PasswordEncoder.encode(any()) } returns passwordHash
 
         //should not throw any exceptions
