@@ -1,5 +1,6 @@
 package ru.zveron.authservice.persistence
 
+import mu.KLogging
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -19,6 +20,8 @@ class SessionStorage(
     private val sessionRepository: SessionRepository,
     private val properties: SessionProperties,
 ) {
+
+    companion object : KLogging()
 
     suspend fun createSession(fingerprint: String, profileId: Long): SessionEntity {
         val sessionEntity = SessionEntity(
@@ -57,6 +60,16 @@ class SessionStorage(
         }
 
         return sessionRepository.findById(id)
+    }
+
+    suspend fun deleteExpired() {
+        try {
+            val now = Instant.now()
+            val deleteRows = sessionRepository.deleteAllByExpiresAtBefore(now)
+            logger.info { "Deleted $deleteRows expired sessions" }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Failed to delete expired sessions" }
+        }
     }
 }
 
