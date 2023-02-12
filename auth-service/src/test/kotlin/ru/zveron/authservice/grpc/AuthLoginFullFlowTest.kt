@@ -17,7 +17,7 @@ import ru.zveron.authservice.grpc.client.model.ProfileNotFound
 import ru.zveron.authservice.persistence.entity.StateContextEntity
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
-import ru.zveron.authservice.service.ServiceMapper.toContext
+import ru.zveron.authservice.service.mapper.ServiceMapper.toContext
 import ru.zveron.authservice.util.randomCode
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomId
@@ -60,7 +60,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
                 this.sessionId = initResponse.sessionId
             }
 
-            coEvery { profileClient.getAccountByPhone(any()) } returns ProfileFound(
+            coEvery { profileClient.getProfileByPhone(any()) } returns ProfileFound(
                 randomId(),
                 randomName(),
                 randomSurname()
@@ -109,7 +109,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
                 this.sessionId = initResponse.sessionId
             }
 
-            coEvery { profileClient.getAccountByPhone(any()) } returns ProfileNotFound
+            coEvery { profileClient.getProfileByPhone(any()) } returns ProfileNotFound
 
             val verifyResponse = authLoginController.phoneLoginVerify(verifyRequest)
             verifyResponse.shouldNotBeNull()
@@ -125,7 +125,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             assertSoftly {
                 updatedCtx.isChannelVerified shouldBe true
-                updatedCtx.deviceFp shouldBe deviceFp
+                updatedCtx.fingerprint shouldBe deviceFp
                 updatedCtx.phoneNumber shouldBe phoneNumber.toContext()
             }
         }
@@ -154,7 +154,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
                 this.sessionId = initResponse.sessionId
             }
 
-            coEvery { profileClient.getAccountByPhone(any()) } returns ProfileNotFound
+            coEvery { profileClient.getProfileByPhone(any()) } returns ProfileNotFound
 
             val verifyResponse = authLoginController.phoneLoginVerify(verifyRequest)
             verifyResponse.shouldNotBeNull()
@@ -170,7 +170,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             assertSoftly {
                 updatedCtx.isChannelVerified shouldBe true
-                updatedCtx.deviceFp shouldBe deviceFp
+                updatedCtx.fingerprint shouldBe deviceFp
                 updatedCtx.phoneNumber shouldBe phoneNumber.toContext()
             }
 

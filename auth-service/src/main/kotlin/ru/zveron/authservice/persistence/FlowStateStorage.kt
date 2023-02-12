@@ -44,6 +44,10 @@ class FlowStateStorage(
         } ?: throw ContextExpiredException()
     }
 
+    /**
+     * throws [ContextExpiredException]
+     *
+     */
     suspend fun <CTX : StateContext> getContext(sessionId: UUID, clazz: KClass<out CTX>): CTX =
         stateRepository.findBySessionId(sessionId)?.data?.toContext(clazz)
             ?: throw ContextExpiredException()
