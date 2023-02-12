@@ -85,7 +85,7 @@ object LotMapper {
     }
 
     fun AddressResponse.toAddress(): Address {
-        // Потом придумаю как это красиво сделать
+        // TODO Потом придумаю как это красиво сделать
         val address = arrayOf(region, district, town, street, house)
             .filter { !it.isNullOrBlank() }
             .joinToString()

@@ -38,10 +38,6 @@ class CardLotBuilder(
         }
         val lot = lot!!
 
-        if (seller == null) {
-            throw LotException(Status.INVALID_ARGUMENT, "Don't get seller for building CardLot")
-        }
-
         if (address == null) {
             throw LotException(Status.INVALID_ARGUMENT, "Don't get address for building CardLot")
         }
@@ -84,6 +80,10 @@ class CardLotBuilder(
     }
 
     private fun buildContact(): Contact {
+        if (seller == null) {
+            return contact { }
+        }
+
         val seller = seller!!
 
         return contact {
@@ -97,6 +97,10 @@ class CardLotBuilder(
     }
 
     private fun buildSeller(): Seller {
+        if (seller == null) {
+            return seller {}
+        }
+
         val seller = seller!!
 
         return seller {

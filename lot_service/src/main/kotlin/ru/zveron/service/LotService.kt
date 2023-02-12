@@ -46,6 +46,13 @@ class LotService(
         return lotRepository.findByIdOrThrow(id)
     }
 
+    @Transactional
+    fun getFullLotById(id: Long): Lot {
+        id.validatePositive("lotId")
+
+        return lotRepository.findByIdOrThrow(id).also { it.initAllFields() }
+    }
+
     fun getLotsByIds(ids: List<Long>): List<Lot> {
         ids.forEach {
             it.validatePositive("lotId")
@@ -146,13 +153,7 @@ class LotService(
             }
         }
 
-        val lotEntity = lotRepository.save(lot)
-
-        Hibernate.initialize(lotEntity.photos)
-        Hibernate.initialize(lotEntity.statistics)
-        Hibernate.initialize(lotEntity.parameters)
-
-        return lotEntity
+        return lotRepository.save(lot).also { it.initAllFields() }
     }
 
     fun closeLot(lot: Lot, request: CloseLotRequest) {
@@ -188,5 +189,11 @@ class LotService(
         seller.validateContacts(communicationChannel)
         photos.validate()
         // TODO validate gender ZV-301
+    }
+
+    private fun Lot.initAllFields() {
+        Hibernate.initialize(photos)
+        Hibernate.initialize(statistics)
+        Hibernate.initialize(parameters)
     }
 }

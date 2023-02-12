@@ -139,7 +139,7 @@ class LotExternalController(
     override suspend fun getCardLot(request: CardLotRequest): CardLot {
         val lotId = request.id
 
-        val lot = lotService.getLotById(lotId)
+        val lot = lotService.getFullLotById(lotId)
 
 
         var isFavoriteLot = false
@@ -154,7 +154,7 @@ class LotExternalController(
 
             val clients = mutableListOf(
                 async {
-                    seller = profileClient.getProfileWithContacts(userId)
+                    seller = lot.sellerId?.let { profileClient.getProfileWithContacts(it) }
                 },
                 async {
                     address = addressClient.getAddressById(lot.addressId)
@@ -175,7 +175,7 @@ class LotExternalController(
 
         return buildCardLot {
             this.lot = lot
-            this.seller = seller!!
+            this.seller = seller
             this.isOwnLot = isOwnLot
             this.isFavoriteLot = isFavoriteLot
             this.address = address

@@ -15,8 +15,8 @@ import ru.zveron.contract.AddressServiceGrpcKt
 import ru.zveron.contract.addressResponse
 import ru.zveron.exception.LotException
 import ru.zveron.mapper.LotMapper.toAddress
-import ru.zveron.test.util.generator.AddressGenerator
 import ru.zveron.test.util.GeneratorUtils
+import ru.zveron.test.util.generator.AddressGenerator
 
 @ExtendWith(MockKExtension::class)
 class AddressClientTest {
@@ -30,7 +30,7 @@ class AddressClientTest {
     @Test
     fun `GetAddressById get correct answer for correct request`(): Unit = runBlocking {
         val id = GeneratorUtils.generateLong()
-        val mock = AddressGenerator.generateAddress(id)
+        val mock = AddressGenerator.generateAddressResponse(id)
 
         coEvery {
             addressStub.getAddress(any(), any())
@@ -55,7 +55,7 @@ class AddressClientTest {
     fun `SaveAddressIfNotExists if saving old address, maybe get other address`(): Unit = runBlocking {
         val id = GeneratorUtils.generateLong()
         val request = AddressGenerator.generateFullAddress()
-        val response = AddressGenerator.generateAddress(id)
+        val response = AddressGenerator.generateAddressResponse(id)
         coEvery {
             addressStub.saveAddressIfNotExists(any(), any())
         } returns response
