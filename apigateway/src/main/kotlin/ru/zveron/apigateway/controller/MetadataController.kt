@@ -1,5 +1,6 @@
 package ru.zveron.apigateway.controller
 
+import kotlinx.coroutines.flow.toList
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -14,8 +15,8 @@ class MetadataController(
 ) {
 
     @PostMapping("/method/alias/get")
-    suspend fun getAllAliases(): MutableList<MethodMetadata> {
-        return metadataRepository.findAll()
+    suspend fun getAllAliases(): List<MethodMetadata> {
+        return metadataRepository.findAll().toList()
     }
 
     @PostMapping("/method/alias/upsert")
