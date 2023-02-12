@@ -128,11 +128,7 @@ infix fun CommunicationLink?.linkShouldBe(expected: CommunicationLink) {
         id shouldBe expected.id
     }
     communicationLinkId shouldBe expected.communicationLinkId
-//    if (data is PhoneData) {
-//        data.shouldBeEqualToIgnoringFields(expected.data, PhoneData::passwordHash)
-//    }
     data.shouldBeEqualToIgnoringFields(expected.data, PhoneData::passwordHash)
-//    data.shouldBeEqualToIgnoringFields(expected.data, data::type)
 }
 
 infix fun GetProfilePageResponse.responseShouldBe(expected: Profile) {
