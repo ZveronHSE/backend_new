@@ -23,6 +23,8 @@ data class StateContextEntity(
     @LastModifiedDate
     val updatedAt: Instant = Instant.now(),
 
+    val expiresAt: Instant = Instant.now(),
+
     @Version
     val version: Long = 0,
 )
