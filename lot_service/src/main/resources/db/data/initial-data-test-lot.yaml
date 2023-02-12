@@ -1,0 +1,137 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1649521052537-8
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: id
+                  name: id
+                  type: NUMERIC
+              - column:
+                  header: created_at
+                  name: created_at
+                  type: DATE
+              - column:
+                  header: description
+                  name: description
+                  type: STRING
+              - column:
+                  header: price
+                  name: price
+                  type: NUMERIC
+              - column:
+                  header: status
+                  name: status
+                  type: STRING
+              - column:
+                  header: title
+                  name: title
+                  type: STRING
+              - column:
+                  header: address_id
+                  name: address_id
+                  type: NUMERIC
+              - column:
+                  header: category_id
+                  name: category_id
+                  type: NUMERIC
+              - column:
+                  header: lot_form_id
+                  name: lot_form_id
+                  type: NUMERIC
+              - column:
+                  header: seller_id
+                  name: seller_id
+                  type: NUMERIC
+              - column:
+                  header: created_at
+                  name: created_at
+                  type: STRING
+              - column:
+                  header: gender
+                  name: gender
+                  type: STRING
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: lot.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: lot
+  - changeSet:
+      id: 1649521052537-9
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: lot_id
+                  name: lot_id
+                  type: NUMERIC
+              - column:
+                  header: parameter_id
+                  name: parameter_id
+                  type: NUMERIC
+              - column:
+                  header: value
+                  name: value
+                  type: STRING
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: lot_parameter.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: lot_parameter
+  - changeSet:
+      id: 1649521052537-10
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: id
+                  name: id
+                  type: NUMERIC
+              - column:
+                  header: order_photo
+                  name: order_photo
+                  type: NUMERIC
+              - column:
+                  header: lot_id
+                  name: lot_id
+                  type: NUMERIC
+              - column:
+                  header: image_id
+                  name: image_id
+                  type: NUMERIC
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: lot_photo.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: lot_photo
+  - changeSet:
+      id: 1649521052537-11
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: quantity_view
+                  name: quantity_view
+                  type: NUMERIC
+              - column:
+                  header: lot_id
+                  name: lot_id
+                  type: NUMERIC
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: lot_statistics.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: lot_statistics

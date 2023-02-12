@@ -116,7 +116,7 @@ class ProfileService(
 
         val addExtraFields = !blacklistCoroutine.awaitBlacklistResponse()
         val addressCoroutine = getAddressById(profile.addressId, addExtraFields)
-        val lotsCoroutine = getLotsBySellerId(profile.id, addExtraFields)
+        val lotsCoroutine = getLotsBySellerId(profile.id, request.authorizedProfileId, addExtraFields)
         val ratingCoroutine = getRatingByProfileId(profile.id, addExtraFields)
 
         getProfilePageResponse {
@@ -201,9 +201,9 @@ class ProfileService(
             ) else false
         }
 
-    private fun CoroutineScope.getLotsBySellerId(id: Long, condition: Boolean = true): Deferred<ProfileLotsResponse> =
+    private fun CoroutineScope.getLotsBySellerId(sellerId: Long, userId: Long, condition: Boolean = true): Deferred<ProfileLotsResponse> =
         async(CoroutineName("Get-Lots-Coroutine")) {
-            if (condition) lotClient.getLotsBySellerId(id) else ProfileLotsResponse.getDefaultInstance()
+            if (condition) lotClient.getLotsBySellerId(sellerId, userId) else ProfileLotsResponse.getDefaultInstance()
         }
 
     private fun CoroutineScope.getAddressById(id: Long, condition: Boolean = true): Deferred<AddressResponse> =

@@ -133,3 +133,16 @@ services:
     depends_on:
       - db
       - registry
+  lot-service:
+    restart: always
+    container_name: lot_service
+    platform: linux/amd64
+    image: ghcr.io/zveronhse/lot_service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/lot
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+      - registry

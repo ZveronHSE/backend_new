@@ -27,6 +27,10 @@ fun main(args: Array<String>) {
 
 - в `properties.yml`
 ```yaml
+spring:
+  application:
+    name: name-service
+
 eureka:
   client:
     webclient:
@@ -60,7 +64,12 @@ class CallerService {
 
 ## Со стороны сервиса в который стучимся / который нужно зарегистрировать в регистре
 - добавить в `properties.yml` 
+
 ```yaml
+spring:
+  application:
+    name: name-service
+    
 eureka:
   client:
     register-with-eureka: true
