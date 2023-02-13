@@ -86,7 +86,7 @@ databaseChangeLog:
               - column:
                   header: type
                   name: type
-                  type: NUMERIC
+                  type: STRING
             commentLineStartsWith: '#'
             encoding: UTF-8
             file: data/links.csv

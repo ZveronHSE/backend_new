@@ -11,7 +11,7 @@ CREATE SEQUENCE IF NOT EXISTS public.communication_link_id_seq START WITH 10 INC
 
 -- changeset dakochik:1676061781084-4
 ALTER TABLE public.communication_link
-    ADD type INTEGER NOT NULL;
+    ADD type VARCHAR(50) NOT NULL;
 
 -- changeset dakochik:1676061781084-5
 ALTER TABLE public.communication_link

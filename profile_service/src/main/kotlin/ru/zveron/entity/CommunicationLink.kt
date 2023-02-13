@@ -6,6 +6,8 @@ import ru.zveron.domain.link.CommunicationLinkData
 import ru.zveron.domain.link.CommunicationLinkType
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
@@ -37,6 +39,7 @@ data class CommunicationLink(
     val profile: Profile,
 ) {
     @Column(nullable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
     val type: CommunicationLinkType = data.type
 
     override fun equals(other: Any?): Boolean {
