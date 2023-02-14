@@ -52,7 +52,7 @@ class LotExternalController(
                     seller = profileClient.getProfileWithContacts(userId)
                 },
                 async {
-                    // TODO validating that category should not has children
+                    // TODO validating that category should not has children ZV-323
                     parameterClient.validateParameters(
                         categoryId = request.categoryId,
                         lotFormId = request.lotFormId,
@@ -165,6 +165,7 @@ class LotExternalController(
                 async {
                     address = addressClient.getAddressById(lot.addressId)
                 }
+                // TODO ZV-323 add get name for parameters id
             )
 
             // Если пользователь авторизован:
