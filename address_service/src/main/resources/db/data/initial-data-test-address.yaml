@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1649521052537-5
+      author: WolfAlm (generated)
+      changes:
+        - loadData:
+            columns:
+              - column:
+                  header: id
+                  name: id
+                  type: NUMERIC
+              - column:
+                  header: region
+                  name: region
+                  type: STRING
+              - column:
+                  header: district
+                  name: district
+                  type: STRING
+              - column:
+                  header: town
+                  name: town
+                  type: STRING
+              - column:
+                  header: street
+                  name: street
+                  type: STRING
+              - column:
+                  header: house
+                  name: house
+                  type: STRING
+              - column:
+                  header: longitude
+                  name: longitude
+                  type: NUMERIC
+              - column:
+                  header: latitude
+                  name: latitude
+                  type: NUMERIC
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: address.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: address

@@ -27,6 +27,8 @@ import ru.zveron.model.Address
 import ru.zveron.model.SellerProfile
 import ru.zveron.service.LotService
 import ru.zveron.service.LotStatisticsService
+import ru.zveron.util.UserUtil
+import kotlin.coroutines.coroutineContext
 
 @GrpcService
 class LotExternalController(
@@ -37,11 +39,10 @@ class LotExternalController(
     private val parameterClient: ParameterClient,
     private val addressClient: AddressClient
 ) : LotExternalProtoServiceGrpcKt.LotExternalProtoServiceCoroutineImplBase() {
-    companion object {
-        const val userId = 10L
-    }
 
     override suspend fun createLot(request: CreateLotRequest): CardLot {
+        val userId = UserUtil.getUserId(true, coroutineContext)
+
         var seller: SellerProfile? = null
         var address: Address? = null
 
@@ -78,6 +79,8 @@ class LotExternalController(
     }
 
     override suspend fun editLot(request: EditLotRequest): CardLot {
+        val userId = UserUtil.getUserId(true, coroutineContext)
+
         var lot = lotService.getLotById(request.id)
 
         if (lot.sellerId != userId) {
@@ -122,6 +125,8 @@ class LotExternalController(
 
 
     override suspend fun closeLot(request: CloseLotRequest): Empty {
+        val userId = UserUtil.getUserId(true, coroutineContext)
+
         val lot = lotService.getLotById(request.id)
 
         if (lot.sellerId != userId) {
@@ -138,6 +143,7 @@ class LotExternalController(
 
     override suspend fun getCardLot(request: CardLotRequest): CardLot {
         val lotId = request.id
+        val userId = UserUtil.getUserId(false, coroutineContext)
 
         val lot = lotService.getFullLotById(lotId)
 
@@ -190,6 +196,8 @@ class LotExternalController(
                 "didn't get any sorts, filter and pagination won't work without it"
             )
         }
+
+        val userId = UserUtil.getUserId(false, coroutineContext)
 
         if (request.pageSize < 1) {
             throw LotException(Status.INVALID_ARGUMENT, "for parameter pageSize value can't ")
