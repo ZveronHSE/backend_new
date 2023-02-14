@@ -15,4 +15,10 @@ class GrpcExceptionAdvice {
         return Status.fromCode(ex.status.code ?: Status.Code.INTERNAL)
             .withDescription(ex.message)
     }
+
+    @GrpcExceptionHandler
+    fun handleAny(e: Exception): Status {
+        logger.error { e.message }
+        return Status.INTERNAL.withDescription("Exception: ${e.message}")
+    }
 }
