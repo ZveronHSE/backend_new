@@ -17,6 +17,7 @@ import ru.zveron.client.profile.ProfileClient
 import ru.zveron.contract.lot.cardLotRequest
 import ru.zveron.contract.lot.waterfallRequest
 import ru.zveron.exception.LotException
+import ru.zveron.grpc.configuration.AuthorizedProfileElement
 import ru.zveron.service.LotService
 import ru.zveron.service.LotStatisticsService
 import ru.zveron.test.util.GeneratorUtils
@@ -68,38 +69,39 @@ class LotExternalControllerTest : DataBaseTest() {
 
 
     @Test
-    fun `GetCardLot get response for correct request`(): Unit = runBlocking {
-        // Creating lot
-        val (sellerId, addressId) = GeneratorUtils.generateIds(2)
-        val lot = lotService.createLot(
-            LotEntities.mockCreateLot(),
-            ProfileGenerator.generateSellerProfile(sellerId),
-            addressId
-        )
+    fun `GetCardLot get response for correct request with user`(): Unit =
+        runBlocking(AuthorizedProfileElement(USER_ID)) {
+            // Creating lot
+            val (sellerId, addressId) = GeneratorUtils.generateIds(2)
+            val lot = lotService.createLot(
+                LotEntities.mockCreateLot(),
+                ProfileGenerator.generateSellerProfile(sellerId),
+                addressId
+            )
 
 
-        coEvery {
-            profileClient.getProfileWithContacts(lot.sellerId!!)
-        } returns ProfileGenerator.generateSellerProfile(lot.sellerId!!, isVk = true, isChat = true)
+            coEvery {
+                profileClient.getProfileWithContacts(lot.sellerId!!)
+            } returns ProfileGenerator.generateSellerProfile(lot.sellerId!!, isVk = true, isChat = true)
 
-        coEvery {
-            addressClient.getAddressById(lot.addressId)
-        } returns AddressGenerator.generateAddress(lot.addressId)
+            coEvery {
+                addressClient.getAddressById(lot.addressId)
+            } returns AddressGenerator.generateAddress(lot.addressId)
 
-        coEvery {
-            lotFavoriteClient.checkLotIsFavorite(lot.id, USER_ID)
-        } returns true
+            coEvery {
+                lotFavoriteClient.checkLotIsFavorite(lot.id, USER_ID)
+            } returns true
 
 
-        val cardLot = lotExternalController.getCardLot(cardLotRequest {
-            id = lot.id
-        })
+            val cardLot = lotExternalController.getCardLot(cardLotRequest {
+                id = lot.id
+            })
 
-        cardLot.asClue {
-            it.id shouldBe lot.id
-            it.seller.id shouldBe sellerId
-            it.contact.communicationChannelCount shouldBe 2
-            it.favorite shouldBe true
+            cardLot.asClue {
+                it.id shouldBe lot.id
+                it.seller.id shouldBe sellerId
+                it.contact.communicationChannelCount shouldBe 2
+                it.favorite shouldBe true
+            }
         }
-    }
 }
