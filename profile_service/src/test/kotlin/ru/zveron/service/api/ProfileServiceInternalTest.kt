@@ -4,6 +4,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.ProfileTest
@@ -16,14 +18,15 @@ import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.contract.profile.createProfileRequest
-import ru.zveron.entity.Profile
-import ru.zveron.exception.ProfileException
-import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
 import ru.zveron.contract.profile.getProfileWithContactsRequest
-import ru.zveron.repository.ProfileRepository
 import ru.zveron.contract.profile.updateContactsRequest
+import ru.zveron.contract.profile.verifyProfileHashRequest
+import ru.zveron.entity.Profile
+import ru.zveron.exception.ProfileException
+import ru.zveron.exception.ProfileNotFoundException
+import ru.zveron.repository.ProfileRepository
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.VkData
 import ru.zveron.mapper.ContactsMapper.toDto
@@ -43,21 +46,20 @@ class ProfileServiceInternalTest : ProfileTest() {
     lateinit var communicationLinkRepository: CommunicationLinkRepository
 
     @Test
-    fun `createProfile whe nrequest is correct`() {
+    fun `createProfile whe request is correct`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now, addPassword = true)
         val expectedSettings = SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         val expectedLinks = generateLinks(expectedProfile, addPhone = true)
         val request = generateCreateProfileRequest(expectedProfile)
 
         runBlocking {
-            service.createProfile(request)
+            val id = service.createProfile(request).id
 
             val actualProfile = profileRepository.findById(id).get()
             val actualCommunicationLinks = communicationLinkRepository.findAllByProfileId(id)
-            actualProfile profileShouldBe expectedProfile
-            actualProfile.settings settingsShouldBe expectedSettings
+            actualProfile profileShouldBe expectedProfile.copy(id = id)
+            actualProfile.settings settingsShouldBe expectedSettings.copy(id = id)
             actualCommunicationLinks.toDto() linksShouldBe expectedLinks
         }
     }
@@ -65,8 +67,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `createProfile when number of channels is incorrect`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         generateLinks(expectedProfile, addPhone = true, addVk = true)
         val request = generateCreateProfileRequest(expectedProfile)
 
@@ -81,10 +82,10 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `createProfile when links are incorrect`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addVk = true, addChat = true)
         generateLinks(expectedProfile, addVk = true, skipVkRef = true)
+        profileRepository.save(expectedProfile)
         val request = generateCreateProfileRequest(expectedProfile)
 
         val exception = shouldThrow<ProfileException> {
@@ -95,13 +96,19 @@ class ProfileServiceInternalTest : ProfileTest() {
         exception.message shouldBe "Vk id and ref should be both present or missed"
     }
 
-    @Test
-    fun `createProfile when id is duplicated`() {
+    @ParameterizedTest
+    @CsvSource(value = ["true,false,false", "false,true,false", "false,false,true"])
+    fun `createProfile when links are not unique`(vk: Boolean, gmail: Boolean, phone: Boolean) {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
-        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        generateLinks(expectedProfile, addPhone = true)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(
+            expectedProfile,
+            addVk = vk,
+            addGmail = gmail,
+            addPhone = phone,
+            addChat = true
+        )
+        generateLinks(expectedProfile, addVk = vk, addGmail = gmail, addPhone = phone)
         profileRepository.save(expectedProfile)
         val request = generateCreateProfileRequest(expectedProfile)
 
@@ -110,17 +117,16 @@ class ProfileServiceInternalTest : ProfileTest() {
                 service.createProfile(request)
             }
         }
-        exception.message shouldBe "Profile with id: $id already exists"
+        exception.message shouldBe "Specified communication link is already used"
     }
 
     @Test
     fun `getProfile when request is correct`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = getProfileRequest { this.id = id }
 
         runBlocking {
@@ -132,7 +138,7 @@ class ProfileServiceInternalTest : ProfileTest() {
 
     @Test
     fun `getProfile when it does not exist`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = getProfileRequest { this.id = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -146,11 +152,10 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `getProfileWithContacts if it exists`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request = getProfileWithContactsRequest { this.id = id }
 
         runBlocking {
@@ -162,7 +167,7 @@ class ProfileServiceInternalTest : ProfileTest() {
 
     @Test
     fun `getProfileWithContacts when it does not exist`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = getProfileWithContactsRequest { this.id = id }
 
         val exception = shouldThrow<ProfileNotFoundException> {
@@ -176,11 +181,10 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `updateContacts when request is correct and add new link`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request =
             generateUpdateContactsRequest(
                 id,
@@ -202,11 +206,10 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `updateContacts when request is correct and edit existed link`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         generateLinks(expectedProfile, addVk = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request =
             generateUpdateContactsRequest(
                 id,
@@ -230,7 +233,7 @@ class ProfileServiceInternalTest : ProfileTest() {
 
     @Test
     fun `updateContacts when profile does not exist`() {
-        val id = PropsGenerator.generateUserId()
+        val id = PropsGenerator.generateLongId()
         val request = generateUpdateContactsRequest(
             id,
             ChannelType.GOOGLE,
@@ -249,11 +252,10 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `updateContacts when chat channel type is selected`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         generateLinks(expectedProfile, addPhone = true)
-        profileRepository.save(expectedProfile)
+        val id = profileRepository.save(expectedProfile).id
         val request =
             generateUpdateContactsRequest(id, ChannelType.CHAT)
 
@@ -268,8 +270,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     @Test
     fun `profileExistsByLink if correct id`() {
         val now = Instant.now()
-        val id = PropsGenerator.generateUserId()
-        val expectedProfile = ProfileGenerator.generateProfile(id, now)
+        val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
         val linksDto = generateLinks(expectedProfile, addPhone = true)
         profileRepository.save(expectedProfile)
@@ -302,12 +303,88 @@ class ProfileServiceInternalTest : ProfileTest() {
         exception.message shouldBe "Can't find profile by channel: $channelType and channel id: $id"
     }
 
+    @Test
+    fun `verifyProfileHash if hash is valid`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addPassword = true)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        profileRepository.save(expectedProfile)
+        val request = verifyProfileHashRequest {
+            phoneNumber = linksDto.phoneLink!!.communicationLinkId
+            passwordHash = expectedProfile.passwordHash!!
+        }
+
+        runBlocking {
+            val response = service.verifyProfileHash(request)
+
+            response.isValidRequest shouldBe true
+        }
+    }
+
+    @Test
+    fun `verifyProfileHash if hash is invalid`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now, addPassword = true)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        profileRepository.save(expectedProfile)
+        val request = verifyProfileHashRequest {
+            phoneNumber = linksDto.phoneLink!!.communicationLinkId
+            passwordHash = "123"
+        }
+
+        runBlocking {
+            val response = service.verifyProfileHash(request)
+
+            response.isValidRequest shouldBe false
+        }
+    }
+
+    @Test
+    fun `verifyProfileHash if profile does not exist`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        val request = verifyProfileHashRequest {
+            phoneNumber = linksDto.phoneLink!!.communicationLinkId
+            passwordHash = "123"
+        }
+
+        runBlocking {
+            val response = service.verifyProfileHash(request)
+
+            response.isValidRequest shouldBe false
+        }
+    }
+
+    @Test
+    fun `verifyProfileHash if profile does not have a password`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        profileRepository.save(expectedProfile)
+        val request = verifyProfileHashRequest {
+            phoneNumber = linksDto.phoneLink!!.communicationLinkId
+            passwordHash = "123"
+        }
+
+        val exception = shouldThrow<ProfileException> {
+            runBlocking {
+                service.verifyProfileHash(request)
+            }
+        }
+        exception.message shouldBe "Password hasn't been set yet for this profile"
+    }
+
     private fun generateCreateProfileRequest(profile: Profile) = createProfileRequest {
-        authAccountId = profile.id
         name = profile.name
         surname = profile.surname
         imageId = profile.imageId
         links = profile.communicationLinks.toDto().toLinks()
+        passwordHash = profile.passwordHash ?: ""
     }
 
     private fun generateUpdateContactsRequest(

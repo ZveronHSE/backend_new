@@ -3,7 +3,7 @@ package ru.zveron.commons.generator
 import ru.zveron.contract.profile.address
 import ru.zveron.commons.generator.PropsGenerator.generateDouble
 import ru.zveron.commons.generator.PropsGenerator.generateString
-import ru.zveron.contract.addressResponse
+import ru.zveron.contract.address.addressResponse
 
 object AddressGenerator {
 

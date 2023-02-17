@@ -9,14 +9,14 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import mu.KLogging
+import org.hibernate.exception.ConstraintViolationException
 import org.hibernate.jpa.QueryHints
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
-import ru.zveron.contract.AddressResponse
+import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.lot.ProfileLotsResponse
 import ru.zveron.contract.profile.Contacts
 import ru.zveron.contract.profile.CreateProfileRequest
-import ru.zveron.contract.profile.GetProfileInfoRequest
 import ru.zveron.contract.profile.GetProfileInfoResponse
 import ru.zveron.contract.profile.GetProfilePageRequest
 import ru.zveron.contract.profile.GetProfilePageResponse
@@ -35,8 +35,8 @@ import ru.zveron.contract.profile.getProfileWithContactsResponse
 import ru.zveron.domain.profile.ProfileInitializationType
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
-import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
+import ru.zveron.exception.ProfileException
 import ru.zveron.mapper.AddressMapper.toAddress
 import ru.zveron.mapper.AddressMapper.toProfileAddress
 import ru.zveron.mapper.AddressMapper.toRequest
@@ -52,7 +52,6 @@ import ru.zveron.service.client.lot.LotClient
 import ru.zveron.service.client.review.ReviewClient
 import ru.zveron.validation.ContactsValidator
 import java.time.Instant
-import javax.persistence.EntityExistsException
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
@@ -80,16 +79,16 @@ class ProfileService(
             ?: throw ProfileNotFoundException("Profile with id: $id doesn't exist")
     }
 
-    suspend fun createProfile(request: CreateProfileRequest) {
+    suspend fun createProfile(request: CreateProfileRequest): Long {
         val waysOfCommunication = request.links.toDto()
         ContactsValidator.validateNumberOfChannels(waysOfCommunication)
         ContactsValidator.validateLinks(request.links)
         val profile = Profile(
-            id = request.authAccountId,
             name = request.name,
             surname = request.surname,
             imageId = request.imageId,
             lastSeen = Instant.now(),
+            passwordHash = request.passwordHash.takeIf { it != "" }
         )
         profile.communicationLinks.addAll(request.links.toCommunicationLinks(profile))
         profile.settings = Settings(
@@ -98,11 +97,11 @@ class ProfileService(
         )
 
         try {
-            profileRepository.save(profile)
+            return profileRepository.save(profile).id
         } catch (e: DataIntegrityViolationException) {
-            if (e.rootCause is EntityExistsException) {
+            if (e.cause is ConstraintViolationException) {
                 throw ProfileException(
-                    "Profile with id: ${request.authAccountId} already exists",
+                    "Specified communication link is already used",
                     Status.INVALID_ARGUMENT.code
                 )
             }
@@ -110,33 +109,34 @@ class ProfileService(
         }
     }
 
-    suspend fun getProfilePage(request: GetProfilePageRequest): GetProfilePageResponse = supervisorScope {
-        val blacklistCoroutine = inOwnerBlacklist(request.requestedProfileId, request.authorizedProfileId)
-        val profile = findByIdOrThrow(request.requestedProfileId, ProfileInitializationType.COMMUNICATION_LINKS)
+    suspend fun getProfilePage(request: GetProfilePageRequest, authorizedProfileId: Long): GetProfilePageResponse =
+        supervisorScope {
+            val blacklistCoroutine = inOwnerBlacklist(request.requestedProfileId, authorizedProfileId)
+            val profile = findByIdOrThrow(request.requestedProfileId, ProfileInitializationType.COMMUNICATION_LINKS)
 
-        val addExtraFields = !blacklistCoroutine.awaitBlacklistResponse()
-        val addressCoroutine = getAddressById(profile.addressId, addExtraFields)
-        val lotsCoroutine = getLotsBySellerId(profile.id, request.authorizedProfileId, addExtraFields)
-        val ratingCoroutine = getRatingByProfileId(profile.id, addExtraFields)
+            val addExtraFields = !blacklistCoroutine.awaitBlacklistResponse()
+            val addressCoroutine = getAddressById(profile.addressId, addExtraFields)
+            val lotsCoroutine = getLotsBySellerId(profile.id, authorizedProfileId, addExtraFields)
+            val ratingCoroutine = getRatingByProfileId(profile.id, addExtraFields)
 
-        getProfilePageResponse {
-            id = profile.id
-            name = profile.name
-            surname = profile.surname
-            imageId = profile.imageId
-            lastActivity = timestamp { seconds = profile.lastSeen.epochSecond; nanos = profile.lastSeen.nano }
-            address = addressCoroutine.awaitAddressResponse().toProfileAddress()
-            rating = ratingCoroutine.await()
-            contacts = getContacts(profile, addExtraFields)
+            getProfilePageResponse {
+                id = profile.id
+                name = profile.name
+                surname = profile.surname
+                imageId = profile.imageId
+                lastActivity = timestamp { seconds = profile.lastSeen.epochSecond; nanos = profile.lastSeen.nano }
+                address = addressCoroutine.awaitAddressResponse().toProfileAddress()
+                rating = ratingCoroutine.await()
+                contacts = getContacts(profile, addExtraFields)
 
-            val (activeLots, closedLots) = lotsCoroutine.awaitLotsResponse()
-            this.activeLots.addAll(activeLots)
-            this.closedLots.addAll(closedLots)
+                val (activeLots, closedLots) = lotsCoroutine.awaitLotsResponse()
+                this.activeLots.addAll(activeLots)
+                this.closedLots.addAll(closedLots)
+            }
         }
-    }
 
-    suspend fun getProfileInfo(request: GetProfileInfoRequest): GetProfileInfoResponse = supervisorScope {
-        val profile = findByIdOrThrow(request.id, ProfileInitializationType.DEFAULT)
+    suspend fun getProfileInfo(authorizedProfileId: Long): GetProfileInfoResponse = supervisorScope {
+        val profile = findByIdOrThrow(authorizedProfileId, ProfileInitializationType.DEFAULT)
         val addressCoroutine = getAddressById(profile.addressId)
         val reviewCoroutine = getRatingByProfileId(profile.id)
 
@@ -177,8 +177,8 @@ class ProfileService(
             }
         }
 
-    suspend fun setProfileInfo(request: SetProfileInfoRequest) {
-        val profile = findByIdOrThrow(request.id, ProfileInitializationType.DEFAULT)
+    suspend fun setProfileInfo(request: SetProfileInfoRequest, authorizedProfileId: Long) {
+        val profile = findByIdOrThrow(authorizedProfileId, ProfileInitializationType.DEFAULT)
         val newAddress = addressClient.saveIfNotExists(request.address.toRequest())
         val updatedProfile = profile.copy(
             name = request.name,
@@ -195,10 +195,11 @@ class ProfileService(
         authorizedProfileId: Long,
     ): Deferred<Boolean> =
         async(CoroutineName("Exists-In-Blacklist-Coroutine")) {
-            if (authorizedProfileId != 0L) blacklistClient.existsInBlacklist(
-                ownerId = requestedProfileId,
-                targetUserId = authorizedProfileId
-            ) else false
+            if (authorizedProfileId != 0L && requestedProfileId != authorizedProfileId)
+                blacklistClient.existsInBlacklist(
+                    ownerId = requestedProfileId,
+                    targetUserId = authorizedProfileId
+                ) else false
         }
 
     private fun CoroutineScope.getLotsBySellerId(sellerId: Long, userId: Long, condition: Boolean = true): Deferred<ProfileLotsResponse> =

@@ -17,8 +17,8 @@ import ru.zveron.contract.profile.GetProfileWithContactsResponse
 import ru.zveron.contract.profile.model.Links
 import ru.zveron.contract.profile.LotSummary
 import ru.zveron.contract.profile.SetProfileInfoRequest
-import ru.zveron.contract.AddressRequest
-import ru.zveron.contract.AddressResponse
+import ru.zveron.contract.address.AddressRequest
+import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.lot.model.Lot
 import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.domain.link.GmailData
@@ -39,6 +39,7 @@ infix fun Profile.profileShouldBe(expected: Profile) {
     surname shouldBe expected.surname
     imageId shouldBe expected.imageId
     addressId shouldBe expected.addressId
+    passwordHash shouldBe expected.passwordHash
     ChronoUnit.MINUTES.between(expected.lastSeen, lastSeen) shouldBe 0
 }
 
@@ -127,7 +128,6 @@ infix fun CommunicationLink?.linkShouldBe(expected: CommunicationLink) {
     }
     communicationLinkId shouldBe expected.communicationLinkId
     data shouldBe expected.data
-    profile shouldBe expected.profile
 }
 
 infix fun GetProfilePageResponse.responseShouldBe(expected: Profile) {
@@ -193,7 +193,6 @@ infix fun AddressRequest.addressShouldBe(expected: Address) {
 }
 
 infix fun Profile.profileShouldBe(expected: SetProfileInfoRequest) {
-    id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
     imageId shouldBe expected.imageId
