@@ -52,7 +52,7 @@ services:
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/apigateway
       - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/apigateway
     ports:
-      - "8081:9091"
+      - "8085:9091" #macos has fcking mcaffee on port 8081
       - "8080:8080"
     depends_on:
       - db
