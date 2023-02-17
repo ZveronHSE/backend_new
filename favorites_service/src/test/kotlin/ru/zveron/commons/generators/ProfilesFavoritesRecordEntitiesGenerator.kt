@@ -1,8 +1,8 @@
 package ru.zveron.commons.generators
 
+import ru.zveron.contract.profile.profileSummary
 import ru.zveron.entity.ProfilesFavoritesRecord
 import ru.zveron.favorites.profile.addProfileToFavoritesRequest
-import ru.zveron.favorites.profile.getFavoriteProfilesRequest
 import ru.zveron.favorites.profile.profileExistsInFavoritesRequest
 import ru.zveron.favorites.profile.removeAllByFavoriteProfileRequest
 import ru.zveron.favorites.profile.removeAllProfilesByOwnerRequest
@@ -18,17 +18,13 @@ object ProfilesFavoritesRecordEntitiesGenerator {
         favoriteUserId = favProfileId
     )
 
-    fun createAddProfileToFavoritesRequest(ownerId: Long, favProfileId: Long) =
+    fun createAddProfileToFavoritesRequest(id:  Long) =
         addProfileToFavoritesRequest {
-            favoritesOwnerId = ownerId
-            favoriteProfileId = favProfileId
+            this.id = id
         }
 
-    fun createRemoveProfileFromFavoritesRequest(ownerId: Long, favProfileId: Long) =
-        removeProfileFromFavoritesRequest {
-            favoritesOwnerId = ownerId
-            favoriteProfileId = favProfileId
-        }
+    fun createRemoveProfileFromFavoritesRequest(id: Long) =
+        removeProfileFromFavoritesRequest { this.id = id }
 
     fun crateProfileExistsInFavoritesRequest(ownerId: Long, favProfileId: Long) =
         profileExistsInFavoritesRequest {
@@ -36,12 +32,17 @@ object ProfilesFavoritesRecordEntitiesGenerator {
             favoriteProfileId = favProfileId
         }
 
-    fun createListFavoritesProfilesRequest(ownerId: Long) =
-        getFavoriteProfilesRequest { id = ownerId }
-
     fun createRemoveAllProfilesByOwnerRequest(ownerId: Long) =
         removeAllProfilesByOwnerRequest { id = ownerId }
 
     fun createRemoveAllByFavoriteProfileRequest(ownerId: Long) =
         removeAllByFavoriteProfileRequest { id = ownerId }
+
+    fun generateProfileSummary(id: Long) = profileSummary {
+        this.id = id
+        name = PrimitivesGenerator.generateString(10)
+        surname = PrimitivesGenerator.generateString(10)
+        imageId = PrimitivesGenerator.generateUserId()
+        addressId = PrimitivesGenerator.generateUserId()
+    }
 }

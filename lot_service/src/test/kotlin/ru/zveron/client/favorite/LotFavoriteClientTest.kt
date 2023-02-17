@@ -13,7 +13,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import ru.zveron.exception.LotException
-import ru.zveron.favorites.lot.LotFavoritesServiceGrpcKt
+import ru.zveron.favorites.lot.LotFavoritesServiceInternalGrpcKt
 import ru.zveron.test.util.GeneratorUtils.generateIds
 import ru.zveron.test.util.GeneratorUtils.generateInt
 import ru.zveron.test.util.GeneratorUtils.generateLong
@@ -25,7 +25,7 @@ class LotFavoriteClientTest {
     lateinit var lotFavoriteClient: LotFavoriteClient
 
     @MockK
-    lateinit var lotFavoriteStub: LotFavoritesServiceGrpcKt.LotFavoritesServiceCoroutineStub
+    lateinit var lotFavoriteStub: LotFavoritesServiceInternalGrpcKt.LotFavoritesServiceInternalCoroutineStub
 
 
     @Test
