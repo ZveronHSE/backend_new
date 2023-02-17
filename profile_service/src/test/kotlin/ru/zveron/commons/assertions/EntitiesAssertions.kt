@@ -17,8 +17,8 @@ import ru.zveron.contract.profile.GetProfileWithContactsResponse
 import ru.zveron.contract.profile.model.Links
 import ru.zveron.contract.profile.LotSummary
 import ru.zveron.contract.profile.SetProfileInfoRequest
-import ru.zveron.contract.AddressRequest
-import ru.zveron.contract.AddressResponse
+import ru.zveron.contract.address.AddressRequest
+import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.lot.model.Lot
 import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.domain.link.GmailData

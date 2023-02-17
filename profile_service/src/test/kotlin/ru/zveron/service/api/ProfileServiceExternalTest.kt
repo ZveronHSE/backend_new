@@ -29,7 +29,7 @@ import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.config.AuthorizedProfileElement
-import ru.zveron.contract.addressResponse
+import ru.zveron.contract.address.addressResponse
 import ru.zveron.contract.lot.profileLotsResponse
 import ru.zveron.contract.profile.SetSettingsRequest
 import ru.zveron.exception.ProfileException

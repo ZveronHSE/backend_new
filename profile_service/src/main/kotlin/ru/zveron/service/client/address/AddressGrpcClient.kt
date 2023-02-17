@@ -2,10 +2,10 @@ package ru.zveron.service.client.address
 
 import net.devh.boot.grpc.client.inject.GrpcClient
 import org.springframework.stereotype.Service
-import ru.zveron.contract.AddressRequest
-import ru.zveron.contract.AddressResponse
-import ru.zveron.contract.AddressServiceGrpcKt
-import ru.zveron.contract.addressIdRequest
+import ru.zveron.contract.address.AddressRequest
+import ru.zveron.contract.address.AddressResponse
+import ru.zveron.contract.address.AddressServiceGrpcKt
+import ru.zveron.contract.address.addressIdRequest
 
 @Service
 class AddressGrpcClient : AddressClient {

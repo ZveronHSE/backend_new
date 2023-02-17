@@ -13,7 +13,7 @@ import org.hibernate.exception.ConstraintViolationException
 import org.hibernate.jpa.QueryHints
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
-import ru.zveron.contract.AddressResponse
+import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.lot.ProfileLotsResponse
 import ru.zveron.contract.profile.Contacts
 import ru.zveron.contract.profile.CreateProfileRequest
