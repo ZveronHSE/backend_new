@@ -37,3 +37,4 @@
 "lotCreate","lot-service","LotService","CreateLot","BUYER"
 "lotEdit","lot-service","LotService","EditLot","BUYER"
 "waterfallGet","lot-service","LotService","GetWaterfall","ANY"
+"authRegisterByPhone","auth-service","AuthService","RegisterByPhone","ANY"
