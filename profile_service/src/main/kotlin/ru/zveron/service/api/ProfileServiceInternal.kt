@@ -11,6 +11,8 @@ import ru.zveron.contract.profile.GetProfileRequest
 import ru.zveron.contract.profile.GetProfileResponse
 import ru.zveron.contract.profile.GetProfileWithContactsRequest
 import ru.zveron.contract.profile.GetProfileWithContactsResponse
+import ru.zveron.contract.profile.GetProfilesSummaryRequest
+import ru.zveron.contract.profile.GetProfilesSummaryResponse
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.UpdateContactsRequest
 import ru.zveron.contract.profile.VerifyProfileHashRequest
@@ -49,4 +51,7 @@ class ProfileServiceInternal(
         verifyProfileHashResponse {
             isValidRequest = communicationLinkService.isPasswordHashValid(request)
         }
+
+    override suspend fun getProfilesSummary(request: GetProfilesSummaryRequest): GetProfilesSummaryResponse =
+        profileService.getProfileSummary(request)
 }

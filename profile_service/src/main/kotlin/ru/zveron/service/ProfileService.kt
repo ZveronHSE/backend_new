@@ -24,6 +24,8 @@ import ru.zveron.contract.profile.GetProfileRequest
 import ru.zveron.contract.profile.GetProfileResponse
 import ru.zveron.contract.profile.GetProfileWithContactsRequest
 import ru.zveron.contract.profile.GetProfileWithContactsResponse
+import ru.zveron.contract.profile.GetProfilesSummaryRequest
+import ru.zveron.contract.profile.GetProfilesSummaryResponse
 import ru.zveron.contract.profile.LotStatus
 import ru.zveron.contract.profile.LotSummary
 import ru.zveron.contract.profile.SetProfileInfoRequest
@@ -32,6 +34,8 @@ import ru.zveron.contract.profile.getProfileInfoResponse
 import ru.zveron.contract.profile.getProfilePageResponse
 import ru.zveron.contract.profile.getProfileResponse
 import ru.zveron.contract.profile.getProfileWithContactsResponse
+import ru.zveron.contract.profile.getProfilesSummaryResponse
+import ru.zveron.contract.profile.profileSummary
 import ru.zveron.domain.profile.ProfileInitializationType
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
@@ -161,6 +165,21 @@ class ProfileService(
             channels.addAll(profile.settings.channels.toModel())
         }
 
+    suspend fun getProfileSummary(request: GetProfilesSummaryRequest): GetProfilesSummaryResponse =
+        profileRepository.findAllById(request.idsList).map {
+            profileSummary {
+                id = it.id
+                name = it.name
+                surname = it.surname
+                imageId = it.imageId
+                addressId = it.addressId
+            }
+        }.let {
+            getProfilesSummaryResponse {
+                profiles.addAll(it)
+            }
+        }
+
     suspend fun getProfileWithContacts(request: GetProfileWithContactsRequest): GetProfileWithContactsResponse =
         getProfileWithContactsResponse {
             val profile = findByIdOrThrow(request.id, ProfileInitializationType.COMMUNICATION_LINKS)
@@ -202,7 +221,11 @@ class ProfileService(
                 ) else false
         }
 
-    private fun CoroutineScope.getLotsBySellerId(sellerId: Long, userId: Long, condition: Boolean = true): Deferred<ProfileLotsResponse> =
+    private fun CoroutineScope.getLotsBySellerId(
+        sellerId: Long,
+        userId: Long,
+        condition: Boolean = true
+    ): Deferred<ProfileLotsResponse> =
         async(CoroutineName("Get-Lots-Coroutine")) {
             if (condition) lotClient.getLotsBySellerId(sellerId, userId) else ProfileLotsResponse.getDefaultInstance()
         }
