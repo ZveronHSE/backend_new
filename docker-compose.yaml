@@ -49,8 +49,10 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/apigateway
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/apigateway
+      - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/apigateway
     ports:
-      - "8081:9091"
+      - "8085:9091" #macos has fcking mcaffee on port 8081
       - "8080:8080"
     depends_on:
       - db
@@ -130,6 +132,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/auth
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/auth
+      - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/auth
     depends_on:
       - db
       - registry
