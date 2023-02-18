@@ -14,16 +14,18 @@ spring:
 
 eureka:
   instance:
-    hostname: localhost # should be put into vault
+    hostname: ${HOSTNAME} # should be put into vault
     prefer-ip-address: true
     health-check-url-path: /actuator/health
     status-page-url-path: /actuator/info
     appname: zv-eureka-instance
+    registry:
+      expected-number-of-clients-sending-renews: 2
   client:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://${HOSTNAME}:8761/eureka/
     refresh:
       enable: true
   server:

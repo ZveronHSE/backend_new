@@ -21,7 +21,7 @@ include(
     "blacklist_service",
     "favorites_service",
     "blacklist_service",
-    "service_registry",
+    "service-registry",
     "apigateway",
     "lot_service",
     "profile_service",
