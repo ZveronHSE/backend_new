@@ -2,8 +2,8 @@ package ru.zveron.mapper
 
 import ru.zveron.contract.profile.Address
 import ru.zveron.contract.profile.address
-import ru.zveron.contract.AddressResponse
-import ru.zveron.contract.addressRequest
+import ru.zveron.contract.address.AddressResponse
+import ru.zveron.contract.address.addressRequest
 
 object AddressMapper {
 

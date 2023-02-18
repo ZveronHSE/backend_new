@@ -19,11 +19,9 @@ spring:
 eureka:
   client:
     webclient:
-      enabled: true # но нужно своими руками инжектить бин WebClient
+      enabled: false # но нужно своими руками инжектить бин WebClient
     register-with-eureka: true # если сам сервис нужно регать тоже
     fetch-registry: true
-    service-url:
-      defaultZone: localhost:8761/eureka/
     enabled: true
 
 server:

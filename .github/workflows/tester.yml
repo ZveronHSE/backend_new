@@ -61,3 +61,7 @@ jobs:
       - name: Test lot service
         shell: bash
         run: if grep -q "lot_service" "temp.txt"; then gradle :lot_service:test --stacktrace; fi
+
+      - name: Test object storage
+        shell: bash
+        run: if grep -q "object-storage" "temp.txt"; then gradle :object-storage:test --stacktrace; fi

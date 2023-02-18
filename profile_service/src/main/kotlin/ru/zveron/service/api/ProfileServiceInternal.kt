@@ -3,6 +3,8 @@ package ru.zveron.service.api
 import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.contract.profile.CreateProfileRequest
+import ru.zveron.contract.profile.CreateProfileResponse
+import ru.zveron.contract.profile.createProfileResponse
 import ru.zveron.contract.profile.GetProfileByChannelRequest
 import ru.zveron.contract.profile.GetProfileByChannelResponse
 import ru.zveron.contract.profile.GetProfileRequest
@@ -11,6 +13,9 @@ import ru.zveron.contract.profile.GetProfileWithContactsRequest
 import ru.zveron.contract.profile.GetProfileWithContactsResponse
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.UpdateContactsRequest
+import ru.zveron.contract.profile.VerifyProfileHashRequest
+import ru.zveron.contract.profile.VerifyProfileHashResponse
+import ru.zveron.contract.profile.verifyProfileHashResponse
 import ru.zveron.service.CommunicationLinkService
 import ru.zveron.service.ProfileService
 
@@ -20,10 +25,10 @@ class ProfileServiceInternal(
     private val profileService: ProfileService,
 ) : ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineImplBase() {
 
-    override suspend fun createProfile(request: CreateProfileRequest): Empty {
-        profileService.createProfile(request)
-        return Empty.getDefaultInstance()
-    }
+    override suspend fun createProfile(request: CreateProfileRequest): CreateProfileResponse =
+        createProfileResponse {
+            id = profileService.createProfile(request)
+        }
 
     override suspend fun getProfile(request: GetProfileRequest): GetProfileResponse =
         profileService.getProfile(request)
@@ -39,4 +44,9 @@ class ProfileServiceInternal(
 
     override suspend fun getProfileByChannel(request: GetProfileByChannelRequest): GetProfileByChannelResponse =
         communicationLinkService.getProfileByChannel(request)
+
+    override suspend fun verifyProfileHash(request: VerifyProfileHashRequest): VerifyProfileHashResponse =
+        verifyProfileHashResponse {
+            isValidRequest = communicationLinkService.isPasswordHashValid(request)
+        }
 }

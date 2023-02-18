@@ -2,9 +2,7 @@ package ru.zveron.service
 
 import io.grpc.Status
 import org.springframework.stereotype.Service
-import ru.zveron.contract.profile.GetChannelTypesRequest
 import ru.zveron.contract.profile.GetChannelTypesResponse
-import ru.zveron.contract.profile.GetSettingsRequest
 import ru.zveron.contract.profile.GetSettingsResponse
 import ru.zveron.contract.profile.SetSettingsRequest
 import ru.zveron.contract.profile.address
@@ -28,15 +26,15 @@ class SettingsService(
     private val repository: SettingsRepository,
 ) {
 
-    suspend fun getChannelTypes(request: GetChannelTypesRequest): GetChannelTypesResponse =
+    suspend fun getChannelTypes(id: Long): GetChannelTypesResponse =
         getChannelTypesResponse {
-            val settings = findByIdOrThrow(request.id)
+            val settings = findByIdOrThrow(id)
             channels.addAll(settings.channels.toModel())
         }
 
-    suspend fun getSettings(request: GetSettingsRequest): GetSettingsResponse =
+    suspend fun getSettings(authorizedProfileId: Long): GetSettingsResponse =
         getSettingsResponse {
-            val settings = findByIdOrThrow(request.id)
+            val settings = findByIdOrThrow(authorizedProfileId)
             val address = addressClient.getById(settings.searchAddressId)
             channels.addAll(settings.channels.toModel())
             this.address = address {
@@ -47,8 +45,8 @@ class SettingsService(
             }
         }
 
-    suspend fun setSettings(request: SetSettingsRequest) {
-        val profile = profileService.findByIdOrThrow(request.id, ProfileInitializationType.COMMUNICATION_LINKS)
+    suspend fun setSettings(request: SetSettingsRequest, authorizedProfileId: Long) {
+        val profile = profileService.findByIdOrThrow(authorizedProfileId, ProfileInitializationType.COMMUNICATION_LINKS)
         val settings = profile.settings
         val links = profile.communicationLinks.toDto()
         val channels = request.channelsList.toSet().toDto()
