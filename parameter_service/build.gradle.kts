@@ -5,7 +5,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
 
     // contract
-    implementation("com.github.zveronHSe.contract:parameter:1.8.4")
+    implementation("com.github.zveronHse.contract:parameter:dbe74fd22d")
 
     implementation("org.springframework.boot:spring-boot-starter-cache:$springVersion")
 }

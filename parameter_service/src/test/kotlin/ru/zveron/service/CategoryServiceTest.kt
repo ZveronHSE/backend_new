@@ -52,27 +52,6 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
     }
 
     @Test
-    fun `GetChildOfRootAncestor Success get child of root category`() {
-        val childChildCategory = categoryRepository.save(mockCategoryWithParent(childCategory))
-
-        val response = categoryService.getChildOfRootAncestor(childChildCategory.id)
-
-        response shouldBe childCategory
-    }
-
-    @Test
-    fun `GetChildOfRootAncestor Should throw exception, if get category root`() {
-        shouldThrow<CategoryException> { categoryService.getChildOfRootAncestor(rootCategory.id) }
-    }
-
-    @Test
-    fun `GetChildOfRootAncestor Should return same entity, if get category which already child of root category`() {
-        val response = categoryService.getChildOfRootAncestor(childCategory.id)
-
-        response shouldBe childCategory
-    }
-
-    @Test
     fun `GetTree Get full family of category`() {
         val response = categoryService.getTree(rootCategory.id)
 
@@ -83,4 +62,27 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
     fun `GetTree Should throw exception if category id not found`() {
         shouldThrow<CategoryException> { categoryService.getTree(UNKNOWN_ID) }
     }
+
+    @Test
+    fun `GetRootCategoryByChild Get correct root category by child category id`() {
+        val result = categoryService.getRootCategoryByChild(childCategory)
+
+        result shouldBe rootCategory
+    }
+
+    @Test
+    fun `GetRootCategoryByChild Get correct root category by child child category id`() {
+        val childChildCategory = categoryRepository.save(mockCategoryWithParent(childCategory))
+        val result = categoryService.getRootCategoryByChild(childChildCategory)
+
+        result shouldBe rootCategory
+    }
+
+    @Test
+    fun `GetRootCategoryByChild return root category if get it`() {
+        val result = categoryService.getRootCategoryByChild(rootCategory)
+
+        result shouldBe rootCategory
+    }
 }
+

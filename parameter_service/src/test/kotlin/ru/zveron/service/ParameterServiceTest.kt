@@ -10,8 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseApplicationTest
-import ru.zveron.contract.parameter.external.Type
 import ru.zveron.contract.parameter.internal.parameterValueRequest
+import ru.zveron.contract.parameter.model.Type
 import ru.zveron.entity.Category
 import ru.zveron.entity.LotForm
 import ru.zveron.exception.CategoryException
@@ -172,5 +172,10 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
         }
 
         shouldThrow<ParameterException> { parameterService.validateValuesForParameters(request) }
+    }
+
+    @Test
+    fun `GetAllParametersById Get parameters by Id`(): Unit = runBlocking {
+//        parameterService.getAllParametersById()
     }
 }
