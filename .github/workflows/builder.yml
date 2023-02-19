@@ -95,3 +95,17 @@ jobs:
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ matrix.image }}
+
+  push:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via ssh
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          password: ${{ secrets.VM_PASSWORD }}
+          script: |
+            cd application/backend_new
+            docker compose pull && docker compose up -d
