@@ -4,7 +4,7 @@ x-logging:
   &loki-logging
   driver: loki
   options:
-    loki-url: https://378511:eyJrIjoiNWI2YmFjOTM0YjZkY2ZmMzMxODk4MWQ1YTcwODE3YWEyNGFlYzRhNyIsIm4iOiJsb2tpLXRlc3QtMiIsImlkIjo3ODg1ODR9@logs-prod-013.grafana.net/loki/api/v1/push
+    loki-url: https://378511:${GRAFANA_API_TOKEN}@logs-prod-013.grafana.net/loki/api/v1/push
 
 services:
   db:
@@ -45,7 +45,6 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - HOSTNAME=service-registry
     ports:
       - "8082:8761"
     depends_on:
@@ -176,4 +175,13 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:
       - db
+      - registry
+  object-storage:
+    restart: always
+    container_name: object-storage
+    platform: linux/amd64
+    image: ghcr.io/zveronhse/object-storage
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
       - registry
