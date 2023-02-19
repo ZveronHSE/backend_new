@@ -2,6 +2,7 @@ name: "Test affected modules"
 
 on:
   - pull_request
+  - merge_group
 
 jobs:
   test:
