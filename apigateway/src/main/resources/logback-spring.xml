@@ -3,24 +3,34 @@
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-
-    <springProfile name="local">
-        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <springProfile name="prod">
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-                <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+                <findAndRegisterJacksonModules>true</findAndRegisterJacksonModules>
                 <providers>
-                    <timestamp/>
+                    <timestamp>
+                        <fieldName>ts</fieldName>
+                        <timeZone>UTC</timeZone>
+                    </timestamp>
+                    <threadName>
+                        <fieldName>thread</fieldName>
+                    </threadName>
                     <logLevel/>
-                    <loggerName/>
+                    <loggerName>
+                        <fieldName>logger</fieldName>
+                    </loggerName>
                     <message/>
+                    <arguments>
+                        <includeStructuredArguments>true</includeStructuredArguments>
+                    </arguments>
                     <logstashMarkers/>
                 </providers>
             </encoder>
         </appender>
     </springProfile>
 
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
     </root>
     <logger name="ru.zveron.apigateway" level="DEBUG"/>
 

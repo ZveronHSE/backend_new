@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GRAFANA_API_TOKEN: ${{ secrets.GRAFANA_API_TOKEN}}
     strategy:
       matrix:
         include:
