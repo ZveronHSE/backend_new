@@ -2,8 +2,11 @@ grpc:
   server:
     port: 0
   client:
-    GLOBAL:
-      shutdown-grace-period: -1
+    profile-service:
+      address: 'discovery:///profile-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
 server:
   port: 0
@@ -26,10 +29,12 @@ spring:
         format_sql: true
 
 eureka:
-  instance:
-    metadata-map:
-      BlacklistService: 'crud.proto'
   client:
     register-with-eureka: true
-    tls:
-      enabled: false
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    enabled: true
+  instance:
+    metadata-map:
+      BlacklistServiceExternal: 'blacklist_external.proto'
