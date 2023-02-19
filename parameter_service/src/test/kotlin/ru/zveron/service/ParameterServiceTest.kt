@@ -1,6 +1,5 @@
 package ru.zveron.service
 
-import com.google.protobuf.Empty
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -11,15 +10,14 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseApplicationTest
-import ru.zveron.contract.parameter.Type
-import ru.zveron.contract.parameter.parameterValueRequest
+import ru.zveron.contract.parameter.external.Type
+import ru.zveron.contract.parameter.internal.parameterValueRequest
 import ru.zveron.entity.Category
 import ru.zveron.entity.LotForm
 import ru.zveron.exception.CategoryException
 import ru.zveron.exception.ParameterException
 import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.repository.ParameterFromTypeRepository
-import ru.zveron.util.CreateEntitiesUtils.mockParameterRequest
 import ru.zveron.util.GeneratorUtils.buildMapParameterValues
 
 
@@ -28,60 +26,52 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     lateinit var parameterService: ParameterService
 
     @Autowired
-    lateinit var categoryService: CategoryService
-
-    @Autowired
     lateinit var parameterFromTypeRepository: ParameterFromTypeRepository
 
     companion object : KLogging() {
         const val ID_UNKNOWN = 100500
         const val UNKNOWN_VALUE = 124323543
+        const val CATEGORY_ID_ROOT = 1
         const val CATEGORY_ID_CAT = 4
         const val LOT_FORM_ID = 1
         const val LOT_FORM_ID_WITHOUT_PARAMETERS = 2
     }
 
     @Test
-    fun `GetParametersByCategory Correct get all parameters by category and lotform`(): Unit = runBlocking {
+    fun `GetAllParameters Correct get all parameters by category and lotform`(): Unit = runBlocking {
         val responseExpected = parameterFromTypeRepository.getAllByCategoryAndLotForm(
             Category(CATEGORY_ID_CAT, ""),
-            LotForm(LOT_FORM_ID, "", "")
-        ).toResponse()
+            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
+        )
 
-        val request = mockParameterRequest(CATEGORY_ID_CAT, LOT_FORM_ID)
-        val responseActual = parameterService.getParametersByCategory(request)
+        val responseActual = parameterService.getAllParameters(CATEGORY_ID_CAT, LOT_FORM_ID)
 
         responseActual shouldBe responseExpected
     }
 
     @Test
-    fun `GetParametersByCategory Correct get zero parameters, if doesnt exists by category and lotform`(): Unit =
+    fun `GetAllParameters Correct get zero parameters, if doesnt exists by category and lotform`(): Unit =
         runBlocking {
-            val request = mockParameterRequest(CATEGORY_ID_CAT, LOT_FORM_ID_WITHOUT_PARAMETERS)
-            val response = parameterService.getParametersByCategory(request)
+            val response = parameterService.getAllParameters(CATEGORY_ID_CAT, LOT_FORM_ID_WITHOUT_PARAMETERS)
 
-            response.parametersCount shouldBe 0
+            response.size shouldBe 0
         }
 
     @Test
-    fun `GetParametersByCategory Should throw exception, if unknown id for category`(): Unit = runBlocking {
-        val request = mockParameterRequest(ID_UNKNOWN, LOT_FORM_ID)
-
-        shouldThrow<CategoryException> { parameterService.getParametersByCategory(request) }
+    fun `GetAllParameters Should throw exception, if unknown id for category`(): Unit = runBlocking {
+        shouldThrow<CategoryException> { parameterService.getAllParameters(ID_UNKNOWN, LOT_FORM_ID) }
     }
 
     @Test
-    fun `GetParametersByCategory Should throw exception, if unknown id for lotform`(): Unit = runBlocking {
-        val request = mockParameterRequest(CATEGORY_ID_CAT, ID_UNKNOWN)
-
-        shouldThrow<CategoryException> { parameterService.getParametersByCategory(request) }
+    fun `GetAllParameters Should throw exception, if unknown id for lotform`(): Unit = runBlocking {
+        shouldThrow<CategoryException> { parameterService.getAllParameters(CATEGORY_ID_CAT, ID_UNKNOWN) }
     }
 
     @Test
     fun `ValidateValuesForParameter Correct request with all type parameters`(): Unit = runBlocking {
         val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
             Category(CATEGORY_ID_CAT, ""),
-            LotForm(LOT_FORM_ID, "", "")
+            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
         ).toResponse().parametersList
 
         val parameterValues = parameters.buildMapParameterValues()
@@ -94,7 +84,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
 
         val response = parameterService.validateValuesForParameters(request)
 
-        response shouldBe Empty.getDefaultInstance()
+        response shouldBe Unit
     }
 
     @Test
@@ -102,7 +92,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
         runBlocking {
             val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
                 Category(CATEGORY_ID_CAT, ""),
-                LotForm(LOT_FORM_ID, "", "")
+                LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
             ).toResponse().parametersList
 
             val parameterValues = parameters.buildMapParameterValues()
@@ -135,7 +125,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
         runBlocking {
             val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
                 Category(CATEGORY_ID_CAT, ""),
-                LotForm(LOT_FORM_ID, "", "")
+                LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
             ).toResponse().parametersList
 
             val parameterValues = parameters.buildMapParameterValues()
@@ -147,6 +137,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
                         parameterIdWhereShouldBeIncorrect = parameter.id
                         break;
                     }
+
                     else -> {}
                 }
             }
@@ -168,7 +159,7 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     fun `ValidateValuesForParameter Extra parameters, should throw exception`(): Unit = runBlocking {
         val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
             Category(CATEGORY_ID_CAT, ""),
-            LotForm(LOT_FORM_ID, "", "")
+            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
         ).toResponse().parametersList
 
         val parameterValues = parameters.buildMapParameterValues()

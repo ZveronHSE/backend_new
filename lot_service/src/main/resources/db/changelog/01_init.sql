@@ -1,11 +1,5 @@
 -- liquibase formatted sql
 
--- changeset WolfAlm:1674856710886-1
-CREATE SEQUENCE IF NOT EXISTS public.lot_id_seq START WITH 100 INCREMENT BY 1;
-
--- changeset WolfAlm:1674856710886-2
-CREATE SEQUENCE IF NOT EXISTS public.lot_photo_id_seq START WITH 100 INCREMENT BY 1;
-
 -- changeset WolfAlm:1674856710886-3
 CREATE TABLE public.lot
 (

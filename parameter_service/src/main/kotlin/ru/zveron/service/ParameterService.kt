@@ -1,37 +1,43 @@
 package ru.zveron.service
 
-import com.google.protobuf.Empty
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import net.devh.boot.grpc.server.service.GrpcService
-import ru.zveron.contract.parameter.ParameterRequest
-import ru.zveron.contract.parameter.ParameterResponse
-import ru.zveron.contract.parameter.ParameterServiceGrpcKt
-import ru.zveron.contract.parameter.ParameterValueRequest
+import org.springframework.stereotype.Service
+import ru.zveron.contract.parameter.internal.ParameterValueRequest
 import ru.zveron.entity.Parameter
 import ru.zveron.entity.ParameterFromType
 import ru.zveron.exception.ParameterException
-import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.model.ParameterType
+import ru.zveron.repository.LotFormRepository
 import ru.zveron.repository.ParameterFromTypeRepository
+import ru.zveron.util.ValidateUtils.validatePositive
 import java.time.Instant
 import java.time.format.DateTimeParseException
 
-@GrpcService
+@Service
 class ParameterService(
     private val parameterFromTypeRepository: ParameterFromTypeRepository,
-    private val lotFormService: LotFormService,
-    private val categoryService: CategoryService
-) : ParameterServiceGrpcKt.ParameterServiceCoroutineImplBase() {
-    // TODO Сделать также прокси для ApiGateway /lots/parameters
-    override suspend fun getParametersByCategory(request: ParameterRequest): ParameterResponse {
-        val parameters = getAllParametersByCategory(request.categoryId, request.lotFormId)
+    private val categoryService: CategoryService,
+    private val lotFormRepository: LotFormRepository
+) {
+    suspend fun getAllParameters(categoryId: Int, lotFormId: Int): List<ParameterFromType> {
+        categoryId.validatePositive("categoryId")
+        lotFormId.validatePositive("lotFormId")
 
-        return parameters.toResponse()
+        return coroutineScope {
+            val coroutineCategory = async {
+                categoryService.getChildOfRootAncestor(categoryId)
+            }
+            val coroutineLotForm = async {
+                lotFormRepository.getLotFormByIdOrThrow(lotFormId)
+            }
+
+            parameterFromTypeRepository.getAllByCategoryAndLotForm(coroutineCategory.await(), coroutineLotForm.await())
+        }
     }
 
-    override suspend fun validateValuesForParameters(request: ParameterValueRequest): Empty {
-        val parameters = getAllParametersByCategory(request.categoryId, request.lotFormId)
+    suspend fun validateValuesForParameters(request: ParameterValueRequest) {
+        val parameters = getAllParameters(request.categoryId, request.lotFormId)
             .associate { it.parameter.id to it.parameter }
 
         val sourceParameters = request.parameterValuesMap.toMutableMap()
@@ -67,9 +73,8 @@ class ParameterService(
         sourceParameters.forEach { (id, _) ->
             if (parameters[id] == null) throw ParameterException("Был передан неизвестный параметр id=${id}")
         }
-
-        return Empty.getDefaultInstance()
     }
+
 
     private fun Parameter.validateIntegerValueForParameter(valueParameter: String): Boolean {
         valueParameter.toIntOrNull()
@@ -98,18 +103,5 @@ class ParameterService(
         }
 
         return true
-    }
-
-    private suspend fun getAllParametersByCategory(categoryId: Int, lotFormId: Int): List<ParameterFromType> {
-        return coroutineScope {
-            val coroutineCategory = async {
-                categoryService.getChildOfRootAncestor(categoryId)
-            }
-            val coroutineLotForm = async {
-                lotFormService.getLotFormByIdOrThrow(lotFormId)
-            }
-
-            parameterFromTypeRepository.getAllByCategoryAndLotForm(coroutineCategory.await(), coroutineLotForm.await())
-        }
     }
 }

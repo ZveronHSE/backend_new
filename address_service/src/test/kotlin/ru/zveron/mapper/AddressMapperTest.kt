@@ -3,8 +3,8 @@ package ru.zveron.mapper
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
-import ru.zveron.contract.addressRequest
-import ru.zveron.contract.addressResponse
+import ru.zveron.contract.address.addressRequest
+import ru.zveron.contract.address.addressResponse
 import ru.zveron.mapper.AddressMapper.toEntity
 import ru.zveron.mapper.AddressMapper.toResponse
 import ru.zveron.util.CreateEntitiesUtil.mockAddressEntity

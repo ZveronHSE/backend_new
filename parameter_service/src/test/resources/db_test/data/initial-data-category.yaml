@@ -35,9 +35,9 @@ databaseChangeLog:
                   name: id
                   type: NUMERIC
               - column:
-                  header: form
-                  name: form
-                  type: STRING
+                  header: id_category
+                  name: id_category
+                  type: NUMERIC
               - column:
                   header: type
                   name: type

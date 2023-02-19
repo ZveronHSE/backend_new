@@ -2,8 +2,9 @@ package ru.zveron.util
 
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
-import ru.zveron.contract.parameter.Parameter
-import ru.zveron.contract.parameter.Type
+import ru.zveron.contract.parameter.external.Parameter
+import ru.zveron.contract.parameter.external.Type
+import ru.zveron.entity.Category
 import ru.zveron.entity.ParameterFromType
 import ru.zveron.model.ParameterType
 import ru.zveron.util.CreateEntitiesUtils.mockParameterFromType
@@ -15,7 +16,11 @@ object GeneratorUtils {
 
     fun generateBoolean() = RandomUtils.nextBoolean()
 
-    private fun generateInt() = RandomUtils.nextInt()
+    fun generateInt() = RandomUtils.nextInt()
+
+    fun generateCategories(n: Int = 5): List<Category> = List(n) {
+        Category(id = RandomUtils.nextInt(), name = generateString())
+    }
 
     fun generateParameterFromType(n: Int = 5): List<ParameterFromType> = List(n) {
         mockParameterFromType(

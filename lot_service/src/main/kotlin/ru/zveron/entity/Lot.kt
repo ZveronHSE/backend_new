@@ -15,7 +15,7 @@ import javax.persistence.*
 data class Lot(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lot_id_seq")
-    @SequenceGenerator(name = "lot_id_seq", allocationSize = 1, initialValue = 1)
+    @SequenceGenerator(name = "lot_id_seq", allocationSize = 1, initialValue = 100)
     val id: Long = -1,
     var title: String,
     var description: String,

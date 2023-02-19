@@ -1,7 +1,15 @@
 package ru.zveron.entity
 
 import org.hibernate.Hibernate
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
 
 @Entity
 data class Category(
@@ -14,8 +22,12 @@ data class Category(
     @JoinColumn(name = "id_parent")
     var parent: Category? = null
 ) {
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-    val subCategories: MutableSet<Category> = mutableSetOf()
+    @OneToMany(mappedBy = "parent")
+    val subCategories: List<Category> = listOf()
+
+    @OneToMany(mappedBy = "category")
+    val lotForms: List<LotForm> = listOf()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false

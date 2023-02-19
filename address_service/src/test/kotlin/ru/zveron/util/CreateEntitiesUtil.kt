@@ -1,7 +1,7 @@
 package ru.zveron.util
 
-import ru.zveron.contract.addressIdRequest
-import ru.zveron.contract.addressRequest
+import ru.zveron.contract.address.addressIdRequest
+import ru.zveron.contract.address.addressRequest
 import ru.zveron.entity.Address
 
 object CreateEntitiesUtil {

@@ -1,18 +1,15 @@
 package ru.zveron.service
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseApplicationTest
-import ru.zveron.contract.category.categoryResponse
 import ru.zveron.entity.Category
 import ru.zveron.exception.CategoryException
 import ru.zveron.repository.CategoryRepository
-import ru.zveron.util.CreateEntitiesUtils.mapCategoriesToResponse
-import ru.zveron.util.CreateEntitiesUtils.mockCategoryRequest
 import ru.zveron.util.CreateEntitiesUtils.mockCategoryWithParent
 import ru.zveron.util.CreateEntitiesUtils.mockRootCategory
 
@@ -38,35 +35,20 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
     }
 
     @Test
-    fun `GetChild Get only children of category`(): Unit = runBlocking {
+    fun `GetChildren Get only children of category`() {
         val childCategory1 = categoryRepository.save(mockCategoryWithParent(rootCategory))
         categoryRepository.save(mockCategoryWithParent(childCategory))
 
-        val response = categoryService.getChild(
-            mockCategoryRequest(rootCategory.id)
-        )
+        val response = categoryService.getChildren(rootCategory.id)
 
-        response shouldBe mapCategoriesToResponse(childCategory, childCategory1)
+        response shouldBe listOf(childCategory, childCategory1)
     }
 
     @Test
-    fun `GetChild Should throw exception if category id not found`(): Unit = runBlocking {
-        shouldThrow<CategoryException> {
-            categoryService.getChild(
-                mockCategoryRequest(UNKNOWN_ID)
-            )
-        }
-    }
+    fun `GetChildren Dont get children of category, if dont have`() {
+        val response = categoryService.getChildren(childCategory.id)
 
-    @Test
-    fun `GetChild Dont get children of category, if dont have`(): Unit = runBlocking {
-        val response = categoryService.getChild(
-            mockCategoryRequest(childCategory.id)
-        )
-
-        response shouldBe categoryResponse {
-
-        }
+        response.shouldBeEmpty()
     }
 
     @Test
@@ -91,16 +73,14 @@ internal class CategoryServiceTest : DataBaseApplicationTest() {
     }
 
     @Test
-    fun `GetCategoryTree Get full family of category`(): Unit =
-        runBlocking {
-            val response = categoryService.getCategoryTree(mockCategoryRequest(rootCategory.id))
+    fun `GetTree Get full family of category`() {
+        val response = categoryService.getTree(rootCategory.id)
 
-            response shouldBe mapCategoriesToResponse(rootCategory, childCategory)
-        }
+        response shouldBe listOf(rootCategory, childCategory)
+    }
 
     @Test
-    fun `GetCategoryTree Should throw exception if category id not found`(): Unit =
-        runBlocking {
-            shouldThrow<CategoryException> { categoryService.getCategoryTree(mockCategoryRequest(UNKNOWN_ID)) }
-        }
+    fun `GetTree Should throw exception if category id not found`() {
+        shouldThrow<CategoryException> { categoryService.getTree(UNKNOWN_ID) }
+    }
 }
