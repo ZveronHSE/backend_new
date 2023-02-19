@@ -4,14 +4,14 @@ import io.grpc.Status
 import io.grpc.StatusException
 import org.springframework.stereotype.Service
 import ru.zveron.exception.LotException
-import ru.zveron.favorites.lot.LotFavoritesServiceGrpcKt
+import ru.zveron.favorites.lot.LotFavoritesServiceInternalGrpcKt
 import ru.zveron.favorites.lot.LotsExistInFavoritesRequest
 import ru.zveron.favorites.lot.LotsExistInFavoritesResponse
 import ru.zveron.favorites.lot.lotsExistInFavoritesRequest
 
 @Service
 class LotFavoriteClient(
-    val lotFavoriteStub: LotFavoritesServiceGrpcKt.LotFavoritesServiceCoroutineStub
+    val lotFavoriteStub: LotFavoritesServiceInternalGrpcKt.LotFavoritesServiceInternalCoroutineStub
 ) {
     /**
      * В ответе берем только самый первый элемент, потому что передаем только один идентификатор для объявления

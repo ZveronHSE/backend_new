@@ -20,6 +20,7 @@ import ru.zveron.contract.profile.SetProfileInfoRequest
 import ru.zveron.contract.address.AddressRequest
 import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.lot.model.Lot
+import ru.zveron.contract.profile.ProfileSummary
 import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.LinksDto
@@ -170,6 +171,14 @@ infix fun LotSummary.lotShouldBe(expected: Lot) {
     publicationDateFormatted shouldBe expected.publicationDate
     firstImage shouldBe expected.photoId
     isFavorite shouldBe expected.favorite
+}
+
+infix fun ProfileSummary.profileShouldBe(expected: Profile) {
+    id shouldBe expected.id
+    name shouldBe expected.name
+    surname shouldBe expected.surname
+    imageId shouldBe expected.imageId
+    addressId shouldBe expected.addressId
 }
 
 infix fun Timestamp.timestampShouldBe(expected: Instant) {
