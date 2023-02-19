@@ -7,7 +7,7 @@ import ru.zveron.entity.BlacklistRecord
 interface BlacklistRepository : JpaRepository<BlacklistRecord, BlacklistRecord.BlacklistKey> {
     fun existsById_OwnerUserIdAndId_ReportedUserId(ownerUserId: Long, reportedUserId: Long): Boolean
 
-    fun getAllById_OwnerUserId(id: Long): Collection<BlacklistRecord>
+    fun getAllById_OwnerUserId(id: Long): List<BlacklistRecord>
 
     @Transactional
     fun deleteAllById_ReportedUserId(id: Long): Long

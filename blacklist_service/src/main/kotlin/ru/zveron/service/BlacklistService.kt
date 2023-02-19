@@ -1,28 +1,29 @@
 package ru.zveron.service
 
 import com.google.protobuf.Empty
-import net.devh.boot.grpc.server.service.GrpcService
-import ru.zveron.AddToBlacklistRequest
-import ru.zveron.BlacklistServiceGrpcKt
-import ru.zveron.DeleteAllRecordsWhereUserBlocksRequest
-import ru.zveron.DeleteAllRecordsWhereUserIsBlockedRequest
-import ru.zveron.DeleteFromBlacklistRequest
-import ru.zveron.ExistInBlacklistRequest
-import ru.zveron.ExistInBlacklistResponse
-import ru.zveron.GetBlacklistRequest
-import ru.zveron.GetBlacklistResponse
-import ru.zveron.blacklistUser
+import org.springframework.stereotype.Service
+import ru.zveron.client.profile.ProfileClient
+import ru.zveron.contract.blacklist.AddToBlacklistRequest
+import ru.zveron.contract.blacklist.DeleteAllRecordsWhereUserBlocksRequest
+import ru.zveron.contract.blacklist.DeleteAllRecordsWhereUserIsBlockedRequest
+import ru.zveron.contract.blacklist.DeleteFromBlacklistRequest
+import ru.zveron.contract.blacklist.ExistInBlacklistRequest
+import ru.zveron.contract.blacklist.ExistInBlacklistResponse
+import ru.zveron.contract.blacklist.GetBlacklistResponse
+import ru.zveron.contract.blacklist.existInBlacklistResponse
+import ru.zveron.contract.blacklist.getBlacklistResponse
 import ru.zveron.entity.BlacklistRecord
 import ru.zveron.exception.BlacklistException
-import ru.zveron.existInBlacklistResponse
-import ru.zveron.getBlacklistResponse
+import ru.zveron.mapper.ProfileMapper.toResponse
 import ru.zveron.repository.BlacklistRepository
 
-@GrpcService
-class BlacklistService(private var blacklistRepository: BlacklistRepository) :
-    BlacklistServiceGrpcKt.BlacklistServiceCoroutineImplBase() {
+@Service
+class BlacklistService(
+    private var blacklistRepository: BlacklistRepository,
+    private val profileClient: ProfileClient,
+) {
 
-    override suspend fun existInBlacklist(request: ExistInBlacklistRequest): ExistInBlacklistResponse =
+    suspend fun existInBlacklist(request: ExistInBlacklistRequest): ExistInBlacklistResponse =
         existInBlacklistResponse {
             exists = blacklistRepository.existsById_OwnerUserIdAndId_ReportedUserId(
                 ownerUserId = request.ownerId,
@@ -30,44 +31,47 @@ class BlacklistService(private var blacklistRepository: BlacklistRepository) :
             )
         }
 
-    override suspend fun getBlacklist(request: GetBlacklistRequest): GetBlacklistResponse =
-        getBlacklistResponse {
-            blacklistUsers.addAll(
-                blacklistRepository.getAllById_OwnerUserId(request.id).map { blacklistUser { id = it.id.reportedUserId } })
-        }
+    suspend fun getBlacklist(authorizedProfileId: Long): GetBlacklistResponse {
+        val ids = blacklistRepository.getAllById_OwnerUserId(authorizedProfileId).map { it.id.reportedUserId }
+        val profiles = profileClient.getProfilesSummary(ids).profilesList.map { it.toResponse() }
 
-    override suspend fun addToBlacklist(request: AddToBlacklistRequest): Empty =
-        request.takeUnless { request.ownerId == request.targetUserId }?.let {
+        return getBlacklistResponse {
+            blacklistUsers.addAll(profiles)
+        }
+    }
+
+    suspend fun addToBlacklist(request: AddToBlacklistRequest, authorizedProfileId: Long): Empty =
+        request.takeUnless { request.id == authorizedProfileId }?.let {
             blacklistRepository.save(
                 BlacklistRecord(
                     BlacklistRecord.BlacklistKey(
-                        request.ownerId,
-                        request.targetUserId
+                        authorizedProfileId,
+                        request.id
                     )
                 )
             )
             Empty.getDefaultInstance()
         } ?: throw BlacklistException("Нельзя добавить себя в черный список")
 
-    override suspend fun deleteFromBlacklist(request: DeleteFromBlacklistRequest): Empty =
-        request.takeUnless { it.ownerId == it.deletedUserId }?.let {
+    suspend fun deleteFromBlacklist(request: DeleteFromBlacklistRequest, authorizedProfileId: Long): Empty =
+        request.takeUnless { it.id == authorizedProfileId }?.let {
             blacklistRepository.delete(
                 BlacklistRecord(
                     BlacklistRecord.BlacklistKey(
-                        request.ownerId,
-                        request.deletedUserId
+                        authorizedProfileId,
+                        request.id
                     )
                 )
             )
             Empty.getDefaultInstance()
         } ?: throw BlacklistException("Нельзя удалить себя из черного списка")
 
-    override suspend fun deleteAllRecordsWhereUserBlocks(request: DeleteAllRecordsWhereUserBlocksRequest): Empty =
+    suspend fun deleteAllRecordsWhereUserBlocks(request: DeleteAllRecordsWhereUserBlocksRequest): Empty =
         Empty.getDefaultInstance().also {
             blacklistRepository.deleteAllById_OwnerUserId(request.ownerId)
         }
 
-    override suspend fun deleteAllRecordsWhereUserIsBlocked(request: DeleteAllRecordsWhereUserIsBlockedRequest): Empty =
+    suspend fun deleteAllRecordsWhereUserIsBlocked(request: DeleteAllRecordsWhereUserIsBlockedRequest): Empty =
         Empty.getDefaultInstance().also {
             blacklistRepository.deleteAllById_ReportedUserId(request.deletedUserId)
         }
