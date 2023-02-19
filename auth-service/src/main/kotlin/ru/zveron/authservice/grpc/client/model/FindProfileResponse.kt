@@ -3,18 +3,18 @@ package ru.zveron.authservice.grpc.client.model
 import io.grpc.Metadata
 import io.grpc.Status
 
-sealed class ProfileClientResponse
+sealed class FindProfileResponse
 
 data class ProfileFound(
     val id: Long,
     val name: String,
     val surname: String,
-) : ProfileClientResponse()
+) : FindProfileResponse()
 
-object ProfileNotFound : ProfileClientResponse()
+object ProfileNotFound : FindProfileResponse()
 
-data class ProfileUnknownFailure(
+data class FindProfileUnknownFailure(
     val message: String?,
     val code: Status.Code,
     val metadata: Metadata,
-) : ProfileClientResponse()
+) : FindProfileResponse()

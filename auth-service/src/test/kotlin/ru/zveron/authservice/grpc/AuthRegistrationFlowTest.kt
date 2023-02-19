@@ -1,6 +1,6 @@
 package ru.zveron.authservice.grpc
 
-import com.google.protobuf.kotlin.toByteStringUtf8
+import com.google.protobuf.kotlin.toByteString
 import io.grpc.Status
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -73,7 +73,7 @@ class AuthRegistrationFlowTest : BaseAuthTest() {
             this.sessionId = sessionId.toStr()
             this.name = name
             this.surname = surname
-            this.password = password.toByteStringUtf8()
+            this.password = password.toByteString()
         }
 
         //when
@@ -123,7 +123,7 @@ class AuthRegistrationFlowTest : BaseAuthTest() {
             this.sessionId = sessionId.toStr()
             this.name = name
             this.surname = surname
-            this.password = password.toByteStringUtf8()
+            this.password = password.toByteString()
         }
 
         //when
@@ -165,7 +165,7 @@ class AuthRegistrationFlowTest : BaseAuthTest() {
             this.sessionId = sessionId.toStr()
             this.name = name
             this.surname = surname
-            this.password = password.toByteStringUtf8()
+            this.password = password.toByteString()
         }
 
         //when
@@ -205,7 +205,7 @@ class AuthRegistrationFlowTest : BaseAuthTest() {
             this.sessionId = sessionId.toStr()
             this.name = name
             this.surname = surname
-            this.password = password.toByteStringUtf8()
+            this.password = password.toByteString()
         }
 
         //when
@@ -248,7 +248,7 @@ class AuthRegistrationFlowTest : BaseAuthTest() {
                 this.sessionId = sessionId.toStr()
                 this.name = name
                 this.surname = surname
-                this.password = password.toByteStringUtf8()
+                this.password = password.toByteString()
             }
 
             //when

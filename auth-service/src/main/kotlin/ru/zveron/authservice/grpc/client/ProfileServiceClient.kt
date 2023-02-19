@@ -4,21 +4,27 @@ import io.grpc.Status
 import io.grpc.Status.Code
 import io.grpc.StatusException
 import org.springframework.core.env.Environment
-import ru.zveron.authservice.grpc.client.model.ProfileClientResponse
+import ru.zveron.authservice.grpc.client.model.FindProfileResponse
+import ru.zveron.authservice.grpc.client.model.FindProfileUnknownFailure
+import ru.zveron.authservice.grpc.client.model.PasswordIsInvalid
+import ru.zveron.authservice.grpc.client.model.PasswordIsValid
+import ru.zveron.authservice.grpc.client.model.PasswordValidationFailure
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
-import ru.zveron.authservice.grpc.client.model.ProfileUnknownFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
 import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.grpc.client.model.RegisterProfileFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileResponse
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
+import ru.zveron.authservice.grpc.client.model.ValidatePasswordRequest
+import ru.zveron.authservice.grpc.client.model.ValidatePasswordResponse
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toClientRequest
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toRequest
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
 import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.contract.profile.verifyProfileHashRequest
 
 class ProfileServiceClient(
     private val profileGrpcClient: ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub,
@@ -40,7 +46,7 @@ class ProfileServiceClient(
         124L to ProfileFound(124L, "player", "two")
     )
 
-    suspend fun getProfileByPhone(phoneNumber: String) =
+    suspend fun getProfileByPhone(phoneNumber: String): FindProfileResponse =
         env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
             phoneNumberToProfile[phoneNumber] ?: ProfileNotFound
         } ?: getAccountByPhoneFromClient(phoneNumber)
@@ -66,7 +72,7 @@ class ProfileServiceClient(
         }
     }
 
-    suspend fun getAccountByPhoneFromClient(phoneNumber: String): ProfileClientResponse {
+    suspend fun getAccountByPhoneFromClient(phoneNumber: String): FindProfileResponse {
         return try {
             val response = profileGrpcClient.getProfileByChannel(getProfileByChannelRequest {
                 this.type = ChannelType.PHONE
@@ -76,19 +82,32 @@ class ProfileServiceClient(
         } catch (ex: StatusException) {
             when (ex.status) {
                 Status.NOT_FOUND -> ProfileNotFound
-                else -> ProfileUnknownFailure(ex.message, ex.status.code, ex.trailers)
+                else -> FindProfileUnknownFailure(ex.message, ex.status.code, ex.trailers)
             }
         }
     }
 
-    suspend fun getAccountByIdFromClient(id: Long): ProfileClientResponse {
+    suspend fun validatePassword(request: ValidatePasswordRequest): ValidatePasswordResponse {
+        return try {
+            val response = profileGrpcClient.verifyProfileHash(verifyProfileHashRequest {
+                this.passwordHash = request.passwordHash
+                this.phoneNumber = request.phoneNumber
+            })
+
+            if (response.isValidRequest) PasswordIsValid else PasswordIsInvalid
+        } catch (ex: StatusException) {
+            PasswordValidationFailure(ex.message, ex.status, ex.trailers)
+        }
+    }
+
+    suspend fun getAccountByIdFromClient(id: Long): FindProfileResponse {
         return try {
             val response = profileGrpcClient.getProfile(getProfileRequest { this.id = id })
             return ProfileFound(response.id, response.name, response.surname)
         } catch (ex: StatusException) {
             when (ex.status) {
                 Status.NOT_FOUND -> ProfileNotFound
-                else -> ProfileUnknownFailure(ex.message, ex.status.code, ex.trailers)
+                else -> FindProfileUnknownFailure(ex.message, ex.status.code, ex.trailers)
             }
         }
     }
