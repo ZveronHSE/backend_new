@@ -1,12 +1,12 @@
 package ru.zveron.client.parameter
 
+import com.google.protobuf.int32Value
 import io.grpc.Status
 import io.grpc.StatusException
 import org.springframework.stereotype.Service
-import ru.zveron.contract.category.CategoryServiceGrpcKt
-import ru.zveron.contract.category.categoryRequest
-import ru.zveron.contract.parameter.ParameterServiceGrpcKt
-import ru.zveron.contract.parameter.parameterValueRequest
+import ru.zveron.contract.parameter.internal.CategoryServiceGrpcKt
+import ru.zveron.contract.parameter.internal.ParameterServiceGrpcKt
+import ru.zveron.contract.parameter.internal.parameterValueRequest
 import ru.zveron.exception.LotException
 import ru.zveron.util.ValidateUtils.validatePositive
 
@@ -18,8 +18,8 @@ class ParameterClient(
     suspend fun getTreeByCategory(categoryId: Int): List<Int> {
         categoryId.validatePositive("categoryId")
 
-        val request = categoryRequest {
-            id = categoryId
+        val request = int32Value {
+            value = categoryId
         }
 
         return try {

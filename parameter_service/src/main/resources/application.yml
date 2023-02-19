@@ -20,8 +20,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
 eureka:
   client:
     register-with-eureka: true
     tls:
       enabled: false
+  instance:
+    metadata-map:
+      CategoryExternalService: 'external/category.proto'
+      ParameterExternalService: 'external/parameter.proto'
