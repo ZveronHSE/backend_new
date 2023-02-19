@@ -110,4 +110,6 @@ jobs:
           password: ${{ secrets.VM_PASSWORD }}
           script: |
             cd application/backend_new
+            git pull origin dev
+            git checkout dev
             docker compose pull && docker compose up -d
