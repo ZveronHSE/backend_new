@@ -47,7 +47,7 @@ class LotExternalController(
         var seller: SellerProfile? = null
         var address: Address? = null
         var category: InfoCategory? = null
-
+        var parameters: Map<Int, String> = mapOf()
         coroutineScope {
             val clients = mutableListOf(
                 async {
@@ -65,6 +65,9 @@ class LotExternalController(
                 },
                 async {
                     category = parameterClient.getInfoAboutCategory(request.categoryId)
+                },
+                async {
+                    parameters = parameterClient.getParametersById(request.parametersMap.keys.toList())
                 }
                 // TODO validating images id for existing by image service ZV-307
             )
@@ -79,6 +82,7 @@ class LotExternalController(
             this.seller = seller!!
             isOwnLot = true
             this.address = address!!
+            parametersMap = parameters
         }
     }
 
@@ -96,6 +100,7 @@ class LotExternalController(
 
         var seller: SellerProfile? = null
         var address: Address? = null
+        var parameters: Map<Int, String> = mapOf()
         coroutineScope {
             val clients = mutableListOf(
                 async {
@@ -110,6 +115,9 @@ class LotExternalController(
                 },
                 async {
                     address = addressClient.getAddressById(lot.addressId)
+                },
+                async {
+                    parameters = parameterClient.getParametersById(lot.parameters.map { it.id.parameter })
                 }
                 // TODO validating images id for existing by image service ZV-307
             )
@@ -124,6 +132,7 @@ class LotExternalController(
             this.seller = seller!!
             isOwnLot = true
             this.address = address
+            parametersMap = parameters
         }
     }
 
