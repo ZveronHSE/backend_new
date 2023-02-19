@@ -5,8 +5,10 @@ import io.grpc.Status
 import io.grpc.StatusException
 import org.springframework.stereotype.Service
 import ru.zveron.contract.parameter.internal.CategoryServiceGrpcKt
+import ru.zveron.contract.parameter.internal.InfoCategory
 import ru.zveron.contract.parameter.internal.ParameterServiceGrpcKt
 import ru.zveron.contract.parameter.internal.parameterValueRequest
+import ru.zveron.contract.parameter.internal.parametersRequest
 import ru.zveron.exception.LotException
 import ru.zveron.util.ValidateUtils.validatePositive
 
@@ -56,6 +58,40 @@ class ParameterClient(
                     "Can't get answer validate for categoryId=$categoryId and lotFormId=$lotFormId. Status: ${ex.status.description}"
                 )
             }
+        }
+    }
+
+    suspend fun getInfoAboutCategory(categoryId: Int): InfoCategory {
+        categoryId.validatePositive("categoryId")
+
+        val request = int32Value {
+            value = categoryId
+        }
+
+        return try {
+            categoryStub.getInfoAboutCategory(request)
+        } catch (ex: StatusException) {
+            throw LotException(
+                Status.INTERNAL,
+                "Can't get info by category id for categoryId=$categoryId. Status: ${ex.status.description}"
+            )
+        }
+    }
+
+    suspend fun getParametersById(parametersId: List<Int>): Map<Int, String> {
+        val request = parametersRequest {
+            parameterIds.addAll(parametersId)
+        }
+
+        return try {
+            val response = parameterStub.getParametersByIds(request)
+
+            response.parametersList.associate { it.id to it.name }
+        } catch (ex: StatusException) {
+            throw LotException(
+                Status.INTERNAL,
+                "Can't get parameters by ids: $parametersId. Status: ${ex.status.description}"
+            )
         }
     }
 }

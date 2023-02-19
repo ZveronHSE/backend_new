@@ -104,4 +104,13 @@ class ParameterClientTest {
         exception.message shouldBe mockExceptionDescription
     }
 
+    @Test
+    fun `getInfoAboutCategory get correct answer for correct request`(): Unit = runBlocking {
+
+    }
+
+    @Test
+    fun `getParametersById get correct answer for correct request`(): Unit = runBlocking {
+
+    }
 }

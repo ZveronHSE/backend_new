@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseTest
 import ru.zveron.client.address.AddressClient
 import ru.zveron.client.favorite.LotFavoriteClient
+import ru.zveron.client.parameter.ParameterClient
 import ru.zveron.client.profile.ProfileClient
 import ru.zveron.contract.lot.cardLotRequest
 import ru.zveron.contract.lot.waterfallRequest
@@ -44,11 +45,13 @@ class LotExternalControllerTest : DataBaseTest() {
     @MockkBean
     lateinit var lotFavoriteClient: LotFavoriteClient
 
+    @MockkBean
+    lateinit var parameterClient: ParameterClient
+
     @Autowired
     lateinit var lotStatisticsService: LotStatisticsService
 
     companion object {
-        // TODO убрать когда будет прокидывание от Apigateway
         const val USER_ID = 10L
     }
 
@@ -76,7 +79,7 @@ class LotExternalControllerTest : DataBaseTest() {
             val lot = lotService.createLot(
                 LotEntities.mockCreateLot(),
                 ProfileGenerator.generateSellerProfile(sellerId),
-                addressId
+                addressId, LotEntities.mockInfoCategory()
             )
 
 
@@ -92,6 +95,9 @@ class LotExternalControllerTest : DataBaseTest() {
                 lotFavoriteClient.checkLotIsFavorite(lot.id, USER_ID)
             } returns true
 
+            coEvery {
+                parameterClient.getParametersById(lot.parameters.map { it.id.parameter })
+            } returns mapOf(1 to "first", 2 to "second")
 
             val cardLot = lotExternalController.getCardLot(cardLotRequest {
                 id = lot.id
@@ -102,6 +108,7 @@ class LotExternalControllerTest : DataBaseTest() {
                 it.seller.id shouldBe sellerId
                 it.contact.communicationChannelCount shouldBe 2
                 it.favorite shouldBe true
+                it.parametersCount shouldBe 2
             }
         }
 }

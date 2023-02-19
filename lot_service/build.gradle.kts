@@ -16,7 +16,7 @@ dependencies {
     compileOnly("com.google.protobuf:protobuf-java-util:$protobufVersion")
 
     // contracts
-    implementation("com.github.zveronHSe.contract:parameter:$contractVersion")
+    implementation("com.github.zveronHse.contract:parameter:dbe74fd22d")
     implementation("com.github.zveronHSe.contract:favorites:$contractVersion")
     implementation("com.github.zveronHSe.contract:address:$contractVersion")
     implementation("com.github.zveronHSe.contract:profile:$contractVersion")

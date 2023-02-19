@@ -7,6 +7,7 @@ import ru.zveron.contract.lot.Seller
 import ru.zveron.contract.lot.cardLot
 import ru.zveron.contract.lot.channelLink
 import ru.zveron.contract.lot.contact
+import ru.zveron.contract.lot.model.Parameter
 import ru.zveron.contract.lot.model.parameter
 import ru.zveron.contract.lot.model.photo
 import ru.zveron.contract.lot.seller
@@ -23,7 +24,8 @@ class CardLotBuilder(
     var isFavoriteLot: Boolean = false,
     var isOwnLot: Boolean = false,
     var seller: SellerProfile? = null,
-    var address: Address? = null
+    var address: Address? = null,
+    var parametersMap: Map<Int, String> = mapOf()
 ) {
     companion object {
         inline fun buildCardLot(init: CardLotBuilder.() -> Unit) =
@@ -53,12 +55,7 @@ class CardLotBuilder(
             })
             lot.gender?.let { gender = it.toContract() }
             this.address = buildAddress()
-            parameters.addAll(lot.parameters.map {
-                parameter {
-                    id = it.id.parameter
-                    value = it.value
-                }
-            })
+            parameters.addAll(buildParameters())
             description = lot.description
             price = lot.price.toFormattingPrice()
             favorite = isFavoriteLot
@@ -66,6 +63,20 @@ class CardLotBuilder(
             // TODO canAddReview ZV-300
             contact = buildContact()
             this.seller = buildSeller()
+        }
+    }
+
+    private fun buildParameters(): List<Parameter> {
+        return lot!!.parameters.mapNotNull {
+            val lotParameter = it
+
+            parametersMap[it.id.parameter]?.let {
+                parameter {
+                    id = lotParameter.id.parameter
+                    name = it
+                    value = lotParameter.value
+                }
+            }
         }
     }
 

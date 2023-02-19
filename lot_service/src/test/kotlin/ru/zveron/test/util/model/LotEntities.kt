@@ -5,6 +5,7 @@ import ru.zveron.contract.lot.editLotRequest
 import ru.zveron.contract.lot.fullAddress
 import ru.zveron.contract.lot.model.CommunicationChannel
 import ru.zveron.contract.lot.model.photo
+import ru.zveron.contract.parameter.internal.infoCategory
 import ru.zveron.entity.Lot
 import ru.zveron.entity.LotStatistics
 import ru.zveron.model.ChannelType
@@ -82,5 +83,13 @@ object LotEntities {
         }))
         this.price = price
         this.communicationChannel.add(communicationChannel)
+    }
+
+    fun mockInfoCategory(
+        hasGender: Boolean = true,
+        hasChildren: Boolean = false
+    ) = infoCategory {
+        this.hasGender = hasGender
+        this.hasChildren = hasChildren
     }
 }
