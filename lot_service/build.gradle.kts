@@ -1,7 +1,7 @@
 val jooqVersion: String = "3.16.6"
 val springVersion: String by rootProject
 val protobufVersion: String by rootProject
-val contractVersion: String = "1.8.5"
+val contractVersion: String = "1.8.7"
 
 dependencies {
     implementation("com.vladmihalcea:hibernate-types-55:2.14.0")
@@ -16,7 +16,7 @@ dependencies {
     compileOnly("com.google.protobuf:protobuf-java-util:$protobufVersion")
 
     // contracts
-    implementation("com.github.zveronHse.contract:parameter:dbe74fd22d")
+    implementation("com.github.zveronHse.contract:parameter:$contractVersion")
     implementation("com.github.zveronHSe.contract:favorites:$contractVersion")
     implementation("com.github.zveronHSe.contract:address:$contractVersion")
     implementation("com.github.zveronHSe.contract:profile:$contractVersion")
