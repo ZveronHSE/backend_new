@@ -1,7 +1,14 @@
-version: "3"
+version: "3.4"
+
+x-logging:
+  &loki-logging
+  driver: loki
+  options:
+    loki-url: https://378511:eyJrIjoiNWI2YmFjOTM0YjZkY2ZmMzMxODk4MWQ1YTcwODE3YWEyNGFlYzRhNyIsIm4iOiJsb2tpLXRlc3QtMiIsImlkIjo3ODg1ODR9@logs-prod-013.grafana.net/loki/api/v1/push
 
 services:
   db:
+    logging: *loki-logging
     restart: always
     container_name: db
     image: 'postgres:13.9-alpine'
@@ -16,6 +23,7 @@ services:
       - "5555:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+
   pgadmin:
     restart: always
     image: dpage/pgadmin4
@@ -25,7 +33,9 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ya@frontender.com
       PGADMIN_DEFAULT_PASSWORD: 123
+
   registry:
+    logging: *loki-logging
     restart: always
     container_name: registry
     platform: linux/amd64
@@ -35,16 +45,18 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - HOSTNAME=registry
+      - HOSTNAME=service-registry
     ports:
       - "8082:8761"
     depends_on:
       - db
+
   apigateway:
+    logging: *loki-logging
     restart: always
     container_name: apigateway
     platform: linux/amd64
-    image: ghcr.io/zveronhse/apigateway
+    image: 992de643d4375030d1f458f97c544720ed467917e866177f660fca9be2278c58
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/apigateway
@@ -52,15 +64,15 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/apigateway
       - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/apigateway
-      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     ports:
-      - "8085:9091" #macos has fcking mcaffee on port 8081
-      - "8080:8080"
-      - "5005:5005"
+      - "8085:8080" #macos has fcking mcaffee on port 8081
+      - "8080:9091"
     depends_on:
       - db
       - registry
+
   address_service:
+    logging: *loki-logging
     restart: always
     container_name: address_service
     platform: linux/amd64
@@ -73,7 +85,9 @@ services:
     depends_on:
       - db
       - registry
+
   blacklist_service:
+    logging: *loki-logging
     restart: always
     container_name: blacklist_service
     platform: linux/amd64
@@ -86,7 +100,9 @@ services:
     depends_on:
       - db
       - registry
+
   favorites_service:
+    logging: *loki-logging
     restart: always
     container_name: favorites_service
     platform: linux/amd64
@@ -99,7 +115,9 @@ services:
     depends_on:
       - db
       - registry
+
   parameter_service:
+    logging: *loki-logging
     restart: always
     container_name: parameter_service
     platform: linux/amd64
@@ -112,7 +130,9 @@ services:
     depends_on:
       - db
       - registry
+
   profile_service:
+    logging: *loki-logging
     restart: always
     container_name: profile_service
     platform: linux/amd64
@@ -125,7 +145,9 @@ services:
     depends_on:
       - db
       - registry
+
   auth-service:
+    logging: *loki-logging
     restart: always
     container_name: auth-service
     platform: linux/amd64
@@ -140,7 +162,9 @@ services:
     depends_on:
       - db
       - registry
+
   lot-service:
+    logging: *loki-logging
     restart: always
     container_name: lot_service
     platform: linux/amd64
