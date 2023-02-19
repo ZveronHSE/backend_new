@@ -1,3 +1,5 @@
 package ru.zveron.exception
 
-class BlacklistException(message: String) : RuntimeException(message)
+import io.grpc.Status
+
+class BlacklistException(message: String, val status: Status = Status.INVALID_ARGUMENT) : RuntimeException(message)

@@ -11,8 +11,8 @@ import io.mockk.junit5.MockKExtension
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import ru.zveron.contract.AddressServiceGrpcKt
-import ru.zveron.contract.addressResponse
+import ru.zveron.contract.address.AddressServiceGrpcKt
+import ru.zveron.contract.address.addressResponse
 import ru.zveron.exception.LotException
 import ru.zveron.mapper.LotMapper.toAddress
 import ru.zveron.test.util.GeneratorUtils

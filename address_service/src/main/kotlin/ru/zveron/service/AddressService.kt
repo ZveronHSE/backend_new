@@ -1,10 +1,10 @@
 package ru.zveron.service
 
 import net.devh.boot.grpc.server.service.GrpcService
-import ru.zveron.contract.AddressIdRequest
-import ru.zveron.contract.AddressRequest
-import ru.zveron.contract.AddressResponse
-import ru.zveron.contract.AddressServiceGrpcKt
+import ru.zveron.contract.address.AddressIdRequest
+import ru.zveron.contract.address.AddressRequest
+import ru.zveron.contract.address.AddressResponse
+import ru.zveron.contract.address.AddressServiceGrpcKt
 import ru.zveron.mapper.AddressMapper.toEntity
 import ru.zveron.mapper.AddressMapper.toResponse
 import ru.zveron.repository.AddressRepository

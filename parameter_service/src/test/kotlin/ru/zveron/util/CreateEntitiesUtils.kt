@@ -1,9 +1,7 @@
 package ru.zveron.util
 
-import ru.zveron.contract.category.category
-import ru.zveron.contract.category.categoryRequest
-import ru.zveron.contract.category.categoryResponse
-import ru.zveron.contract.parameter.parameterRequest
+import com.google.protobuf.int32Value
+import ru.zveron.contract.parameter.external.categoryResponse
 import ru.zveron.entity.Category
 import ru.zveron.entity.LotForm
 import ru.zveron.entity.Parameter
@@ -20,22 +18,23 @@ object CreateEntitiesUtils {
         name = "root"
     )
 
-    fun mockCategoryRequest(id: Int) = categoryRequest {
-        this.id = id
+
+    fun mockIntWrapper(id: Int) = int32Value {
+        value = id
     }
 
-    private fun mapFromCategoryToContract(category: Category) = category {
+    fun mapToInternalCategory(category: Category) = ru.zveron.contract.parameter.internal.category {
         id = category.id
         name = category.name
     }
 
-    fun mapCategoriesToResponse(vararg categories: Category) = categoryResponse {
-        this.categories.addAll(categories.map { mapFromCategoryToContract(it) })
+    fun mapCategoriesToExternalResponse(vararg categories: Category) = categoryResponse {
+        this.categories.addAll(categories.map { mapToExternalCategory(it) })
     }
 
-    fun mockParameterRequest(categoryId: Int, lotFormId: Int) = parameterRequest {
-        this.categoryId = categoryId
-        this.lotFormId = lotFormId
+    private fun mapToExternalCategory(category: Category) = ru.zveron.contract.parameter.external.category {
+        id = category.id
+        name = category.name
     }
 
     fun mockParameterFromType(
@@ -47,7 +46,7 @@ object CreateEntitiesUtils {
     ) = ParameterFromType(
         ParameterFromType.ParameterFromTypeKey(id, id, id),
         Category(id, ""),
-        LotForm(id, "", ""),
+        LotForm(id, Category(id, ""), ""),
         Parameter(
             id = id,
             name = name,

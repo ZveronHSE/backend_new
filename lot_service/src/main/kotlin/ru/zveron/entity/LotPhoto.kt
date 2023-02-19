@@ -14,7 +14,7 @@ import javax.persistence.SequenceGenerator
 data class LotPhoto(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lot_photo_id_seq")
-    @SequenceGenerator(name = "lot_photo_id_seq", allocationSize = 1, initialValue = 1)
+    @SequenceGenerator(name = "lot_photo_id_seq", allocationSize = 1, initialValue = 100)
     val id: Long = -1,
     @ManyToOne
     @JoinColumn(name = "lot_id", nullable = false, updatable = false)

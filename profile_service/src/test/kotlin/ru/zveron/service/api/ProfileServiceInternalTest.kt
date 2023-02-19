@@ -26,6 +26,7 @@ import ru.zveron.contract.profile.verifyProfileHashRequest
 import ru.zveron.entity.Profile
 import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
+import ru.zveron.contract.profile.getProfilesSummaryRequest
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.VkData
@@ -377,6 +378,27 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Password hasn't been set yet for this profile"
+    }
+
+    @Test
+    fun `getProfilesSummary if request is correct`() {
+        val now = Instant.now()
+        val profiles = mutableListOf<Profile>()
+        for (id in 0..2) {
+            val expectedProfile = ProfileGenerator.generateProfile(now)
+            SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+            generateLinks(expectedProfile, addPhone = true)
+            profiles.add(profileRepository.save(expectedProfile))
+        }
+        val request = getProfilesSummaryRequest {
+            this.ids.addAll(listOf(profiles[0].id, profiles[1].id))
+        }
+
+        runBlocking {
+            val response = service.getProfilesSummary(request).profilesList
+            response.first { it.id == profiles[0].id } profileShouldBe profiles[0]
+            response.first { it.id == profiles[1].id  } profileShouldBe profiles[1]
+        }
     }
 
     private fun generateCreateProfileRequest(profile: Profile) = createProfileRequest {

@@ -10,11 +10,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 abstract class DataBaseApplicationTest {
     companion object {
-        private val container = PostgreSQLContainer("postgres:13.1-alpine").apply {
-            withDatabaseName("test_db")
-            withUsername("test_db_name")
-            withPassword("test_db_password")
-        }
+        private val container = PostgreSQLContainer("postgres:13.1-alpine")
 
         @JvmStatic
         @DynamicPropertySource

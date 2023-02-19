@@ -1,7 +1,14 @@
-version: "3"
+version: "3.4"
+
+x-logging:
+  &loki-logging
+  driver: loki
+  options:
+    loki-url: https://378511:${GRAFANA_API_TOKEN}@logs-prod-013.grafana.net/loki/api/v1/push
 
 services:
   db:
+    logging: *loki-logging
     restart: always
     container_name: db
     image: 'postgres:13.9-alpine'
@@ -16,6 +23,7 @@ services:
       - "5555:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+
   pgadmin:
     restart: always
     image: dpage/pgadmin4
@@ -25,7 +33,9 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ya@frontender.com
       PGADMIN_DEFAULT_PASSWORD: 123
+
   registry:
+    logging: *loki-logging
     restart: always
     container_name: registry
     platform: linux/amd64
@@ -39,7 +49,9 @@ services:
       - "8082:8761"
     depends_on:
       - db
+
   apigateway:
+    logging: *loki-logging
     restart: always
     container_name: apigateway
     platform: linux/amd64
@@ -52,12 +64,14 @@ services:
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/apigateway
       - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/apigateway
     ports:
-      - "8085:9091" #macos has fcking mcaffee on port 8081
-      - "8080:8080"
+      - "8085:8080" #macos has fcking mcaffee on port 8081
+      - "80:9091"
     depends_on:
       - db
       - registry
+
   address_service:
+    logging: *loki-logging
     restart: always
     container_name: address_service
     platform: linux/amd64
@@ -70,7 +84,9 @@ services:
     depends_on:
       - db
       - registry
+
   blacklist_service:
+    logging: *loki-logging
     restart: always
     container_name: blacklist_service
     platform: linux/amd64
@@ -83,7 +99,9 @@ services:
     depends_on:
       - db
       - registry
+
   favorites_service:
+    logging: *loki-logging
     restart: always
     container_name: favorites_service
     platform: linux/amd64
@@ -96,7 +114,9 @@ services:
     depends_on:
       - db
       - registry
+
   parameter_service:
+    logging: *loki-logging
     restart: always
     container_name: parameter_service
     platform: linux/amd64
@@ -109,7 +129,9 @@ services:
     depends_on:
       - db
       - registry
+
   profile_service:
+    logging: *loki-logging
     restart: always
     container_name: profile_service
     platform: linux/amd64
@@ -122,7 +144,9 @@ services:
     depends_on:
       - db
       - registry
+
   auth-service:
+    logging: *loki-logging
     restart: always
     container_name: auth-service
     platform: linux/amd64
@@ -137,7 +161,9 @@ services:
     depends_on:
       - db
       - registry
+
   lot-service:
+    logging: *loki-logging
     restart: always
     container_name: lot_service
     platform: linux/amd64

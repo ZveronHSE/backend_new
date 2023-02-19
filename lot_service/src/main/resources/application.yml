@@ -23,6 +23,9 @@ eureka:
     register-with-eureka: true # если сам сервис нужно регать тоже
     fetch-registry: true
     enabled: true
+  instance:
+    metadata-map:
+      LotExternalProtoService: 'external_lot.proto'
 
 server:
   port: 0

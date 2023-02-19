@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import ru.zveron.contract.parameter.Type
+import ru.zveron.contract.parameter.external.Type
 import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.util.CreateEntitiesUtils
 import ru.zveron.util.GeneratorUtils

@@ -1,9 +1,9 @@
 package ru.zveron.mapper
 
-import ru.zveron.contract.parameter.ParameterResponse
-import ru.zveron.contract.parameter.Type
-import ru.zveron.contract.parameter.parameter
-import ru.zveron.contract.parameter.parameterResponse
+import ru.zveron.contract.parameter.external.ParameterResponse
+import ru.zveron.contract.parameter.external.Type
+import ru.zveron.contract.parameter.external.parameter
+import ru.zveron.contract.parameter.external.parameterResponse
 import ru.zveron.entity.ParameterFromType
 
 object ParameterMapper {

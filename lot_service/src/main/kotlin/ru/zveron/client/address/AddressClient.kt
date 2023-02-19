@@ -3,9 +3,9 @@ package ru.zveron.client.address
 import io.grpc.Status
 import io.grpc.StatusException
 import org.springframework.stereotype.Service
-import ru.zveron.contract.AddressServiceGrpcKt
-import ru.zveron.contract.addressIdRequest
-import ru.zveron.contract.addressRequest
+import ru.zveron.contract.address.AddressServiceGrpcKt
+import ru.zveron.contract.address.addressIdRequest
+import ru.zveron.contract.address.addressRequest
 import ru.zveron.contract.lot.FullAddress
 import ru.zveron.exception.LotException
 import ru.zveron.mapper.LotMapper.toAddress

@@ -1,7 +1,7 @@
 package ru.zveron.mapper
 
 import com.google.protobuf.util.Timestamps
-import ru.zveron.contract.AddressResponse
+import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.lot.LotsIdResponse
 import ru.zveron.contract.lot.ProfileLotsResponse
 import ru.zveron.contract.lot.WaterfallResponse

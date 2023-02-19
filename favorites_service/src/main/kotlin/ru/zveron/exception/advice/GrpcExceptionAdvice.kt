@@ -14,7 +14,7 @@ class GrpcExceptionAdvice {
     @GrpcExceptionHandler(FavoritesException::class)
     fun handleFavoritesException(e: FavoritesException) : Status {
         logger.info {e.message}
-        return Status.INVALID_ARGUMENT.withDescription(e.message).withCause(e)
+        return e.status.withDescription(e.message).withCause(e)
     }
 
     @GrpcExceptionHandler

@@ -6,21 +6,18 @@ import io.grpc.StatusException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
-import ru.zveron.contract.category.CategoryServiceGrpcKt
-import ru.zveron.contract.category.category
-import ru.zveron.contract.category.categoryResponse
-import ru.zveron.contract.parameter.ParameterServiceGrpcKt
+import ru.zveron.contract.parameter.internal.CategoryServiceGrpcKt
+import ru.zveron.contract.parameter.internal.ParameterServiceGrpcKt
+import ru.zveron.contract.parameter.internal.category
+import ru.zveron.contract.parameter.internal.categoryTreeResponse
 import ru.zveron.exception.LotException
-import ru.zveron.test.util.GeneratorUtils.generateIds
 import ru.zveron.test.util.GeneratorUtils.generateInt
 import ru.zveron.test.util.GeneratorUtils.generateInts
 import ru.zveron.test.util.GeneratorUtils.generateString
@@ -44,7 +41,7 @@ class ParameterClientTest {
 
         coEvery {
             categoryStub.getCategoryTree(any(), any())
-        } returns categoryResponse {
+        } returns categoryTreeResponse {
             categories.addAll(categoryIds.map {
                 category {
                     id = it
