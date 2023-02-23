@@ -1,6 +1,7 @@
 package ru.zveron.service
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.runBlocking
@@ -18,6 +19,7 @@ import ru.zveron.exception.CategoryException
 import ru.zveron.exception.ParameterException
 import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.repository.ParameterFromTypeRepository
+import ru.zveron.util.GeneratorUtils
 import ru.zveron.util.GeneratorUtils.buildMapParameterValues
 
 
@@ -176,6 +178,18 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
 
     @Test
     fun `GetAllParametersById Get parameters by Id`(): Unit = runBlocking {
-//        parameterService.getAllParametersById()
+        // Знаем, что в БД есть эти параметры гарантированно
+        val ids = listOf(1, 4, 5)
+        val parameters = parameterService.getAllParametersById(ids)
+        parameters.size shouldBe ids.size
+
+        parameters.map { it.id } shouldContainExactlyInAnyOrder ids
+    }
+
+    @Test
+    fun `GetAllParametersById Should throw exception if get not valid identificators`(): Unit = runBlocking {
+        val ids = List(4) { -GeneratorUtils.generateInt() }
+
+        shouldThrow<ParameterException> { parameterService.getAllParametersById(ids) }
     }
 }
