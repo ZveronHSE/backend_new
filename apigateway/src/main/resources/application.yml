@@ -20,6 +20,8 @@ spring:
     password: zveron_password
     pool:
       enabled: true
+  netty:
+    leak-detection: advanced
 eureka:
   client:
     enabled: true
