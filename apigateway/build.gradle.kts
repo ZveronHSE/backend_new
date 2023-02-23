@@ -9,6 +9,7 @@ configurations {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jetty:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")
 
     //kotlinx
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinxVersion")
@@ -30,11 +31,6 @@ dependencies {
     implementation("com.github.zveronHSe.contract:apigateway:1.8.7")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
-
-    //logging
-    implementation("net.logstash.logback:logstash-logback-encoder:7.2")
-    implementation("org.apache.logging.log4j:log4j-api-kotlin:1.2.0")
-    implementation("org.apache.logging.log4j:log4j-core:2.17.2")
 
     //ен особо понятно, но если вынести зависимость в рутовый градлг, то падает
     testImplementation("com.ninja-squad:springmockk:4.0.0")

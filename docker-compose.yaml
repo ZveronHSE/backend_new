@@ -6,6 +6,7 @@ x-logging:
   options:
     loki-url: https://378511:${GRAFANA_API_TOKEN}@logs-prod-013.grafana.net/loki/api/v1/push
 
+
 services:
   db:
     logging: *loki-logging
@@ -23,6 +24,14 @@ services:
       - "5555:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   pgadmin:
     restart: always
@@ -49,6 +58,14 @@ services:
       - "8082:8761"
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   apigateway:
     logging: *loki-logging
@@ -69,6 +86,14 @@ services:
     depends_on:
       - db
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   address_service:
     logging: *loki-logging
@@ -84,6 +109,14 @@ services:
     depends_on:
       - db
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   blacklist_service:
     logging: *loki-logging
@@ -99,6 +132,14 @@ services:
     depends_on:
       - db
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   favorites_service:
     logging: *loki-logging
@@ -114,6 +155,14 @@ services:
     depends_on:
       - db
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   parameter_service:
     logging: *loki-logging
@@ -129,6 +178,14 @@ services:
     depends_on:
       - db
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   profile_service:
     logging: *loki-logging
@@ -144,6 +201,14 @@ services:
     depends_on:
       - db
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   auth-service:
     logging: *loki-logging
@@ -161,6 +226,14 @@ services:
     depends_on:
       - db
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
 
   lot-service:
     logging: *loki-logging
@@ -176,6 +249,16 @@ services:
     depends_on:
       - db
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+
   object-storage:
     restart: always
     container_name: object-storage
@@ -185,3 +268,11 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M

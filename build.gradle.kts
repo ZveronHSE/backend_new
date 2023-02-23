@@ -6,6 +6,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     id("org.liquibase.gradle") version "2.1.1"
+    id("com.google.cloud.tools.jib") version "3.3.1"
 
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -86,6 +87,7 @@ subprojects {
         plugin("org.springframework.boot")
         plugin("io.spring.dependency-management")
         plugin("org.liquibase.gradle")
+        plugin("com.google.cloud.tools.jib")
     }
 
     dependencies {
@@ -148,7 +150,7 @@ subprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
+            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all","-Xss512k")
             jvmTarget = "17"
         }
     }
