@@ -12,9 +12,8 @@ class GrpcExceptionAdvice {
 
     @GrpcExceptionHandler
     fun handleAny(e: Exception): Status {
-        logger.error { e.message }
-
-        return Status.INTERNAL.withDescription("Exception: ${e.message}").withCause(e)
+        logger.error(e) { "Unknown exception" }
+        return Status.INTERNAL.withCause(e)
     }
 
     @GrpcExceptionHandler(CategoryException::class)
