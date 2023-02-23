@@ -13,6 +13,8 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import ru.zveron.contract.parameter.internal.CategoryServiceGrpcKt
 import ru.zveron.contract.parameter.internal.ParameterServiceGrpcKt
 import ru.zveron.contract.parameter.internal.category
@@ -104,4 +106,9 @@ class ParameterClientTest {
         exception.message shouldBe mockExceptionDescription
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = [-5, -10, 0])
+    fun `getInfoAboutCategory should throw exception if category id not valid`(categoryId: Int): Unit = runBlocking {
+        shouldThrow<LotException> { parameterClient.getInfoAboutCategory(categoryId) }
+    }
 }

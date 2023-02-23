@@ -1,6 +1,5 @@
 package ru.zveron.authservice.util
 
-import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.apache.commons.lang3.RandomStringUtils.randomNumeric
 import org.apache.commons.lang3.RandomUtils
@@ -46,7 +45,7 @@ fun randomLoginVerifyApigRequest(
     this.sessionId = session
 }
 
-fun randomCode() = randomNumeric(4)
+fun randomCode(): String = randomNumeric(4)
 
 fun randomLoginVerifyRequest() = LoginByPhoneVerifyRequest(
     code = randomCode(),
@@ -60,17 +59,13 @@ fun randomLoginFlowContext() = MobilePhoneLoginStateContext(
     fingerprint = randomDeviceFp(),
 )
 
-fun randomApigPhone() = "7${randomNumeric(10)}"
+fun randomApigPhone() = "7925${randomNumeric(7)}"
 
 fun randomId() = RandomUtils.nextLong()
 
 fun randomName() = "name-${UUID.randomUUID()}"
 
 fun randomSurname() = "surname-${UUID.randomUUID()}"
-
-fun randomPassword(): String = randomAlphabetic(10)
-
-fun randomHash() = randomAlphanumeric(32)
 
 fun randomTokens() = MobileTokens(
     refreshToken = randomRefreshToken(),
@@ -96,6 +91,10 @@ fun randomSessionEntity() = SessionEntity(
     profileId = randomId(),
     expiresAt = Instant.now(),
 )
+
+fun randomPassword() = randomAlphanumeric(10).toByteArray()
+
+fun randomHash(): String = randomAlphanumeric(32)
 
 fun randomPersistencePhone() = ru.zveron.authservice.persistence.model.PhoneNumber(countryCode = "7", randomNumeric(10))
 

@@ -1,9 +1,11 @@
 package ru.zveron.grpc
 
 import com.ninjasquad.springmockk.MockkBean
+import io.kotest.assertions.asClue
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -25,29 +27,54 @@ class CategoryInternalControllerTest : DataBaseApplicationTest() {
     lateinit var categoryService: CategoryService
 
     @Test
-    fun `CategoryHasChildren correct request for category which has children`(): Unit = runBlocking {
+    fun `CategoryHasChildren correct request for category which has children and animal`(): Unit = runBlocking {
         val categoryId = generateInt()
 
         every {
             categoryService.getChildren(categoryId)
         } returns listOf(Category(categoryId + 1, "name"))
 
-        val response = categoryInternalController.categoryHasChildren(mockIntWrapper(categoryId))
+        every {
+            categoryService.getCategoryByIDOrThrow(categoryId)
+        } returns Category(categoryId, "main")
 
-        response.value.shouldBeTrue()
+        every {
+            categoryService.getRootCategoryByChild(Category(categoryId, "main"))
+        } returns Category(1, "animal")
+
+        val response = categoryInternalController.getInfoAboutCategory(mockIntWrapper(categoryId))
+
+        response.asClue {
+            it.category.asClue {
+                it.id shouldBe categoryId
+                it.name shouldBe "main"
+            }
+
+            it.hasChildren.shouldBeTrue()
+            it.hasGender.shouldBeTrue()
+        }
     }
 
     @Test
-    fun `CategoryHasChildren correct request for category which hasn't children`(): Unit = runBlocking {
+    fun `CategoryHasChildren correct request for category which hasn't children and not animal`(): Unit = runBlocking {
         val categoryId = generateInt()
 
         every {
             categoryService.getChildren(categoryId)
         } returns listOf()
 
-        val response = categoryInternalController.categoryHasChildren(mockIntWrapper(categoryId))
+        every {
+            categoryService.getCategoryByIDOrThrow(categoryId)
+        } returns Category(categoryId, "main")
 
-        response.value.shouldBeFalse()
+        every {
+            categoryService.getRootCategoryByChild(Category(categoryId, "main"))
+        } returns Category(2, "goods")
+
+        val response = categoryInternalController.getInfoAboutCategory(mockIntWrapper(categoryId))
+
+        response.hasChildren.shouldBeFalse()
+        response.hasGender.shouldBeFalse()
     }
 
     @Test

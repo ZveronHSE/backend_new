@@ -10,6 +10,7 @@ import ru.zveron.exception.ParameterException
 import ru.zveron.model.ParameterType
 import ru.zveron.repository.LotFormRepository
 import ru.zveron.repository.ParameterFromTypeRepository
+import ru.zveron.repository.ParameterRepository
 import ru.zveron.util.ValidateUtils.validatePositive
 import java.time.Instant
 import java.time.format.DateTimeParseException
@@ -18,7 +19,8 @@ import java.time.format.DateTimeParseException
 class ParameterService(
     private val parameterFromTypeRepository: ParameterFromTypeRepository,
     private val categoryService: CategoryService,
-    private val lotFormRepository: LotFormRepository
+    private val lotFormRepository: LotFormRepository,
+    private val parameterRepository: ParameterRepository
 ) {
     suspend fun getAllParameters(categoryId: Int, lotFormId: Int): List<ParameterFromType> {
         categoryId.validatePositive("categoryId")
@@ -26,7 +28,7 @@ class ParameterService(
 
         return coroutineScope {
             val coroutineCategory = async {
-                categoryService.getChildOfRootAncestor(categoryId)
+                categoryService.getCategoryByIDOrThrow(categoryId)
             }
             val coroutineLotForm = async {
                 lotFormRepository.getLotFormByIdOrThrow(lotFormId)
@@ -34,6 +36,12 @@ class ParameterService(
 
             parameterFromTypeRepository.getAllByCategoryAndLotForm(coroutineCategory.await(), coroutineLotForm.await())
         }
+    }
+
+    fun getAllParametersById(parametersIds: List<Int>): List<Parameter> {
+        parametersIds.forEach { it.validatePositive("parameterId") }
+
+        return parameterRepository.findAllById(parametersIds)
     }
 
     suspend fun validateValuesForParameters(request: ParameterValueRequest) {

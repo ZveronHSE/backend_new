@@ -2,8 +2,8 @@ package ru.zveron.util
 
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
-import ru.zveron.contract.parameter.external.Parameter
-import ru.zveron.contract.parameter.external.Type
+import ru.zveron.contract.parameter.model.Parameter
+import ru.zveron.contract.parameter.model.Type
 import ru.zveron.entity.Category
 import ru.zveron.entity.ParameterFromType
 import ru.zveron.model.ParameterType

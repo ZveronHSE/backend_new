@@ -12,6 +12,7 @@ import ru.zveron.contract.lot.EditLotRequest
 import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.model.CommunicationChannel
 import ru.zveron.contract.lot.model.Photo
+import ru.zveron.contract.parameter.internal.InfoCategory
 import ru.zveron.entity.Lot
 import ru.zveron.entity.LotParameter
 import ru.zveron.entity.LotPhoto
@@ -22,6 +23,7 @@ import ru.zveron.mapper.LotMapper.toGender
 import ru.zveron.mapper.SellerMapper.toChannelType
 import ru.zveron.model.SellerProfile
 import ru.zveron.model.SummaryLot
+import ru.zveron.model.enum.Gender
 import ru.zveron.model.enum.LotStatus
 import ru.zveron.repository.LotParameterRepository
 import ru.zveron.repository.LotPhotoRepository
@@ -81,8 +83,14 @@ class LotService(
         return waterfallRepository.findAll(conditions)
     }
 
-    fun createLot(request: CreateLotRequest, seller: SellerProfile, addressId: Long): Lot {
+    fun createLot(request: CreateLotRequest, seller: SellerProfile, addressId: Long, category: InfoCategory): Lot {
         validateLotProperties(request.photosList, request.communicationChannelList, seller)
+
+        val gender = validateAndBuildGender(request, category)
+
+        if (category.hasChildren) {
+            throw LotException(Status.INVALID_ARGUMENT, "A leaf category must be selected for the lot")
+        }
 
         var lot = with(request) {
             Lot(
@@ -92,7 +100,7 @@ class LotService(
                 lotFormId = lotFormId,
                 createdAt = Instant.now(),
                 status = LotStatus.ACTIVE,
-                gender = gender.toGender(),
+                gender = gender,
                 sellerId = seller.id,
                 categoryId = categoryId,
                 channelType = communicationChannelList.toChannelType(),
@@ -188,12 +196,23 @@ class LotService(
     ) {
         seller.validateContacts(communicationChannel)
         photos.validate()
-        // TODO validate gender ZV-301
     }
 
     private fun Lot.initAllFields() {
         Hibernate.initialize(photos)
         Hibernate.initialize(statistics)
         Hibernate.initialize(parameters)
+    }
+
+    private fun validateAndBuildGender(request: CreateLotRequest, category: InfoCategory): Gender? {
+        return if (category.hasGender) {
+            if (!request.hasGender()) {
+                throw LotException(Status.INVALID_ARGUMENT, "Lot hasn't gender, but it should be")
+            } else {
+                request.gender.toGender()
+            }
+        } else {
+            null
+        }
     }
 }

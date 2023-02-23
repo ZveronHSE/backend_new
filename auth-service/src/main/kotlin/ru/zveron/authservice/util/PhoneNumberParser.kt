@@ -16,6 +16,6 @@ object PhoneNumberParser {
                 val parsedPhone = phoneNumberUtils.parse(phone, RU_REGION)
                 return PhoneNumber(parsedPhone.countryCode, parsedPhone.nationalNumber)
             }
-            ?: throw AuthException("Failed to parse phone number", Status.Code.INVALID_ARGUMENT)
+            ?: throw AuthException("Failed to parse phone number=$phone", Status.Code.INVALID_ARGUMENT)
     }
 }

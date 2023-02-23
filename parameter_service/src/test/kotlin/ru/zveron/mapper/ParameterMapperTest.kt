@@ -8,7 +8,8 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import ru.zveron.contract.parameter.external.Type
+import ru.zveron.contract.parameter.model.Type
+import ru.zveron.mapper.ParameterMapper.toParameterResponse
 import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.util.CreateEntitiesUtils
 import ru.zveron.util.GeneratorUtils
@@ -21,6 +22,31 @@ internal class ParameterMapperTest {
         val parametersMock = generateParameterFromType(quantity)
 
         val parametersActual = parametersMock.toResponse()
+
+        parametersActual.parametersCount shouldBe quantity
+
+        parametersActual.parametersList.forEachAsClue { parameterActual ->
+            val parameterExpected = parametersMock
+                .find { mockParameter -> mockParameter.id.parameter == parameterActual.id }
+                ?.parameter
+
+            parameterExpected.shouldNotBeNull()
+
+            parameterActual.asClue {
+                it.name shouldBe parameterExpected.name
+                it.type shouldBe Type.valueOf(parameterExpected.type)
+                it.isRequired shouldBe parameterExpected.isRequired
+                it.valuesList shouldBe parameterExpected.list_value
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 10])
+    fun `Validate mapping from Parameters to ParameterResponse`(quantity: Int) {
+        val parametersMock = generateParameterFromType(quantity)
+
+        val parametersActual = parametersMock.map { it.parameter }.toParameterResponse()
 
         parametersActual.parametersCount shouldBe quantity
 
