@@ -32,6 +32,6 @@
     <root level="info">
         <appender-ref ref="CONSOLE"/>
     </root>
-    <logger name="ru.zveron.apigateway" level="DEBUG"/>
+    <logger name="ru.zveron.service_registry" level="DEBUG"/>
 
 </configuration>

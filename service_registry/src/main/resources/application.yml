@@ -11,6 +11,8 @@ spring:
   #[--------------------------]
   application:
     name: zv-eureka-server
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration, org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration, org.springframework.boot.actuate.autoconfigure.audit.AuditEventsEndpointAutoConfiguration, org.springframework.boot.actuate.autoconfigure.audit.AuditAutoConfiguration, org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration, org.springframework.boot.autoconfigure.web.embedded.EmbeddedWebServerFactoryCustomizerAutoConfiguration, org.springframework.cloud.client.discovery.composite.reactive.ReactiveCompositeDiscoveryClientAutoConfiguration, org.springframework.boot.autoconfigure.web.reactive.ReactiveWebServerFactoryAutoConfiguration, org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration,
 
 eureka:
   instance:
@@ -26,14 +28,17 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     refresh:
       enable: true
+    eureka-server-total-connections: 20
   server:
     enable-self-preservation: true
     registry-sync-retries: 3
     registry-sync-retry-wait-ms: 300
+    max-threads-for-peer-replication: 2
+    remote-region-fetch-thread-pool-size: 5
 
 server:
   port: 8761
-
-grpc:
-  server:
-    port: 0
+  tomcat:
+    threads:
+      max: 50
+      min-spare: 5

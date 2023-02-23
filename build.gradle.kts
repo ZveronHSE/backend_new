@@ -6,6 +6,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     id("org.liquibase.gradle") version "2.1.1"
+    id("com.google.cloud.tools.jib") version "3.3.1"
 
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -86,6 +87,7 @@ subprojects {
         plugin("org.springframework.boot")
         plugin("io.spring.dependency-management")
         plugin("org.liquibase.gradle")
+        plugin("com.google.cloud.tools.jib")
     }
 
     dependencies {
@@ -103,6 +105,10 @@ subprojects {
 
         // Логгирование
         implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
+        //logging
+        implementation("net.logstash.logback:logstash-logback-encoder:7.2")
+        implementation("org.apache.logging.log4j:log4j-api-kotlin:1.2.0")
+        implementation("org.apache.logging.log4j:log4j-core:2.17.2")
 
         // База данных
         implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
@@ -148,7 +154,7 @@ subprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
+            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all","-Xss512k")
             jvmTarget = "17"
         }
     }
