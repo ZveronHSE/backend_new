@@ -57,7 +57,7 @@ class ApiGatewayService(
                 method = grpcMethodDescriptor,
                 request = grpcMessage,
                 headers = Metadata().apply {
-                    this.put(profileIdKey, profileId.toString())
+                    profileId?.let { this.put(profileIdKey, it.toString()) }
                 }
             )
         } catch (e: Exception) {
