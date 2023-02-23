@@ -14,7 +14,7 @@ import ru.zveron.apigateway.component.GrpcChannelRegistry
 import ru.zveron.apigateway.component.ProtoDefinitionRegistry
 import ru.zveron.apigateway.grpc.client.GrpcAuthClient
 import ru.zveron.contract.auth.AuthServiceGrpcKt
-import ru.zveron.contract.auth.profileId
+import ru.zveron.contract.auth.profileDto
 
 @Configuration
 @ImportAutoConfiguration(
@@ -28,7 +28,7 @@ class GrpcServiceTestConfig {
     @Primary
     fun authClient(): GrpcAuthClient {
         val clientMock = mockk<AuthServiceGrpcKt.AuthServiceCoroutineStub>()
-        coEvery { clientMock.verifyToken(any(), any()) } returns profileId { this.id = 123 }
+        coEvery { clientMock.verifyToken(any(), any()) } returns profileDto { this.id = 123 }
         return GrpcAuthClient(clientMock)
     }
 

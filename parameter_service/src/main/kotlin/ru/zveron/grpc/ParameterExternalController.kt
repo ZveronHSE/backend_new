@@ -5,9 +5,9 @@ import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.contract.parameter.external.LotFormResponse
 import ru.zveron.contract.parameter.external.ParameterExternalServiceGrpcKt
 import ru.zveron.contract.parameter.external.ParameterRequest
-import ru.zveron.contract.parameter.external.ParameterResponse
 import ru.zveron.contract.parameter.external.lotForm
 import ru.zveron.contract.parameter.external.lotFormResponse
+import ru.zveron.contract.parameter.model.ParameterResponse
 import ru.zveron.mapper.ParameterMapper.toResponse
 import ru.zveron.service.LotFormService
 import ru.zveron.service.ParameterService

@@ -94,7 +94,8 @@ class LotServiceTest : DataBaseTest() {
     fun `CreateLot correct creating lot`() {
         val request = LotEntities.mockCreateLot()
         val (sellerId, addressId) = generateIds(2)
-        val lot = lotService.createLot(request, generateSellerProfile(sellerId), addressId)
+        val lot =
+            lotService.createLot(request, generateSellerProfile(sellerId), addressId, LotEntities.mockInfoCategory())
 
         lot.asClue {
             it.createdAt.shouldBeAfter(Instant.now().minusSeconds(3))
@@ -124,7 +125,7 @@ class LotServiceTest : DataBaseTest() {
                 title = "title",
                 description = "description",
                 price = 5
-            ), seller, addressId
+            ), seller, addressId, LotEntities.mockInfoCategory()
         )
 
         // Editing lot

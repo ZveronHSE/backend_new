@@ -20,6 +20,7 @@ import ru.zveron.contract.lot.EditLotRequest
 import ru.zveron.contract.lot.LotExternalProtoServiceGrpcKt
 import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.WaterfallResponse
+import ru.zveron.contract.parameter.internal.InfoCategory
 import ru.zveron.exception.LotException
 import ru.zveron.mapper.CardLotBuilder.Companion.buildCardLot
 import ru.zveron.mapper.LotMapper
@@ -45,14 +46,14 @@ class LotExternalController(
 
         var seller: SellerProfile? = null
         var address: Address? = null
-
+        var category: InfoCategory? = null
+        var parameters: Map<Int, String> = mapOf()
         coroutineScope {
             val clients = mutableListOf(
                 async {
                     seller = profileClient.getProfileWithContacts(userId)
                 },
                 async {
-                    // TODO validating that category should not has children ZV-323
                     parameterClient.validateParameters(
                         categoryId = request.categoryId,
                         lotFormId = request.lotFormId,
@@ -61,6 +62,12 @@ class LotExternalController(
                 },
                 async {
                     address = addressClient.saveAddressIfNotExists(request.address)
+                },
+                async {
+                    category = parameterClient.getInfoAboutCategory(request.categoryId)
+                },
+                async {
+                    parameters = parameterClient.getParametersById(request.parametersMap.keys.toList())
                 }
                 // TODO validating images id for existing by image service ZV-307
             )
@@ -68,13 +75,14 @@ class LotExternalController(
             return@coroutineScope clients.awaitAll()
         }
 
-        val lot = lotService.createLot(request, seller!!, address!!.id)
+        val lot = lotService.createLot(request, seller!!, address!!.id, category!!)
 
         return buildCardLot {
             this.lot = lot
             this.seller = seller!!
             isOwnLot = true
             this.address = address!!
+            parametersMap = parameters
         }
     }
 
@@ -92,6 +100,7 @@ class LotExternalController(
 
         var seller: SellerProfile? = null
         var address: Address? = null
+        var parameters: Map<Int, String> = mapOf()
         coroutineScope {
             val clients = mutableListOf(
                 async {
@@ -106,6 +115,9 @@ class LotExternalController(
                 },
                 async {
                     address = addressClient.getAddressById(lot.addressId)
+                },
+                async {
+                    parameters = parameterClient.getParametersById(lot.parameters.map { it.id.parameter })
                 }
                 // TODO validating images id for existing by image service ZV-307
             )
@@ -120,6 +132,7 @@ class LotExternalController(
             this.seller = seller!!
             isOwnLot = true
             this.address = address
+            parametersMap = parameters
         }
     }
 
@@ -152,6 +165,7 @@ class LotExternalController(
         var isOwnLot = false
         var seller: SellerProfile? = null
         var address: Address? = null
+        var parameters: Map<Int, String> = mapOf()
         coroutineScope {
             // TODO подумать как тут лучше сделать(реально ли запускать в любом случае, ибо может быть ряд ошибок ниже
             launch {
@@ -164,6 +178,9 @@ class LotExternalController(
                 },
                 async {
                     address = addressClient.getAddressById(lot.addressId)
+                },
+                async {
+                    parameters = parameterClient.getParametersById(lot.parameters.map { it.id.parameter })
                 }
                 // TODO ZV-323 add get name for parameters id
             )
@@ -186,6 +203,7 @@ class LotExternalController(
             this.isOwnLot = isOwnLot
             this.isFavoriteLot = isFavoriteLot
             this.address = address
+            parametersMap = parameters
         }
     }
 
