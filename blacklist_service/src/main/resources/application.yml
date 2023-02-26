@@ -38,3 +38,13 @@ eureka:
   instance:
     metadata-map:
       BlacklistServiceExternal: 'blacklist_external.proto'
+
+
+platform:
+  grpc:
+    apigateway:
+      metadata: true
+    client:
+      logging: true
+    server:
+      logging: true

@@ -46,3 +46,12 @@ grpc:
     address:
       address: 'discovery:///address-service'
       negotiationType: plaintext
+
+platform:
+  grpc:
+    apigateway:
+      metadata: true
+    client:
+      logging: true
+    server:
+      logging: true

@@ -3,6 +3,8 @@ grpc:
     port: 0
 server:
   port: 0
+
+
 spring:
   main:
     banner-mode: off
@@ -20,6 +22,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+
 eureka:
   client:
     register-with-eureka: true
@@ -27,3 +31,13 @@ eureka:
       enabled: false
     webclient:
       enabled: true
+
+
+platform:
+  grpc:
+    apigateway:
+      metadata: false
+    client:
+      logging: false
+    server:
+      logging: true

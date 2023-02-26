@@ -15,12 +15,12 @@ import org.springframework.transaction.support.TransactionTemplate
 import ru.zveron.FavoritesTest
 import ru.zveron.client.lot.LotClient
 import ru.zveron.commons.assertions.LotAssertions.lotsShouldBe
-import ru.zveron.commons.generators.PrimitivesGenerator
 import ru.zveron.commons.generators.LotsFavoritesRecordEntitiesGenerator
 import ru.zveron.commons.generators.LotsFavoritesRecordEntitiesGenerator.generateLot
-import ru.zveron.config.AuthorizedProfileElement
+import ru.zveron.commons.generators.PrimitivesGenerator
 import ru.zveron.contract.lot.lotsIdResponse
 import ru.zveron.exception.FavoritesException
+import ru.zveron.library.grpc.interceptor.model.MetadataElement
 import ru.zveron.repository.LotsFavoritesRecordRepository
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -47,7 +47,7 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `AddLotToFavorites When adds lot to favorites first time Then it is added`() {
         val (profileId1, lotId1) = PrimitivesGenerator.generateNIds(2)
-        runBlocking(AuthorizedProfileElement(profileId1)) {
+        runBlocking(MetadataElement(profileId1)) {
             lotsFavoriteService.addToFavorites(
                 LotsFavoritesRecordEntitiesGenerator.createAddLotToFavoritesRequest(lotId1)
             )
@@ -65,7 +65,7 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     fun `AddLotToFavorites When adds lot to favorites And it is already in favorites Then no exception is thrown`() {
         val (profileId1, lotId1) = PrimitivesGenerator.generateNIds(2)
         shouldNotThrow<FavoritesException> {
-            runBlocking(AuthorizedProfileElement(profileId1)) {
+            runBlocking(MetadataElement(profileId1)) {
                 saveLotId(profileId1, lotId1)
                 lotsFavoriteService.addToFavorites(
                     LotsFavoritesRecordEntitiesGenerator.createAddLotToFavoritesRequest(lotId1)
@@ -97,7 +97,7 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `RemoveLotFromFavorites When removes lot from favorites Then it is removed`() {
         val (profileId1, lotId1) = PrimitivesGenerator.generateNIds(2)
-        runBlocking(AuthorizedProfileElement(profileId1)) {
+        runBlocking(MetadataElement(profileId1)) {
             saveLotId(profileId1, lotId1)
             lotsFavoriteService.removeFromFavorites(
                 LotsFavoritesRecordEntitiesGenerator.createRemoveLotFromFavoritesRequest(lotId1)
@@ -116,7 +116,7 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     fun `RemoveLotFromFavorites When removes not favorite lot from favorites Then got exception`() {
         val (profileId1, lotId1) = PrimitivesGenerator.generateNIds(2)
         val exception = shouldThrow<FavoritesException> {
-            runBlocking(AuthorizedProfileElement(profileId1)) {
+            runBlocking(MetadataElement(profileId1)) {
                 saveLotId(profileId1, lotId1)
                 removeLot(profileId1, lotId1)
 
@@ -152,7 +152,7 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
                 expectedLots
             )
         }
-        runBlocking(AuthorizedProfileElement(profileId1)) {
+        runBlocking(MetadataElement(profileId1)) {
             saveLotId(profileId1, lotId1)
             saveLotId(profileId1, lotId2)
             saveLotId(profileId2, lotId2)

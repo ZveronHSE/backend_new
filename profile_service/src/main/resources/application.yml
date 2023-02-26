@@ -17,8 +17,13 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+
+
 server:
   port: 0
+
+
+
 spring:
   main:
     banner-mode: off
@@ -36,6 +41,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+
+
 eureka:
   client:
     register-with-eureka: true
@@ -46,3 +54,14 @@ eureka:
   instance:
     metadata-map:
       ProfileServiceExternal: 'profile_external.proto'
+
+
+
+platform:
+  grpc:
+    apigateway:
+      metadata: true
+    client:
+      logging: true
+    server:
+      logging: true

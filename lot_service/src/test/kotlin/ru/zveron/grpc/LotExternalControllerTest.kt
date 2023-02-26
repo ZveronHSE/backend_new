@@ -18,7 +18,7 @@ import ru.zveron.client.profile.ProfileClient
 import ru.zveron.contract.lot.cardLotRequest
 import ru.zveron.contract.lot.waterfallRequest
 import ru.zveron.exception.LotException
-import ru.zveron.grpc.configuration.AuthorizedProfileElement
+import ru.zveron.library.grpc.interceptor.model.MetadataElement
 import ru.zveron.service.LotService
 import ru.zveron.service.LotStatisticsService
 import ru.zveron.test.util.GeneratorUtils
@@ -73,7 +73,7 @@ class LotExternalControllerTest : DataBaseTest() {
 
     @Test
     fun `GetCardLot get response for correct request with user`(): Unit =
-        runBlocking(AuthorizedProfileElement(USER_ID)) {
+        runBlocking(MetadataElement(USER_ID)) {
             // Creating lot
             val (sellerId, addressId) = GeneratorUtils.generateIds(2)
             val lot = lotService.createLot(
