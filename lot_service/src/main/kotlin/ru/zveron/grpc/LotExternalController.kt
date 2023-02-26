@@ -156,7 +156,7 @@ class LotExternalController(
 
     override suspend fun getCardLot(request: CardLotRequest): CardLot {
         val lotId = request.id
-        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId!!
 
         val lot = lotService.getFullLotById(lotId)
 
@@ -216,7 +216,7 @@ class LotExternalController(
             )
         }
 
-        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId!!
 
         if (request.pageSize < 1) {
             throw LotException(Status.INVALID_ARGUMENT, "for parameter pageSize value can't ")
