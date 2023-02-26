@@ -38,6 +38,7 @@ import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.exception.ProfileUnauthenticated
 import ru.zveron.library.grpc.interceptor.model.MetadataElement
+import ru.zveron.library.grpc.model.Metadata
 import ru.zveron.mapper.AddressMapper.toProfileAddress
 import ru.zveron.mapper.AddressMapper.toRequest
 import ru.zveron.repository.CommunicationLinkRepository
@@ -114,7 +115,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val rating = PropsGenerator.generateDouble()
         coEvery { reviewClient.getRating(id) } returns rating
 
-        runBlocking(MetadataElement(authorizedId)) {
+        runBlocking(MetadataElement(Metadata(authorizedId))) {
             val response = service.getProfilePage(request)
 
             response responseShouldBe expectedProfile
@@ -156,7 +157,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val rating = PropsGenerator.generateDouble()
         coEvery { reviewClient.getRating(id) } returns rating
 
-        runBlocking(MetadataElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val response = service.getProfilePage(request)
 
             response responseShouldBe expectedProfile
@@ -189,7 +190,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         }
         coEvery { blacklistClient.existsInBlacklist(id, authorizedProfile) } returns true
 
-        runBlocking(MetadataElement(authorizedProfile)) {
+        runBlocking(MetadataElement(Metadata(authorizedProfile))) {
             val response = service.getProfilePage(request)
 
             response responseShouldBeBlockedAnd expectedProfile
@@ -228,7 +229,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val rating = PropsGenerator.generateDouble()
         coEvery { reviewClient.getRating(id) } returns rating
 
-        runBlocking(MetadataElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val response = service.getProfileInfo(request)
 
             response responseShouldBe expectedProfile
@@ -269,7 +270,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             this.id = newAddressId
         }
 
-        runBlocking(MetadataElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             service.setProfileInfo(request)
         }
 
@@ -300,7 +301,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
         val request = Empty.getDefaultInstance()
 
-        runBlocking(MetadataElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val response = service.getChannelTypes(request)
 
             response.channelsList channelsShouldBe settings.channels
@@ -329,7 +330,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
         val request = Empty.getDefaultInstance()
 
-        runBlocking(MetadataElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val links = service.getLinks(request)
 
             links linksShouldBe contacts
@@ -361,7 +362,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val address = generateAddress(addressId)
         coEvery { addressClient.getById(addressId) } returns address
 
-        runBlocking(MetadataElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val response = service.getSettings(request)
 
             response.channelsList channelsShouldBe settings.channels
@@ -397,7 +398,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             this.id = addressId
         }
 
-        runBlocking(MetadataElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             service.setSettings(request)
 
             val actualSettings = settingsRepository.findById(id).get()
@@ -420,7 +421,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         }
 
         val exception = shouldThrow<ProfileException> {
-            runBlocking(MetadataElement(id)) {
+            runBlocking(MetadataElement(Metadata(id))) {
                 service.setSettings(request)
             }
         }
@@ -440,7 +441,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         }
 
         val exception = shouldThrow<ProfileException> {
-            runBlocking(MetadataElement(id)) {
+            runBlocking(MetadataElement(Metadata(id))) {
                 service.setSettings(request)
             }
         }
@@ -469,7 +470,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
         val request = Empty.getDefaultInstance()
 
-        runBlocking(MetadataElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             service.deleteProfile(request)
         }
 

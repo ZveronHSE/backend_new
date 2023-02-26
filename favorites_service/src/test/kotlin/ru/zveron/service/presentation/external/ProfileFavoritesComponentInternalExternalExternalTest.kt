@@ -18,6 +18,7 @@ import ru.zveron.commons.generators.ProfilesFavoritesRecordEntitiesGenerator
 import ru.zveron.commons.generators.ProfilesFavoritesRecordEntitiesGenerator.generateProfileSummary
 import ru.zveron.exception.FavoritesException
 import ru.zveron.library.grpc.interceptor.model.MetadataElement
+import ru.zveron.library.grpc.model.Metadata
 import ru.zveron.repository.ProfilesFavoritesRecordRepository
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -41,7 +42,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `AddProfileToFavorites When adds someones profile to favorites Then it is added`() {
         val (profileId1, profileId2) = PrimitivesGenerator.generateNIds(2)
-        runBlocking(MetadataElement(profileId1)) {
+        runBlocking(MetadataElement(Metadata(profileId1))) {
             profilesFavoritesService.addToFavorites(
                 ProfilesFavoritesRecordEntitiesGenerator.createAddProfileToFavoritesRequest(profileId2)
             )
@@ -72,7 +73,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     fun `AddProfileToFavorites When adds myself to favorites Then got exception`() {
         val profileId1 = PrimitivesGenerator.generateUserId()
         val exception = shouldThrow<FavoritesException> {
-            runBlocking(MetadataElement(profileId1)) {
+            runBlocking(MetadataElement(Metadata(profileId1))) {
                 profilesFavoritesService.addToFavorites(
                     ProfilesFavoritesRecordEntitiesGenerator.createAddProfileToFavoritesRequest(profileId1)
                 )
@@ -85,7 +86,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `RemoveProfileFromFavorites When removes someones profile from favorites Then it is removed`() {
         val (profileId1, profileId2) = PrimitivesGenerator.generateNIds(2)
-        runBlocking(MetadataElement(profileId1)) {
+        runBlocking(MetadataElement(Metadata(profileId1))) {
             saveProfile(profileId1, profileId2)
             profilesFavoritesService.removeFromFavorites(
                 ProfilesFavoritesRecordEntitiesGenerator.createRemoveProfileFromFavoritesRequest(profileId2)
@@ -118,7 +119,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     fun `RemoveProfileFromFavorites When removes not favorite profile from favorites Then got exception`() {
         val (profileId1, profileId2) = PrimitivesGenerator.generateNIds(2)
         val exception = shouldThrow<FavoritesException> {
-            runBlocking(MetadataElement(profileId1)) {
+            runBlocking(MetadataElement(Metadata(profileId1))) {
                 profilesFavoritesService.removeFromFavorites(
                     ProfilesFavoritesRecordEntitiesGenerator.createRemoveProfileFromFavoritesRequest(profileId2)
                 )
@@ -132,7 +133,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     fun `RemoveProfileFromFavorites When removes myself from favorites Then got exception`() {
         val profileId1 = PrimitivesGenerator.generateUserId()
         val exception = shouldThrow<FavoritesException> {
-            runBlocking(MetadataElement(profileId1)) {
+            runBlocking(MetadataElement(Metadata(profileId1))) {
                 profilesFavoritesService.removeFromFavorites(
                     ProfilesFavoritesRecordEntitiesGenerator.createRemoveProfileFromFavoritesRequest(profileId1)
                 )
@@ -147,7 +148,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
         val (profileId1, profileId2, profileId3) = PrimitivesGenerator.generateNIds(3)
         val expectedProfiles = listOf(generateProfileSummary(profileId2))
         coEvery { profileClient.getProfilesSummary(listOf(profileId2)) } returns expectedProfiles
-        runBlocking(MetadataElement(profileId1)) {
+        runBlocking(MetadataElement(Metadata(profileId1))) {
             saveProfile(profileId1, profileId2)
             saveProfile(profileId3, profileId2)
             saveProfile(profileId2, profileId3)
