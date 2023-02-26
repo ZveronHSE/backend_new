@@ -25,6 +25,7 @@ import ru.zveron.commons.BlacklistServiceEntitiesGenerator.generateUserId
 import ru.zveron.contract.profile.getProfilesSummaryResponse
 import ru.zveron.entity.BlacklistRecord
 import ru.zveron.exception.BlacklistException
+import ru.zveron.library.grpc.exception.PlatformException
 import ru.zveron.library.grpc.interceptor.model.MetadataElement
 import ru.zveron.library.grpc.model.Metadata
 import ru.zveron.repository.BlacklistRepository
@@ -73,14 +74,14 @@ class BlacklistServiceExternalTest : BlacklistTest() {
 
     @Test
     fun `GetBlacklist When unauthenticated`() {
-        val exception = shouldThrow<BlacklistException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 blacklistService.getBlacklist(empty { })
             }
         }
 
         exception.status shouldBe Status.UNAUTHENTICATED
-        exception.message shouldBe "Authentication required"
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     @Test
@@ -120,14 +121,14 @@ class BlacklistServiceExternalTest : BlacklistTest() {
     @Test
     fun `AddToBlacklist When unauthenticated`() {
         val user1Id = generateUserId()
-        val exception = shouldThrow<BlacklistException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 blacklistService.addToBlacklist(createAddToBlacklistRequest(user1Id))
             }
         }
 
         exception.status shouldBe Status.UNAUTHENTICATED
-        exception.message shouldBe "Authentication required"
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     @Test
@@ -167,13 +168,13 @@ class BlacklistServiceExternalTest : BlacklistTest() {
     @Test
     fun `DeleteFromBlacklist When unauthenticated`() {
         val user1Id = generateUserId()
-        val exception = shouldThrow<BlacklistException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 blacklistService.deleteFromBlacklist(createDeleteFromBlacklistRequest(user1Id))
             }
         }
 
         exception.status shouldBe Status.UNAUTHENTICATED
-        exception.message shouldBe "Authentication required"
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 }

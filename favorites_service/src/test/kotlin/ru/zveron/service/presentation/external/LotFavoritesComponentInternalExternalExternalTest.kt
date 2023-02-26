@@ -1,6 +1,7 @@
 package ru.zveron.service.presentation.external
 
 import com.google.protobuf.Empty
+import io.grpc.Status
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -20,6 +21,7 @@ import ru.zveron.commons.generators.LotsFavoritesRecordEntitiesGenerator.generat
 import ru.zveron.commons.generators.PrimitivesGenerator
 import ru.zveron.contract.lot.lotsIdResponse
 import ru.zveron.exception.FavoritesException
+import ru.zveron.library.grpc.exception.PlatformException
 import ru.zveron.library.grpc.interceptor.model.MetadataElement
 import ru.zveron.library.grpc.model.Metadata
 import ru.zveron.repository.LotsFavoritesRecordRepository
@@ -85,14 +87,15 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `AddLotToFavorites When unauthenticated`() {
         val (lotId1) = PrimitivesGenerator.generateNIds(1)
-        val exception = shouldThrow<FavoritesException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 lotsFavoriteService.addToFavorites(
                     LotsFavoritesRecordEntitiesGenerator.createAddLotToFavoritesRequest(lotId1)
                 )
             }
         }
-        exception.message shouldBe "Authentication required"
+        exception.status shouldBe Status.UNAUTHENTICATED
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     @Test
@@ -133,14 +136,15 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `RemoveLotFromFavorites When unauthenticated`() {
         val (lotId1) = PrimitivesGenerator.generateNIds(1)
-        val exception = shouldThrow<FavoritesException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 lotsFavoriteService.removeFromFavorites(
                     LotsFavoritesRecordEntitiesGenerator.createRemoveLotFromFavoritesRequest(lotId1)
                 )
             }
         }
-        exception.message shouldBe "Authentication required"
+        exception.status shouldBe Status.UNAUTHENTICATED
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     @Test
@@ -167,12 +171,13 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
 
     @Test
     fun `GetFavoriteLots When unauthenticated`() {
-        val exception = shouldThrow<FavoritesException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 lotsFavoriteService.getFavoriteLots(Empty.getDefaultInstance())
             }
         }
-        exception.message shouldBe "Authentication required"
+        exception.status shouldBe Status.UNAUTHENTICATED
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     private fun saveLotId(profileId: Long, lotId: Long) = lotsFavoritesRecordRepository.save(

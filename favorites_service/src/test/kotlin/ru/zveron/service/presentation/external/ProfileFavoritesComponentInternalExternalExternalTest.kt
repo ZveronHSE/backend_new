@@ -1,6 +1,7 @@
 package ru.zveron.service.presentation.external
 
 import com.google.protobuf.Empty
+import io.grpc.Status
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -17,6 +18,7 @@ import ru.zveron.commons.generators.PrimitivesGenerator
 import ru.zveron.commons.generators.ProfilesFavoritesRecordEntitiesGenerator
 import ru.zveron.commons.generators.ProfilesFavoritesRecordEntitiesGenerator.generateProfileSummary
 import ru.zveron.exception.FavoritesException
+import ru.zveron.library.grpc.exception.PlatformException
 import ru.zveron.library.grpc.interceptor.model.MetadataElement
 import ru.zveron.library.grpc.model.Metadata
 import ru.zveron.repository.ProfilesFavoritesRecordRepository
@@ -59,14 +61,15 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `AddProfileToFavorites When unauthenticated`() {
         val (profileId2) = PrimitivesGenerator.generateNIds(1)
-        val exception = shouldThrow<FavoritesException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 profilesFavoritesService.addToFavorites(
                     ProfilesFavoritesRecordEntitiesGenerator.createAddProfileToFavoritesRequest(profileId2)
                 )
             }
         }
-        exception.message shouldBe "Authentication required"
+        exception.status shouldBe Status.UNAUTHENTICATED
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     @Test
@@ -104,7 +107,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `RemoveProfileFromFavorites When unauthenticated`() {
         val (profileId1, profileId2) = PrimitivesGenerator.generateNIds(2)
-        val exception = shouldThrow<FavoritesException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 saveProfile(profileId1, profileId2)
                 profilesFavoritesService.removeFromFavorites(
@@ -112,7 +115,8 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
                 )
             }
         }
-        exception.message shouldBe "Authentication required"
+        exception.status shouldBe Status.UNAUTHENTICATED
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     @Test
@@ -160,12 +164,13 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
 
     @Test
     fun `GetFavoriteProfiles When unauthenticated`() {
-        val exception = shouldThrow<FavoritesException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 profilesFavoritesService.getFavoriteProfiles(Empty.getDefaultInstance())
             }
         }
-        exception.message shouldBe "Authentication required"
+        exception.status shouldBe Status.UNAUTHENTICATED
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     private fun saveProfile(ownerId: Long, targetId: Long) =
