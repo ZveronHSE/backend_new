@@ -137,7 +137,7 @@ subprojects {
         liquibaseRuntime(sourceSets.getByName("main").output)
 
         // Платформенная либа:
-        implementation("com.github.zveronHse:platform-library:5f7e71abc8")
+        implementation("com.github.zveronHse:platform-library:a1dd9b4d1f")
 
         // Тесты
         testImplementation("io.grpc:grpc-testing:$grpcVersion")
