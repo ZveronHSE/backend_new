@@ -62,6 +62,6 @@ platform:
     apigateway:
       metadata: true
     client:
-      logging: true
+      logging-enabled: true
     server:
-      logging: true
+      logging-enabled: true

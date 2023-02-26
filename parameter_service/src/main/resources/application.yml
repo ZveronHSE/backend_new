@@ -37,6 +37,6 @@ platform:
     apigateway:
       metadata: false
     client:
-      logging: false
+      logging-enabled: false
     server:
-      logging: true
+      logging-enabled: true
