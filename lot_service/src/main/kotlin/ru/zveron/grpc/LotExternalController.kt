@@ -156,7 +156,7 @@ class LotExternalController(
 
     override suspend fun getCardLot(request: CardLotRequest): CardLot {
         val lotId = request.id
-        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId!!
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId
 
         val lot = lotService.getFullLotById(lotId)
 
@@ -186,7 +186,7 @@ class LotExternalController(
             )
 
             // Если пользователь авторизован:
-            if (userId != 0L) {
+            if (userId != null && userId != 0L) {
                 isOwnLot = lot.sellerId == userId
 
                 clients.add(async {
@@ -216,7 +216,7 @@ class LotExternalController(
             )
         }
 
-        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId!!
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId
 
         if (request.pageSize < 1) {
             throw LotException(Status.INVALID_ARGUMENT, "for parameter pageSize value can't ")
@@ -224,7 +224,7 @@ class LotExternalController(
 
         val lots = lotService.getWaterfall(request, userId)
 
-        val favorites = userId.takeIf { it > 0 }
+        val favorites = userId?.takeIf { it > 0 }
             ?.let { lotFavoriteClient.checkLotsAreFavorites(lots.map { it.id }, userId) }
 
 
