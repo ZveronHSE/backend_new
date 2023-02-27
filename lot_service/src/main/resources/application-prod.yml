@@ -3,7 +3,7 @@ server:
 grpc:
   server:
     port: 6061
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://registry:8761/eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://registry:8761/eureka
