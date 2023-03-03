@@ -13,8 +13,8 @@ import ru.zveron.authservice.service.mapper.ServiceMapper.toContext
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
 import ru.zveron.authservice.service.model.PhoneNumber
-import ru.zveron.contract.auth.phoneLoginInitRequest
-import ru.zveron.contract.auth.phoneLoginVerifyRequest
+import ru.zveron.contract.auth.external.phoneLoginInitRequest
+import ru.zveron.contract.auth.external.phoneLoginVerifyRequest
 import java.time.Instant
 import java.util.UUID
 
