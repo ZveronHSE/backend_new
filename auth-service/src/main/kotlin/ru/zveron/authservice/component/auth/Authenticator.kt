@@ -55,7 +55,10 @@ class Authenticator(
     /**
      * throws [InvalidTokenException]
      * */
-    suspend fun validateAccessToken(token: String): Long {
+    suspend fun validateAccessToken(token: String?): Long {
+        if (token == null) {
+            throw InvalidTokenException("Access token is null")
+        }
         val decodedToken = jwtManager.decodeAccessToken(token)
         return decodedToken.profileId
     }

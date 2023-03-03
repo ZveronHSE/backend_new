@@ -27,14 +27,14 @@ import ru.zveron.authservice.util.randomPhoneNumber
 import ru.zveron.authservice.util.randomSurname
 import ru.zveron.authservice.webclient.NotifierSuccess
 import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
-import ru.zveron.contract.auth.copy
-import ru.zveron.contract.auth.mobileTokenOrNull
-import ru.zveron.contract.auth.phoneLoginVerifyRequest
+import ru.zveron.contract.auth.external.copy
+import ru.zveron.contract.auth.external.mobileTokenOrNull
+import ru.zveron.contract.auth.external.phoneLoginVerifyRequest
 
 class AuthLoginFullFlowTest : BaseAuthTest() {
 
     @Autowired
-    lateinit var authLoginController: AuthLoginController
+    lateinit var authExternalController: AuthExternalController
 
     @Test
     fun `when login by phone init is a success and verify is success and finds account, then returns response with tokens`() =
@@ -52,7 +52,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             coEvery { notifierClient.initializeVerification(clientRequest) } returns NotifierSuccess(code)
 
             //when
-            val initResponse = authLoginController.phoneLoginInit(request)
+            val initResponse = authExternalController.phoneLoginInit(request)
 
             val verifyRequest = phoneLoginVerifyRequest {
                 this.deviceFp = deviceFp
@@ -66,7 +66,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
                 randomSurname()
             )
 
-            val verifyResponse = authLoginController.phoneLoginVerify(verifyRequest)
+            val verifyResponse = authExternalController.phoneLoginVerify(verifyRequest)
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
@@ -101,7 +101,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             coEvery { notifierClient.initializeVerification(clientRequest) } returns NotifierSuccess(code)
 
             //when
-            val initResponse = authLoginController.phoneLoginInit(request)
+            val initResponse = authExternalController.phoneLoginInit(request)
 
             val verifyRequest = phoneLoginVerifyRequest {
                 this.deviceFp = deviceFp
@@ -111,7 +111,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             coEvery { profileClient.getProfileByPhone(any()) } returns ProfileNotFound
 
-            val verifyResponse = authLoginController.phoneLoginVerify(verifyRequest)
+            val verifyResponse = authExternalController.phoneLoginVerify(verifyRequest)
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
@@ -146,7 +146,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
             coEvery { notifierClient.initializeVerification(clientRequest) } returns NotifierSuccess(code)
 
             //when
-            val initResponse = authLoginController.phoneLoginInit(request)
+            val initResponse = authExternalController.phoneLoginInit(request)
 
             val verifyRequest = phoneLoginVerifyRequest {
                 this.deviceFp = deviceFp
@@ -156,7 +156,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             coEvery { profileClient.getProfileByPhone(any()) } returns ProfileNotFound
 
-            val verifyResponse = authLoginController.phoneLoginVerify(verifyRequest)
+            val verifyResponse = authExternalController.phoneLoginVerify(verifyRequest)
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
@@ -176,7 +176,7 @@ class AuthLoginFullFlowTest : BaseAuthTest() {
 
             //here throws exception
             assertThrows<ru.zveron.authservice.exception.CodeValidatedException> {
-                authLoginController.phoneLoginVerify(verifyRequest)
+                authExternalController.phoneLoginVerify(verifyRequest)
             }
         }
 }

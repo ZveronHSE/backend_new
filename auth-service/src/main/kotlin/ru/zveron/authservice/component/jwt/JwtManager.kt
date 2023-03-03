@@ -17,12 +17,12 @@ class JwtManager(
 ) {
 
     fun issueMobileTokens(request: IssueMobileTokensRequest): MobileTokens {
-        val accessToken = issueMobileAccessToken(request)
+        val accessToken = issueAccessToken(request)
         val refreshToken = issueRefreshToken(request)
         return MobileTokens(refreshToken, accessToken)
     }
 
-    private fun issueMobileAccessToken(request: IssueMobileTokensRequest): AccessToken {
+    private fun issueAccessToken(request: IssueMobileTokensRequest): AccessToken {
         val claimsBuilder = JWTClaimsSet.Builder()
             .claim(SESSION_ID, request.session.id)
             .subject(request.profileId.toString())
