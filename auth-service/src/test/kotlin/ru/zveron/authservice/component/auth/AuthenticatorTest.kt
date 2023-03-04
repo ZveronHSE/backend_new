@@ -8,7 +8,6 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import ru.zveron.authservice.component.auth.model.RefreshMobileSessionRequest
 import ru.zveron.authservice.component.jwt.JwtManager
-import ru.zveron.authservice.component.jwt.model.IssueMobileTokensRequest
 import ru.zveron.authservice.exception.InvalidTokenException
 import ru.zveron.authservice.exception.SessionExpiredException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
@@ -43,7 +42,6 @@ class AuthenticatorTest {
         val decodedToken = randomDecodedToken()
         val profile = ProfileFound(decodedToken.profileId, randomName(), randomSurname())
         val session = randomSessionEntity()
-        val issueTokensRequest = IssueMobileTokensRequest(profile.id, session)
         val refreshMobileSessionReq = RefreshMobileSessionRequest(token, fp)
 
         coEvery { jwtManager.decodeRefreshToken(eq(token)) } returns decodedToken
@@ -55,7 +53,7 @@ class AuthenticatorTest {
                 decodedToken.tokenIdentifier
             )
         } returns session
-        coEvery { jwtManager.issueMobileTokens(eq(issueTokensRequest)) } returns randomTokens()
+        coEvery { jwtManager.issueMobileTokens(profile.id, session) } returns randomTokens()
 
         assertDoesNotThrow {
             service.refreshMobileSession(refreshMobileSessionReq)

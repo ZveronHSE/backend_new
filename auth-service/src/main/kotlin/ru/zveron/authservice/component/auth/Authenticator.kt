@@ -4,7 +4,6 @@ import mu.KLogging
 import org.springframework.stereotype.Component
 import ru.zveron.authservice.component.auth.model.RefreshMobileSessionRequest
 import ru.zveron.authservice.component.jwt.JwtManager
-import ru.zveron.authservice.component.jwt.model.IssueMobileTokensRequest
 import ru.zveron.authservice.component.jwt.model.MobileTokens
 import ru.zveron.authservice.exception.InvalidTokenException
 import ru.zveron.authservice.exception.SessionExpiredException
@@ -25,10 +24,8 @@ class Authenticator(
         val session = sessionStorage.createSession(fingerprint = fingerprint, profileId = profileId)
 
         return jwtManager.issueMobileTokens(
-            IssueMobileTokensRequest(
-                profileId = profileId,
-                session = session,
-            )
+            profileId = profileId,
+            session = session,
         )
     }
 
@@ -49,7 +46,7 @@ class Authenticator(
             sessionStorage.updateSession(decodedToken.sessionId, request.fingerprint, decodedToken.tokenIdentifier)
                 ?: throw InvalidTokenException("No session wss bound to token")
 
-        return jwtManager.issueMobileTokens(IssueMobileTokensRequest(decodedToken.profileId, sessionEntity))
+        return jwtManager.issueMobileTokens(decodedToken.profileId, sessionEntity)
     }
 
     /**
@@ -59,7 +56,12 @@ class Authenticator(
         if (token == null) {
             throw InvalidTokenException("Access token is null")
         }
+
         val decodedToken = jwtManager.decodeAccessToken(token)
+        if (decodedToken.isExpired()){
+            throw InvalidTokenException()
+        }
+
         return decodedToken.profileId
     }
 }

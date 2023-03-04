@@ -1,4 +1,4 @@
-package ru.zveron.authservice.component.jwt.model
+package ru.zveron.authservice.component.jwt.contant
 
 import com.fasterxml.jackson.annotation.JsonCreator
 
