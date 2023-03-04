@@ -1,12 +1,16 @@
 package ru.zveron.authservice.grpc
 
+import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.authservice.component.auth.Authenticator
+import ru.zveron.authservice.exception.InvalidTokenException
+import ru.zveron.authservice.grpc.context.AccessTokenElement
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toGrpcContract
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toGrpcToken
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toServiceRequest
 import ru.zveron.authservice.service.LoginByPasswordFlowService
 import ru.zveron.authservice.service.LoginByPhoneFlowService
+import ru.zveron.authservice.service.LogoutService
 import ru.zveron.authservice.service.RegistrationService
 import ru.zveron.contract.auth.external.AuthServiceExternalGrpcKt
 import ru.zveron.contract.auth.external.IssueNewTokensRequest
@@ -18,6 +22,7 @@ import ru.zveron.contract.auth.external.PhoneLoginVerifyRequest
 import ru.zveron.contract.auth.external.PhoneLoginVerifyResponse
 import ru.zveron.contract.auth.external.PhoneRegisterRequest
 import ru.zveron.contract.auth.external.phoneLoginInitResponse
+import kotlin.coroutines.coroutineContext
 
 @GrpcService
 class AuthExternalController(
@@ -25,6 +30,7 @@ class AuthExternalController(
     private val authenticator: Authenticator,
     private val loginByPasswordFlowService: LoginByPasswordFlowService,
     private val registrationService: RegistrationService,
+    private val logoutService: LogoutService,
 ) : AuthServiceExternalGrpcKt.AuthServiceExternalCoroutineImplBase() {
 
     override suspend fun phoneLoginInit(request: PhoneLoginInitRequest): PhoneLoginInitResponse {
@@ -53,5 +59,12 @@ class AuthExternalController(
         val response = registrationService.registerByPhone(request.toServiceRequest())
 
         return response.toGrpcToken()
+    }
+
+    override suspend fun performLogout(request: Empty): Empty {
+        val accessToken = coroutineContext[AccessTokenElement.Key]?.accessToken ?: throw InvalidTokenException()
+        logoutService.logout(accessToken)
+
+        return Empty.getDefaultInstance()
     }
 }

@@ -19,6 +19,7 @@ import ru.zveron.authservice.webclient.NotifierClient
     properties = [
         "zveron.cron.session.rate-in-ms=5000",
         "zveron.cron.flow-context.rate-in-ms=5000",
+        "spring.main.web-application-type=reactive"
     ]
 )
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)

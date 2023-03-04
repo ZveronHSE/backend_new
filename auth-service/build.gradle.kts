@@ -7,10 +7,12 @@ configurations {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-jetty:$springVersion")
+    //reactive server
+    implementation("org.springframework.boot:spring-boot-starter-reactor-netty:$springVersion")
+
+    //coroutines with reactor
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinxVersion")
-
 
     //reactive database
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springVersion")

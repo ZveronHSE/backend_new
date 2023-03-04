@@ -6,10 +6,10 @@ import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.JWSSigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import ru.zveron.authservice.component.jwt.Constants.TOKEN_TYPE
+import ru.zveron.authservice.component.jwt.contant.TokenConstants.TOKEN_TYPE
 import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.RefreshToken
-import ru.zveron.authservice.component.jwt.model.TokenType
+import ru.zveron.authservice.component.jwt.contant.TokenType
 import java.time.Instant
 import java.util.Date
 
