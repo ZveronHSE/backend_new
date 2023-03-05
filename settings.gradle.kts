@@ -27,4 +27,5 @@ include(
     "profile_service",
     "auth-service",
     "object-storage",
+    "push_notification",
 )

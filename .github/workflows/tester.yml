@@ -66,3 +66,7 @@ jobs:
       - name: Test object storage
         shell: bash
         run: if grep -q "object-storage" "temp.txt"; then gradle :object-storage:test --stacktrace; fi
+
+      - name: Test push notification
+        shell: bash
+        run: if grep -q "push_notification" "temp.txt"; then gradle :push_notification:test --stacktrace; fi
