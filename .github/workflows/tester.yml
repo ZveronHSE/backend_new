@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
@@ -64,3 +64,9 @@ jobs:
       - name: Test ${{ matrix.name }}
         shell: bash
         run: gradle :${{ matrix.gradle }}:test --stacktrace
+
+  check:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - run: echo Check success!
