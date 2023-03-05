@@ -64,5 +64,3 @@ jobs:
       - name: Test ${{ matrix.name }}
         shell: bash
         run: gradle :${{ matrix.gradle }}:test --stacktrace
-        with:
-          context: .
