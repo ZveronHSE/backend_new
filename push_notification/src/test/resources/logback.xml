@@ -14,6 +14,6 @@
         <appender-ref ref="CONSOLE"/>
     </root>
     <logger name="org.testcontainers.dockerclient" level="DEBUG"/>
-    <logger name="ru.zveron.objectstorage" level="DEBUG"/>
+    <logger name="ru.zveron.push" level="DEBUG"/>
 
 </configuration>
