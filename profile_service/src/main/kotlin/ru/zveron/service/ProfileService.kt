@@ -209,6 +209,8 @@ class ProfileService(
         profileRepository.save(updatedProfile)
     }
 
+    suspend fun existsById(id: Long) = profileRepository.existsById(id)
+
     private fun CoroutineScope.inOwnerBlacklist(
         requestedProfileId: Long,
         authorizedProfileId: Long,

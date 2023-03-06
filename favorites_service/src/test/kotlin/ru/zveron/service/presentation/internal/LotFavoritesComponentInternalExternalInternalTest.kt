@@ -24,17 +24,20 @@ class LotFavoritesComponentInternalExternalInternalTest : FavoritesTest() {
     @Test
     fun `LotExistsInFavorites When checks if lot exists in favorites Then returns correct results`() {
         val (profileId1, lotId1, lotId2, lotId3) = PrimitivesGenerator.generateNIds(4)
+        val categoryId = PrimitivesGenerator.generateCategoryId()
         runBlocking {
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId1,
-                    lotId1
+                    lotId1,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId1,
-                    lotId3
+                    lotId3,
+                    categoryId,
                 )
             )
 
@@ -53,29 +56,34 @@ class LotFavoritesComponentInternalExternalInternalTest : FavoritesTest() {
     fun `RemoveAllLotsByOwner When removes Than appropriate records should be removed`() {
         val (profileId1, profileId2) = PrimitivesGenerator.generateNIds(2)
         val (lotId1, lotId2, lotId3) = PrimitivesGenerator.generateNIds(3)
+        val categoryId = PrimitivesGenerator.generateCategoryId()
         runBlocking {
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId1,
-                    lotId1
+                    lotId1,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId1,
-                    lotId2
+                    lotId2,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId2,
-                    lotId2
+                    lotId2,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId2,
-                    lotId3
+                    lotId3,
+                    categoryId,
                 )
             )
 
@@ -95,29 +103,34 @@ class LotFavoritesComponentInternalExternalInternalTest : FavoritesTest() {
     fun `RemoveAllByFavoriteLot When removes Than appropriate records should be removed`() {
         val (profileId1, profileId2) = PrimitivesGenerator.generateNIds(2)
         val (lotId1, lotId2, lotId3) = PrimitivesGenerator.generateNIds(3)
+        val categoryId = PrimitivesGenerator.generateCategoryId()
         runBlocking {
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId1,
-                    lotId1
+                    lotId1,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId1,
-                    lotId2
+                    lotId2,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId2,
-                    lotId2
+                    lotId2,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId2,
-                    lotId3
+                    lotId3,
+                    categoryId,
                 )
             )
 
@@ -135,23 +148,27 @@ class LotFavoritesComponentInternalExternalInternalTest : FavoritesTest() {
     @Test
     fun `GetCounter When request is correct`() {
         val (profileId1, profileId2, lotId1, lotId2) = PrimitivesGenerator.generateNIds(4)
+        val categoryId = PrimitivesGenerator.generateCategoryId()
         runBlocking {
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId1,
-                    lotId1
+                    lotId1,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId2,
-                    lotId1
+                    lotId1,
+                    categoryId,
                 )
             )
             lotsFavoritesRecordRepository.save(
                 LotsFavoritesRecordEntitiesGenerator.generateLotRecords(
                     profileId2,
-                    lotId2
+                    lotId2,
+                    categoryId,
                 )
             )
 

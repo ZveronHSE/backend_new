@@ -113,6 +113,7 @@ object LotMapper {
                 publicationDate = lot.createdAt.toFormattingDate()
                 favorites?.let { favorite = it[index] }
                 status = Status.forNumber(lot.status.ordinal)
+                categoryId = lot.categoryId
             }
         }
 

@@ -17,6 +17,9 @@ class ProfileFavoritesService(
         if (authorizedProfileId == targetUserId) {
             throw FavoritesException("Нельзя добавить себя в свой список избранного")
         }
+        if (!profileClient.existsById(targetUserId)) {
+            throw FavoritesException("Пользователя с id: $targetUserId не существует")
+        }
         service.addToFavorites(authorizedProfileId = authorizedProfileId, targetUserId = targetUserId)
     }
 

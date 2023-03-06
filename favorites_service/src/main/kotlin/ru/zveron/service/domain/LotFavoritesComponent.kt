@@ -9,12 +9,13 @@ import ru.zveron.repository.LotsFavoritesRecordRepository
 @Service
 class LotFavoritesComponent(private val lotRepository: LotsFavoritesRecordRepository) {
 
-    suspend fun addToFavorites(profileId: Long, lotId: Long) = lotRepository.save(
+    suspend fun addToFavorites(profileId: Long, lotId: Long, categoryId: Int) = lotRepository.save(
         LotsFavoritesRecord(
             LotsFavoritesRecord.LotsFavoritesKey(
                 ownerUserId = profileId,
                 favoriteLotId = lotId
-            )
+            ),
+            categoryId
         )
     )
 
@@ -39,11 +40,17 @@ class LotFavoritesComponent(private val lotRepository: LotsFavoritesRecordReposi
         )
     }
 
-    suspend fun getFavorites(profileId: Long) = lotRepository.getAllById_OwnerUserId(profileId)
+    suspend fun getFavorites(profileId: Long, categoryId: Int) =
+        lotRepository.getAllById_OwnerUserIdAndCategoryId(profileId, categoryId)
 
     suspend fun getCounter(lotId: Long) = lotRepository.countAllById_FavoriteLotId(lotId)
 
     suspend fun removeAllByOwner(profileId: Long) = lotRepository.deleteAllById_OwnerUserId(profileId)
 
     suspend fun removeAllByLot(lotId: Long) = lotRepository.deleteAllById_FavoriteLotId(lotId)
+
+    suspend fun removeAllByCategoryId(profileId: Long, categoryId: Int) =
+        lotRepository.deleteById_OwnerUserIdAndCategoryId(profileId, categoryId)
+
+    suspend fun removeAllByKey(keys: List<LotsFavoritesRecord.LotsFavoritesKey>) = lotRepository.deleteAllById(keys)
 }

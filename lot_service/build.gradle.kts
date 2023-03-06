@@ -20,5 +20,5 @@ dependencies {
     implementation("com.github.zveronHSe.contract:favorites:$contractVersion")
     implementation("com.github.zveronHSe.contract:address:$contractVersion")
     implementation("com.github.zveronHSe.contract:profile:$contractVersion")
-    implementation("com.github.zveronHSe.contract:lot:$contractVersion")
+    implementation("com.github.zveronHSe.contract:lot:feature~ZV-342-favorite-lots-separation-SNAPSHOT")
 }

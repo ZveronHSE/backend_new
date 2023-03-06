@@ -18,6 +18,7 @@ import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.contract.profile.createProfileRequest
+import ru.zveron.contract.profile.existsByIdRequest
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
 import ru.zveron.contract.profile.getProfileWithContactsRequest
@@ -398,6 +399,26 @@ class ProfileServiceInternalTest : ProfileTest() {
             val response = service.getProfilesSummary(request).profilesList
             response.first { it.id == profiles[0].id } profileShouldBe profiles[0]
             response.first { it.id == profiles[1].id  } profileShouldBe profiles[1]
+        }
+    }
+
+    @Test
+    fun `ExistsById if exists`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        generateLinks(expectedProfile, addVk = true)
+        val id = profileRepository.save(expectedProfile).id
+
+        runBlocking {
+            service.existsById(existsByIdRequest { this.id = id }).exists shouldBe true
+        }
+    }
+
+    @Test
+    fun `ExistsById if not exists`() {
+        runBlocking {
+            service.existsById(existsByIdRequest { this.id = PropsGenerator.generateLongId() }).exists shouldBe false
         }
     }
 
