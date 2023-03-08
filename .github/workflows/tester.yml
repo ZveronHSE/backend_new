@@ -6,7 +6,43 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: Address Service
+            gradle: address_service
+
+          - name: API Gateway
+            gradle: apigateway
+
+          - name: Blacklist Service
+            gradle: blacklist_service
+
+          - name: Favorites Service
+            gradle: favorites_service
+
+          - name: Parameter Service
+            gradle: parameter_service
+
+          - name: Profile Service
+            gradle: profile_service
+
+          - name: Lot Service
+            gradle: lot_service
+
+          - name: Service Registry
+            gradle: service_registry
+
+          - name: Auth Service
+            gradle: auth-service
+
+          - name: Object Storage
+            gradle: object-storage
+
+          - name: Push Notification
+            gradle: push_notification
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -14,8 +50,8 @@ jobs:
       - name: Get changed files
         shell: bash
         run: |
-          git fetch origin master
-          (git diff origin/master HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
+          git fetch origin dev
+          (git diff origin/dev HEAD --name-only | cut -d "/" -f1 | uniq) >> temp.txt
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v2.3.0
@@ -31,38 +67,12 @@ jobs:
         with:
           gradle-version: 7.4.1
 
-      - name: Test blacklist service
+      - name: Test ${{ matrix.name }}
         shell: bash
-        run: if grep -q "blacklist_service" "temp.txt"; then gradle :blacklist_service:test --stacktrace; fi
+        run: if grep -q "${{ matrix.gradle }}" "temp.txt"; then gradle :${{ matrix.gradle }}:test --stacktrace; fi
 
-      - name: Test address service
-        shell: bash
-        run: if grep -q "address_service" "temp.txt"; then gradle :address_service:test --stacktrace; fi
-
-      - name: Test favorites service
-        shell: bash
-        run: if grep -q "favorites_service" "temp.txt"; then gradle :favorites_service:test --stacktrace; fi
-
-      - name: Test parameter service
-        shell: bash
-        run: if grep -q "parameter_service" "temp.txt"; then gradle :parameter_service:test --stacktrace; fi
-
-      - name: Test profile service
-        shell: bash
-        run: if grep -q "profile_service" "temp.txt"; then gradle :profile_service:test --stacktrace; fi
-
-      - name: Test auth service
-        shell: bash
-        run: if grep -q "auth-service" "temp.txt"; then gradle :auth-service:test --stacktrace; fi
-
-      - name: Test apigateway service
-        shell: bash
-        run: if grep -q "apigateway" "temp.txt"; then gradle :apigateway:test --stacktrace; fi
-
-      - name: Test lot service
-        shell: bash
-        run: if grep -q "lot_service" "temp.txt"; then gradle :lot_service:test --stacktrace; fi
-
-      - name: Test object storage
-        shell: bash
-        run: if grep -q "object-storage" "temp.txt"; then gradle :object-storage:test --stacktrace; fi
+  check:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - run: echo Check success!

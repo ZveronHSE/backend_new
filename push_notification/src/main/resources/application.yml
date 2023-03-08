@@ -1,0 +1,43 @@
+spring:
+  main:
+    banner-mode: off
+    allow-bean-definition-overriding: true
+
+  liquibase:
+    enabled: false
+
+  application:
+    name: push_notification
+
+  datasource:
+    url: jdbc:postgresql://localhost:5555/push
+    password: zveron_password
+    username: zveron_user
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+grpc:
+  server:
+    port: 0
+
+eureka:
+  client:
+    webclient:
+      enabled: false
+    register-with-eureka: true
+    fetch-registry: true
+    enabled: true
+
+platform:
+  grpc:
+    apigateway:
+      metadata: false
+    client:
+      logging-enabled: false
+    server:
+      logging-enabled: false
