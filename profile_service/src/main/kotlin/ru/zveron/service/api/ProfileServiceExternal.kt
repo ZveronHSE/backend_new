@@ -2,17 +2,17 @@ package ru.zveron.service.api
 
 import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.service.GrpcService
-import ru.zveron.config.AuthorizedProfileElement
 import ru.zveron.contract.profile.GetChannelTypesResponse
 import ru.zveron.contract.profile.GetProfileInfoResponse
 import ru.zveron.contract.profile.GetProfilePageRequest
 import ru.zveron.contract.profile.GetProfilePageResponse
 import ru.zveron.contract.profile.GetSettingsResponse
-import ru.zveron.contract.profile.model.Links
 import ru.zveron.contract.profile.ProfileServiceExternalGrpcKt
 import ru.zveron.contract.profile.SetProfileInfoRequest
 import ru.zveron.contract.profile.SetSettingsRequest
+import ru.zveron.contract.profile.model.Links
 import ru.zveron.exception.ProfileUnauthenticated
+import ru.zveron.library.grpc.util.GrpcUtils
 import ru.zveron.mapper.ContactsMapper.toLinks
 import ru.zveron.service.CommunicationLinkService
 import ru.zveron.service.ProfileService
@@ -78,5 +78,6 @@ class ProfileServiceExternal(
         return Empty.getDefaultInstance()
     }
 
-    private suspend fun getAuthorizedProfileId() = coroutineContext[AuthorizedProfileElement]?.id
+    private suspend fun getAuthorizedProfileId() =
+        GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId
 }

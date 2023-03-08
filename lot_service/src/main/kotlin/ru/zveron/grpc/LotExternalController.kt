@@ -22,13 +22,13 @@ import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.WaterfallResponse
 import ru.zveron.contract.parameter.internal.InfoCategory
 import ru.zveron.exception.LotException
+import ru.zveron.library.grpc.util.GrpcUtils
 import ru.zveron.mapper.CardLotBuilder.Companion.buildCardLot
 import ru.zveron.mapper.LotMapper
 import ru.zveron.model.Address
 import ru.zveron.model.SellerProfile
 import ru.zveron.service.LotService
 import ru.zveron.service.LotStatisticsService
-import ru.zveron.util.UserUtil
 import kotlin.coroutines.coroutineContext
 
 @GrpcService
@@ -42,7 +42,7 @@ class LotExternalController(
 ) : LotExternalProtoServiceGrpcKt.LotExternalProtoServiceCoroutineImplBase() {
 
     override suspend fun createLot(request: CreateLotRequest): CardLot {
-        val userId = UserUtil.getUserId(true, coroutineContext)
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         var seller: SellerProfile? = null
         var address: Address? = null
@@ -87,7 +87,7 @@ class LotExternalController(
     }
 
     override suspend fun editLot(request: EditLotRequest): CardLot {
-        val userId = UserUtil.getUserId(true, coroutineContext)
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         var lot = lotService.getLotById(request.id)
 
@@ -138,7 +138,7 @@ class LotExternalController(
 
 
     override suspend fun closeLot(request: CloseLotRequest): Empty {
-        val userId = UserUtil.getUserId(true, coroutineContext)
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         val lot = lotService.getLotById(request.id)
 
@@ -156,7 +156,7 @@ class LotExternalController(
 
     override suspend fun getCardLot(request: CardLotRequest): CardLot {
         val lotId = request.id
-        val userId = UserUtil.getUserId(false, coroutineContext)
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId
 
         val lot = lotService.getFullLotById(lotId)
 
@@ -186,7 +186,7 @@ class LotExternalController(
             )
 
             // Если пользователь авторизован:
-            if (userId != 0L) {
+            if (userId != null && userId != 0L) {
                 isOwnLot = lot.sellerId == userId
 
                 clients.add(async {
@@ -216,7 +216,7 @@ class LotExternalController(
             )
         }
 
-        val userId = UserUtil.getUserId(false, coroutineContext)
+        val userId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = false).profileId
 
         if (request.pageSize < 1) {
             throw LotException(Status.INVALID_ARGUMENT, "for parameter pageSize value can't ")
@@ -224,7 +224,7 @@ class LotExternalController(
 
         val lots = lotService.getWaterfall(request, userId)
 
-        val favorites = userId.takeIf { it > 0 }
+        val favorites = userId?.takeIf { it > 0 }
             ?.let { lotFavoriteClient.checkLotsAreFavorites(lots.map { it.id }, userId) }
 
 

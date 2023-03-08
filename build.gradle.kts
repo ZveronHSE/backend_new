@@ -136,6 +136,9 @@ subprojects {
         liquibaseRuntime(sourceSets.getByName("main").compileClasspath)
         liquibaseRuntime(sourceSets.getByName("main").output)
 
+        // Платформенная либа:
+        implementation("com.github.zveronHse:platform-library:1.0.0")
+
         // Тесты
         testImplementation("io.grpc:grpc-testing:$grpcVersion")
         testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")

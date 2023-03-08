@@ -31,3 +31,14 @@ eureka:
   instance:
     metadata-map:
       AuthService: 'ObjectStorage.proto'
+
+
+
+platform:
+  grpc:
+    apigateway:
+      metadata: false
+    client:
+      logging-enabled: false
+    server:
+      logging-enabled: true

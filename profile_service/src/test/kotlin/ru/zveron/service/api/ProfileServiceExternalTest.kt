@@ -3,7 +3,8 @@ package ru.zveron.service.api
 import com.google.protobuf.Empty
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.mockk.coEvery import io.mockk.mockk
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -11,10 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import ru.zveron.contract.profile.model.ChannelType
-import ru.zveron.contract.profile.LotStatus
 import ru.zveron.ProfileTest
-import ru.zveron.mapper.AddressMapper.toProfileAddress
 import ru.zveron.commons.assertions.addressShouldBe
 import ru.zveron.commons.assertions.channelsShouldBe
 import ru.zveron.commons.assertions.linksShouldBe
@@ -28,24 +26,28 @@ import ru.zveron.commons.generator.LotsGenerator
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
-import ru.zveron.config.AuthorizedProfileElement
 import ru.zveron.contract.address.addressResponse
 import ru.zveron.contract.lot.profileLotsResponse
+import ru.zveron.contract.profile.LotStatus
 import ru.zveron.contract.profile.SetSettingsRequest
+import ru.zveron.contract.profile.getProfilePageRequest
+import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.contract.profile.setProfileInfoRequest
+import ru.zveron.contract.profile.setSettingsRequest
 import ru.zveron.exception.ProfileException
 import ru.zveron.exception.ProfileNotFoundException
-import ru.zveron.contract.profile.getProfilePageRequest
+import ru.zveron.exception.ProfileUnauthenticated
+import ru.zveron.library.grpc.interceptor.model.MetadataElement
+import ru.zveron.library.grpc.model.Metadata
+import ru.zveron.mapper.AddressMapper.toProfileAddress
+import ru.zveron.mapper.AddressMapper.toRequest
+import ru.zveron.repository.CommunicationLinkRepository
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.repository.SettingsRepository
 import ru.zveron.service.client.address.AddressClient
 import ru.zveron.service.client.blakclist.BlacklistClient
 import ru.zveron.service.client.lot.LotClient
 import ru.zveron.service.client.review.ReviewClient
-import ru.zveron.contract.profile.setProfileInfoRequest
-import ru.zveron.contract.profile.setSettingsRequest
-import ru.zveron.exception.ProfileUnauthenticated
-import ru.zveron.mapper.AddressMapper.toRequest
-import ru.zveron.repository.CommunicationLinkRepository
 import java.time.Instant
 
 class ProfileServiceExternalTest : ProfileTest() {
@@ -113,7 +115,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val rating = PropsGenerator.generateDouble()
         coEvery { reviewClient.getRating(id) } returns rating
 
-        runBlocking(AuthorizedProfileElement(authorizedId)) {
+        runBlocking(MetadataElement(Metadata(authorizedId))) {
             val response = service.getProfilePage(request)
 
             response responseShouldBe expectedProfile
@@ -155,7 +157,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val rating = PropsGenerator.generateDouble()
         coEvery { reviewClient.getRating(id) } returns rating
 
-        runBlocking(AuthorizedProfileElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val response = service.getProfilePage(request)
 
             response responseShouldBe expectedProfile
@@ -188,7 +190,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         }
         coEvery { blacklistClient.existsInBlacklist(id, authorizedProfile) } returns true
 
-        runBlocking(AuthorizedProfileElement(authorizedProfile)) {
+        runBlocking(MetadataElement(Metadata(authorizedProfile))) {
             val response = service.getProfilePage(request)
 
             response responseShouldBeBlockedAnd expectedProfile
@@ -227,7 +229,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val rating = PropsGenerator.generateDouble()
         coEvery { reviewClient.getRating(id) } returns rating
 
-        runBlocking(AuthorizedProfileElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val response = service.getProfileInfo(request)
 
             response responseShouldBe expectedProfile
@@ -268,7 +270,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             this.id = newAddressId
         }
 
-        runBlocking(AuthorizedProfileElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             service.setProfileInfo(request)
         }
 
@@ -299,7 +301,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
         val request = Empty.getDefaultInstance()
 
-        runBlocking(AuthorizedProfileElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val response = service.getChannelTypes(request)
 
             response.channelsList channelsShouldBe settings.channels
@@ -328,7 +330,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
         val request = Empty.getDefaultInstance()
 
-        runBlocking(AuthorizedProfileElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val links = service.getLinks(request)
 
             links linksShouldBe contacts
@@ -360,7 +362,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val address = generateAddress(addressId)
         coEvery { addressClient.getById(addressId) } returns address
 
-        runBlocking(AuthorizedProfileElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             val response = service.getSettings(request)
 
             response.channelsList channelsShouldBe settings.channels
@@ -396,7 +398,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             this.id = addressId
         }
 
-        runBlocking(AuthorizedProfileElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             service.setSettings(request)
 
             val actualSettings = settingsRepository.findById(id).get()
@@ -419,7 +421,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         }
 
         val exception = shouldThrow<ProfileException> {
-            runBlocking(AuthorizedProfileElement(id)) {
+            runBlocking(MetadataElement(Metadata(id))) {
                 service.setSettings(request)
             }
         }
@@ -439,7 +441,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         }
 
         val exception = shouldThrow<ProfileException> {
-            runBlocking(AuthorizedProfileElement(id)) {
+            runBlocking(MetadataElement(Metadata(id))) {
                 service.setSettings(request)
             }
         }
@@ -468,7 +470,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val id = profileRepository.save(expectedProfile).id
         val request = Empty.getDefaultInstance()
 
-        runBlocking(AuthorizedProfileElement(id)) {
+        runBlocking(MetadataElement(Metadata(id))) {
             service.deleteProfile(request)
         }
 

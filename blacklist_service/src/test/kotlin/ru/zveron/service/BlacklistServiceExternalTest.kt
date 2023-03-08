@@ -22,10 +22,12 @@ import ru.zveron.commons.BlacklistServiceEntitiesGenerator.generateBlacklistReco
 import ru.zveron.commons.BlacklistServiceEntitiesGenerator.generateNIds
 import ru.zveron.commons.BlacklistServiceEntitiesGenerator.generateProfileSummary
 import ru.zveron.commons.BlacklistServiceEntitiesGenerator.generateUserId
-import ru.zveron.config.AuthorizedProfileElement
 import ru.zveron.contract.profile.getProfilesSummaryResponse
 import ru.zveron.entity.BlacklistRecord
 import ru.zveron.exception.BlacklistException
+import ru.zveron.library.grpc.exception.PlatformException
+import ru.zveron.library.grpc.interceptor.model.MetadataElement
+import ru.zveron.library.grpc.model.Metadata
 import ru.zveron.repository.BlacklistRepository
 
 @Suppress("BlockingMethodInNonBlockingContext")
@@ -54,7 +56,7 @@ class BlacklistServiceExternalTest : BlacklistTest() {
         coEvery { profileClient.getProfilesSummary(listOf(user2Id, user3Id)) } returns getProfilesSummaryResponse {
             profiles.addAll(listOf(profile2, profile3))
         }
-        runBlocking(AuthorizedProfileElement(user1Id)) {
+        runBlocking(MetadataElement(Metadata(user1Id))) {
             val record1 = blacklistRepository.save(BlacklistRecord(BlacklistRecord.BlacklistKey(user1Id, user2Id)))
             val record2 = blacklistRepository.save(BlacklistRecord(BlacklistRecord.BlacklistKey(user1Id, user3Id)))
             blacklistRepository.save(BlacklistRecord(BlacklistRecord.BlacklistKey(user2Id, user3Id)))
@@ -63,8 +65,8 @@ class BlacklistServiceExternalTest : BlacklistTest() {
 
             set.apply {
                 size shouldBe 2
-                first { it.id ==  user2Id} summaryShouldBe profile2
-                first { it.id ==  user3Id} summaryShouldBe profile3
+                first { it.id == user2Id } summaryShouldBe profile2
+                first { it.id == user3Id } summaryShouldBe profile3
             }
             set.map { it.id }.shouldContainExactlyInAnyOrder(record1.id.reportedUserId, record2.id.reportedUserId)
         }
@@ -72,20 +74,20 @@ class BlacklistServiceExternalTest : BlacklistTest() {
 
     @Test
     fun `GetBlacklist When unauthenticated`() {
-        val exception = shouldThrow<BlacklistException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 blacklistService.getBlacklist(empty { })
             }
         }
 
         exception.status shouldBe Status.UNAUTHENTICATED
-        exception.message shouldBe "Authentication required"
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     @Test
     fun `AddToBlacklist When add someone to blacklist new record is created`() {
         val (user1Id, user2Id) = generateNIds(2)
-        runBlocking(AuthorizedProfileElement(user1Id)) {
+        runBlocking(MetadataElement(Metadata(user1Id))) {
             blacklistService.addToBlacklist(createAddToBlacklistRequest(user2Id))
 
             blacklistRepository.findById(generateBlacklistRecord(user1Id, user2Id).id).isPresent shouldBe true
@@ -96,7 +98,7 @@ class BlacklistServiceExternalTest : BlacklistTest() {
     fun `AddToBlacklist When add someone to blacklist while it is in the black list no exceptions are thrown`() {
         val (user1Id, user2Id) = generateNIds(2)
         shouldNotThrow<BlacklistException> {
-            runBlocking(AuthorizedProfileElement(user1Id)) {
+            runBlocking(MetadataElement(Metadata(user1Id))) {
                 blacklistRepository.save(generateBlacklistRecord(user1Id, user2Id))
 
                 blacklistService.addToBlacklist(createAddToBlacklistRequest(user2Id))
@@ -108,7 +110,7 @@ class BlacklistServiceExternalTest : BlacklistTest() {
     fun `AddToBlacklist When add myself to blacklist got exception`() {
         val user1Id = generateUserId()
         val exception = shouldThrow<BlacklistException> {
-            runBlocking(AuthorizedProfileElement(user1Id)) {
+            runBlocking(MetadataElement(Metadata(user1Id))) {
                 blacklistService.addToBlacklist(createAddToBlacklistRequest(user1Id))
             }
         }
@@ -119,20 +121,20 @@ class BlacklistServiceExternalTest : BlacklistTest() {
     @Test
     fun `AddToBlacklist When unauthenticated`() {
         val user1Id = generateUserId()
-        val exception = shouldThrow<BlacklistException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 blacklistService.addToBlacklist(createAddToBlacklistRequest(user1Id))
             }
         }
 
         exception.status shouldBe Status.UNAUTHENTICATED
-        exception.message shouldBe "Authentication required"
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 
     @Test
     fun `DeleteFromBlacklist When delete someone from blacklist new record is deleted`() {
         val (user1Id, user2Id) = generateNIds(2)
-        runBlocking(AuthorizedProfileElement(user1Id)) {
+        runBlocking(MetadataElement(Metadata(user1Id))) {
             val record = blacklistRepository.save(generateBlacklistRecord(user1Id, user2Id))
 
             blacklistService.deleteFromBlacklist(createDeleteFromBlacklistRequest(user2Id))
@@ -145,7 +147,7 @@ class BlacklistServiceExternalTest : BlacklistTest() {
     fun `DeleteFromBlacklist When delete someone from blacklist while it is not in the black list no exceptions are thrown`() {
         val (user1Id, user2Id) = generateNIds(2)
         shouldNotThrow<BlacklistException> {
-            runBlocking(AuthorizedProfileElement(user1Id)) {
+            runBlocking(MetadataElement(Metadata(user1Id))) {
                 blacklistService.deleteFromBlacklist(createDeleteFromBlacklistRequest(user2Id))
             }
         }
@@ -155,7 +157,7 @@ class BlacklistServiceExternalTest : BlacklistTest() {
     fun `DeleteFromBlacklist When delete myself from blacklist got exception`() {
         val user1Id = generateUserId()
         val exception = shouldThrow<BlacklistException> {
-            runBlocking(AuthorizedProfileElement(user1Id)) {
+            runBlocking(MetadataElement(Metadata(user1Id))) {
                 blacklistService.deleteFromBlacklist(createDeleteFromBlacklistRequest(user1Id))
             }
         }
@@ -166,13 +168,13 @@ class BlacklistServiceExternalTest : BlacklistTest() {
     @Test
     fun `DeleteFromBlacklist When unauthenticated`() {
         val user1Id = generateUserId()
-        val exception = shouldThrow<BlacklistException> {
+        val exception = shouldThrow<PlatformException> {
             runBlocking {
                 blacklistService.deleteFromBlacklist(createDeleteFromBlacklistRequest(user1Id))
             }
         }
 
         exception.status shouldBe Status.UNAUTHENTICATED
-        exception.message shouldBe "Authentication required"
+        exception.message shouldBe "user should be authorized for this endpoint"
     }
 }
