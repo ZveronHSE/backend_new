@@ -2,7 +2,9 @@ package ru.zveron.apigateway.grpc.service
 
 import com.google.protobuf.Descriptors
 import com.google.protobuf.DynamicMessage
+import io.grpc.ManagedChannel
 import io.grpc.Metadata
+import io.grpc.MethodDescriptor
 import io.grpc.Status
 import io.grpc.kotlin.ClientCalls
 import mu.KLogging
@@ -34,14 +36,17 @@ class ApiGatewayService(
 
     companion object : KLogging() {
         private val profileIdKey = Metadata.Key.of("profile_id", Metadata.ASCII_STRING_MARSHALLER)
+        private val accessTokenKey = Metadata.Key.of("access_token", Metadata.ASCII_STRING_MARSHALLER)
     }
 
     suspend fun handleGatewayCall(request: GatewayServiceRequest): DynamicMessage {
         logger.debug(append("requestAlias", request.alias)) { "Handling gateway call request" }
+
         val metadata = methodMetadataRepository.findByAlias(request.alias)
             ?: throw ApiGatewayException(message = "Non existent method alias", code = Status.Code.INVALID_ARGUMENT)
 
         val profileId = verifyUserAccess(metadata.accessScope)
+        val accessToken = AuthenticationContext.accessToken()
         val channel = managedChannelRegistry.getChannel(metadata.serviceName)
         val protoMethodDescriptor = getProtoMethodDescriptor(metadata)
         val grpcMethodDescriptor = protoMethodDescriptor.getGrpcMethodDescriptor()
@@ -51,23 +56,37 @@ class ApiGatewayService(
             append("grpcRequest", grpcMessage?.allFields?.toJson()).and(append("grpcService", metadata.serviceName)),
             "Calling grpc service"
         )
-        try {
-            return ClientCalls.unaryRpc(
-                channel = channel,
-                method = grpcMethodDescriptor,
-                request = grpcMessage,
-                headers = Metadata().apply {
-                    profileId?.let { this.put(profileIdKey, it.toString()) }
-                }
-            )
-        } catch (e: Exception) {
-            logger.error(e) { "Failed service request $e" }
-            throw e
-        }
+
+        return tryToCallService(
+            channel = channel,
+            grpcMethodDescriptor = grpcMethodDescriptor,
+            grpcMessage = grpcMessage,
+            metadata = Metadata().apply {
+                profileId?.let { this.put(profileIdKey, it.toString()) }
+                accessToken?.let { this.put(accessTokenKey, accessToken) }
+            }
+        )
+    }
+
+    private suspend fun tryToCallService(
+        channel: ManagedChannel,
+        grpcMethodDescriptor: MethodDescriptor<DynamicMessage?, DynamicMessage>,
+        grpcMessage: DynamicMessage?,
+        metadata: Metadata,
+    ): DynamicMessage = try {
+        ClientCalls.unaryRpc(
+            channel = channel,
+            method = grpcMethodDescriptor,
+            request = grpcMessage,
+            headers = metadata,
+        )
+    } catch (e: Exception) {
+        logger.error(e) { "Failed service request $e" }
+        throw e
     }
 
     private suspend fun verifyUserAccess(accessScope: AccessScope): Long? {
-        val accessToken = AuthenticationContext.current()
+        val accessToken = AuthenticationContext.accessToken()
         logger.debug(append("accessToken", accessToken), "Access token in the context")
 
         return authResolver.resolveForScope(ResolveForRoleRequest(accessScope.toScope(), accessToken))

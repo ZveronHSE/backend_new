@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Primary
 import ru.zveron.apigateway.component.GrpcChannelRegistry
 import ru.zveron.apigateway.component.ProtoDefinitionRegistry
 import ru.zveron.apigateway.grpc.client.GrpcAuthClient
-import ru.zveron.contract.auth.AuthServiceGrpcKt
-import ru.zveron.contract.auth.profileDto
+import ru.zveron.contract.auth.internal.AuthServiceInternalGrpcKt
+import ru.zveron.contract.auth.internal.profileDto
 
 @Configuration
 @ImportAutoConfiguration(
@@ -27,7 +27,7 @@ class GrpcServiceTestConfig {
     @Bean
     @Primary
     fun authClient(): GrpcAuthClient {
-        val clientMock = mockk<AuthServiceGrpcKt.AuthServiceCoroutineStub>()
+        val clientMock = mockk<AuthServiceInternalGrpcKt.AuthServiceInternalCoroutineStub>()
         coEvery { clientMock.verifyToken(any(), any()) } returns profileDto { this.id = 123 }
         return GrpcAuthClient(clientMock)
     }

@@ -32,7 +32,7 @@ class LogoutServiceTest {
         val decodedToken = randomDecodedToken()
 
         coEvery { jwtManager.decodeAccessToken(accessToken.token) } returns decodedToken
-        coEvery { sessionRepository.deleteById(any()) } just Runs
+        coEvery { sessionRepository.deleteAllById(any()) } just Runs
 
         runBlocking {
             shouldNotThrowAny {
@@ -60,7 +60,7 @@ class LogoutServiceTest {
         val decodedToken = randomDecodedToken().copy(expiresAt = Instant.now().minusSeconds(10))
 
         coEvery { jwtManager.decodeAccessToken(accessToken.token) } returns decodedToken
-        coEvery { sessionRepository.deleteById(any()) } just Runs
+        coEvery { sessionRepository.deleteAllById(any()) } just Runs
 
         runBlocking {
             shouldNotThrowAny {

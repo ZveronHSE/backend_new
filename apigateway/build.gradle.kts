@@ -27,7 +27,7 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:auth:1.8.7")
+    implementation("com.github.zveronHSe.contract:auth:99597be969")
     implementation("com.github.zveronHSe.contract:apigateway:1.8.7")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
