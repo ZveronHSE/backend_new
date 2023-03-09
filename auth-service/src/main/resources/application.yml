@@ -91,15 +91,6 @@ logging:
   level:
     ru.zveron.authservice.cron: INFO
 
-    reactor:
-      util:
-        Loggers: DEBUG
-    kotlin:
-      coroutines: INFO
-
-
-
-
 
   grpc:
     apigateway:
