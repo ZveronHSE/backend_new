@@ -9,10 +9,8 @@ class NotifierClient(
     private val client: WebClient,
 ) {
 
-    private val shift = AtomicInteger()
-
     fun initializeVerification(req: GetVerificationCodeRequest): NotifierResponse =
-        NotifierSuccess(req.phoneNumber.takeLast(3) + (shift.incrementAndGet() % 2).toString())
+        NotifierSuccess("1111")
 }
 
 sealed class NotifierResponse

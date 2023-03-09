@@ -48,3 +48,7 @@ grpc:
 
   server:
     port: 9091
+
+logging:
+  level:
+    ru.zveron.ru.zveron.apigateway: DEBUG

@@ -23,6 +23,6 @@ class LogoutService(
             logger.error { "Access token is expired, when trying to logout" }
         }
 
-        sessionRepository.deleteById(decodeAccessToken.sessionId)
+        sessionRepository.deleteAllById(setOf(decodeAccessToken.sessionId))
     }
 }

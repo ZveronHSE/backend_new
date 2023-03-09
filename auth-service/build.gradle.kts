@@ -25,7 +25,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:profile:bb650395f8")
+    implementation("com.github.zveronHSe.contract:profile:1.8.7")
     implementation("com.github.zveronHSe.contract:auth:99597be969")
 
     //testing
