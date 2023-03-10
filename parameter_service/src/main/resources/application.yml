@@ -30,3 +30,13 @@ eureka:
     metadata-map:
       CategoryExternalService: 'external/category.proto'
       ParameterExternalService: 'external/parameter.proto'
+
+
+platform:
+  grpc:
+    apigateway:
+      metadata: false
+    client:
+      logging-enabled: false
+    server:
+      logging-enabled: true

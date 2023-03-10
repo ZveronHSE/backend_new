@@ -1,21 +1,19 @@
-grpc:
-  server:
-    port: 0
-server:
-  port: 0
-
-
 spring:
   main:
     banner-mode: off
+    allow-bean-definition-overriding: true
+
   liquibase:
-    change-log: classpath:db/master.yaml
+    enabled: false
+
   application:
-    name: address-service
+    name: push_notification
+
   datasource:
-    url: jdbc:postgresql://localhost:5555/address
+    url: jdbc:postgresql://localhost:5555/push
     password: zveron_password
     username: zveron_user
+
   jpa:
     show-sql: true
     properties:
@@ -23,15 +21,17 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
+grpc:
+  server:
+    port: 0
 
 eureka:
   client:
-    register-with-eureka: true
-    tls:
-      enabled: false
     webclient:
-      enabled: true
-
+      enabled: false
+    register-with-eureka: true
+    fetch-registry: true
+    enabled: true
 
 platform:
   grpc:
@@ -40,4 +40,4 @@ platform:
     client:
       logging-enabled: false
     server:
-      logging-enabled: true
+      logging-enabled: false

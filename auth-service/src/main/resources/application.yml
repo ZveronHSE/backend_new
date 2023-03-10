@@ -89,3 +89,13 @@ zveron:
 logging:
   level:
     ru.zveron.authservice.cron: INFO
+
+
+platform:
+  grpc:
+    apigateway:
+      metadata: false
+    client:
+      logging-enabled: true
+    server:
+      logging-enabled: true

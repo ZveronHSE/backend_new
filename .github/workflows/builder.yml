@@ -67,6 +67,11 @@ jobs:
             dockerfile: object-storage/Dockerfile
             image: ghcr.io/zveronhse/object-storage:latest
 
+          - name: Push Notification
+            env: push_notification
+            dockerfile: push_notification/Dockerfile
+            image: ghcr.io/zveronhse/push_notification:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -101,15 +106,16 @@ jobs:
   push:
     needs: build
     runs-on: ubuntu-latest
+
     steps:
       - name: Deploy via ssh
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
-          password: ${{ secrets.VM_PASSWORD }}
+          key: ${{ secrets.VM_KEY }}
           script: |
-            cd application/backend_new
+            cd backend_new
             git checkout dev
             git pull origin dev
             docker compose pull && docker compose up -d

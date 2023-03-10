@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <springProfile name="prod">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <findAndRegisterJacksonModules>true</findAndRegisterJacksonModules>
+                <providers>
+                    <timestamp>
+                        <fieldName>ts</fieldName>
+                        <timeZone>UTC</timeZone>
+                    </timestamp>
+                    <threadName>
+                        <fieldName>thread</fieldName>
+                    </threadName>
+                    <logLevel/>
+                    <loggerName>
+                        <fieldName>logger</fieldName>
+                    </loggerName>
+                    <message/>
+                    <arguments>
+                        <includeStructuredArguments>true</includeStructuredArguments>
+                    </arguments>
+                    <logstashMarkers/>
+                </providers>
+            </encoder>
+        </appender>
+    </springProfile>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+    <logger name="ru.zveron.push" level="DEBUG"/>
+
+</configuration>
