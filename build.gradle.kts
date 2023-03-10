@@ -50,8 +50,12 @@ subprojects {
         val password: String,
     )
 
-    extra["getDataSource"] = fun(): DataSource { // TODO надо бы все это вынести в отдельный градл скриптик
+    extra["getDataSource"] = fun(): DataSource? { // TODO надо бы все это вынести в отдельный градл скриптик
         val pathToApplicationYml = "src/main/resources/application.yml"
+
+        if (project.name == "e2e") {
+            return null
+        }
 
         val applicationYaml = try {
             File(projectDir, pathToApplicationYml).inputStream().use {
@@ -145,7 +149,7 @@ subprojects {
         testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
         testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
         testImplementation("com.ninja-squad:springmockk:4.0.0")
-        testImplementation("io.kotest:kotest-assertions-core-jvm:5.2.2")
+        testImplementation("io.kotest:kotest-assertions-core-jvm:5.3.1")
         testImplementation("org.assertj:assertj-core:3.22.0")
         testImplementation("io.mockk:mockk:1.13.3")
     }
@@ -170,9 +174,10 @@ subprojects {
         }
     }
 
-    val dataSource = (extra["getDataSource"] as () -> DataSource)()
+    val dataSource = (extra["getDataSource"] as () -> DataSource?)()
 
     tasks.register("createNextChangeSet") {
+        dataSource ?: return@register
         group = "liquibase"
 
         val migrationName: String? by project

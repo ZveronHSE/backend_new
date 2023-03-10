@@ -119,3 +119,26 @@ jobs:
             git checkout dev
             git pull origin dev
             docker compose pull && docker compose up -d
+
+  e2e:
+    needs: push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17.0.3
+          distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.1
+
+      - name: Run e2e tests
+        shell: bash
+        run: gradle :e2e:test --stacktrace
