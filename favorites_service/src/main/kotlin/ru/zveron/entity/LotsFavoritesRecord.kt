@@ -9,7 +9,8 @@ import javax.persistence.Entity
 @Entity
 data class LotsFavoritesRecord(
     @EmbeddedId
-    val id: LotsFavoritesKey
+    val id: LotsFavoritesKey,
+    val categoryId: Int,
 ) {
     @Embeddable
     data class LotsFavoritesKey(

@@ -11,8 +11,8 @@ import ru.zveron.favorites.lot.removeLotFromFavoritesRequest
 
 object LotsFavoritesRecordEntitiesGenerator {
 
-    fun generateLotRecords(ownerId: Long, favProfileID: Long) =
-        LotsFavoritesRecord(generateKey(ownerId, favProfileID))
+    fun generateLotRecords(ownerId: Long, favProfileID: Long, categoryId: Int) =
+        LotsFavoritesRecord(generateKey(ownerId, favProfileID), categoryId)
 
     fun generateKey(ownerId: Long, favLotId: Long) = LotsFavoritesRecord.LotsFavoritesKey(
         ownerUserId = ownerId,
@@ -37,12 +37,12 @@ object LotsFavoritesRecordEntitiesGenerator {
     fun createRemoveAllByFavoriteLotRequest(lotId: Long) =
         removeAllByFavoriteLotRequest { id = lotId }
 
-    fun generateLot(id: Long) = lot {
+    fun generateLot(id: Long, status: Status = Status.ACTIVE) = lot {
         this.id = id
         title = PrimitivesGenerator.generateString(10)
         price = PrimitivesGenerator.generateString(10)
         publicationDate = PrimitivesGenerator.generateString(10)
-        status = Status.ACTIVE
+        this.status = status
         photoId = PrimitivesGenerator.generateUserId()
     }
 }

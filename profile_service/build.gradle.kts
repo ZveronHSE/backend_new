@@ -1,4 +1,4 @@
-val contractVersion: String = "1.8.6"
+val contractVersion: String = "1.8.9"
 
 dependencies {
     implementation("com.vladmihalcea:hibernate-types-55:2.14.0")

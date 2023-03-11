@@ -3,6 +3,9 @@ package ru.zveron.service.presentation.external
 import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.favorites.lot.AddLotToFavoritesRequest
+import ru.zveron.favorites.lot.DeleteAllByCategoryRequest
+import ru.zveron.favorites.lot.DeleteAllByStatusAndCategoryRequest
+import ru.zveron.favorites.lot.GetFavoriteLotsRequest
 import ru.zveron.favorites.lot.GetFavoriteLotsResponse
 import ru.zveron.favorites.lot.LotFavoritesServiceExternalGrpcKt
 import ru.zveron.favorites.lot.RemoveLotFromFavoritesRequest
@@ -23,11 +26,28 @@ class LotFavoritesGrpcServiceExternal(
         lotFavoritesService.addToFavorites(coroutineContext.getAuthorizedProfileId(), request.id)
             .let { Empty.getDefaultInstance() }
 
-    override suspend fun getFavoriteLots(request: Empty): GetFavoriteLotsResponse = getFavoriteLotsResponse {
-        favoriteLots.addAll(lotFavoritesService.getFavorites(coroutineContext.getAuthorizedProfileId()))
-    }
+    override suspend fun getFavoriteLots(request: GetFavoriteLotsRequest): GetFavoriteLotsResponse =
+        getFavoriteLotsResponse {
+            favoriteLots.addAll(
+                lotFavoritesService.getFavorites(
+                    coroutineContext.getAuthorizedProfileId(),
+                    request.categoryId
+                )
+            )
+        }
 
     override suspend fun removeFromFavorites(request: RemoveLotFromFavoritesRequest): Empty =
         lotFavoritesService.removeFromFavorites(coroutineContext.getAuthorizedProfileId(), request.id)
             .let { Empty.getDefaultInstance() }
+
+    override suspend fun deleteAllByCategory(request: DeleteAllByCategoryRequest): Empty =
+        lotFavoritesService.removeAllByCategory(coroutineContext.getAuthorizedProfileId(), request.categoryId)
+            .let { Empty.getDefaultInstance() }
+
+    override suspend fun deleteAllByStatusAndCategory(request: DeleteAllByStatusAndCategoryRequest): Empty =
+        lotFavoritesService.removeAllByStatus(
+            coroutineContext.getAuthorizedProfileId(),
+            request.status,
+            request.categoryId
+        ).let { Empty.getDefaultInstance() }
 }
