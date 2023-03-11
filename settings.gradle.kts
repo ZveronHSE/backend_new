@@ -28,4 +28,5 @@ include(
     "auth-service",
     "object-storage",
     "push_notification",
+    "e2e",
 )

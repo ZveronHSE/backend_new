@@ -24,6 +24,7 @@ services:
       - "5555:5432"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
+      - ./db_data:/var/lib/postgresql/data
     deploy:
       resources:
         limits:
@@ -278,3 +279,6 @@ services:
         reservations:
           cpus: '0.25'
           memory: 128M
+
+volumes:
+  db_data:
