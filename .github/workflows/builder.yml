@@ -139,6 +139,13 @@ jobs:
         with:
           gradle-version: 7.4.1
 
+      - name: Delay for 1 minute
+        shell: bash
+        run: sleep 1m
+
       - name: Run e2e tests
         shell: bash
+        env:
+          zveron_server_host: ${{ secrets.VM_HOST }}
+          zveron_server_port: ${{ secrets.VM_PORT }}
         run: gradle :e2e:test --stacktrace
