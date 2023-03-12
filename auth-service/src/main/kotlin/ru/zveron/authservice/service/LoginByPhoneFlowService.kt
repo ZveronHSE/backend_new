@@ -2,17 +2,19 @@ package ru.zveron.authservice.service
 
 import io.grpc.Status
 import mu.KLogging
+import net.logstash.logback.marker.Markers.append
 import org.springframework.stereotype.Service
 import ru.zveron.authservice.component.auth.Authenticator
+import ru.zveron.authservice.exception.AuthException
 import ru.zveron.authservice.exception.CodeValidatedException
 import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.exception.FingerprintException
 import ru.zveron.authservice.exception.NotifierClientException
 import ru.zveron.authservice.exception.WrongCodeException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
+import ru.zveron.authservice.grpc.client.model.FindProfileUnknownFailure
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
-import ru.zveron.authservice.grpc.client.model.FindProfileUnknownFailure
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneLoginStateContext
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
@@ -47,6 +49,8 @@ class LoginByPhoneFlowService(
             fingerprint = request.fingerprint,
         )
 
+        logger.debug { "Initiating verification code" }
+
         val notifierResponse = notifierClient.initializeVerification(request.toClientRequest())
 
         val verificationCtxWithCode =
@@ -60,6 +64,7 @@ class LoginByPhoneFlowService(
             }
 
         return flowStateStorage.createContext(verificationCtxWithCode)
+            .also { logger.debug(append("sessionId", it)) { "Context with code saved" } }
     }
 
     /**
@@ -72,17 +77,21 @@ class LoginByPhoneFlowService(
     suspend fun verify(request: LoginByPhoneVerifyRequest): LoginByPhoneVerifyResponse {
         val phoneVerificationCtx = flowStateStorage.getContext<MobilePhoneLoginStateContext>(request.sessionId)
 
+        logger.debug { "Validating context" }
+
         validateContext(phoneVerificationCtx, request.fingerprint)
 
         val updatedCtx = validateCodeAndUpdateContext(phoneVerificationCtx, request.code, request.sessionId)
+
+        logger.debug(append("phone", updatedCtx.phoneNumber)) { "Get profile by phone" }
 
         val profileResponse = profileClient.getProfileByPhone(updatedCtx.phoneNumber.toProfileClientRequest())
 
         val profileData: ProfileTokenData? = when (profileResponse) {
             is ProfileFound -> ProfileTokenData(profileResponse.id, profileResponse.name, profileResponse.surname)
             is ProfileNotFound -> null
-            is FindProfileUnknownFailure -> throw NotifierClientException(
-                profileResponse.message ?: "no message",
+            is FindProfileUnknownFailure -> throw AuthException(
+                profileResponse.message ?: "Profile client failed with no message",
                 profileResponse.code
             )
         }
@@ -90,6 +99,7 @@ class LoginByPhoneFlowService(
         return profileData?.let {
             val tokens = authenticator.loginUser(request.fingerprint, it.id)
             LoginByPhoneVerifyResponse.login(tokens)
+                .also { logger.debug(append("profileId", profileData.id)) { "User logged in" } }
         } ?: flowStateStorage.createContext(
             MobilePhoneRegisterStateContext(
                 phoneNumber = updatedCtx.phoneNumber,
@@ -97,7 +107,9 @@ class LoginByPhoneFlowService(
                 isChannelVerified = updatedCtx.isVerified,
             )
         ).let {
-            LoginByPhoneVerifyResponse.registration(it)
+            LoginByPhoneVerifyResponse.registration(it).also { response ->
+                logger.debug(append("sessionId", response.sessionId)) { "Registration context created" }
+            }
         }
     }
 

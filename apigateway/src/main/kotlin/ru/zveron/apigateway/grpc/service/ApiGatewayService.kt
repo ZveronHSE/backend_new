@@ -81,7 +81,11 @@ class ApiGatewayService(
             headers = metadata,
         )
     } catch (e: Exception) {
-        logger.error(e) { "Failed service request $e" }
+        logger.error(
+            append("channelState", channel.getState(true))
+                .and(append("method", grpcMethodDescriptor.fullMethodName)),
+            e
+        ) { "Failed service request $e" }
         throw e
     }
 
