@@ -1,5 +1,7 @@
 package ru.zveron.authservice.service
 
+import mu.KLogging
+import net.logstash.logback.marker.Markers.append
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
 import org.springframework.stereotype.Service
 import ru.zveron.authservice.component.auth.Authenticator
@@ -22,21 +24,27 @@ class LoginByPasswordFlowService(
     private val argon2PasswordEncoder: Argon2PasswordEncoder,
 ) {
 
+    companion object : KLogging()
+
     suspend fun loginByPassword(request: LoginByPasswordRequest): MobileTokens {
         val passwordHash = argon2PasswordEncoder.encode(request.password.decodeToString())
 
         val validatePwdResponse = profileClient.validatePassword(request.toClientRequest(passwordHash))
 
+        logger.debug { "Validating password" }
+
         when (validatePwdResponse) {
             PasswordIsValid -> {}
 
-            PasswordIsInvalid -> throw PasswordValidationException()
+            PasswordIsInvalid -> throw PasswordValidationException("Password is invalid")
             is PasswordValidationFailure -> throw PasswordValidationException(
                 validatePwdResponse.message,
                 validatePwdResponse.status.code,
                 validatePwdResponse.metadata
             )
         }
+
+        logger.debug(append("phone", request.loginPhone)) { "Searching for the profile" }
 
         val findProfileResponse = profileClient.getProfileByPhone(request.loginPhone.toClientPhone())
 
@@ -50,6 +58,8 @@ class LoginByPasswordFlowService(
                 findProfileResponse.metadata
             )
         }
+
+        logger.debug(append("profileId", profileId)) { "Authenticating" }
 
         return authenticator.loginUser(profileId = profileId, fingerprint = request.fingerprint)
     }

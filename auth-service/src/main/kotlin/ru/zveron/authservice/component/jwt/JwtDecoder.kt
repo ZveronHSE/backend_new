@@ -37,7 +37,7 @@ class JwtDecoder(
         val jwsObject = JWSObject.parse(token)
 
         if (!jwsObject.verify(verifier)) {
-            throw InvalidTokenException()
+            throw InvalidTokenException("$tokenType verification failed")
         }
 
         val payload = jwsObject.payload

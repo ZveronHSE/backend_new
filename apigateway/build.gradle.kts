@@ -8,7 +8,7 @@ configurations {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-jetty:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-reactor-netty:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")
 
     //kotlinx
