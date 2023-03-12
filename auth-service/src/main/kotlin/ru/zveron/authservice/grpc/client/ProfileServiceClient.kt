@@ -19,6 +19,7 @@ import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordRequest
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordResponse
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toClientRequest
+import ru.zveron.authservice.grpc.mapper.GrpcMapper.toProfileClientType
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
@@ -109,9 +110,4 @@ class ProfileServiceClient(
             }
         }
     }
-}
-
-fun ThirdPartyProviderType.toProfileClientType() = when (this) {
-    ThirdPartyProviderType.GMAIL -> ChannelType.GOOGLE
-    ThirdPartyProviderType.VK -> ChannelType.VK
 }
