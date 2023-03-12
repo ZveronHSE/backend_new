@@ -1,10 +1,11 @@
 package ru.zveron.authservice.config
 
 import mu.KLogging
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
-
+@AutoConfigureWireMock(port = 0) //random port
 abstract class ContainerConfigurer {
 
     companion object : KLogging() {

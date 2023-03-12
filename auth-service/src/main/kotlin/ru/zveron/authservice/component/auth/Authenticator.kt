@@ -36,7 +36,7 @@ class Authenticator(
     suspend fun refreshMobileSession(request: RefreshMobileSessionRequest): MobileTokens {
         val decodedToken = jwtManager.decodeRefreshToken(token = request.token)
 
-        val profileResponse = profileServiceClient.getProfileById(decodedToken.profileId)
+        val profileResponse = profileServiceClient.findProfileById(decodedToken.profileId)
 
         if (profileResponse is ProfileNotFound) {
             throw InvalidTokenException("Profile not found")

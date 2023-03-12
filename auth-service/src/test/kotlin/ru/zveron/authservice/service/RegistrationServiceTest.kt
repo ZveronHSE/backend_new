@@ -16,12 +16,10 @@ import ru.zveron.authservice.exception.FingerprintException
 import ru.zveron.authservice.exception.RegistrationException
 import ru.zveron.authservice.grpc.client.model.PhoneNumber
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
-import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
-import ru.zveron.authservice.service.model.RegisterByPhoneRequest
 import ru.zveron.authservice.util.randomDeviceFp
 import ru.zveron.authservice.util.randomHash
 import ru.zveron.authservice.util.randomId
@@ -67,7 +65,7 @@ class RegistrationServiceTest {
             val tokens = randomTokens()
 
             //service request
-            val registerByPhoneRequest = RegisterByPhoneRequest(
+            val registerByPhoneRequest = ru.zveron.authservice.service.model.RegisterByPhoneRequest(
                 fingerprint = fingerprint,
                 sessionId = sessionId,
                 password = RandomUtils.nextBytes(10),
@@ -83,7 +81,7 @@ class RegistrationServiceTest {
             )
 
             //request to register new profile
-            val registerClientRequest = RegisterProfileByPhone(
+            val registerClientRequest = ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest(
                 name = name,
                 phone = PhoneNumber.of(phoneNumber),
                 hash = hash,
@@ -137,7 +135,7 @@ class RegistrationServiceTest {
         } returns registrationContext
 
         //service request
-        val registerByPhoneRequest = RegisterByPhoneRequest(
+        val registerByPhoneRequest = ru.zveron.authservice.service.model.RegisterByPhoneRequest(
             fingerprint = fingerprint,
             sessionId = sessionId,
             password = RandomUtils.nextBytes(10),
@@ -173,7 +171,7 @@ class RegistrationServiceTest {
             )
 
             //service request
-            val registerByPhoneRequest = RegisterByPhoneRequest(
+            val registerByPhoneRequest = ru.zveron.authservice.service.model.RegisterByPhoneRequest(
                 fingerprint = fingerprint,
                 sessionId = sessionId,
                 password = RandomUtils.nextBytes(10),
@@ -182,7 +180,7 @@ class RegistrationServiceTest {
             )
 
             //request to register new profile
-            val registerClientRequest = RegisterProfileByPhone(
+            val registerClientRequest = ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest(
                 name = name,
                 phone = PhoneNumber.of(phoneNumber),
                 hash = hash,
@@ -219,7 +217,7 @@ class RegistrationServiceTest {
             val phoneNumber = randomPersistencePhone()
 
             //service request
-            val registerByPhoneRequest = RegisterByPhoneRequest(
+            val registerByPhoneRequest = ru.zveron.authservice.service.model.RegisterByPhoneRequest(
                 fingerprint = fingerprint,
                 sessionId = sessionId,
                 password = RandomUtils.nextBytes(10),
@@ -259,7 +257,7 @@ class RegistrationServiceTest {
             val surname = randomSurname()
 
             //service request
-            val registerByPhoneRequest = RegisterByPhoneRequest(
+            val registerByPhoneRequest = ru.zveron.authservice.service.model.RegisterByPhoneRequest(
                 fingerprint = fingerprint,
                 sessionId = sessionId,
                 password = RandomUtils.nextBytes(10),

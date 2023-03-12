@@ -1,5 +1,6 @@
 package ru.zveron.authservice.util
 
+import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
 import org.apache.commons.lang3.RandomStringUtils.randomNumeric
 import org.apache.commons.lang3.RandomUtils
@@ -97,5 +98,7 @@ fun randomPassword() = randomAlphanumeric(10).toByteArray()
 fun randomHash(): String = randomAlphanumeric(32)
 
 fun randomPersistencePhone() = ru.zveron.authservice.persistence.model.PhoneNumber(countryCode = "7", randomNumeric(10))
+
+fun randomEmail() = "${randomAlphabetic(10)}@mail.ru"
 
 inline fun <reified T : Enum<T>> randomEnum() = enumValues<T>().random()

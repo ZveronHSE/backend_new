@@ -4,7 +4,6 @@ import net.devh.boot.grpc.client.inject.GrpcClient
 import net.devh.boot.grpc.client.inject.GrpcClientBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.Environment
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 
@@ -19,8 +18,7 @@ class ProfileServiceClientConfiguration {
     @Bean
     fun profileGrpcServiceClient(
         profileGrpcClient: ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub,
-        env: Environment
     ): ProfileServiceClient {
-        return ProfileServiceClient(profileGrpcClient, env)
+        return ProfileServiceClient(profileGrpcClient)
     }
 }
