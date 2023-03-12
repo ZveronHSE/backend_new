@@ -27,6 +27,7 @@ import ru.zveron.contract.auth.external.mobileToken
 import ru.zveron.contract.auth.external.phoneLoginVerifyResponse
 import ru.zveron.contract.auth.external.timedToken
 import ru.zveron.contract.profile.createProfileRequest
+import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.contract.profile.model.gmail
 import ru.zveron.contract.profile.model.links
 import ru.zveron.contract.profile.model.phone
@@ -120,6 +121,11 @@ object GrpcMapper {
                 }
             }
         }
+    }
+
+    fun ThirdPartyProviderType.toProfileClientType() = when (this) {
+        ThirdPartyProviderType.GMAIL -> ChannelType.GOOGLE
+        ThirdPartyProviderType.VK -> ChannelType.VK
     }
 
     private fun AuthProvider.toServiceProvider() = when (this) {
