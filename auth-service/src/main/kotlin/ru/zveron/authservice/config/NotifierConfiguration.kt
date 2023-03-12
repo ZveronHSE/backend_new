@@ -2,8 +2,6 @@ package ru.zveron.authservice.config
 
 import io.netty.channel.ChannelOption
 import io.netty.handler.timeout.ReadTimeoutHandler
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,7 +9,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
 import reactor.netty.resources.ConnectionProvider
-import ru.zveron.authservice.webclient.NotifierClient
+import ru.zveron.authservice.webclient.notifier.NotifierClient
 import java.util.concurrent.TimeUnit
 
 @Configuration
@@ -47,12 +45,3 @@ class NotifierConfiguration {
         return NotifierClient(webclient)
     }
 }
-
-@ConstructorBinding
-@ConfigurationProperties(value = "clients.notifier")
-data class NotifierProperties(
-    val baseUrl: String,
-    val maxConnections: Int = 10,
-    val connectionTimeoutMs: Int = 5000,
-    val readTimeoutMs: Long = 5000L,
-)

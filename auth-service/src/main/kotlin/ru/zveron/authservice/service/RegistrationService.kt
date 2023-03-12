@@ -14,12 +14,10 @@ import ru.zveron.authservice.exception.RegistrationException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
 import ru.zveron.authservice.grpc.client.model.PhoneNumber
 import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
-import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.grpc.client.model.RegisterProfileFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
 import ru.zveron.authservice.persistence.FlowStateStorage
 import ru.zveron.authservice.persistence.model.MobilePhoneRegisterStateContext
-import ru.zveron.authservice.service.model.RegisterByPhoneRequest
 
 @Service
 class RegistrationService(
@@ -38,7 +36,7 @@ class RegistrationService(
      * @throws [ContextExpiredException]
      *
      */
-    suspend fun registerByPhone(request: RegisterByPhoneRequest): MobileTokens {
+    suspend fun registerByPhone(request: ru.zveron.authservice.service.model.RegisterByPhoneRequest): MobileTokens {
         val registrationContext = flowStateStorage.getContext(request.sessionId, MobilePhoneRegisterStateContext::class)
 
         if (registrationContext.fingerprint != request.fingerprint) {
@@ -52,7 +50,7 @@ class RegistrationService(
         val hash = argon2Encoder.encode(request.password.decodeToString())
 
         val response = profileServiceClient.registerProfileByPhone(
-            RegisterProfileByPhone(
+            ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest(
                 request.name,
                 PhoneNumber.of(registrationContext.phoneNumber),
                 hash,

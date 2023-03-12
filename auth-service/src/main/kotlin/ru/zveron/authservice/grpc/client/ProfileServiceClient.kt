@@ -2,7 +2,7 @@ package ru.zveron.authservice.grpc.client
 
 import io.grpc.Status.Code
 import io.grpc.StatusException
-import org.springframework.core.env.Environment
+import ru.zveron.authservice.component.thirdparty.contant.ThirdPartyProviderType
 import ru.zveron.authservice.grpc.client.model.FindProfileResponse
 import ru.zveron.authservice.grpc.client.model.FindProfileUnknownFailure
 import ru.zveron.authservice.grpc.client.model.PasswordIsInvalid
@@ -10,15 +10,15 @@ import ru.zveron.authservice.grpc.client.model.PasswordIsValid
 import ru.zveron.authservice.grpc.client.model.PasswordValidationFailure
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
+import ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest
+import ru.zveron.authservice.grpc.client.model.RegisterBySocialMediaRequest
 import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
-import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
 import ru.zveron.authservice.grpc.client.model.RegisterProfileFailure
 import ru.zveron.authservice.grpc.client.model.RegisterProfileResponse
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordRequest
 import ru.zveron.authservice.grpc.client.model.ValidatePasswordResponse
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toClientRequest
-import ru.zveron.authservice.grpc.mapper.GrpcMapper.toRequest
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
@@ -27,41 +27,9 @@ import ru.zveron.contract.profile.verifyProfileHashRequest
 
 class ProfileServiceClient(
     private val profileGrpcClient: ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub,
-    private val env: Environment,
 ) {
 
-    private val phoneNumberToProfile = mapOf(
-        "79257646188" to ProfileFound(123L, "vedro", "pomoyev"),
-        "79996662233" to ProfileFound(124L, "player", "two")
-    )
-
-    private val registerPhoneNumberToProfile = mapOf(
-        "79993332211" to ProfileFound(1L, "vedro", "pomoyev"),
-        "79996662233" to ProfileFound(124L, "player", "two")
-    )
-
-    private val idToProfile = mapOf(
-        123L to ProfileFound(123L, "vedro", "pomoyev"),
-        124L to ProfileFound(124L, "player", "two")
-    )
-
-    suspend fun getProfileByPhone(phoneNumber: String): FindProfileResponse =
-        env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
-            phoneNumberToProfile[phoneNumber] ?: ProfileNotFound
-        } ?: getAccountByPhoneFromClient(phoneNumber)
-
-    suspend fun getProfileById(id: Long) =
-        env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
-            idToProfile[id] ?: ProfileNotFound
-        } ?: getAccountByIdFromClient(id)
-
-    suspend fun registerProfileByPhone(request: RegisterProfileByPhone) =
-        env.activeProfiles.singleOrNull { it.equals("local", true) }?.let {
-            registerPhoneNumberToProfile[request.phone.toRequest()]?.id?.let { RegisterProfileSuccess(it) }
-                ?: RegisterProfileAlreadyExists
-        } ?: registerProfileByPhoneFromClient(request)
-
-    suspend fun registerProfileByPhoneFromClient(request: RegisterProfileByPhone): RegisterProfileResponse = try {
+    suspend fun registerProfileByPhone(request: RegisterByPhoneRequest): RegisterProfileResponse = try {
         val response = profileGrpcClient.createProfile(request.toClientRequest())
         RegisterProfileSuccess(response.id)
     } catch (e: StatusException) {
@@ -71,7 +39,18 @@ class ProfileServiceClient(
         }
     }
 
-    suspend fun getAccountByPhoneFromClient(phoneNumber: String): FindProfileResponse {
+    suspend fun registerProfileBySocialMedia(request: RegisterBySocialMediaRequest): RegisterProfileResponse = try {
+        val response = profileGrpcClient.createProfile(request.toClientRequest())
+
+        RegisterProfileSuccess(response.id)
+    } catch (e: StatusException) {
+        when (e.status.code) {
+            Code.ALREADY_EXISTS -> RegisterProfileAlreadyExists
+            else -> RegisterProfileFailure(e.message, e.status, e.trailers)
+        }
+    }
+
+    suspend fun getProfileByPhone(phoneNumber: String): FindProfileResponse {
         return try {
             val response = profileGrpcClient.getProfileByChannel(getProfileByChannelRequest {
                 this.type = ChannelType.PHONE
@@ -83,6 +62,25 @@ class ProfileServiceClient(
                 Code.NOT_FOUND -> ProfileNotFound
                 else -> FindProfileUnknownFailure(ex.message, ex.status.code, ex.trailers)
             }
+        }
+    }
+
+    suspend fun findProfileBySocialMedia(
+        providerType: ThirdPartyProviderType,
+        providerUserId: String,
+    ) = try {
+        val request = getProfileByChannelRequest {
+            this.type = providerType.toProfileClientType()
+            this.identifier = providerUserId
+        }
+
+        val response = profileGrpcClient.getProfileByChannel(request)
+
+        ProfileFound(response.id, response.name, response.surname)
+    } catch (ex: StatusException) {
+        when (ex.status.code) {
+            Code.NOT_FOUND -> ProfileNotFound
+            else -> FindProfileUnknownFailure(ex.message, ex.status.code, ex.trailers)
         }
     }
 
@@ -99,9 +97,10 @@ class ProfileServiceClient(
         }
     }
 
-    suspend fun getAccountByIdFromClient(id: Long): FindProfileResponse {
+    suspend fun findProfileById(id: Long): FindProfileResponse {
         return try {
             val response = profileGrpcClient.getProfile(getProfileRequest { this.id = id })
+
             return ProfileFound(response.id, response.name, response.surname)
         } catch (ex: StatusException) {
             when (ex.status.code) {
@@ -112,3 +111,7 @@ class ProfileServiceClient(
     }
 }
 
+fun ThirdPartyProviderType.toProfileClientType() = when (this) {
+    ThirdPartyProviderType.GMAIL -> ChannelType.GOOGLE
+    ThirdPartyProviderType.VK -> ChannelType.VK
+}

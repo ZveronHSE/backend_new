@@ -5,16 +5,19 @@ import ru.zveron.authservice.component.auth.model.RefreshMobileSessionRequest
 import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.MobileTokens
 import ru.zveron.authservice.component.jwt.model.RefreshToken
+import ru.zveron.authservice.component.thirdparty.contant.ThirdPartyProviderType
 import ru.zveron.authservice.grpc.client.model.PhoneNumber
-import ru.zveron.authservice.grpc.client.model.RegisterProfileByPhone
+import ru.zveron.authservice.grpc.client.model.RegisterBySocialMediaRequest
 import ru.zveron.authservice.service.model.JwtMobileTokens
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyResponse
-import ru.zveron.authservice.service.model.RegisterByPhoneRequest
+import ru.zveron.authservice.service.model.LoginBySocialMediaRequest
 import ru.zveron.authservice.util.PhoneNumberParser
+import ru.zveron.contract.auth.external.AuthProvider
 import ru.zveron.contract.auth.external.IssueNewTokensRequest
 import ru.zveron.contract.auth.external.LoginByPasswordRequest
+import ru.zveron.contract.auth.external.LoginBySocialRequest
 import ru.zveron.contract.auth.external.MobileToken
 import ru.zveron.contract.auth.external.PhoneLoginInitRequest
 import ru.zveron.contract.auth.external.PhoneLoginVerifyRequest
@@ -24,8 +27,10 @@ import ru.zveron.contract.auth.external.mobileToken
 import ru.zveron.contract.auth.external.phoneLoginVerifyResponse
 import ru.zveron.contract.auth.external.timedToken
 import ru.zveron.contract.profile.createProfileRequest
+import ru.zveron.contract.profile.model.gmail
 import ru.zveron.contract.profile.model.links
 import ru.zveron.contract.profile.model.phone
+import ru.zveron.contract.profile.model.vk
 import java.time.Instant
 import java.util.UUID
 
@@ -66,7 +71,7 @@ object GrpcMapper {
         this@toGrpcContract.tokens?.let { this.mobileToken = it.toGrpcToken() }
     }
 
-    fun PhoneRegisterRequest.toServiceRequest() = RegisterByPhoneRequest(
+    fun PhoneRegisterRequest.toServiceRequest() = ru.zveron.authservice.service.model.RegisterByPhoneRequest(
         fingerprint = this@toServiceRequest.deviceFp,
         sessionId = this@toServiceRequest.sessionId.let { UUID.fromString(it) },
         password = this@toServiceRequest.password.toByteArray(),
@@ -74,7 +79,7 @@ object GrpcMapper {
         surname = this@toServiceRequest.surname
     )
 
-    fun RegisterProfileByPhone.toClientRequest() = createProfileRequest {
+    fun ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest.toClientRequest() = createProfileRequest {
         this.name = this@toClientRequest.name
         this.links = links {
             this.phone = phone {
@@ -90,6 +95,38 @@ object GrpcMapper {
     )
 
     fun PhoneNumber.toRequest() = "$countryCode$phone"
+
+    fun LoginBySocialRequest.toServiceRequest() = LoginBySocialMediaRequest(
+        accessToken = this.accessToken,
+        providerType = this.authProvider.toServiceProvider(),
+        providerUserId = this.providerUserId,
+        fingerprint = this.deviceFp,
+    )
+
+    fun RegisterBySocialMediaRequest.toClientRequest() = createProfileRequest {
+        this.name = this@toClientRequest.userInfo.firstName
+        this.surname = this@toClientRequest.userInfo.lastName
+        this.links = links {
+            when (provider) {
+                ThirdPartyProviderType.VK -> vk {
+                    this.id = this@toClientRequest.userInfo.userId
+                    this.ref = "https://vk.com/${this@toClientRequest.userInfo.userId}"
+                    this.email = this@toClientRequest.userInfo.email ?: ""
+                }
+
+                ThirdPartyProviderType.GMAIL -> gmail {
+                    this.id = this@toClientRequest.userInfo.userId
+                    this.email = this@toClientRequest.userInfo.email ?: ""
+                }
+            }
+        }
+    }
+
+    private fun AuthProvider.toServiceProvider() = when (this) {
+        AuthProvider.VK -> ThirdPartyProviderType.VK
+        AuthProvider.GMAIL -> ThirdPartyProviderType.GMAIL
+        else -> throw IllegalArgumentException()
+    }
 
     private fun AccessToken.toGrpc(): TimedToken = timedToken {
         this.token = this@toGrpc.token

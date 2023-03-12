@@ -1,9 +1,8 @@
-package ru.zveron.authservice.webclient
+package ru.zveron.authservice.webclient.notifier
 
 import io.grpc.Status
 import org.springframework.web.reactive.function.client.WebClient
-import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
-import java.util.concurrent.atomic.AtomicInteger
+import ru.zveron.authservice.webclient.notifier.model.GetVerificationCodeRequest
 
 class NotifierClient(
     private val client: WebClient,
