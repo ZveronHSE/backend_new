@@ -33,5 +33,6 @@
         <appender-ref ref="CONSOLE"/>
     </root>
     <logger name="ru.zveron.apigateway" level="DEBUG"/>
+    <logger name="org.springframework.r2dbc" level="DEBUG"/>
 
 </configuration>
