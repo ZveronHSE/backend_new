@@ -1,6 +1,7 @@
 package ru.zveron.service.api
 
 import com.google.protobuf.Empty
+import io.grpc.Status
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -213,6 +214,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -289,6 +291,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -318,6 +321,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -347,6 +351,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -380,6 +385,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -426,6 +432,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Can't use gmail as communication channel because link is missed"
+        exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -446,6 +453,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Invalid number of communication ways. Expected 1 or 2, but was: 0"
+        exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -458,6 +466,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -491,5 +500,6 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe Status.Code.UNAUTHENTICATED
     }
 }
