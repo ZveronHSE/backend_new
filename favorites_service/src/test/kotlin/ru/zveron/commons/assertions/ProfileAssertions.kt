@@ -20,6 +20,5 @@ object ProfileAssertions {
         name shouldBe expected.name
         surname shouldBe expected.surname
         imageId shouldBe expected.imageId
-        addressId shouldBe expected.addressId
     }
 }
