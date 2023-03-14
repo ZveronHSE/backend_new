@@ -1,4 +1,4 @@
-val contractVersion: String = "1.8.9"
+val contractVersion: String = "1.8.91"
 
 dependencies {
     implementation("com.github.zveronHSe.contract:favorites:$contractVersion")

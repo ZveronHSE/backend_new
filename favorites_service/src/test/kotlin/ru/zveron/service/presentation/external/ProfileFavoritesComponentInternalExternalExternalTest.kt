@@ -176,6 +176,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
 
             val profiles = profilesFavoritesService.getFavoriteProfiles(Empty.getDefaultInstance())
             profiles.favoriteProfilesList profilesShouldBe expectedProfiles
+            profiles.favoriteProfilesList.forEach { it.rating shouldBe 4.2 }
         }
     }
 

@@ -1,5 +1,6 @@
 package ru.zveron.service.api
 
+import io.grpc.Status
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
@@ -79,6 +80,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Invalid number of communication ways. Expected 1 or 2, but was: 3"
+        exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -96,6 +98,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Vk id and ref should be both present or missed"
+        exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
     @ParameterizedTest
@@ -120,6 +123,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Specified communication link is already used"
+        exception.code shouldBe Status.Code.ALREADY_EXISTS
     }
 
     @Test
@@ -149,6 +153,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -178,6 +183,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -249,6 +255,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -267,6 +274,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Chat channel type don't need to be added to contacts"
+        exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -303,6 +311,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Can't find profile by channel: $channelType and channel id: $id"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -379,6 +388,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Password hasn't been set yet for this profile"
+        exception.code shouldBe Status.Code.FAILED_PRECONDITION
     }
 
     @Test

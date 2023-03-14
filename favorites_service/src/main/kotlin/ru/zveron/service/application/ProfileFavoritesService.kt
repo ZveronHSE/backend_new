@@ -2,6 +2,7 @@ package ru.zveron.service.application
 
 import org.springframework.stereotype.Service
 import ru.zveron.client.profile.ProfileClient
+import ru.zveron.client.rating.ReviewClient
 import ru.zveron.exception.FavoritesException
 import ru.zveron.favorites.profile.ProfileSummary
 import ru.zveron.mapper.ProfileMapper.toFavoritesSummary
@@ -11,6 +12,7 @@ import ru.zveron.service.domain.ProfileFavoritesComponent
 class ProfileFavoritesService(
     private val service: ProfileFavoritesComponent,
     private val profileClient: ProfileClient,
+    private val reviewClient: ReviewClient,
 ) {
 
     suspend fun addToFavorites(authorizedProfileId: Long, targetUserId: Long) {
@@ -39,7 +41,7 @@ class ProfileFavoritesService(
 
     suspend fun getFavoriteProfiles(authorizedProfileId: Long): List<ProfileSummary> {
         val ids = service.getFavoriteProfiles(authorizedProfileId).map { it.id.favoriteUserId }
-        return profileClient.getProfilesSummary(ids).map { it.toFavoritesSummary() }
+        return profileClient.getProfilesSummary(ids).map { it.toFavoritesSummary(reviewClient.getProfileRating(it.id)) }
     }
 
     suspend fun removeAllByOwner(id: Long) = service.removeAllByOwner(id)
