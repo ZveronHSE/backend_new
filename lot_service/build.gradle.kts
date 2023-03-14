@@ -1,7 +1,7 @@
 val jooqVersion: String = "3.16.6"
 val springVersion: String by rootProject
 val protobufVersion: String by rootProject
-val contractVersion: String = "1.8.9"
+val contractVersion: String = "1.9.0"
 
 dependencies {
     implementation("com.vladmihalcea:hibernate-types-55:2.14.0")
@@ -21,4 +21,5 @@ dependencies {
     implementation("com.github.zveronHSe.contract:address:$contractVersion")
     implementation("com.github.zveronHSe.contract:profile:$contractVersion")
     implementation("com.github.zveronHSe.contract:lot:$contractVersion")
+    implementation("com.github.zveronHSe.contract:core:$contractVersion")
 }

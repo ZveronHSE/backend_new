@@ -17,6 +17,10 @@ class AddressService(
 ) : AddressServiceGrpcKt.AddressServiceCoroutineImplBase() {
 
     override suspend fun getAddress(request: AddressIdRequest): AddressResponse {
+        if (request.id <= 0) {
+            throw IllegalArgumentException("Address ID can't be less than 1")
+        }
+
         val address = addressRepository.findById(request.id)
             .orElseThrow { throw EntityNotFoundException("Address by id ${request.id} didn't find") }
 

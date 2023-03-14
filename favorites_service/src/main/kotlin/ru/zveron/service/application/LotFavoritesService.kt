@@ -2,12 +2,10 @@ package ru.zveron.service.application
 
 import org.springframework.stereotype.Service
 import ru.zveron.client.lot.LotClient
+import ru.zveron.contract.core.Lot
+import ru.zveron.contract.core.Status
 import ru.zveron.entity.LotsFavoritesRecord
 import ru.zveron.exception.FavoritesException
-import ru.zveron.favorites.lot.LotStatus
-import ru.zveron.favorites.lot.LotSummary
-import ru.zveron.mapper.LotMapper.toFavoritesStatus
-import ru.zveron.mapper.LotMapper.toSummary
 import ru.zveron.service.domain.LotFavoritesComponent
 
 @Service
@@ -30,9 +28,9 @@ class LotFavoritesService(
     suspend fun existsInFavorites(profileId: Long, lotIds: List<Long>) =
         lotFavoritesComponent.existsInFavorites(profileId = profileId, lotIds = lotIds)
 
-    suspend fun getFavorites(profileId: Long, categoryId: Int): List<LotSummary> {
+    suspend fun getFavorites(profileId: Long, categoryId: Int): List<Lot> {
         val favoriteLotsIds = lotFavoritesComponent.getFavorites(profileId, categoryId).map { it.id.favoriteLotId }
-        return lotClient.getLotsById(favoriteLotsIds).lotsList.map { it.toSummary() }
+        return lotClient.getLotsById(favoriteLotsIds).lotsList
     }
 
     suspend fun getCounter(lotId: Long) = lotFavoritesComponent.getCounter(lotId)
@@ -44,10 +42,10 @@ class LotFavoritesService(
     suspend fun removeAllByCategory(profileId: Long, categoryId: Int) =
         lotFavoritesComponent.removeAllByCategoryId(profileId, categoryId)
 
-    suspend fun removeAllByStatus(profileId: Long, status: LotStatus, categoryId: Int) {
+    suspend fun removeAllByStatus(profileId: Long, status: Status, categoryId: Int) {
         val profileLots = lotFavoritesComponent.getFavorites(profileId, categoryId).map { it.id.favoriteLotId }
         val removedLotsKeys =
-            lotClient.getLotsById(profileLots).lotsList.filter { it.status.toFavoritesStatus() == status }
+            lotClient.getLotsById(profileLots).lotsList.filter { it.status == status }
                 .map { LotsFavoritesRecord.LotsFavoritesKey(ownerUserId = profileId, favoriteLotId = it.id) }
         lotFavoritesComponent.removeAllByKey(removedLotsKeys)
     }

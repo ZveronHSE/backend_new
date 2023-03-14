@@ -28,8 +28,8 @@ import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.contract.address.addressResponse
+import ru.zveron.contract.core.Status
 import ru.zveron.contract.lot.profileLotsResponse
-import ru.zveron.contract.profile.LotStatus
 import ru.zveron.contract.profile.SetSettingsRequest
 import ru.zveron.contract.profile.getProfilePageRequest
 import ru.zveron.contract.profile.model.ChannelType
@@ -126,12 +126,12 @@ class ProfileServiceExternalTest : ProfileTest() {
             response.activeLotsList.apply {
                 size shouldBe 1
                 first() lotShouldBe activeLot
-                first().status shouldBe LotStatus.ACTIVE
+                first().status shouldBe Status.ACTIVE
             }
             response.closedLotsList.apply {
                 size shouldBe 1
                 first() lotShouldBe closedLot
-                first().status shouldBe LotStatus.CLOSED
+                first().status shouldBe Status.CLOSED
             }
         }
     }
@@ -168,12 +168,12 @@ class ProfileServiceExternalTest : ProfileTest() {
             response.activeLotsList.apply {
                 size shouldBe 1
                 first() lotShouldBe activeLot
-                first().status shouldBe LotStatus.ACTIVE
+                first().status shouldBe Status.ACTIVE
             }
             response.closedLotsList.apply {
                 size shouldBe 1
                 first() lotShouldBe closedLot
-                first().status shouldBe LotStatus.CLOSED
+                first().status shouldBe Status.CLOSED
             }
         }
     }

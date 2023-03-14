@@ -9,9 +9,6 @@ import ru.zveron.model.SellerProfile
 
 object SellerMapper {
 
-    private const val MAILTO_LINK = "mailto:"
-    private const val TEL_LINK = "tel:"
-
     fun GetProfileWithContactsResponse.toSellerProfile() = SellerProfile(
         id = id,
         name = name,
@@ -25,8 +22,8 @@ object SellerMapper {
     private fun Links.toChannelLink(): ChannelLink {
         return ChannelLink(
             vk = if (vk.isInitialized) vk.ref else null,
-            email = if (gmail.isInitialized) "$MAILTO_LINK${gmail.email}" else null,
-            phone = if (phone.isInitialized) "$TEL_LINK${phone.number}" else null
+            email = if (gmail.isInitialized) gmail.email else null,
+            phone = if (phone.isInitialized) phone.number else null
         )
     }
 
