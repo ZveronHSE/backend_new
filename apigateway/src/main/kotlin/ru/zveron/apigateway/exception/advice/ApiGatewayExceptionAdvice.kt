@@ -21,7 +21,7 @@ class ApiGatewayExceptionAdvice {
 
     @GrpcExceptionHandler(Exception::class)
     fun handleAnyException(ex: Exception): Status {
-        logger.error(ex) { "Unknown exception" }
-        return Status.INTERNAL.withCause(ex)
+        logger.error(ex) { "Unknown exception: ${ex.message}" }
+        return Status.INTERNAL.withCause(ex).withDescription(ex.message)
     }
 }
