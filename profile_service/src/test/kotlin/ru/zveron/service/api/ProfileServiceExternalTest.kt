@@ -103,8 +103,8 @@ class ProfileServiceExternalTest : ProfileTest() {
             requestedProfileId = id
         }
         coEvery { blacklistClient.existsInBlacklist(id, authorizedId) } returns false
-        val activeLot = LotsGenerator.generateLot(false)
-        val closedLot = LotsGenerator.generateLot(false)
+        val activeLot = LotsGenerator.generateLot(favorite = false, active = true)
+        val closedLot = LotsGenerator.generateLot(favorite = false, active = false)
         coEvery { lotClient.getLotsBySellerId(id, authorizedId) } returns profileLotsResponse {
             activateLots.add(activeLot)
             inactivateLots.add(closedLot)
@@ -145,8 +145,8 @@ class ProfileServiceExternalTest : ProfileTest() {
         val request = getProfilePageRequest {
             requestedProfileId = id
         }
-        val activeLot = LotsGenerator.generateLot(false)
-        val closedLot = LotsGenerator.generateLot(false)
+        val activeLot = LotsGenerator.generateLot(favorite = false, active = true)
+        val closedLot = LotsGenerator.generateLot(favorite = false, active = false)
         coEvery { lotClient.getLotsBySellerId(id, id) } returns profileLotsResponse {
             activateLots.add(activeLot)
             inactivateLots.add(closedLot)
