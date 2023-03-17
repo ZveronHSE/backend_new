@@ -1,7 +1,6 @@
 package ru.zveron.service.api
 
 import com.google.protobuf.Empty
-import io.grpc.Status
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -17,7 +16,6 @@ import ru.zveron.ProfileTest
 import ru.zveron.commons.assertions.addressShouldBe
 import ru.zveron.commons.assertions.channelsShouldBe
 import ru.zveron.commons.assertions.linksShouldBe
-import ru.zveron.commons.assertions.lotShouldBe
 import ru.zveron.commons.assertions.profileShouldBe
 import ru.zveron.commons.assertions.responseShouldBe
 import ru.zveron.commons.assertions.responseShouldBeBlockedAnd
@@ -125,12 +123,12 @@ class ProfileServiceExternalTest : ProfileTest() {
             //TODO: response.reviewNumber should be (?)
             response.activeLotsList.apply {
                 size shouldBe 1
-                first() lotShouldBe activeLot
+                first() shouldBe activeLot
                 first().status shouldBe Status.ACTIVE
             }
             response.closedLotsList.apply {
                 size shouldBe 1
-                first() lotShouldBe closedLot
+                first() shouldBe closedLot
                 first().status shouldBe Status.CLOSED
             }
         }
@@ -167,12 +165,12 @@ class ProfileServiceExternalTest : ProfileTest() {
             //TODO: response.reviewNumber should be (?)
             response.activeLotsList.apply {
                 size shouldBe 1
-                first() lotShouldBe activeLot
+                first() shouldBe activeLot
                 first().status shouldBe Status.ACTIVE
             }
             response.closedLotsList.apply {
                 size shouldBe 1
-                first() lotShouldBe closedLot
+                first() shouldBe closedLot
                 first().status shouldBe Status.CLOSED
             }
         }
@@ -214,7 +212,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
-        exception.code shouldBe Status.Code.NOT_FOUND
+        exception.code shouldBe io.grpc.Status.Code.NOT_FOUND
     }
 
     @Test
@@ -291,7 +289,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
-        exception.code shouldBe Status.Code.UNAUTHENTICATED
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -321,7 +319,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
-        exception.code shouldBe Status.Code.UNAUTHENTICATED
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -351,7 +349,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
-        exception.code shouldBe Status.Code.UNAUTHENTICATED
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -385,7 +383,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
-        exception.code shouldBe Status.Code.UNAUTHENTICATED
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -432,7 +430,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Can't use gmail as communication channel because link is missed"
-        exception.code shouldBe Status.Code.INVALID_ARGUMENT
+        exception.code shouldBe io.grpc.Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -453,7 +451,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Invalid number of communication ways. Expected 1 or 2, but was: 0"
-        exception.code shouldBe Status.Code.INVALID_ARGUMENT
+        exception.code shouldBe io.grpc.Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -466,7 +464,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
-        exception.code shouldBe Status.Code.UNAUTHENTICATED
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -500,6 +498,6 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
-        exception.code shouldBe Status.Code.UNAUTHENTICATED
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 }

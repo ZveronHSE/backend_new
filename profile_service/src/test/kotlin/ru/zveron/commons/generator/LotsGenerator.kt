@@ -1,8 +1,8 @@
 package ru.zveron.commons.generator
 
-import ru.zveron.commons.generator.PropsGenerator.generateString
 import ru.zveron.commons.generator.PropsGenerator.generateLongId
-import ru.zveron.contract.lot.model.lot
+import ru.zveron.commons.generator.PropsGenerator.generateString
+import ru.zveron.contract.core.lot
 
 object LotsGenerator {
 
