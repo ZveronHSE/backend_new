@@ -3,6 +3,7 @@ package ru.zveron.service.presentation.external
 import io.grpc.Status
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -14,13 +15,11 @@ import org.springframework.context.annotation.Bean
 import org.springframework.transaction.support.TransactionTemplate
 import ru.zveron.FavoritesTest
 import ru.zveron.client.lot.LotClient
-import ru.zveron.commons.assertions.LotAssertions.lotsShouldBe
 import ru.zveron.commons.generators.LotsFavoritesRecordEntitiesGenerator
 import ru.zveron.commons.generators.LotsFavoritesRecordEntitiesGenerator.generateLot
 import ru.zveron.commons.generators.PrimitivesGenerator
 import ru.zveron.contract.lot.lotsIdResponse
 import ru.zveron.exception.FavoritesException
-import ru.zveron.favorites.lot.LotStatus
 import ru.zveron.favorites.lot.deleteAllByCategoryRequest
 import ru.zveron.favorites.lot.deleteAllByStatusAndCategoryRequest
 import ru.zveron.favorites.lot.getFavoriteLotsRequest
@@ -190,7 +189,7 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
 
             val list = lotsFavoriteService.getFavoriteLots(getFavoriteLotsRequest { this.categoryId = categoryId })
 
-            list.favoriteLotsList lotsShouldBe expectedLots
+            list.favoriteLotsList shouldContainExactlyInAnyOrder expectedLots
         }
     }
 
@@ -268,8 +267,8 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
         val (lotId1, lotId2, lotId3, lotId4) = PrimitivesGenerator.generateNIds(4)
         val (categoryId1, categoryId2) = PrimitivesGenerator.generateNCategoryIds(2)
         val expectedLots = listOf(
-            generateLot(lotId2, ru.zveron.contract.lot.model.Status.CLOSED),
-            generateLot(lotId3, ru.zveron.contract.lot.model.Status.CLOSED),
+            generateLot(lotId2, ru.zveron.contract.core.Status.CLOSED),
+            generateLot(lotId3, ru.zveron.contract.core.Status.CLOSED),
             generateLot(lotId4),
         )
         coEvery { lotClient.getLotsById(listOf(lotId2, lotId3, lotId4)) } returns lotsIdResponse {
@@ -287,7 +286,7 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
 
             lotsFavoriteService.deleteAllByStatusAndCategory(deleteAllByStatusAndCategoryRequest {
                 this.categoryId = categoryId2
-                this.status = LotStatus.CLOSED
+                this.status = ru.zveron.contract.core.Status.CLOSED
             })
 
             lotsFavoritesRecordRepository.existsById_OwnerUserIdAndId_FavoriteLotId(profileId1, lotId1) shouldBe true
@@ -306,7 +305,7 @@ class LotFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
             runBlocking {
                 lotsFavoriteService.deleteAllByStatusAndCategory(deleteAllByStatusAndCategoryRequest {
                     this.categoryId = categoryId
-                    this.status = LotStatus.CLOSED
+                    this.status = ru.zveron.contract.core.Status.CLOSED
                 })
             }
         }

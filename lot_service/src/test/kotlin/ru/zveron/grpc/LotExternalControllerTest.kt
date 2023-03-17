@@ -110,6 +110,7 @@ class LotExternalControllerTest : DataBaseTest() {
                 it.contact.communicationChannelCount shouldBe 2
                 it.favorite shouldBe true
                 it.parametersCount shouldBe 2
+                it.statistics.view shouldBe 0
             }
         }
 }
