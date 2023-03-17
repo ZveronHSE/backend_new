@@ -1,5 +1,6 @@
 package ru.zveron.authservice.grpc
 
+import com.google.protobuf.Empty
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.mockk.coEvery
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.authservice.config.BaseAuthTest
 import ru.zveron.authservice.exception.InvalidTokenException
 import ru.zveron.authservice.grpc.client.model.ProfileFound
+import ru.zveron.authservice.grpc.context.AccessTokenElement
 import ru.zveron.authservice.persistence.entity.StateContextEntity
 import ru.zveron.authservice.service.mapper.ServiceMapper.toContext
 import ru.zveron.authservice.util.randomCode
@@ -22,16 +24,18 @@ import ru.zveron.authservice.util.randomLoginFlowContext
 import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPhoneNumber
 import ru.zveron.authservice.util.randomSurname
-import ru.zveron.contract.auth.issueNewTokensRequest
-import ru.zveron.contract.auth.mobileTokenOrNull
-import ru.zveron.contract.auth.phoneLoginVerifyRequest
-import ru.zveron.contract.auth.verifyMobileTokenRequest
+import ru.zveron.contract.auth.external.issueNewTokensRequest
+import ru.zveron.contract.auth.external.mobileTokenOrNull
+import ru.zveron.contract.auth.external.phoneLoginVerifyRequest
 import java.util.UUID
 
 class AuthTokensTest : BaseAuthTest() {
 
     @Autowired
-    lateinit var authLoginController: AuthLoginController
+    lateinit var authExternalController: AuthExternalController
+
+    @Autowired
+    lateinit var authInternalController: AuthInternalController
 
     @Test
     fun `when logged in, then return valid tokens, that pass validation and can be used to refresh session`(): Unit =
@@ -74,7 +78,7 @@ class AuthTokensTest : BaseAuthTest() {
                 this.sessionId = sessionId.toString()
             }
 
-            val verifyResponse = authLoginController.phoneLoginVerify(verifyRequest)
+            val verifyResponse = authExternalController.phoneLoginVerify(verifyRequest)
             verifyResponse.shouldNotBeNull()
 
             assertSoftly {
@@ -86,27 +90,27 @@ class AuthTokensTest : BaseAuthTest() {
 
             //access token passes validation
             assertDoesNotThrow {
-                authLoginController.verifyToken(verifyMobileTokenRequest {
-                    this.accessToken = accessToken.token
-                })
+                runBlocking(AccessTokenElement(accessToken.token)) {
+                    authInternalController.verifyToken(Empty.getDefaultInstance())
+                }
             }
 
             //can get new tokens from
-            val newTokens = authLoginController.issueNewTokens(request = issueNewTokensRequest {
+            val newTokens = authExternalController.issueNewTokens(request = issueNewTokensRequest {
                 this.deviceFp = deviceFp
                 this.refreshToken = refreshToken.token
             })
 
             //new access token passes validation
             assertDoesNotThrow {
-                authLoginController.verifyToken(verifyMobileTokenRequest {
-                    this.accessToken = newTokens.accessToken.token
-                })
+                runBlocking(AccessTokenElement(newTokens.accessToken.token)) {
+                    authInternalController.verifyToken(Empty.getDefaultInstance())
+                }
             }
 
             //old refresh token fails
             assertThrows<InvalidTokenException> {
-                authLoginController.issueNewTokens(request = issueNewTokensRequest {
+                authExternalController.issueNewTokens(request = issueNewTokensRequest {
                     this.deviceFp = deviceFp
                     this.refreshToken = refreshToken.token
                 })

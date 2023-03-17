@@ -8,7 +8,7 @@ interface LotsFavoritesRecordRepository: JpaRepository<LotsFavoritesRecord, Lots
 
     fun countAllById_FavoriteLotId(lotId: Long): Long
 
-    fun getAllById_OwnerUserId(ownerUSerId: Long): List<LotsFavoritesRecord>
+    fun getAllById_OwnerUserIdAndCategoryId(ownerUSerId: Long, categoryId: Int): List<LotsFavoritesRecord>
 
     fun existsById_OwnerUserIdAndId_FavoriteLotId(ownerUserId: Long, favoriteLotId: Long): Boolean
 
@@ -17,4 +17,7 @@ interface LotsFavoritesRecordRepository: JpaRepository<LotsFavoritesRecord, Lots
 
     @Transactional
     fun deleteAllById_FavoriteLotId(lotId: Long)
+
+    @Transactional
+    fun deleteById_OwnerUserIdAndCategoryId(profileId: Long, categoryId: Int)
 }

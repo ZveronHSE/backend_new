@@ -24,12 +24,12 @@ import ru.zveron.authservice.util.randomId
 import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPassword
 import ru.zveron.authservice.util.randomSurname
-import ru.zveron.contract.auth.loginByPasswordRequest
+import ru.zveron.contract.auth.external.loginByPasswordRequest
 
 class LoginByPasswordFullFlowTest : BaseAuthTest() {
 
     @Autowired
-    lateinit var controller: AuthLoginController
+    lateinit var controller: AuthExternalController
 
     @Autowired
     lateinit var argon2PasswordEncoder: Argon2PasswordEncoder

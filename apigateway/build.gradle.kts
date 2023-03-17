@@ -8,7 +8,7 @@ configurations {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-jetty:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-reactor-netty:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")
 
     //kotlinx
@@ -27,7 +27,7 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:auth:1.8.7")
+    implementation("com.github.zveronHSe.contract:auth:99597be969")
     implementation("com.github.zveronHSe.contract:apigateway:1.8.7")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")

@@ -3,6 +3,7 @@ spring:
     name: auth-service
   main:
     banner-mode: off
+    web-application-type: reactive
 
 zveron:
   jwt:

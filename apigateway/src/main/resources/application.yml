@@ -20,8 +20,11 @@ spring:
     password: zveron_password
     pool:
       enabled: true
+
   netty:
     leak-detection: advanced
+  jpa:
+    show-sql: true
 eureka:
   client:
     enabled: true
@@ -48,3 +51,7 @@ grpc:
 
   server:
     port: 9091
+
+logging:
+  level:
+    ru.zveron.ru.zveron.apigateway: DEBUG

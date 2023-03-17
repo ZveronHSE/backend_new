@@ -60,7 +60,8 @@ eureka:
 
   instance:
     metadata-map:
-      AuthService: 'auth.proto'
+      AuthServiceInternal: 'internal/auth_internal.proto'
+      AuthServiceExternal: 'external/auth_external.proto'
 
 server:
   port: 0
@@ -91,7 +92,6 @@ logging:
     ru.zveron.authservice.cron: INFO
 
 
-platform:
   grpc:
     apigateway:
       metadata: false
@@ -99,3 +99,6 @@ platform:
       logging-enabled: true
     server:
       logging-enabled: true
+
+
+

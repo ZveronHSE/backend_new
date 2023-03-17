@@ -9,9 +9,9 @@ import io.kotest.matchers.shouldBe
 import org.apache.commons.lang3.RandomUtils
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import ru.zveron.authservice.component.jwt.Constants.SESSION_ID
+import ru.zveron.authservice.component.jwt.contant.TokenConstants.SESSION_ID
 import ru.zveron.authservice.component.jwt.JwtEncoder
-import ru.zveron.authservice.component.jwt.model.TokenType
+import ru.zveron.authservice.component.jwt.contant.TokenType
 import ru.zveron.authservice.exception.InvalidTokenException
 import java.util.UUID
 

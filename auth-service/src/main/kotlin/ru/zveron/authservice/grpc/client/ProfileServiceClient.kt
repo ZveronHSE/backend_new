@@ -1,6 +1,5 @@
 package ru.zveron.authservice.grpc.client
 
-import io.grpc.Status
 import io.grpc.Status.Code
 import io.grpc.StatusException
 import org.springframework.core.env.Environment
@@ -80,8 +79,8 @@ class ProfileServiceClient(
             })
             return ProfileFound(response.id, response.name, response.surname)
         } catch (ex: StatusException) {
-            when (ex.status) {
-                Status.NOT_FOUND -> ProfileNotFound
+            when (ex.status.code) {
+                Code.NOT_FOUND -> ProfileNotFound
                 else -> FindProfileUnknownFailure(ex.message, ex.status.code, ex.trailers)
             }
         }
@@ -105,8 +104,8 @@ class ProfileServiceClient(
             val response = profileGrpcClient.getProfile(getProfileRequest { this.id = id })
             return ProfileFound(response.id, response.name, response.surname)
         } catch (ex: StatusException) {
-            when (ex.status) {
-                Status.NOT_FOUND -> ProfileNotFound
+            when (ex.status.code) {
+                Code.NOT_FOUND -> ProfileNotFound
                 else -> FindProfileUnknownFailure(ex.message, ex.status.code, ex.trailers)
             }
         }

@@ -15,7 +15,7 @@ spring:
       enabled: true
 eureka:
   client:
-    enabled: true
+    enabled: false
     webclient:
       enabled: true
     fetch-registry: true
@@ -24,10 +24,6 @@ eureka:
     register-with-eureka: false
   instance:
     prefer-ip-address: true
-management:
-  endpoint:
-    serviceregistry:
-      enabled: true
 
 logging:
   level:

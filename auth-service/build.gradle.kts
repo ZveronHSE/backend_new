@@ -7,10 +7,12 @@ configurations {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-jetty:$springVersion")
+    //reactive server
+    implementation("org.springframework.boot:spring-boot-starter-reactor-netty:$springVersion")
+
+    //coroutines with reactor
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinxVersion")
-
 
     //reactive database
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springVersion")
@@ -23,8 +25,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:profile:bb650395f8")
-    implementation("com.github.zveronHSe.contract:auth:1.8.3")
+    implementation("com.github.zveronHSe.contract:profile:1.8.8")
+    implementation("com.github.zveronHSe.contract:auth:1.8.8")
 
     //testing
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")

@@ -44,6 +44,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
     @Test
     fun `AddProfileToFavorites When adds someones profile to favorites Then it is added`() {
         val (profileId1, profileId2) = PrimitivesGenerator.generateNIds(2)
+        coEvery { profileClient.existsById(profileId2) } returns true
         runBlocking(MetadataElement(Metadata(profileId1))) {
             profilesFavoritesService.addToFavorites(
                 ProfilesFavoritesRecordEntitiesGenerator.createAddProfileToFavoritesRequest(profileId2)
@@ -84,6 +85,22 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
         }
 
         exception.message shouldBe "Нельзя добавить себя в свой список избранного"
+    }
+
+    @Test
+    fun `AddProfileToFavorites When target profile does not exists`() {
+        val (profileId1, profileId2) = PrimitivesGenerator.generateNIds(2)
+        coEvery { profileClient.existsById(profileId2) } returns false
+        val exception = shouldThrow<FavoritesException> {
+            runBlocking(MetadataElement(Metadata(profileId1))) {
+                profilesFavoritesService.addToFavorites(
+                    ProfilesFavoritesRecordEntitiesGenerator.createAddProfileToFavoritesRequest(profileId2)
+                )
+            }
+        }
+
+        exception.message shouldBe "Пользователя с id: $profileId2 не существует"
+        exception.status shouldBe Status.INVALID_ARGUMENT
     }
 
     @Test
@@ -159,6 +176,7 @@ class ProfileFavoritesComponentInternalExternalExternalTest : FavoritesTest() {
 
             val profiles = profilesFavoritesService.getFavoriteProfiles(Empty.getDefaultInstance())
             profiles.favoriteProfilesList profilesShouldBe expectedProfiles
+            profiles.favoriteProfilesList.forEach { it.rating shouldBe 4.2 }
         }
     }
 

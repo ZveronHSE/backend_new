@@ -5,6 +5,7 @@ import io.grpc.ManagedChannelBuilder
 import mu.KLogging
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 @Component
 class GrpcChannelRegistry {
@@ -21,6 +22,8 @@ class GrpcChannelRegistry {
         }
 
     private fun createManagedChannel(service: String) = ManagedChannelBuilder.forTarget("$DISCOVERY_PREFIX$service")
+        .enableRetry()
+        .idleTimeout(75, TimeUnit.SECONDS)
         .usePlaintext()
         .build()
 }

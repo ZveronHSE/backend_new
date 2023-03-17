@@ -32,6 +32,7 @@
     <root level="info">
         <appender-ref ref="CONSOLE"/>
     </root>
+
     <logger name="ru.zveron.authservice" level="DEBUG"/>
 
 </configuration>

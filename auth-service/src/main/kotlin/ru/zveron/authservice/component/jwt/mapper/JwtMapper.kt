@@ -1,12 +1,12 @@
-package ru.zveron.authservice.component.jwt
+package ru.zveron.authservice.component.jwt.mapper
 
 import com.nimbusds.jwt.JWTClaimNames.EXPIRATION_TIME
 import com.nimbusds.jwt.JWTClaimNames.JWT_ID
 import com.nimbusds.jwt.JWTClaimNames.SUBJECT
-import ru.zveron.authservice.component.jwt.Constants.SESSION_ID
-import ru.zveron.authservice.component.jwt.Constants.TOKEN_TYPE
+import ru.zveron.authservice.component.jwt.contant.TokenConstants.SESSION_ID
+import ru.zveron.authservice.component.jwt.contant.TokenConstants.TOKEN_TYPE
 import ru.zveron.authservice.component.jwt.model.DecodedToken
-import ru.zveron.authservice.component.jwt.model.TokenType
+import ru.zveron.authservice.component.jwt.contant.TokenType
 import ru.zveron.authservice.exception.InvalidTokenException
 import java.time.Instant
 import java.util.UUID

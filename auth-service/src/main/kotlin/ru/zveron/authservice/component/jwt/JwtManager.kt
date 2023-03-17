@@ -2,13 +2,13 @@ package ru.zveron.authservice.component.jwt
 
 import com.nimbusds.jwt.JWTClaimsSet
 import org.springframework.stereotype.Component
-import ru.zveron.authservice.component.jwt.Constants.SESSION_ID
+import ru.zveron.authservice.component.jwt.contant.TokenConstants.SESSION_ID
 import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.DecodedToken
-import ru.zveron.authservice.component.jwt.model.IssueMobileTokensRequest
 import ru.zveron.authservice.component.jwt.model.MobileTokens
 import ru.zveron.authservice.component.jwt.model.RefreshToken
 import ru.zveron.authservice.exception.InvalidTokenException
+import ru.zveron.authservice.persistence.entity.SessionEntity
 
 @Component
 class JwtManager(
@@ -16,25 +16,34 @@ class JwtManager(
     private val jwtDecoder: JwtDecoder,
 ) {
 
-    fun issueMobileTokens(request: IssueMobileTokensRequest): MobileTokens {
-        val accessToken = issueMobileAccessToken(request)
-        val refreshToken = issueRefreshToken(request)
+    fun issueMobileTokens(
+        profileId: Long,
+        session: SessionEntity
+    ): MobileTokens {
+        val accessToken = issueAccessToken(profileId, session)
+        val refreshToken = issueRefreshToken(profileId, session)
         return MobileTokens(refreshToken, accessToken)
     }
 
-    private fun issueMobileAccessToken(request: IssueMobileTokensRequest): AccessToken {
+    private fun issueAccessToken(
+        profileId: Long,
+        session: SessionEntity
+    ): AccessToken {
         val claimsBuilder = JWTClaimsSet.Builder()
-            .claim(SESSION_ID, request.session.id)
-            .subject(request.profileId.toString())
+            .claim(SESSION_ID, session.id)
+            .subject(profileId.toString())
 
         return jwtEncoder.signAccess(claimsBuilder)
     }
 
-    private fun issueRefreshToken(request: IssueMobileTokensRequest): RefreshToken {
+    private fun issueRefreshToken(
+        profileId: Long,
+        session: SessionEntity
+    ): RefreshToken {
         val claimsBuilder = JWTClaimsSet.Builder()
-            .jwtID(request.session.tokenIdentifier.toString())
-            .claim(SESSION_ID, request.session.id)
-            .subject(request.profileId.toString())
+            .jwtID(session.tokenIdentifier.toString())
+            .claim(SESSION_ID, session.id)
+            .subject(profileId.toString())
 
         return jwtEncoder.signRefresh(claimsBuilder)
     }

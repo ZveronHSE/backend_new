@@ -1,5 +1,6 @@
 package ru.zveron.service.api
 
+import io.grpc.Status
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
@@ -18,6 +19,7 @@ import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.contract.profile.createProfileRequest
+import ru.zveron.contract.profile.existsByIdRequest
 import ru.zveron.contract.profile.getProfileByChannelRequest
 import ru.zveron.contract.profile.getProfileRequest
 import ru.zveron.contract.profile.getProfileWithContactsRequest
@@ -78,6 +80,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Invalid number of communication ways. Expected 1 or 2, but was: 3"
+        exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -95,6 +98,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Vk id and ref should be both present or missed"
+        exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
     @ParameterizedTest
@@ -119,6 +123,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Specified communication link is already used"
+        exception.code shouldBe Status.Code.ALREADY_EXISTS
     }
 
     @Test
@@ -148,6 +153,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -177,6 +183,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -248,6 +255,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -266,6 +274,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Chat channel type don't need to be added to contacts"
+        exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -302,6 +311,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Can't find profile by channel: $channelType and channel id: $id"
+        exception.code shouldBe Status.Code.NOT_FOUND
     }
 
     @Test
@@ -378,6 +388,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Password hasn't been set yet for this profile"
+        exception.code shouldBe Status.Code.FAILED_PRECONDITION
     }
 
     @Test
@@ -398,6 +409,26 @@ class ProfileServiceInternalTest : ProfileTest() {
             val response = service.getProfilesSummary(request).profilesList
             response.first { it.id == profiles[0].id } profileShouldBe profiles[0]
             response.first { it.id == profiles[1].id  } profileShouldBe profiles[1]
+        }
+    }
+
+    @Test
+    fun `ExistsById if exists`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        generateLinks(expectedProfile, addVk = true)
+        val id = profileRepository.save(expectedProfile).id
+
+        runBlocking {
+            service.existsById(existsByIdRequest { this.id = id }).exists shouldBe true
+        }
+    }
+
+    @Test
+    fun `ExistsById if not exists`() {
+        runBlocking {
+            service.existsById(existsByIdRequest { this.id = PropsGenerator.generateLongId() }).exists shouldBe false
         }
     }
 

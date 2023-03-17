@@ -7,7 +7,7 @@ import kotlin.coroutines.coroutineContext
 class AuthenticationContext(var accessToken: String?) : ThreadContextElement<String?> {
 
     companion object Key : CoroutineContext.Key<AuthenticationContext> {
-        suspend fun current() = coroutineContext[Key]?.accessToken
+        suspend fun accessToken() = coroutineContext[Key]?.accessToken
     }
 
     override val key: CoroutineContext.Key<*>

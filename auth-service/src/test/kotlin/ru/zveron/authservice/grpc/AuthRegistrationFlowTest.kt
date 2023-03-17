@@ -28,13 +28,13 @@ import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPassword
 import ru.zveron.authservice.util.randomPersistencePhone
 import ru.zveron.authservice.util.randomSurname
-import ru.zveron.contract.auth.phoneRegisterRequest
+import ru.zveron.contract.auth.external.phoneRegisterRequest
 import java.util.UUID
 
 class AuthRegistrationFlowTest : BaseAuthTest() {
 
     @Autowired
-    lateinit var controller: AuthLoginController
+    lateinit var controller: AuthExternalController
 
     @Autowired
     lateinit var jwtDecoder: JwtDecoder

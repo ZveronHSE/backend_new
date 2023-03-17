@@ -106,7 +106,7 @@ class ProfileService(
             if (e.cause is ConstraintViolationException) {
                 throw ProfileException(
                     "Specified communication link is already used",
-                    Status.INVALID_ARGUMENT.code
+                    Status.ALREADY_EXISTS.code
                 )
             }
             throw e
@@ -208,6 +208,8 @@ class ProfileService(
 
         profileRepository.save(updatedProfile)
     }
+
+    suspend fun existsById(id: Long) = profileRepository.existsById(id)
 
     private fun CoroutineScope.inOwnerBlacklist(
         requestedProfileId: Long,
