@@ -72,8 +72,9 @@ class ApiGatewayService(
         val grpcMessage = protoMethodDescriptor.dynamicMessageBuilder(request.requestBody)?.build()
 
         logger.debug(
-            "Prepared {} for request to {}",
-            keyValue("message", grpcMessage?.allFields?.toJson()), keyValue("grpcService", metadata.serviceName)
+            "Prepared for request to {}",
+//            keyValue("message", grpcMessage?.allFields?.toJson()),
+            keyValue("grpcService", metadata.serviceName)
         )
         return tryToCallService(
             channel = channel,
