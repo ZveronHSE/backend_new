@@ -25,6 +25,10 @@ spring:
     leak-detection: advanced
   jpa:
     show-sql: true
+  sleuth:
+     grpc:
+       enabled: true
+
 eureka:
   client:
     enabled: true

@@ -24,6 +24,10 @@
                         <includeStructuredArguments>true</includeStructuredArguments>
                     </arguments>
                     <logstashMarkers/>
+                    <rootStackTraceElement/>
+                    <stackTrace/>
+                    <throwableRootCauseClassName/>
+                    <throwableClassName/>
                 </providers>
             </encoder>
         </appender>
