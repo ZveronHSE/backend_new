@@ -11,6 +11,7 @@ import mu.KLogging
 import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor
 import net.logstash.logback.marker.Markers
 import net.logstash.logback.marker.Markers.append
+import net.logstash.logback.marker.Markers.appendRaw
 import org.apache.commons.lang3.StringUtils
 import ru.zveron.contract.apigateway.ApiGatewayRequest
 import ru.zveron.contract.apigateway.ApigatewayResponse
@@ -64,7 +65,7 @@ class LoggingInterceptor(
 
         val marker = Markers.aggregate(
             //todo sensitive masking
-            append("requestBody", protoMessage.requestBody.toStringUtf8()),
+            appendRaw("requestBody", protoMessage.requestBody.toStringUtf8()),
             append("methodAlias", protoMessage.methodAlias),
             append(CALL_TYPE, MethodType.REQUEST),
         )
@@ -78,7 +79,7 @@ class LoggingInterceptor(
         val responseBody = response.responseBody.toStringUtf8().let { StringUtils.normalizeSpace(it) }
 
         val marker = Markers.aggregate(
-            append("responseBody", responseBody),
+            appendRaw("responseBody", responseBody),
             append(CALL_TYPE, MethodType.RESPONSE),
         )
 
