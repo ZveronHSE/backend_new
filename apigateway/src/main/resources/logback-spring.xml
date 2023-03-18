@@ -3,7 +3,6 @@
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-    <springProfile name="prod">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
                 <findAndRegisterJacksonModules>true</findAndRegisterJacksonModules>
@@ -12,6 +11,14 @@
                         <fieldName>ts</fieldName>
                         <timeZone>UTC</timeZone>
                     </timestamp>
+                    <pattern>
+                        <omitEmptyFields>true</omitEmptyFields>
+                        <pattern>
+                            {
+                            "trace_id": "%mdc{traceId}"
+                            }
+                        </pattern>
+                    </pattern>
                     <threadName>
                         <fieldName>thread</fieldName>
                     </threadName>
@@ -24,10 +31,13 @@
                         <includeStructuredArguments>true</includeStructuredArguments>
                     </arguments>
                     <logstashMarkers/>
+                    <rootStackTraceElement/>
+                    <stackTrace/>
+                    <throwableRootCauseClassName/>
+                    <throwableClassName/>
                 </providers>
             </encoder>
         </appender>
-    </springProfile>
 
     <root level="info">
         <appender-ref ref="CONSOLE"/>
