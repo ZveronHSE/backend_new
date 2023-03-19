@@ -8,11 +8,12 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn
 import org.springframework.data.cassandra.core.mapping.Table
 import ru.zveron.model.enum.MessageType
 import java.time.Instant
+import java.util.*
 
 @Table
 data class Message(
     @PrimaryKeyColumn(name = "chat_id", type = PrimaryKeyType.PARTITIONED, ordinal = 1)
-    val chatId: String,
+    val chatId: UUID,
     @PrimaryKeyColumn(name = "received_at", type = PrimaryKeyType.CLUSTERED, ordinal = 2, ordering = Ordering.DESCENDING)
     val receivedAt: Instant,
     @field:Column("sender_id")

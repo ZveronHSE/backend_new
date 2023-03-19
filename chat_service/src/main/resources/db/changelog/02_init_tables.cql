@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS zveron_chat.chat (
     user_id bigint,
-    folder_type text,
-    chat_id text,
+    folder_type int,
+    chat_id uuid,
     another_user_id bigint,
     last_update timestamp,
     lots_ids list<bigint>,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS zveron_chat.chat (
 ) WITH CLUSTERING ORDER BY (chat_id ASC);
 
 CREATE TABLE IF NOT EXISTS zveron_chat.message (
-    chat_id text,
+    chat_id uuid,
     received_at timestamp,
     images_ids list<bigint>,
     is_read boolean,
