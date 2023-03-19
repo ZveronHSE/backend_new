@@ -1,4 +1,4 @@
-val contractVersion: String = "1.8.6"
+val contractVersion: String = "1.9.0"
 val kotlinxVersion: String by rootProject
 
 dependencies {
