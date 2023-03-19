@@ -231,7 +231,7 @@ class ProfileService(
 
     private fun CoroutineScope.getAddressById(id: Long, condition: Boolean = true): Deferred<AddressResponse> =
         async(CoroutineName("Get-Address-Coroutine")) {
-            if (condition && id != 0L) addressClient.getById(id) else AddressResponse.getDefaultInstance()
+            if (condition && id > 0L) addressClient.getById(id) else AddressResponse.getDefaultInstance()
         }
 
     private fun CoroutineScope.getRatingByProfileId(id: Long, condition: Boolean = true): Deferred<Double> =
