@@ -7,7 +7,6 @@ import ru.zveron.contract.core.lot
 import ru.zveron.contract.lot.LotsIdResponse
 import ru.zveron.contract.lot.ProfileLotsResponse
 import ru.zveron.contract.lot.WaterfallResponse
-import ru.zveron.contract.lot.dataFilter
 import ru.zveron.contract.lot.lotsIdResponse
 import ru.zveron.contract.lot.profileLotsResponse
 import ru.zveron.contract.lot.waterfallResponse
@@ -54,7 +53,8 @@ object LotMapper {
         return waterfallResponse {
             this.lots.addAll(lots)
 
-            dataFilter = dataFilter {
+            this.lastLot = ru.zveron.contract.lot.lastLot {
+                id = lastLot.id
                 price = lastLot.price
                 date = Timestamps.fromMillis(lastLot.createdAt.toEpochMilli())
             }
