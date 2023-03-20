@@ -8,6 +8,7 @@ import ru.zveron.authservice.component.jwt.model.RefreshToken
 import ru.zveron.authservice.component.thirdparty.contant.ThirdPartyProviderType
 import ru.zveron.authservice.grpc.client.model.PhoneNumber
 import ru.zveron.authservice.grpc.client.model.RegisterBySocialMediaRequest
+import ru.zveron.authservice.grpc.constant.VK_HOST
 import ru.zveron.authservice.service.model.JwtMobileTokens
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
@@ -105,19 +106,19 @@ object GrpcMapper {
     )
 
     fun RegisterBySocialMediaRequest.toClientRequest() = createProfileRequest {
-        this.name = this@toClientRequest.userInfo.firstName
-        this.surname = this@toClientRequest.userInfo.lastName
-        this.links = links {
+        name = userInfo.firstName
+        surname = userInfo.lastName
+        links = links {
             when (provider) {
                 ThirdPartyProviderType.VK -> vk {
-                    this.id = this@toClientRequest.userInfo.userId
-                    this.ref = "https://vk.com/${this@toClientRequest.userInfo.userId}"
-                    this.email = this@toClientRequest.userInfo.email ?: ""
+                    id = userInfo.userId
+                    ref = "$VK_HOST/${userInfo.userId}"
+                    email = userInfo.email ?: ""
                 }
 
                 ThirdPartyProviderType.GMAIL -> gmail {
-                    this.id = this@toClientRequest.userInfo.userId
-                    this.email = this@toClientRequest.userInfo.email ?: ""
+                    id = userInfo.userId
+                    email = userInfo.email ?: ""
                 }
             }
         }

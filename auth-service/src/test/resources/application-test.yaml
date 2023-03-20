@@ -25,5 +25,5 @@ zveron:
 
 third-party:
   providers:
-    google:
+    gmail:
       host: http://localhost:${wiremock.server.port}

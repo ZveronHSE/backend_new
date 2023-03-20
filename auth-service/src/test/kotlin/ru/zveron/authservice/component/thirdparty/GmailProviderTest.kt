@@ -8,7 +8,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
-import ru.zveron.authservice.config.GoogleProviderProperties
+import ru.zveron.authservice.config.ThirdPartyProviderProperties
 import ru.zveron.authservice.exception.SocialMediaException
 import ru.zveron.authservice.util.randomAccessToken
 import ru.zveron.authservice.util.testUserInfoGoogle
@@ -17,14 +17,14 @@ import ru.zveron.authservice.webclient.thirdparty.model.GetThirdPartyUserInfoFai
 import ru.zveron.authservice.webclient.thirdparty.model.GetThirdPartyUserInfoSuccess
 import ru.zveron.authservice.webclient.thirdparty.model.UserInfoGoogle
 
-class GoogleProviderTest {
+class GmailProviderTest {
     private val client = mockk<ThirdPartyClient>()
 
-    private val props = mockk<GoogleProviderProperties>().also {
-        coEvery { it.host } returns "http://localhost:8080"
+    private val props = mockk<ThirdPartyProviderProperties>().also {
+        coEvery { it.gmail.host } returns "http://localhost:8080"
     }
 
-    private val googleProvider = GoogleProvider(client = client, props)
+    private val gmailProvider = GmailProvider(client = client, props)
 
     @Test
     fun `given access token in request, when client responds with success, then return user info`() {
@@ -38,7 +38,7 @@ class GoogleProviderTest {
 
         //when
         val response = runBlocking {
-            googleProvider.getUserInfo(accessToken)
+            gmailProvider.getUserInfo(accessToken)
         }
 
         //then
@@ -67,7 +67,7 @@ class GoogleProviderTest {
         runBlocking {
             //then
             shouldThrow<SocialMediaException> {
-                googleProvider.getUserInfo(accessToken)
+                gmailProvider.getUserInfo(accessToken)
             }
         }
     }

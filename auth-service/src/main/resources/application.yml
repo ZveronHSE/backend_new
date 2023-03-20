@@ -89,7 +89,7 @@ zveron:
 
 third-party:
   providers:
-    google:
+    gmail:
       host: https://www.googleapis.com
 
 logging:

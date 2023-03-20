@@ -9,7 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import ru.zveron.authservice.component.thirdparty.contant.ThirdPartyProviderType
 import ru.zveron.authservice.component.thirdparty.mapper.ThirdPartyMapper.of
 import ru.zveron.authservice.component.thirdparty.model.ThirdPartyUserInfo
-import ru.zveron.authservice.config.GoogleProviderProperties
+import ru.zveron.authservice.config.ThirdPartyProviderProperties
 import ru.zveron.authservice.exception.SocialMediaException
 import ru.zveron.authservice.webclient.thirdparty.ThirdPartyClient
 import ru.zveron.authservice.webclient.thirdparty.model.GetThirdPartyUserInfoFailure
@@ -17,10 +17,10 @@ import ru.zveron.authservice.webclient.thirdparty.model.GetThirdPartyUserInfoSuc
 import ru.zveron.authservice.webclient.thirdparty.model.UserInfoGoogle
 
 @Component
-@EnableConfigurationProperties(GoogleProviderProperties::class)
-class GoogleProvider(
+@EnableConfigurationProperties(ThirdPartyProviderProperties::class)
+class GmailProvider(
     private val client: ThirdPartyClient,
-    private val providerProperties: GoogleProviderProperties,
+    private val providerProperties: ThirdPartyProviderProperties,
 ) : ThirdPartyProvider {
 
     companion object : KLogging() {
@@ -46,7 +46,7 @@ class GoogleProvider(
     }
 
     private fun buildGetUserInfoUri(accessToken: String) =
-        UriComponentsBuilder.fromHttpUrl(providerProperties.host + USERS_GET_PATH)
+        UriComponentsBuilder.fromHttpUrl(providerProperties.gmail.host + USERS_GET_PATH)
             .queryParam("access_token", accessToken)
             .build()
             .toUri()
