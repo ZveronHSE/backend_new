@@ -7,7 +7,7 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
 
 @Configuration
 @EnableConfigurationProperties(ArgonConfigurationProperties::class)
-class PasswordEncoderConfig(
+class PasswordEncoderConfiguration(
     private val properties: ArgonConfigurationProperties,
 ) {
 

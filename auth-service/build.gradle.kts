@@ -30,11 +30,11 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:profile:1.8.8")
-    implementation("com.github.zveronHSe.contract:auth:8b336e247f")
+    implementation("com.github.zveronHSe.contract:profile:1.9.1")
+    implementation("com.github.zveronHSe.contract:auth:1.9.1")
 
     //testing
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
-    implementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.5")
+    testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.5")
 }

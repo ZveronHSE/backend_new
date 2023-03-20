@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.web.util.UriComponentsBuilder
-import ru.zveron.authservice.component.thirdparty.GoogleProvider
+import ru.zveron.authservice.component.thirdparty.GmailProvider
 import ru.zveron.authservice.util.getHost
 import ru.zveron.authservice.util.randomAccessToken
 import ru.zveron.authservice.util.testUserInfoGoogle
@@ -29,7 +29,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //prepare data
         val accessToken = randomAccessToken().token
         val host = server.getHost()
-        val uri = UriComponentsBuilder.fromHttpUrl(host + GoogleProvider.USERS_GET_PATH)
+        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.USERS_GET_PATH)
             .queryParam("access_token", accessToken)
             .build()
             .toUri()
@@ -57,7 +57,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //prepare data
         val accessToken = randomAccessToken().token
         val host = server.getHost()
-        val uri = UriComponentsBuilder.fromHttpUrl(host + GoogleProvider.USERS_GET_PATH)
+        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.USERS_GET_PATH)
             .queryParam("access_token", accessToken)
             .build()
             .toUri()
@@ -81,7 +81,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //prepare data
         val accessToken = randomAccessToken().token
         val host = server.getHost()
-        val uri = UriComponentsBuilder.fromHttpUrl(host + GoogleProvider.USERS_GET_PATH)
+        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.USERS_GET_PATH)
             .queryParam("access_token", accessToken)
             .build()
             .toUri()

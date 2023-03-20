@@ -8,7 +8,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import ru.zveron.authservice.component.auth.Authenticator
-import ru.zveron.authservice.component.thirdparty.GoogleProvider
+import ru.zveron.authservice.component.thirdparty.GmailProvider
 import ru.zveron.authservice.component.thirdparty.contant.ThirdPartyProviderType
 import ru.zveron.authservice.exception.SocialMediaException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
@@ -29,12 +29,12 @@ class LoginBySocialMediaServiceTest {
 
     private val authenticator = mockk<Authenticator>()
 
-    private val googleProvider = mockk<GoogleProvider>().also {
+    private val gmailProvider = mockk<GmailProvider>().also {
         coEvery { it.providerType } returns ThirdPartyProviderType.GMAIL
     }
 
     private val service = LoginBySocialMediaService(
-        thirdPartyProviders = listOf(googleProvider),
+        thirdPartyProviders = listOf(gmailProvider),
         profileServiceClient = profileServiceClient,
         authenticator = authenticator,
     )
@@ -46,7 +46,7 @@ class LoginBySocialMediaServiceTest {
 
 
         //prepare env
-        coEvery { googleProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
+        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
 
         coEvery { profileServiceClient.findProfileBySocialMedia(any(), any()) } returns ProfileNotFound
 
@@ -70,7 +70,7 @@ class LoginBySocialMediaServiceTest {
 
 
         //prepare env
-        coEvery { googleProvider.getUserInfo(any()) } returns testThirdPartyUserInfo()
+        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo()
 
         //when
         runBlocking {
@@ -93,7 +93,7 @@ class LoginBySocialMediaServiceTest {
         val request = testLoginBySocialMediaRequest()
 
         //prepare env
-        coEvery { googleProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
+        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
 
         coEvery { profileServiceClient.findProfileBySocialMedia(any(), any()) } returns profileFoundResponse
 
@@ -116,7 +116,7 @@ class LoginBySocialMediaServiceTest {
         val request = testLoginBySocialMediaRequest()
 
         //prepare env
-        coEvery { googleProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
+        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
 
         coEvery { profileServiceClient.findProfileBySocialMedia(any(), any()) } returns ProfileNotFound
 
