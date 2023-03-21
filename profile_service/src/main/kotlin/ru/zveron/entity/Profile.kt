@@ -36,7 +36,7 @@ data class Profile(
     val imageId: Long,
     @Column(nullable = false)
     val lastSeen: Instant,
-    val addressId: Long = -1,
+    val addressId: Long = 0,
     val passwordHash: String? = null,
 ) {
 

@@ -43,9 +43,7 @@ class ApiGatewayService(
     }
 
     suspend fun handleGatewayCall(request: GatewayServiceRequest): DynamicMessage {
-        logger.debug(append("requestAlias", request.alias)) { "Handling gateway call request" }
-
-        logger.debug("Requesting method metadata {}", value("alias", request.alias))
+        logger.debug("Requesting method metadata for {}", value("alias", request.alias))
         val metadata = methodMetadataRepository.findByAlias(request.alias)
             ?: throw ApiGatewayException(message = "Non existent method alias", code = Status.Code.INVALID_ARGUMENT)
 
@@ -72,8 +70,9 @@ class ApiGatewayService(
         val grpcMessage = protoMethodDescriptor.dynamicMessageBuilder(request.requestBody)?.build()
 
         logger.debug(
-            "Prepared {} for request to {}",
-            keyValue("message", grpcMessage?.allFields?.toJson()), keyValue("grpcService", metadata.serviceName)
+            "Prepared {} to call {}",
+            keyValue("message", grpcMessage?.toJson()),
+            keyValue("grpcService", metadata.serviceName)
         )
         return tryToCallService(
             channel = channel,
@@ -101,17 +100,15 @@ class ApiGatewayService(
     } catch (ex: StatusException) {
         logger.warn(
             "Response for {} to {} failed. {}",
-            keyValue("message", grpcMessage?.allFields?.toJson()),
+            keyValue("message", grpcMessage?.toJson()),
             keyValue("method", grpcMethodDescriptor.fullMethodName),
             keyValue("code", ex.status.code)
         )
         throw ex
     } catch (e: Exception) {
-        logger.error(
-            "Failed service request for {} with {}. {}",
-            keyValue("method", grpcMethodDescriptor.fullMethodName),
-            keyValue("channelState", channel.getState(false)),
-            keyValue("stacktrace", e.stackTrace)
+        logger.warn(
+            append("method", grpcMethodDescriptor.fullMethodName).and(append("message", grpcMessage?.toJson())),
+            "Request failed"
         )
 
         throw e

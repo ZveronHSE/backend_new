@@ -4,6 +4,7 @@ import io.grpc.Status
 import io.grpc.StatusException
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.keyValue
+import net.logstash.logback.marker.Markers.append
 import org.springframework.stereotype.Component
 import ru.zveron.apigateway.component.constant.ServiceScope
 import ru.zveron.apigateway.component.model.ResolveForRoleRequest
@@ -29,9 +30,11 @@ class AuthResolver(
                 ?.let {
                     authClient.verifyAccessToken(request.token).also {
                         logger.debug(
-                            "Token not required. Received response from auth-client {}",
-                            keyValue("response", it)
-                        )
+                            append(
+                                "response",
+                                it
+                            )
+                        ) { "Token not required. Received response from auth-client" }
                     }
                         .let {
                             (it as? AccessTokenValid)?.profileId

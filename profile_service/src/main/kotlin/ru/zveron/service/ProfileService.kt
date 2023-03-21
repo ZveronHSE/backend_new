@@ -1,7 +1,6 @@
 package ru.zveron.service
 
 import com.google.protobuf.timestamp
-import io.grpc.Status
 import io.grpc.StatusException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +13,7 @@ import org.hibernate.jpa.QueryHints
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import ru.zveron.contract.address.AddressResponse
+import ru.zveron.contract.core.Lot
 import ru.zveron.contract.lot.ProfileLotsResponse
 import ru.zveron.contract.profile.Contacts
 import ru.zveron.contract.profile.CreateProfileRequest
@@ -26,8 +26,6 @@ import ru.zveron.contract.profile.GetProfileWithContactsRequest
 import ru.zveron.contract.profile.GetProfileWithContactsResponse
 import ru.zveron.contract.profile.GetProfilesSummaryRequest
 import ru.zveron.contract.profile.GetProfilesSummaryResponse
-import ru.zveron.contract.profile.LotStatus
-import ru.zveron.contract.profile.LotSummary
 import ru.zveron.contract.profile.SetProfileInfoRequest
 import ru.zveron.contract.profile.contacts
 import ru.zveron.contract.profile.getProfileInfoResponse
@@ -39,16 +37,15 @@ import ru.zveron.contract.profile.profileSummary
 import ru.zveron.domain.profile.ProfileInitializationType
 import ru.zveron.entity.Profile
 import ru.zveron.entity.Settings
-import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.exception.ProfileException
+import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.mapper.AddressMapper.toAddress
 import ru.zveron.mapper.AddressMapper.toProfileAddress
 import ru.zveron.mapper.AddressMapper.toRequest
 import ru.zveron.mapper.ContactsMapper.toCommunicationLinks
 import ru.zveron.mapper.ContactsMapper.toDto
-import ru.zveron.mapper.ContactsMapper.toModel
 import ru.zveron.mapper.ContactsMapper.toLinks
-import ru.zveron.mapper.LotsMapper.toBuilder
+import ru.zveron.mapper.ContactsMapper.toModel
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.service.client.address.AddressClient
 import ru.zveron.service.client.blakclist.BlacklistClient
@@ -106,7 +103,7 @@ class ProfileService(
             if (e.cause is ConstraintViolationException) {
                 throw ProfileException(
                     "Specified communication link is already used",
-                    Status.ALREADY_EXISTS.code
+                    io.grpc.Status.ALREADY_EXISTS.code
                 )
             }
             throw e
@@ -234,7 +231,7 @@ class ProfileService(
 
     private fun CoroutineScope.getAddressById(id: Long, condition: Boolean = true): Deferred<AddressResponse> =
         async(CoroutineName("Get-Address-Coroutine")) {
-            if (condition && id != 0L) addressClient.getById(id) else AddressResponse.getDefaultInstance()
+            if (condition && id > 0L) addressClient.getById(id) else AddressResponse.getDefaultInstance()
         }
 
     private fun CoroutineScope.getRatingByProfileId(id: Long, condition: Boolean = true): Deferred<Double> =
@@ -250,13 +247,13 @@ class ProfileService(
             true
         }
 
-    private suspend fun Deferred<ProfileLotsResponse>.awaitLotsResponse(): Pair<List<LotSummary>, List<LotSummary>> {
-        var activeLots = listOf<LotSummary>()
-        var closedLots = listOf<LotSummary>()
+    private suspend fun Deferred<ProfileLotsResponse>.awaitLotsResponse(): Pair<List<Lot>, List<Lot>> {
+        var activeLots = listOf<Lot>()
+        var closedLots = listOf<Lot>()
         try {
             val lots = await()
-            activeLots = lots.activateLotsList.toBuilder(LotStatus.ACTIVE)
-            closedLots = lots.inactivateLotsList.toBuilder(LotStatus.CLOSED)
+            activeLots = lots.activateLotsList
+            closedLots = lots.inactivateLotsList
         } catch (ex: StatusException) {
             logger.error(ex.message)
         }

@@ -43,7 +43,7 @@ class ConditionsMapperTest {
             lotId = GeneratorUtils.generateLong(),
             lotValue = GeneratorUtils.generateLong()
         )
-        val (sorts, values) = WaterfallEntities.buildParametersForSeekMethod(waterfallRequest)
+        val (sorts, values) = WaterfallEntities.buildParametersForSeekMethod(waterfallRequest.sort)
         val conditionsSearch = ConditionsMapper.parse(waterfallRequest, categories = null, sellerId = null)
 
         conditionsSearch.pageSize shouldBe pageSize

@@ -18,6 +18,7 @@ import ru.zveron.contract.lot.CloseLotRequest
 import ru.zveron.contract.lot.CreateLotRequest
 import ru.zveron.contract.lot.EditLotRequest
 import ru.zveron.contract.lot.LotExternalProtoServiceGrpcKt
+import ru.zveron.contract.lot.Sort
 import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.WaterfallResponse
 import ru.zveron.contract.parameter.internal.InfoCategory
@@ -209,7 +210,7 @@ class LotExternalController(
 
     override suspend fun getWaterfall(request: WaterfallRequest): WaterfallResponse {
         // Если нет запросов по сортировке, то пагинация и выдача не может работать корректно
-        if (request.sortCase == WaterfallRequest.SortCase.SORT_NOT_SET) {
+        if (request.sort.sortBy == Sort.SortBy.UNRECOGNIZED) {
             throw LotException(
                 Status.INVALID_ARGUMENT,
                 "didn't get any sorts, filter and pagination won't work without it"
