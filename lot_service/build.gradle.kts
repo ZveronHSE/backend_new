@@ -1,7 +1,7 @@
 val jooqVersion: String = "3.16.6"
 val springVersion: String by rootProject
 val protobufVersion: String by rootProject
-val contractVersion: String = "1.9.0"
+val contractVersion: String = "1.9.2"
 
 dependencies {
     implementation("com.vladmihalcea:hibernate-types-55:2.14.0")

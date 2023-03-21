@@ -8,6 +8,7 @@ import org.jooq.impl.DSL
 import ru.zveron.contract.lot.Field
 import ru.zveron.contract.lot.Filter
 import ru.zveron.contract.lot.Operation
+import ru.zveron.contract.lot.Sort
 import ru.zveron.contract.lot.TypeSort
 import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.model.Parameter
@@ -24,7 +25,7 @@ object ConditionsMapper {
         val conditionsSearch = ConditionsSearch()
 
         // 1. Сортировка и пагинация с помощью seek method
-        conditionsSearch.addSortAndPagination(request)
+        conditionsSearch.addSortAndPagination(request.sort)
 
         // 2. Количество объявлений
         conditionsSearch.pageSize = request.pageSize
@@ -110,44 +111,30 @@ object ConditionsMapper {
      * - Сортировка по дате создания
      * - TODO Сортировка по рейтингу продавца ZV-300
      *
-     * В зависимости от параметра в запросе [waterfallRequest] сортировка может быть
+     * В зависимости от параметра в запросе [sort] сортировка может быть
      * либо [SortOrder.ASC], либо [SortOrder.DESC].
      */
     private fun ConditionsSearch.addSortAndPagination(
-        waterfallRequest: WaterfallRequest
+        sort: Sort
     ) {
         val seekMethod = ParametersSeekMethod()
-        var isAscendingOrder = false
         var fieldName: TableField<Record, *>? = null
 
-        if (waterfallRequest.sortCase == WaterfallRequest.SortCase.SORT_BY_DATE) {
-            isAscendingOrder = waterfallRequest.sortByDate.typeSort == TypeSort.ASC
+        if (sort.sortBy == Sort.SortBy.PRICE) {
             fieldName = LOT.CREATED_AT
 
-            if (waterfallRequest.sortByDate.hasLastLot()) {
-
-                seekMethod.values.addAll(
-                    listOf(
-                        waterfallRequest.sortByDate.lastLot.id,
-                        waterfallRequest.sortByDate.lastLot.date
-                    )
-                )
+            if (sort.hasLastLot()) {
+                seekMethod.values.addAll(listOf(sort.lastLot.id, sort.lastLot.date))
             }
-        } else if (waterfallRequest.sortCase == WaterfallRequest.SortCase.SORT_BY_PRICE) {
-            isAscendingOrder = waterfallRequest.sortByPrice.typeSort == TypeSort.ASC
+        } else if (sort.sortBy == Sort.SortBy.DATE) {
             fieldName = LOT.PRICE
 
-            if (waterfallRequest.sortByPrice.hasLastLot()) {
-                seekMethod.values.addAll(
-                    listOf(
-                        waterfallRequest.sortByPrice.lastLot.id,
-                        waterfallRequest.sortByPrice.lastLot.price
-                    )
-                )
+            if (sort.hasLastLot()) {
+                seekMethod.values.addAll(listOf(sort.lastLot.id, sort.lastLot.price))
             }
         }
 
-        val sortOrder = if (isAscendingOrder) SortOrder.ASC else SortOrder.DESC
+        val sortOrder = if (sort.typeSort == TypeSort.ASC) SortOrder.ASC else SortOrder.DESC
 
         seekMethod.sorts.addAll(
             listOf(
