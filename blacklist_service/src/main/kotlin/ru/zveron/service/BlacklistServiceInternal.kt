@@ -2,14 +2,14 @@ package ru.zveron.service
 
 import com.google.protobuf.Empty
 import com.google.protobuf.empty
-import org.springframework.stereotype.Service
+import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.contract.blacklist.BlacklistServiceInternalGrpcKt
 import ru.zveron.contract.blacklist.DeleteAllRecordsWhereUserBlocksRequest
 import ru.zveron.contract.blacklist.DeleteAllRecordsWhereUserIsBlockedRequest
 import ru.zveron.contract.blacklist.ExistInBlacklistRequest
 import ru.zveron.contract.blacklist.ExistInBlacklistResponse
 
-@Service
+@GrpcService
 class BlacklistServiceInternal(private val blacklistService: BlacklistService) :
     BlacklistServiceInternalGrpcKt.BlacklistServiceInternalCoroutineImplBase() {
 

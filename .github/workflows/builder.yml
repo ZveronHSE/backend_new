@@ -72,6 +72,11 @@ jobs:
             dockerfile: push_notification/Dockerfile
             image: ghcr.io/zveronhse/push_notification:latest
 
+          - name: Chat Service
+            env: chat_service
+            dockerfile: chat_service/Dockerfile
+            image: ghcr.io/zveronhse/chat_service:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
