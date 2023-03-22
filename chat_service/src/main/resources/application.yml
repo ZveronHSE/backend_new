@@ -22,7 +22,12 @@ grpc:
 server:
   port: 0
 
-
+service:
+  persistence:
+    chat:
+      pagination-size: 100
+    connection:
+      buffer-size: 50
 
 spring:
   main:
@@ -31,7 +36,6 @@ spring:
     name: chat-service
   data:
     cassandra:
-      keyspace-name: zveron_chat
       contact-points: localhost
       port: 9042
       local-datacenter: datacenter1

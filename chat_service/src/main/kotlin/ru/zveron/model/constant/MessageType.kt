@@ -1,4 +1,4 @@
-package ru.zveron.model.enum
+package ru.zveron.model.constant
 
 enum class MessageType {
     DEFAULT,

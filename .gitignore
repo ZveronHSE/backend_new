@@ -45,3 +45,4 @@ outTmp/
 kotlin-ide/
 
 db_data/*
+db_scylla/*

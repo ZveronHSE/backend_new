@@ -4,15 +4,12 @@ import com.datastax.oss.driver.api.core.CqlSession
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
-import ru.zveron.config.ScyllaInitConfig
 
-@Import(ScyllaInitConfig::class)
 @Testcontainers(disabledWithoutDocker = true)
 @SpringBootTest(properties = ["eureka.client.enabled=false", "spring.data.cassandra.local-datacenter=datacenter1"])
 abstract class ChatServiceApplicationTest {
@@ -31,8 +28,6 @@ abstract class ChatServiceApplicationTest {
 
             registry.add("spring.data.cassandra.contact-points") { scyllaDb.host + ":" + scyllaDb.firstMappedPort }
         }
-
-
     }
 
     @BeforeEach

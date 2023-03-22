@@ -77,6 +77,11 @@ jobs:
             dockerfile: order-service/Dockerfile
             image: ghcr.io/zveronhse/order-service:latest
 
+          - name: Chat Service
+            env: chat_service
+            dockerfile: chat_service/Dockerfile
+            image: ghcr.io/zveronhse/chat_service:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
