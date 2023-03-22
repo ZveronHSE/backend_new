@@ -41,7 +41,7 @@ class ConditionsMapperTest {
             isSortByDate = isSortByDate,
             typeSort = typeSort,
             lotId = GeneratorUtils.generateLong(),
-            lotValue = GeneratorUtils.generateLong()
+            lotValue = GeneratorUtils.generateInt()
         )
         val (sorts, values) = WaterfallEntities.buildParametersForSeekMethod(waterfallRequest.sort)
         val conditionsSearch = ConditionsMapper.parse(waterfallRequest, categories = null, sellerId = null)

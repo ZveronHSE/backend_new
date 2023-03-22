@@ -5,15 +5,10 @@ import org.jooq.Record
 import org.jooq.SortField
 import org.jooq.SortOrder
 import org.jooq.TableField
-import ru.zveron.contract.lot.Filter
-import ru.zveron.contract.lot.Sort
-import ru.zveron.contract.lot.TypeSort
-import ru.zveron.contract.lot.WaterfallRequest
-import ru.zveron.contract.lot.lastLot
+import ru.zveron.contract.lot.*
 import ru.zveron.contract.lot.model.Parameter
-import ru.zveron.contract.lot.sort
-import ru.zveron.contract.lot.waterfallRequest
 import ru.zveron.model.search.table.LOT
+import java.time.Instant
 
 object WaterfallEntities {
     fun mockWaterfallRequest(
@@ -21,7 +16,7 @@ object WaterfallEntities {
         isSortByDate: Boolean = false,
         typeSort: TypeSort = TypeSort.ASC,
         lotId: Long = 10L,
-        lotValue: Long = 10000L,
+        lotValue: Int = 10000,
         query: String = "",
         parameters: List<Parameter> = listOf(),
         filters: List<Filter> = listOf()
@@ -32,9 +27,9 @@ object WaterfallEntities {
                 this.typeSort = typeSort
                 lastLot = lastLot {
                     id = lotId
-                    price = lotValue.toInt()
+                    price = lotValue
                     date = timestamp {
-                        seconds = lotValue
+                        seconds = lotValue.toLong()
                     }
                 }
                 sortBy = if (isSortByDate) Sort.SortBy.DATE else Sort.SortBy.PRICE
@@ -55,24 +50,27 @@ object WaterfallEntities {
 
 
         if (sort.sortBy == Sort.SortBy.PRICE) {
-            fieldName = LOT.CREATED_AT
-
-            if (sort.hasLastLot()) {
-                conditionsSeek.addAll(
-                    listOf(
-                        sort.lastLot.id,
-                        sort.lastLot.date
-                    )
-                )
-            }
-        } else {
             fieldName = LOT.PRICE
 
             if (sort.hasLastLot()) {
                 conditionsSeek.addAll(
                     listOf(
+                        sort.lastLot.price,
                         sort.lastLot.id,
-                        sort.lastLot.price
+                    )
+                )
+            }
+        } else {
+            fieldName = LOT.CREATED_AT
+
+            if (sort.hasLastLot()) {
+                conditionsSeek.addAll(
+                    listOf(
+                        Instant.ofEpochSecond(
+                            sort.lastLot.date.seconds,
+                            sort.lastLot.date.nanos.toLong()
+                        ),
+                        sort.lastLot.id,
                     )
                 )
             }
@@ -81,6 +79,6 @@ object WaterfallEntities {
         val sortOrder = if (sort.typeSort == TypeSort.ASC) SortOrder.ASC else SortOrder.DESC
 
 
-        return listOf(LOT.ID.sort(sortOrder), fieldName.sort(sortOrder)) to conditionsSeek
+        return listOf(fieldName.sort(sortOrder), LOT.ID.sort(sortOrder)) to conditionsSeek
     }
 }
