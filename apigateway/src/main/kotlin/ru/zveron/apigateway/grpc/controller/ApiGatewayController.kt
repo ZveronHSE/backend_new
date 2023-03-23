@@ -7,7 +7,6 @@ import net.devh.boot.grpc.server.service.GrpcService
 import net.logstash.logback.marker.Markers.append
 import ru.zveron.apigateway.grpc.ApiGatewayMapper.toServiceRequest
 import ru.zveron.apigateway.grpc.service.ApiGatewayService
-import ru.zveron.apigateway.utils.LogstashHelper.toMarker
 import ru.zveron.contract.apigateway.ApiGatewayRequest
 import ru.zveron.contract.apigateway.ApigatewayResponse
 import ru.zveron.contract.apigateway.ApigatewayServiceGrpcKt
@@ -21,8 +20,7 @@ class ApiGatewayController(
     companion object : KLogging()
 
     override suspend fun callApiGateway(request: ApiGatewayRequest): ApigatewayResponse {
-        logger.debug(request.toMarker()) { "Entered apigateway call processor" }
-
+        logger.debug { "Calling service gateway call handler" }
         val response = service.handleGatewayCall(request.toServiceRequest())
 
         logger.debug(append("response", response)) { "Service response" }

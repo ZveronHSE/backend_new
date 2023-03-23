@@ -11,6 +11,7 @@ import ru.zveron.contract.lot.model.Parameter
 import ru.zveron.contract.lot.model.parameter
 import ru.zveron.contract.lot.model.photo
 import ru.zveron.contract.lot.seller
+import ru.zveron.contract.lot.statistics
 import ru.zveron.entity.Lot
 import ru.zveron.exception.LotException
 import ru.zveron.mapper.LotMapper.toContract
@@ -63,6 +64,11 @@ class CardLotBuilder(
             // TODO canAddReview ZV-300
             contact = buildContact()
             this.seller = buildSeller()
+
+            statistics = statistics {
+                view = lot.statistics.quantityView
+                // TODO add favorite
+            }
         }
     }
 

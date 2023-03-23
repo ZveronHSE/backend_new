@@ -8,7 +8,7 @@ configurations {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-jetty:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-reactor-netty:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")
 
     //kotlinx
@@ -34,4 +34,12 @@ dependencies {
 
     //ен особо понятно, но если вынести зависимость в рутовый градлг, то падает
     testImplementation("com.ninja-squad:springmockk:4.0.0")
+
+    // https://mvnrepository.com/artifact/io.zipkin.brave/brave-instrumentation-grpc
+    implementation("io.zipkin.brave:brave-instrumentation-grpc:5.15.0")
+    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-sleuth
+    implementation("org.springframework.cloud:spring-cloud-starter-sleuth:3.1.7")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
+
 }

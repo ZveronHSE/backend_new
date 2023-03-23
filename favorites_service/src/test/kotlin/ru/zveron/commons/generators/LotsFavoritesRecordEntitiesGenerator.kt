@@ -1,7 +1,7 @@
 package ru.zveron.commons.generators
 
-import ru.zveron.contract.lot.model.Status
-import ru.zveron.contract.lot.model.lot
+import ru.zveron.contract.core.Status
+import ru.zveron.contract.core.lot
 import ru.zveron.entity.LotsFavoritesRecord
 import ru.zveron.favorites.lot.addLotToFavoritesRequest
 import ru.zveron.favorites.lot.lotsExistInFavoritesRequest

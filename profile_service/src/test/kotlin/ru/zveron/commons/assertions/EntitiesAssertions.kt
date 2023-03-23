@@ -7,20 +7,18 @@ import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import ru.zveron.contract.address.AddressRequest
+import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.profile.Address
-import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.contract.profile.GetProfileByChannelResponse
 import ru.zveron.contract.profile.GetProfileInfoResponse
 import ru.zveron.contract.profile.GetProfilePageResponse
 import ru.zveron.contract.profile.GetProfileResponse
 import ru.zveron.contract.profile.GetProfileWithContactsResponse
-import ru.zveron.contract.profile.model.Links
-import ru.zveron.contract.profile.LotSummary
-import ru.zveron.contract.profile.SetProfileInfoRequest
-import ru.zveron.contract.address.AddressRequest
-import ru.zveron.contract.address.AddressResponse
-import ru.zveron.contract.lot.model.Lot
 import ru.zveron.contract.profile.ProfileSummary
+import ru.zveron.contract.profile.SetProfileInfoRequest
+import ru.zveron.contract.profile.model.ChannelType
+import ru.zveron.contract.profile.model.Links
 import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.LinksDto
@@ -162,15 +160,6 @@ infix fun GetProfileByChannelResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-}
-
-infix fun LotSummary.lotShouldBe(expected: Lot) {
-    id shouldBe expected.id
-    title shouldBe expected.title
-    priceFormatted shouldBe expected.price
-    publicationDateFormatted shouldBe expected.publicationDate
-    firstImage shouldBe expected.photoId
-    isFavorite shouldBe expected.favorite
 }
 
 infix fun ProfileSummary.profileShouldBe(expected: Profile) {

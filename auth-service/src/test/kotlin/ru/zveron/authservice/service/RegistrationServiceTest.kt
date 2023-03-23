@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
 import ru.zveron.authservice.component.auth.Authenticator
-import ru.zveron.authservice.exception.ChannelNotValidatedException
+import ru.zveron.authservice.exception.ChannelNotVerifiedException
 import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.exception.FingerprintException
 import ru.zveron.authservice.exception.RegistrationException
@@ -143,7 +143,7 @@ class RegistrationServiceTest {
             surname = surname,
         )
 
-        assertThrows<ChannelNotValidatedException> {
+        assertThrows<ChannelNotVerifiedException> {
             service.registerByPhone(registerByPhoneRequest)
         }
     }

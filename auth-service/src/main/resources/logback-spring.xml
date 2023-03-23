@@ -24,6 +24,10 @@
                         <includeStructuredArguments>true</includeStructuredArguments>
                     </arguments>
                     <logstashMarkers/>
+                    <rootStackTraceElement/>
+                    <stackTrace/>
+                    <throwableRootCauseClassName/>
+                    <throwableClassName/>
                 </providers>
             </encoder>
         </appender>
@@ -32,6 +36,7 @@
     <root level="info">
         <appender-ref ref="CONSOLE"/>
     </root>
+
     <logger name="ru.zveron.authservice" level="DEBUG"/>
 
 </configuration>

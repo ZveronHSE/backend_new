@@ -1,11 +1,13 @@
 package ru.zveron.authservice.service
 
 import io.grpc.Status
+import mu.KLogging
+import net.logstash.logback.marker.Markers.append
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
 import org.springframework.stereotype.Service
 import ru.zveron.authservice.component.auth.Authenticator
 import ru.zveron.authservice.component.jwt.model.MobileTokens
-import ru.zveron.authservice.exception.ChannelNotValidatedException
+import ru.zveron.authservice.exception.ChannelNotVerifiedException
 import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.exception.FingerprintException
 import ru.zveron.authservice.exception.RegistrationException
@@ -25,9 +27,11 @@ class RegistrationService(
     private val argon2Encoder: Argon2PasswordEncoder,
 ) {
 
+    companion object : KLogging()
+
     /**
      * @throws [RegistrationException]
-     * @throws [ChannelNotValidatedException]
+     * @throws [ChannelNotVerifiedException]
      * @throws [FingerprintException]
      * @throws [ContextExpiredException]
      *
@@ -40,7 +44,7 @@ class RegistrationService(
         }
 
         if (!registrationContext.isChannelVerified) {
-            throw ChannelNotValidatedException()
+            throw ChannelNotVerifiedException()
         }
 
         val hash = argon2Encoder.encode(request.password.decodeToString())
@@ -62,6 +66,8 @@ class RegistrationService(
                 response.metadata
             )
         }
+
+        logger.debug(append("profileId", profileId)) { "Profile creation succeeded" }
 
         return authenticator.loginUser(request.fingerprint, profileId)
     }

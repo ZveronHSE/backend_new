@@ -20,8 +20,15 @@ spring:
     password: zveron_password
     pool:
       enabled: true
+
   netty:
     leak-detection: advanced
+  jpa:
+    show-sql: true
+  sleuth:
+     grpc:
+       enabled: true
+
 eureka:
   client:
     enabled: true

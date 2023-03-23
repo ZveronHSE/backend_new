@@ -16,7 +16,6 @@ import ru.zveron.ProfileTest
 import ru.zveron.commons.assertions.addressShouldBe
 import ru.zveron.commons.assertions.channelsShouldBe
 import ru.zveron.commons.assertions.linksShouldBe
-import ru.zveron.commons.assertions.lotShouldBe
 import ru.zveron.commons.assertions.profileShouldBe
 import ru.zveron.commons.assertions.responseShouldBe
 import ru.zveron.commons.assertions.responseShouldBeBlockedAnd
@@ -27,8 +26,8 @@ import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.commons.generator.PropsGenerator
 import ru.zveron.commons.generator.SettingsGenerator
 import ru.zveron.contract.address.addressResponse
+import ru.zveron.contract.core.Status
 import ru.zveron.contract.lot.profileLotsResponse
-import ru.zveron.contract.profile.LotStatus
 import ru.zveron.contract.profile.SetSettingsRequest
 import ru.zveron.contract.profile.getProfilePageRequest
 import ru.zveron.contract.profile.model.ChannelType
@@ -104,8 +103,8 @@ class ProfileServiceExternalTest : ProfileTest() {
             requestedProfileId = id
         }
         coEvery { blacklistClient.existsInBlacklist(id, authorizedId) } returns false
-        val activeLot = LotsGenerator.generateLot(false)
-        val closedLot = LotsGenerator.generateLot(false)
+        val activeLot = LotsGenerator.generateLot(favorite = false, active = true)
+        val closedLot = LotsGenerator.generateLot(favorite = false, active = false)
         coEvery { lotClient.getLotsBySellerId(id, authorizedId) } returns profileLotsResponse {
             activateLots.add(activeLot)
             inactivateLots.add(closedLot)
@@ -124,13 +123,13 @@ class ProfileServiceExternalTest : ProfileTest() {
             //TODO: response.reviewNumber should be (?)
             response.activeLotsList.apply {
                 size shouldBe 1
-                first() lotShouldBe activeLot
-                first().status shouldBe LotStatus.ACTIVE
+                first() shouldBe activeLot
+                first().status shouldBe Status.ACTIVE
             }
             response.closedLotsList.apply {
                 size shouldBe 1
-                first() lotShouldBe closedLot
-                first().status shouldBe LotStatus.CLOSED
+                first() shouldBe closedLot
+                first().status shouldBe Status.CLOSED
             }
         }
     }
@@ -146,8 +145,8 @@ class ProfileServiceExternalTest : ProfileTest() {
         val request = getProfilePageRequest {
             requestedProfileId = id
         }
-        val activeLot = LotsGenerator.generateLot(false)
-        val closedLot = LotsGenerator.generateLot(false)
+        val activeLot = LotsGenerator.generateLot(favorite = false, active = true)
+        val closedLot = LotsGenerator.generateLot(favorite = false, active = false)
         coEvery { lotClient.getLotsBySellerId(id, id) } returns profileLotsResponse {
             activateLots.add(activeLot)
             inactivateLots.add(closedLot)
@@ -166,13 +165,13 @@ class ProfileServiceExternalTest : ProfileTest() {
             //TODO: response.reviewNumber should be (?)
             response.activeLotsList.apply {
                 size shouldBe 1
-                first() lotShouldBe activeLot
-                first().status shouldBe LotStatus.ACTIVE
+                first() shouldBe activeLot
+                first().status shouldBe Status.ACTIVE
             }
             response.closedLotsList.apply {
                 size shouldBe 1
-                first() lotShouldBe closedLot
-                first().status shouldBe LotStatus.CLOSED
+                first() shouldBe closedLot
+                first().status shouldBe Status.CLOSED
             }
         }
     }
@@ -213,6 +212,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Profile with id: $id doesn't exist"
+        exception.code shouldBe io.grpc.Status.Code.NOT_FOUND
     }
 
     @Test
@@ -289,6 +289,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -318,6 +319,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -347,6 +349,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -380,6 +383,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -426,6 +430,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Can't use gmail as communication channel because link is missed"
+        exception.code shouldBe io.grpc.Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -446,6 +451,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Invalid number of communication ways. Expected 1 or 2, but was: 0"
+        exception.code shouldBe io.grpc.Status.Code.INVALID_ARGUMENT
     }
 
     @Test
@@ -458,6 +464,7 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 
     @Test
@@ -491,5 +498,6 @@ class ProfileServiceExternalTest : ProfileTest() {
             }
         }
         exception.message shouldBe "Authentication required"
+        exception.code shouldBe io.grpc.Status.Code.UNAUTHENTICATED
     }
 }
