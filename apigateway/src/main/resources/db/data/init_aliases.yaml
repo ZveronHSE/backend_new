@@ -53,7 +53,7 @@ databaseChangeLog:
         changes:
             - loadUpdateData:
                   encoding: UTF-8
-                  file: login_by_pass_alias.csv
+                  file: login_by_social_media_alias.csv
                   primaryKey: alias
                   relativeToChangelogFile: true
                   quotchar: '"'
