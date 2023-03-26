@@ -35,6 +35,40 @@ databaseChangeLog:
             tableName: method_metadata
 
   - changeSet:
+      id: upload_image_alias
+      author: Schuyweiz
+      changes:
+        - loadUpdateData:
+            columns:
+              - column:
+                  header: alias
+                  name: alias
+                  type: STRING
+              - column:
+                  header: service_name
+                  name: service_name
+                  type: STRING
+              - column:
+                  header: grpc_service_name
+                  name: grpc_service_name
+                  type: STRING
+              - column:
+                  header: grpc_method_name
+                  name: grpc_method_name
+                  type: STRING
+              - column:
+                  header: access_scope
+                  name: access_scope
+                  type: access_scope
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: image_upload.csv
+            primaryKey: alias
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: method_metadata
+  - changeSet:
       id: login_by_pass_alias
       author: Schuyweiz
       changes:
