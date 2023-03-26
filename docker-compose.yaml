@@ -283,6 +283,7 @@ services:
 
 
   object-storage:
+    logging: *loki-logging
     restart: always
     container_name: object-storage
     platform: linux/amd64
