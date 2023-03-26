@@ -4,13 +4,7 @@ import com.google.protobuf.util.Timestamps
 import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.core.Status
 import ru.zveron.contract.core.lot
-import ru.zveron.contract.lot.LotsIdResponse
-import ru.zveron.contract.lot.ProfileLotsResponse
-import ru.zveron.contract.lot.WaterfallResponse
-import ru.zveron.contract.lot.dataFilter
-import ru.zveron.contract.lot.lotsIdResponse
-import ru.zveron.contract.lot.profileLotsResponse
-import ru.zveron.contract.lot.waterfallResponse
+import ru.zveron.contract.lot.*
 import ru.zveron.entity.Lot
 import ru.zveron.exception.LotException
 import ru.zveron.model.Address
@@ -18,8 +12,7 @@ import ru.zveron.model.SummaryLot
 import ru.zveron.model.enum.Gender
 import java.text.SimpleDateFormat
 import java.time.Instant
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 object LotMapper {
     /**
@@ -38,12 +31,17 @@ object LotMapper {
     }
 
     fun buildWaterfallResponse(summaryLots: List<SummaryLot>, favorites: List<Boolean>?): WaterfallResponse {
+        if (summaryLots.isEmpty()) {
+            return waterfallResponse { }
+        }
+
         val lots = summaryLots.mapIndexed { index, summaryLot ->
             lot {
                 id = summaryLot.id
                 title = summaryLot.title
                 price = summaryLot.price.toFormattingPrice()
                 publicationDate = summaryLot.createdAt.toFormattingDate()
+                photoId = summaryLot.photoId
                 favorites?.let { favorite = it[index] }
             }
         }
@@ -54,7 +52,8 @@ object LotMapper {
         return waterfallResponse {
             this.lots.addAll(lots)
 
-            dataFilter = dataFilter {
+            this.lastLot = ru.zveron.contract.lot.lastLot {
+                id = lastLot.id
                 price = lastLot.price
                 date = Timestamps.fromMillis(lastLot.createdAt.toEpochMilli())
             }

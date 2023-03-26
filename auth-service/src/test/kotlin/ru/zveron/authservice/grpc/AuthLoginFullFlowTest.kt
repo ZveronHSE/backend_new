@@ -25,8 +25,8 @@ import ru.zveron.authservice.util.randomLoginInitApigRequest
 import ru.zveron.authservice.util.randomName
 import ru.zveron.authservice.util.randomPhoneNumber
 import ru.zveron.authservice.util.randomSurname
-import ru.zveron.authservice.webclient.NotifierSuccess
-import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
+import ru.zveron.authservice.webclient.notifier.NotifierSuccess
+import ru.zveron.authservice.webclient.notifier.model.GetVerificationCodeRequest
 import ru.zveron.contract.auth.external.copy
 import ru.zveron.contract.auth.external.mobileTokenOrNull
 import ru.zveron.contract.auth.external.phoneLoginVerifyRequest

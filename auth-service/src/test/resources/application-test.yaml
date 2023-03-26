@@ -5,6 +5,10 @@ spring:
     banner-mode: off
     web-application-type: reactive
 
+grpc:
+  server:
+    port: 0
+
 zveron:
   jwt:
     #create something legit and put in vault
@@ -13,3 +17,13 @@ zveron:
     refreshDurationMs: 6000000 # 100 mins
   session:
     sessionDurationMs: 2629800000 # 1 month
+  cron:
+    session:
+      rate-in-ms: 5000
+    flow-context:
+      rate-in-ms: 5000
+
+third-party:
+  providers:
+    gmail:
+      host: http://localhost:${wiremock.server.port}

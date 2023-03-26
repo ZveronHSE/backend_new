@@ -42,7 +42,7 @@ class Authenticator(
 
         val decodedToken = jwtManager.decodeRefreshToken(token = request.token)
 
-        val profileResponse = profileServiceClient.getProfileById(decodedToken.profileId)
+        val profileResponse = profileServiceClient.findProfileById(decodedToken.profileId)
 
         if (profileResponse is ProfileNotFound) {
             throw InvalidTokenException("Profile not found")

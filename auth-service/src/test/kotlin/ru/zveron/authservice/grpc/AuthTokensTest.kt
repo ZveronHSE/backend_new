@@ -70,7 +70,7 @@ class AuthTokensTest : BaseAuthTest() {
             template.insert(entity).awaitSingle()
 
             coEvery { profileClient.getProfileByPhone(any()) } returns profileFoundResponse
-            coEvery { profileClient.getProfileById(eq(profileId)) } returns profileFoundResponse
+            coEvery { profileClient.findProfileById(eq(profileId)) } returns profileFoundResponse
 
             val verifyRequest = phoneLoginVerifyRequest {
                 this.deviceFp = deviceFp

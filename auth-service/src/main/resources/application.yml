@@ -1,6 +1,6 @@
 grpc:
   server:
-    port: 0
+    port: 9092
 
   client:
     profile-service:
@@ -64,7 +64,7 @@ eureka:
       AuthServiceExternal: 'external/auth_external.proto'
 
 server:
-  port: 0
+  port: 8082
 
 clients:
   notifier:
@@ -87,6 +87,11 @@ zveron:
     flow-context:
       rate-in-ms: 60_000
 
+third-party:
+  providers:
+    gmail:
+      host: https://www.googleapis.com
+
 logging:
   level:
     ru.zveron.authservice.cron: INFO
@@ -99,6 +104,3 @@ logging:
       logging-enabled: true
     server:
       logging-enabled: true
-
-
-

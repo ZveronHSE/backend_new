@@ -68,3 +68,28 @@ databaseChangeLog:
             quotchar: '"'
             separator: ','
             tableName: method_metadata
+  - changeSet:
+      id: login_by_pass_alias
+      author: Schuyweiz
+      changes:
+        - loadUpdateData:
+            encoding: UTF-8
+            file: login_by_pass_alias.csv
+            primaryKey: alias
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: method_metadata
+
+  - changeSet:
+        id: login_by_social_media_alias
+        author: Schuyweiz
+        changes:
+            - loadUpdateData:
+                  encoding: UTF-8
+                  file: login_by_social_media_alias.csv
+                  primaryKey: alias
+                  relativeToChangelogFile: true
+                  quotchar: '"'
+                  separator: ','
+                  tableName: method_metadata

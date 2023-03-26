@@ -3,12 +3,9 @@ package ru.zveron.authservice.config
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.crypto.MACSigner
 import com.nimbusds.jose.crypto.MACVerifier
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.validation.annotation.Validated
 import ru.zveron.authservice.component.jwt.JwtDecoder
 import ru.zveron.authservice.component.jwt.JwtEncoder
 
@@ -31,15 +28,3 @@ class JwtConfiguration(
         verifier = MACVerifier(properties.secret)
     )
 }
-
-@Validated
-@ConstructorBinding
-@ConfigurationProperties("zveron.jwt")
-data class JwtProperties(
-
-    val secret: String,
-
-    val accessDurationMs: Long,
-
-    val refreshDurationMs: Long,
-)
