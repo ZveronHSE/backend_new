@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import kotlin.collections.setOf
 
 plugins {
     idea
@@ -25,6 +26,8 @@ val eurekaVersion: String by project
 val kotlinxVersion: String by project
 val testcontainersVersion: String by project
 val arch = System.getProperty("os.arch")
+
+val modulesWithoutPostgreSql = setOf("e2e", "chat_service")
 
 
 allprojects {
@@ -53,7 +56,7 @@ subprojects {
     extra["getDataSource"] = fun(): DataSource? { // TODO надо бы все это вынести в отдельный градл скриптик
         val pathToApplicationYml = "src/main/resources/application.yml"
 
-        if (project.name == "e2e") {
+        if (project.name in modulesWithoutPostgreSql) {
             return null
         }
 
@@ -115,10 +118,12 @@ subprojects {
         implementation("org.apache.logging.log4j:log4j-core:2.17.2")
 
         // База данных
-        implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
-        implementation("org.postgresql:postgresql:42.3.8")
-        implementation("org.liquibase:liquibase-core:4.18.0")
-        implementation("org.hibernate:hibernate-core:5.6.7.Final")
+        if (project.name != "chat_service") {
+            implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
+            implementation("org.postgresql:postgresql:42.3.8")
+            implementation("org.liquibase:liquibase-core:4.18.0")
+            implementation("org.hibernate:hibernate-core:5.6.7.Final")
+        }
 
         //Eureka
         implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
@@ -146,7 +151,9 @@ subprojects {
         // Тесты
         testImplementation("io.grpc:grpc-testing:$grpcVersion")
         testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
-        testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+        if (project.name != "chat_service") {
+            testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+        }
         testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
         testImplementation("com.ninja-squad:springmockk:4.0.0")
         testImplementation("io.kotest:kotest-assertions-core-jvm:5.3.1")
