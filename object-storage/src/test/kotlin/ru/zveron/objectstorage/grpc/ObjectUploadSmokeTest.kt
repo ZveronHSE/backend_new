@@ -23,7 +23,7 @@ class ObjectUploadSmokeTest : BaseObjectStorageTest() {
         //prep data
         val grpcRequest = uploadImageRequest {
             this.body = randomImageBytes().toByteString()
-            this.flowSource = FlowSource.values().asIterable().shuffled().first()
+            this.flowSource = FlowSource.values().asIterable().filter { it.number != -1 }.shuffled().first()
         }
 
         //prep env
