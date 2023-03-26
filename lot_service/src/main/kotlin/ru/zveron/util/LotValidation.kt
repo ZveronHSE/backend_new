@@ -8,7 +8,7 @@ import ru.zveron.model.SellerProfile
 
 object LotValidation {
 
-    const val DEFAULT_URL_FOR_PHOTO = """3https://storage.yandexcloud.net/zveron-profile/random.jpeg"""
+    const val DEFAULT_URL_FOR_PHOTO = """https://storage.yandexcloud.net/zveron-profile/random.jpeg"""
 
     fun SellerProfile.validateContacts(communicationChannel: List<CommunicationChannel>) {
         if (communicationChannel.size !in 1..2) {

@@ -135,33 +135,3 @@ databaseChangeLog:
             quotchar: '"'
             separator: ','
             tableName: lot_statistics
-  - changeSet:
-      id: image_id_to_image_url
-      author: Schuyweiz
-      changes:
-        - loadUpdateData:
-            columns:
-              - column:
-                  header: id
-                  name: id
-                  type: NUMERIC
-              - column:
-                  header: order_photo
-                  name: order_photo
-                  type: NUMERIC
-              - column:
-                  header: lot_id
-                  name: lot_id
-                  type: NUMERIC
-              - column:
-                  header: image_url
-                  name: image_url
-                  type: STRING
-            commentLineStartsWith: '#'
-            encoding: UTF-8
-            primaryKey: id
-            file: lot_photo.csv
-            relativeToChangelogFile: true
-            quotchar: '"'
-            separator: ','
-            tableName: lot_photo
