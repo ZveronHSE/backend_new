@@ -12,7 +12,7 @@ object ProfileGenerator {
         this.id = id
         name = GeneratorUtils.generateString(10)
         surname = GeneratorUtils.generateString(10)
-        imageId = GeneratorUtils.generateLong()
+        imageUrl = GeneratorUtils.generateImageUrl()
         addressId = GeneratorUtils.generateLong()
         channels.add(ChannelType.CHAT)
         lastSeen = timestamp {
@@ -25,13 +25,13 @@ object ProfileGenerator {
         isChat: Boolean = true,
         isVk: Boolean = false,
         isEmail: Boolean = false,
-        isPhone: Boolean = false
+        isPhone: Boolean = false,
     ) =
         SellerProfile(
             id = id,
             name = GeneratorUtils.generateString(10),
             surname = GeneratorUtils.generateString(10),
-            imageId = GeneratorUtils.generateLong(),
+            imageUrl = GeneratorUtils.generateImageUrl(),
             contact = ru.zveron.model.ChannelType(isChat = isChat, isVk = isVk, isEmail = isEmail, isPhone = isPhone),
             channelLink = ChannelLink(
                 vk = if (isVk) GeneratorUtils.generateString(10) else null,

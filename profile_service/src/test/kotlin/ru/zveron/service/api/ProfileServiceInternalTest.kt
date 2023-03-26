@@ -435,7 +435,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     private fun generateCreateProfileRequest(profile: Profile) = createProfileRequest {
         name = profile.name
         surname = profile.surname
-        imageId = profile.imageId
+        imageUrl = profile.imageUrl
         links = profile.communicationLinks.toDto().toLinks()
         passwordHash = profile.passwordHash ?: ""
     }

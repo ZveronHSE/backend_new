@@ -19,8 +19,8 @@ data class LotPhoto(
     @ManyToOne
     @JoinColumn(name = "lot_id", nullable = false, updatable = false)
     val lot: Lot,
-    @Column(name = "image_id")
-    val imageId: Long,
+    @Column(name = "image_url")
+    val imageUrl: String,
     @Column(name = "order_photo")
     val orderPhoto: Int
 ) {
@@ -36,6 +36,6 @@ data class LotPhoto(
 
     @Override
     override fun toString(): String {
-        return "LotPhoto(id = $id, imageId=$imageId, order_photo = $orderPhoto )"
+        return "LotPhoto(id = $id, imageUrl=$imageUrl, order_photo = $orderPhoto )"
     }
 }

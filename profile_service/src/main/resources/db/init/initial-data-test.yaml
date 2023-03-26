@@ -94,3 +94,42 @@ databaseChangeLog:
             quotchar: '"'
             separator: ','
             tableName: communication_link
+
+  - changeSet:
+      id: image_id_to_url
+      author: Schuyweiz
+      changes:
+        - loadUpdateData:
+            columns:
+              - column:
+                  header: last_seen
+                  name: last_seen
+                  type: DATE
+              - column:
+                  header: name
+                  name: name
+                  type: STRING
+              - column:
+                  header: surname
+                  name: surname
+                  type: STRING
+              - column:
+                  header: id
+                  name: id
+                  type: NUMERIC
+              - column:
+                  header: address_id
+                  name: address_id
+                  type: NUMERIC
+              - column:
+                  header: image_url
+                  name: image_url
+                  type: NUMERIC
+            commentLineStartsWith: '#'
+            encoding: UTF-8
+            file: data/profile.csv
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            primaryKey: id
+            tableName: profile

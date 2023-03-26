@@ -41,7 +41,7 @@ object LotMapper {
                 title = summaryLot.title
                 price = summaryLot.price.toFormattingPrice()
                 publicationDate = summaryLot.createdAt.toFormattingDate()
-                photoId = summaryLot.photoId
+                imageUrl = summaryLot.imageUrl
                 favorites?.let { favorite = it[index] }
             }
         }
