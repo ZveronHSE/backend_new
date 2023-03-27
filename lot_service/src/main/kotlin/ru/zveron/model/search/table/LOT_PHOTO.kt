@@ -22,8 +22,7 @@ object LOT_PHOTO : TableImpl<Record>(DSL.name("lot_photo"), null) {
     val ID_LOT = createField(DSL.name("lot_id"), SQLDataType.BIGINT.nullable(false), this, "")
 
     /**
-     * The column `public.lot_photo.image_id`.
+     * The column `public.lot_photo.image_url`.
      */
-    val IMAGE_ID = createField(DSL.name("image_id"), SQLDataType.BIGINT, this, "")
-
+    val IMAGE_URL = createField(DSL.name("image_url"), SQLDataType.VARCHAR, this, "")
 }

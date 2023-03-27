@@ -9,7 +9,7 @@ object ProfileMapper {
         id = this@toResponse.id
         name = this@toResponse.name
         surname = this@toResponse.surname
-        imageId = this@toResponse.imageId
+        imageUrl = this@toResponse.imageUrl
         addressId = this@toResponse.addressId
     }
 }

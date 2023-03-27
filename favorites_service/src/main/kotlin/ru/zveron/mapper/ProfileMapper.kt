@@ -9,7 +9,7 @@ object ProfileMapper {
         id = this@toFavoritesSummary.id
         name = this@toFavoritesSummary.name
         surname = this@toFavoritesSummary.surname
-        imageId = this@toFavoritesSummary.imageId
+        imageUrl = this@toFavoritesSummary.imageUrl
         this.rating = rating
     }
 }

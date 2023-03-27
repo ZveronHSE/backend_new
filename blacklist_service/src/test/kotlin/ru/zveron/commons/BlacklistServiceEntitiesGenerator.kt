@@ -40,7 +40,7 @@ object BlacklistServiceEntitiesGenerator {
         this.id = id
         name = generateString(10)
         surname = generateString(10)
-        imageId = generateUserId()
+        imageUrl = generateString(10)
         addressId = generateUserId()
     }
 }
