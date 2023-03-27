@@ -45,7 +45,7 @@ class AuthenticatorTest {
         val refreshMobileSessionReq = RefreshMobileSessionRequest(token, fp)
 
         coEvery { jwtManager.decodeRefreshToken(eq(token)) } returns decodedToken
-        coEvery { profileServiceClient.getProfileById(eq(decodedToken.profileId)) } returns profile
+        coEvery { profileServiceClient.findProfileById(eq(decodedToken.profileId)) } returns profile
         coEvery {
             sessionStorage.updateSession(
                 eq(decodedToken.sessionId),
@@ -83,7 +83,7 @@ class AuthenticatorTest {
             val refreshMobileSessionReq = RefreshMobileSessionRequest(token, fp)
 
             coEvery { jwtManager.decodeRefreshToken(eq(token)) } returns decodedToken
-            coEvery { profileServiceClient.getProfileById(eq(decodedToken.profileId)) } returns ProfileNotFound
+            coEvery { profileServiceClient.findProfileById(eq(decodedToken.profileId)) } returns ProfileNotFound
 
 
             assertThrows<InvalidTokenException> {
@@ -100,7 +100,7 @@ class AuthenticatorTest {
         val refreshMobileSessionReq = RefreshMobileSessionRequest(token, fp)
 
         coEvery { jwtManager.decodeRefreshToken(eq(token)) } returns decodedToken
-        coEvery { profileServiceClient.getProfileById(eq(decodedToken.profileId)) } returns profile
+        coEvery { profileServiceClient.findProfileById(eq(decodedToken.profileId)) } returns profile
         coEvery {
             sessionStorage.updateSession(
                 eq(decodedToken.sessionId),

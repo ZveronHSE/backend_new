@@ -1,0 +1,38 @@
+spring:
+  main:
+    banner-mode: off
+    web-application-type: reactive
+
+  application:
+    name: object-storage
+
+  datasource:
+    url: jdbc:postgresql://localhost:5555/objectstorage
+    password: zveron_password
+    username: zveron_user
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration, org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration, org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+
+
+grpc:
+  server:
+    port: 0
+
+eureka:
+  client:
+    enabled: false
+
+platform:
+  grpc:
+    apigateway:
+      metadata: false
+    client:
+      logging-enabled: false
+    server:
+      logging-enabled: true
+
+s3client:
+  accessKeyId: RANDOM_KEY_ID
+  secretAccessKey: RANDOM_ACCESS_KEY
+  region: ru-central1
+  endpointUrl: https://storage.yandexcloud.net

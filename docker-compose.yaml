@@ -34,6 +34,26 @@ services:
           cpus: '0.25'
           memory: 128M
 
+  scylla_db:
+    restart: always
+    container_name: scylla_db
+    image: 'scylladb/scylla:5.1'
+    profiles:
+      - "unreleased"
+    volumes:
+      - type: volume
+        source: db_scylla
+        target: /var/lib/scylla
+        volume:
+          nocopy: true
+      - ./chat_service/src/main/resources/db/changelog:/docker-entrypoint-initdb.d
+    expose:
+      - 7000
+      - 9042
+    ports:
+      - "7000:7000"
+      - "9042:9042"
+
   pgadmin:
     restart: always
     image: dpage/pgadmin4
@@ -263,6 +283,7 @@ services:
 
 
   object-storage:
+    logging: *loki-logging
     restart: always
     container_name: object-storage
     platform: linux/amd64
@@ -282,3 +303,4 @@ services:
 
 volumes:
   db_data:
+  db_scylla:

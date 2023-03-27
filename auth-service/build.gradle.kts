@@ -4,11 +4,16 @@ val springVersion: String by rootProject
 
 configurations {
     implementation.get().exclude("org.springframework.boot", "spring-boot-starter-tomcat")
+    implementation.get().exclude("org.springframework", "spring-mvc:5.3.23")
 }
 
 dependencies {
+
     //reactive server
     implementation("org.springframework.boot:spring-boot-starter-reactor-netty:$springVersion")
+
+    //webflux to call third party clients
+    implementation("org.springframework:spring-webflux:5.3.19")
 
     //coroutines with reactor
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxVersion")
@@ -25,10 +30,11 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:profile:1.8.8")
-    implementation("com.github.zveronHSe.contract:auth:1.8.8")
+    implementation("com.github.zveronHSe.contract:profile:1.9.1")
+    implementation("com.github.zveronHSe.contract:auth:1.9.1")
 
     //testing
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
+    testImplementation("org.springframework.cloud:spring-cloud-contract-wiremock:3.1.5")
 }

@@ -1,0 +1,2 @@
+"alias","service_name","grpc_service_name","grpc_method_name","access_scope"
+"authLoginByPassword","auth-service","AuthServiceExternal","LoginByPassword","ANY"

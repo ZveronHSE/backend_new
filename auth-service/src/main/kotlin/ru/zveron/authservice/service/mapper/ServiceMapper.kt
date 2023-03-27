@@ -4,7 +4,7 @@ import ru.zveron.authservice.grpc.client.model.ValidatePasswordRequest
 import ru.zveron.authservice.service.model.LoginByPasswordRequest
 import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.PhoneNumber
-import ru.zveron.authservice.webclient.model.GetVerificationCodeRequest
+import ru.zveron.authservice.webclient.notifier.model.GetVerificationCodeRequest
 
 object ServiceMapper {
 

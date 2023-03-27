@@ -25,9 +25,9 @@ import ru.zveron.authservice.service.model.LoginByPhoneInitRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyRequest
 import ru.zveron.authservice.service.model.LoginByPhoneVerifyResponse
 import ru.zveron.authservice.service.model.ProfileTokenData
-import ru.zveron.authservice.webclient.NotifierClient
-import ru.zveron.authservice.webclient.NotifierFailure
-import ru.zveron.authservice.webclient.NotifierSuccess
+import ru.zveron.authservice.webclient.notifier.NotifierClient
+import ru.zveron.authservice.webclient.notifier.NotifierFailure
+import ru.zveron.authservice.webclient.notifier.NotifierSuccess
 import java.time.Instant
 import java.util.UUID
 

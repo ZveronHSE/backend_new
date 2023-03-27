@@ -5,18 +5,14 @@ import org.jooq.Record
 import org.jooq.SortOrder
 import org.jooq.TableField
 import org.jooq.impl.DSL
-import ru.zveron.contract.lot.Field
-import ru.zveron.contract.lot.Filter
-import ru.zveron.contract.lot.Operation
-import ru.zveron.contract.lot.Sort
-import ru.zveron.contract.lot.TypeSort
-import ru.zveron.contract.lot.WaterfallRequest
+import ru.zveron.contract.lot.*
 import ru.zveron.contract.lot.model.Parameter
 import ru.zveron.model.enum.Gender
 import ru.zveron.model.search.ConditionsSearch
 import ru.zveron.model.search.ParametersSearch
 import ru.zveron.model.search.ParametersSeekMethod
 import ru.zveron.model.search.table.LOT
+import java.time.Instant
 
 object ConditionsMapper {
     private const val SEPARATOR_VALUES = ";"
@@ -121,16 +117,23 @@ object ConditionsMapper {
         var fieldName: TableField<Record, *>? = null
 
         if (sort.sortBy == Sort.SortBy.PRICE) {
-            fieldName = LOT.CREATED_AT
-
-            if (sort.hasLastLot()) {
-                seekMethod.values.addAll(listOf(sort.lastLot.id, sort.lastLot.date))
-            }
-        } else if (sort.sortBy == Sort.SortBy.DATE) {
             fieldName = LOT.PRICE
 
             if (sort.hasLastLot()) {
-                seekMethod.values.addAll(listOf(sort.lastLot.id, sort.lastLot.price))
+                seekMethod.values.addAll(listOf(sort.lastLot.price, sort.lastLot.id))
+            }
+        } else if (sort.sortBy == Sort.SortBy.DATE) {
+            fieldName = LOT.CREATED_AT
+
+            if (sort.hasLastLot()) {
+                seekMethod.values.addAll(
+                    listOf(
+                        Instant.ofEpochSecond(
+                            sort.lastLot.date.seconds,
+                            sort.lastLot.date.nanos.toLong()
+                        ), sort.lastLot.id
+                    )
+                )
             }
         }
 
@@ -138,8 +141,8 @@ object ConditionsMapper {
 
         seekMethod.sorts.addAll(
             listOf(
-                LOT.ID.sort(sortOrder),
-                fieldName!!.sort(sortOrder) // Всегда !!, тк сортировка всегда передана
+                fieldName!!.sort(sortOrder), // Всегда !!, тк сортировка всегда передана
+                LOT.ID.sort(sortOrder)
             )
         )
 

@@ -10,18 +10,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.await
+import org.springframework.test.context.ActiveProfiles
 import ru.zveron.authservice.cron.SessionCronScheduler
 import ru.zveron.authservice.cron.StateContextCronScheduler
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
-import ru.zveron.authservice.webclient.NotifierClient
+import ru.zveron.authservice.webclient.notifier.NotifierClient
 
-@SpringBootTest(
-    properties = [
-        "zveron.cron.session.rate-in-ms=5000",
-        "zveron.cron.flow-context.rate-in-ms=5000",
-        "spring.main.web-application-type=reactive"
-    ]
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class BaseAuthTest : ContainerConfigurer() {
 

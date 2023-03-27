@@ -29,4 +29,6 @@ include(
     "object-storage",
     "push_notification",
     "e2e",
+    "chat_service",
+
 )

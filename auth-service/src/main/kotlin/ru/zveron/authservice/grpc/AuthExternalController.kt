@@ -10,11 +10,13 @@ import ru.zveron.authservice.grpc.mapper.GrpcMapper.toGrpcToken
 import ru.zveron.authservice.grpc.mapper.GrpcMapper.toServiceRequest
 import ru.zveron.authservice.service.LoginByPasswordFlowService
 import ru.zveron.authservice.service.LoginByPhoneFlowService
+import ru.zveron.authservice.service.LoginBySocialMediaService
 import ru.zveron.authservice.service.LogoutService
 import ru.zveron.authservice.service.RegistrationService
 import ru.zveron.contract.auth.external.AuthServiceExternalGrpcKt
 import ru.zveron.contract.auth.external.IssueNewTokensRequest
 import ru.zveron.contract.auth.external.LoginByPasswordRequest
+import ru.zveron.contract.auth.external.LoginBySocialRequest
 import ru.zveron.contract.auth.external.MobileToken
 import ru.zveron.contract.auth.external.PhoneLoginInitRequest
 import ru.zveron.contract.auth.external.PhoneLoginInitResponse
@@ -31,6 +33,7 @@ class AuthExternalController(
     private val loginByPasswordFlowService: LoginByPasswordFlowService,
     private val registrationService: RegistrationService,
     private val logoutService: LogoutService,
+    private val loginBySocialMediaService: LoginBySocialMediaService,
 ) : AuthServiceExternalGrpcKt.AuthServiceExternalCoroutineImplBase() {
 
     override suspend fun phoneLoginInit(request: PhoneLoginInitRequest): PhoneLoginInitResponse {
@@ -66,5 +69,11 @@ class AuthExternalController(
         logoutService.logout(accessToken)
 
         return Empty.getDefaultInstance()
+    }
+
+    override suspend fun loginBySocial(request: LoginBySocialRequest): MobileToken {
+        val serviceResponse = loginBySocialMediaService.loginBySocialMedia(request.toServiceRequest())
+
+        return serviceResponse.toGrpcToken()
     }
 }
