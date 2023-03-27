@@ -48,5 +48,3 @@ s3client:
   secretAccessKey: ${S3_SECRET_ACCESS_KEY}
   region: ru-central1
   endpointUrl: https://storage.yandexcloud.net
-server:
-  port: -1
