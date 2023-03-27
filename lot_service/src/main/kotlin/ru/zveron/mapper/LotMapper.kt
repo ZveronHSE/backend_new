@@ -4,7 +4,12 @@ import com.google.protobuf.util.Timestamps
 import ru.zveron.contract.address.AddressResponse
 import ru.zveron.contract.core.Status
 import ru.zveron.contract.core.lot
-import ru.zveron.contract.lot.*
+import ru.zveron.contract.lot.LotsIdResponse
+import ru.zveron.contract.lot.ProfileLotsResponse
+import ru.zveron.contract.lot.WaterfallResponse
+import ru.zveron.contract.lot.lotsIdResponse
+import ru.zveron.contract.lot.profileLotsResponse
+import ru.zveron.contract.lot.waterfallResponse
 import ru.zveron.entity.Lot
 import ru.zveron.exception.LotException
 import ru.zveron.model.Address
@@ -12,7 +17,8 @@ import ru.zveron.model.SummaryLot
 import ru.zveron.model.enum.Gender
 import java.text.SimpleDateFormat
 import java.time.Instant
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object LotMapper {
     /**
@@ -113,7 +119,7 @@ object LotMapper {
                 publicationDate = lot.createdAt.toFormattingDate()
                 favorites?.let { favorite = it[index] }
                 status = Status.forNumber(lot.status.ordinal)
-                categoryId = if (lot.gender == null) CATEGORY_ID_ANIMAL else CATEGORY_ID_GOOD
+                categoryId = if (lot.gender == null) CATEGORY_ID_GOOD else CATEGORY_ID_ANIMAL
             }
         }
 }
