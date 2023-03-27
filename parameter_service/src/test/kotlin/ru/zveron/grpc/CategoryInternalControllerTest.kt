@@ -32,15 +32,15 @@ class CategoryInternalControllerTest : DataBaseApplicationTest() {
 
         every {
             categoryService.getChildren(categoryId)
-        } returns listOf(Category(categoryId + 1, "name"))
+        } returns listOf(Category(categoryId + 1, "name", ""))
 
         every {
             categoryService.getCategoryByIDOrThrow(categoryId)
-        } returns Category(categoryId, "main")
+        } returns Category(categoryId, "main", "")
 
         every {
-            categoryService.getRootCategoryByChild(Category(categoryId, "main"))
-        } returns Category(1, "animal")
+            categoryService.getRootCategoryByChild(Category(categoryId, "main", ""))
+        } returns Category(1, "animal", "")
 
         val response = categoryInternalController.getInfoAboutCategory(mockIntWrapper(categoryId))
 
@@ -65,11 +65,11 @@ class CategoryInternalControllerTest : DataBaseApplicationTest() {
 
         every {
             categoryService.getCategoryByIDOrThrow(categoryId)
-        } returns Category(categoryId, "main")
+        } returns Category(categoryId, "main", "")
 
         every {
-            categoryService.getRootCategoryByChild(Category(categoryId, "main"))
-        } returns Category(2, "goods")
+            categoryService.getRootCategoryByChild(Category(categoryId, "main", ""))
+        } returns Category(2, "goods", "")
 
         val response = categoryInternalController.getInfoAboutCategory(mockIntWrapper(categoryId))
 
@@ -80,7 +80,7 @@ class CategoryInternalControllerTest : DataBaseApplicationTest() {
     @Test
     fun `GetCategoryTree correct request for category with tree`(): Unit = runBlocking {
         val categoryId = generateInt()
-        val categories = listOf(Category(categoryId + 1, "name"), Category(categoryId + 2, "name2"))
+        val categories = listOf(Category(categoryId + 1, "name", ""), Category(categoryId + 2, "name2", ""))
         every {
             categoryService.getTree(categoryId)
         } returns categories
