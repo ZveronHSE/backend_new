@@ -96,7 +96,7 @@ databaseChangeLog:
             tableName: communication_link
 
   - changeSet:
-      id: image_id_to_url
+      id: 1649521052537-4
       author: Schuyweiz
       changes:
         - loadUpdateData:
@@ -124,7 +124,7 @@ databaseChangeLog:
               - column:
                   header: image_url
                   name: image_url
-                  type: NUMERIC
+                  type: STRING
             commentLineStartsWith: '#'
             encoding: UTF-8
             file: data/profile.csv

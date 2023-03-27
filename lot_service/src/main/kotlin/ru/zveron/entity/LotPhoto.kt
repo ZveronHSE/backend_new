@@ -1,6 +1,5 @@
 package ru.zveron.entity
 
-import org.apache.commons.lang3.RandomStringUtils.randomNumeric
 import org.hibernate.Hibernate
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -24,9 +23,6 @@ data class LotPhoto(
 
     @Column(name = "image_url")
     val imageUrl: String,
-
-    @Column(name = "image_id")
-    val imageId: String = randomNumeric(5),
 
     @Column(name = "order_photo")
     val orderPhoto: Int

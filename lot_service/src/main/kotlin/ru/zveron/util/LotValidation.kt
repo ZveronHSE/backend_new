@@ -50,9 +50,9 @@ object LotValidation {
                 throw LotException(Status.INVALID_ARGUMENT, "None of the photos should be a default photo")
             }
         }
-
-        if (uniqueId.size != this.size) {
-            throw LotException(Status.INVALID_ARGUMENT, "User cant select same photos several time")
-        }
+//        TODO after img
+//        if (uniqueId.size != this.size) {
+//            throw LotException(Status.INVALID_ARGUMENT, "User cant select same photos several time")
+//        }
     }
 }
