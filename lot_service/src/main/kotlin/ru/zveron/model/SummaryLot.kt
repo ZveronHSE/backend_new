@@ -7,5 +7,5 @@ data class SummaryLot(
     val title: String,
     val price: Int,
     val createdAt: Instant,
-    val photoId: Long
+    val imageUrl: String,
 )

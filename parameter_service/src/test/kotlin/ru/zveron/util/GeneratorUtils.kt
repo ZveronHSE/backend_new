@@ -19,7 +19,7 @@ object GeneratorUtils {
     fun generateInt() = RandomUtils.nextInt()
 
     fun generateCategories(n: Int = 5): List<Category> = List(n) {
-        Category(id = RandomUtils.nextInt(), name = generateString())
+        Category(id = RandomUtils.nextInt(), name = generateString(), imageUrl = "")
     }
 
     fun generateParameterFromType(n: Int = 5): List<ParameterFromType> = List(n) {

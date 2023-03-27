@@ -87,7 +87,7 @@ class ProfileService(
         val profile = Profile(
             name = request.name,
             surname = request.surname,
-            imageId = request.imageId,
+            imageUrl = request.imageUrl,
             lastSeen = Instant.now(),
             passwordHash = request.passwordHash.takeIf { it != "" }
         )
@@ -124,7 +124,7 @@ class ProfileService(
                 id = profile.id
                 name = profile.name
                 surname = profile.surname
-                imageId = profile.imageId
+                imageUrl = profile.imageUrl
                 lastActivity = timestamp { seconds = profile.lastSeen.epochSecond; nanos = profile.lastSeen.nano }
                 address = addressCoroutine.awaitAddressResponse().toProfileAddress()
                 rating = ratingCoroutine.await()
@@ -145,7 +145,7 @@ class ProfileService(
             id = profile.id
             name = profile.name
             surname = profile.surname
-            imageId = profile.imageId
+            imageUrl = profile.imageUrl
             address = addressCoroutine.awaitAddressResponse().toAddress()
             rating = reviewCoroutine.awaitRatingResponse()
         }
@@ -157,7 +157,7 @@ class ProfileService(
             id = request.id
             name = profile.name
             surname = profile.surname
-            imageId = profile.imageId
+            imageUrl = profile.imageUrl
             addressId = profile.addressId
             channels.addAll(profile.settings.channels.toModel())
         }
@@ -168,7 +168,7 @@ class ProfileService(
                 id = it.id
                 name = it.name
                 surname = it.surname
-                imageId = it.imageId
+                imageUrl = it.imageUrl
                 addressId = it.addressId
             }
         }.let {
@@ -183,7 +183,7 @@ class ProfileService(
             id = request.id
             name = profile.name
             surname = profile.surname
-            imageId = profile.imageId
+            imageUrl = profile.imageUrl
             addressId = profile.addressId
             channels.addAll(profile.settings.channels.toModel())
             links = profile.communicationLinks.toDto().toLinks()
@@ -199,7 +199,7 @@ class ProfileService(
         val updatedProfile = profile.copy(
             name = request.name,
             surname = request.surname,
-            imageId = request.imageId,
+            imageUrl = request.imageUrl,
             addressId = newAddress.id,
         )
 
@@ -223,7 +223,7 @@ class ProfileService(
     private fun CoroutineScope.getLotsBySellerId(
         sellerId: Long,
         userId: Long,
-        condition: Boolean = true
+        condition: Boolean = true,
     ): Deferred<ProfileLotsResponse> =
         async(CoroutineName("Get-Lots-Coroutine")) {
             if (condition) lotClient.getLotsBySellerId(sellerId, userId) else ProfileLotsResponse.getDefaultInstance()

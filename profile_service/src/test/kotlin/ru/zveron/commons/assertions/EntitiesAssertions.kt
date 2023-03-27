@@ -36,7 +36,7 @@ infix fun Profile.profileShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     addressId shouldBe expected.addressId
     passwordHash shouldBe expected.passwordHash
     ChronoUnit.MINUTES.between(expected.lastSeen, lastSeen) shouldBe 0
@@ -46,7 +46,7 @@ infix fun GetProfileResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     addressId shouldBe expected.addressId
     channelsList shouldBe expected.settings.channels.toModel()
 }
@@ -55,7 +55,7 @@ infix fun GetProfileWithContactsResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     addressId shouldBe expected.addressId
     channelsList shouldBe expected.settings.channels.toModel()
     links linksShouldBe expected.communicationLinks.toDto()
@@ -133,7 +133,7 @@ infix fun GetProfilePageResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     contacts.channelsList channelsShouldBe expected.settings.channels
     contacts.links linksShouldBe expected.communicationLinks.toDto()
     lastActivity timestampShouldBe expected.lastSeen
@@ -143,14 +143,14 @@ infix fun GetProfileInfoResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
 }
 
 infix fun GetProfilePageResponse.responseShouldBeBlockedAnd(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     contacts.channelsList.size shouldBe 0
     contacts.links shouldBe Links.getDefaultInstance()
     lastActivity timestampShouldBe expected.lastSeen
@@ -166,7 +166,7 @@ infix fun ProfileSummary.profileShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     addressId shouldBe expected.addressId
 }
 
@@ -193,5 +193,5 @@ infix fun AddressRequest.addressShouldBe(expected: Address) {
 infix fun Profile.profileShouldBe(expected: SetProfileInfoRequest) {
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
 }

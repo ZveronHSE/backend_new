@@ -13,20 +13,20 @@ interface CategoryRepository : JpaRepository<Category, Int> {
      * а не только по родительским, поэтому тут идет выборка по дереву вниз :D
      */
     @Query(
-        value = """with recursive c (id, name, id_parent) as
+        value = """with recursive c (id, name, id_parent, image_url) as
             (
-            select category.id, category.name, category.id_parent
+            select category.id, category.name, category.id_parent, category.image_url
             from category
             where category.id = :id
             
             union all
             
-            select category.id, category.name, category.id_parent
+            select category.id, category.name, category.id_parent, category.image_url
             from c
                 join category on c.id = category.id_parent
             )
                 
-            select id, name, id_parent
+            select id, name, id_parent, image_url
             from c 
         """,
         nativeQuery = true

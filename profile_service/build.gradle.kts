@@ -1,4 +1,4 @@
-val contractVersion: String = "1.9.0"
+val contractVersion: String by rootProject
 
 dependencies {
     implementation("com.vladmihalcea:hibernate-types-55:2.14.0")

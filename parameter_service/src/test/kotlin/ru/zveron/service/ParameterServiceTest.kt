@@ -42,8 +42,8 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     @Test
     fun `GetAllParameters Correct get all parameters by category and lotform`(): Unit = runBlocking {
         val responseExpected = parameterFromTypeRepository.getAllByCategoryAndLotForm(
-            Category(CATEGORY_ID_CAT, ""),
-            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
+            Category(CATEGORY_ID_CAT, "", ""),
+            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, "", ""), "")
         )
 
         val responseActual = parameterService.getAllParameters(CATEGORY_ID_CAT, LOT_FORM_ID)
@@ -72,8 +72,8 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     @Test
     fun `ValidateValuesForParameter Correct request with all type parameters`(): Unit = runBlocking {
         val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
-            Category(CATEGORY_ID_CAT, ""),
-            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
+            Category(CATEGORY_ID_CAT, "", ""),
+            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, "", ""), "")
         ).toResponse().parametersList
 
         val parameterValues = parameters.buildMapParameterValues()
@@ -93,8 +93,8 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     fun `ValidateValuesForParameter Should throw exception for a required parameter that has not been filled in`(): Unit =
         runBlocking {
             val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
-                Category(CATEGORY_ID_CAT, ""),
-                LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
+                Category(CATEGORY_ID_CAT, "", ""),
+                LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, "", ""), "")
             ).toResponse().parametersList
 
             val parameterValues = parameters.buildMapParameterValues()
@@ -126,8 +126,8 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     fun `ValidateValuesForParameter Should throw exception for incorrect value for each type parameter`(type: Type): Unit =
         runBlocking {
             val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
-                Category(CATEGORY_ID_CAT, ""),
-                LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
+                Category(CATEGORY_ID_CAT, "", ""),
+                LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, "", ""), "")
             ).toResponse().parametersList
 
             val parameterValues = parameters.buildMapParameterValues()
@@ -160,8 +160,8 @@ internal class ParameterServiceTest : DataBaseApplicationTest() {
     @Test
     fun `ValidateValuesForParameter Extra parameters, should throw exception`(): Unit = runBlocking {
         val parameters = parameterFromTypeRepository.getAllByCategoryAndLotForm(
-            Category(CATEGORY_ID_CAT, ""),
-            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, ""), "")
+            Category(CATEGORY_ID_CAT, "", ""),
+            LotForm(LOT_FORM_ID, Category(CATEGORY_ID_ROOT, "", ""), "")
         ).toResponse().parametersList
 
         val parameterValues = parameters.buildMapParameterValues()

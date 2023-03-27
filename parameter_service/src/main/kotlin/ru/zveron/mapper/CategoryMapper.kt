@@ -12,6 +12,7 @@ object CategoryMapper {
             category {
                 id = it.id
                 name = it.name
+                imageUrl = it.imageUrl
             }
         }
 

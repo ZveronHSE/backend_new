@@ -26,7 +26,7 @@ class CardLotBuilder(
     var isOwnLot: Boolean = false,
     var seller: SellerProfile? = null,
     var address: Address? = null,
-    var parametersMap: Map<Int, String> = mapOf()
+    var parametersMap: Map<Int, String> = mapOf(),
 ) {
     companion object {
         inline fun buildCardLot(init: CardLotBuilder.() -> Unit) =
@@ -50,7 +50,7 @@ class CardLotBuilder(
             title = lot.title
             photos.addAll(lot.photos.map {
                 photo {
-                    id = it.id
+                    url = it.imageUrl
                     order = it.orderPhoto
                 }
             })
@@ -126,7 +126,7 @@ class CardLotBuilder(
             surname = seller.surname
 //           TODO     rating = seller ZV-304
             online = seller.isOnline
-            photoId = seller.imageId
+            imageUrl = seller.imageUrl
         }
     }
 

@@ -9,7 +9,7 @@ object Assertions {
         id shouldBe expected.id
         name shouldBe expected.name
         surname shouldBe expected.surname
-        imageId shouldBe expected.imageId
+        imageUrl shouldBe expected.imageUrl
         addressId shouldBe expected.addressId
     }
 }

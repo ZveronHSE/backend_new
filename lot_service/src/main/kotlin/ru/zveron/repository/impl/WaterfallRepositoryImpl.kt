@@ -37,7 +37,7 @@ class WaterfallRepositoryImpl(
                 LOT.TITLE,
                 LOT.PRICE,
                 LOT.CREATED_AT.`as`("createdAt"),
-                LOT_PHOTO.IMAGE_ID.`as`("photoId")
+                LOT_PHOTO.IMAGE_URL.`as`("imageUrl")
             )
             .from(LOT)
             .join(LOT_PHOTO)

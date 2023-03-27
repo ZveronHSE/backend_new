@@ -45,10 +45,10 @@ object LotEntities {
         this.description = description
         photos.addAll(listOf(
             photo {
-                id = 3
+                url = "someurl"
                 order = 0
             }, photo {
-                id = 2
+                url = "someurl"
                 order = 1
             })
         )
@@ -77,7 +77,7 @@ object LotEntities {
         this.description = description
         photos.addAll(listOf(photo {
             photo {
-                id = 3
+                url= "someurl"
                 order = 0
             }
         }))

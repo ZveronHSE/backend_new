@@ -33,7 +33,7 @@ data class Profile(
     val name: String,
     @Column(nullable = false, length = 50)
     val surname: String,
-    val imageId: Long,
+    val imageUrl: String,
     @Column(nullable = false)
     val lastSeen: Instant,
     val addressId: Long = 0,

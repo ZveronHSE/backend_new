@@ -262,7 +262,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val request = setProfileInfoRequest {
             name = PropsGenerator.generateString(10)
             surname = PropsGenerator.generateString(10)
-            imageId = PropsGenerator.generateLongId()
+            imageUrl = PropsGenerator.generateImageUrl()
             address = generateAddress()
         }
         val newAddressId = PropsGenerator.generateLongId()

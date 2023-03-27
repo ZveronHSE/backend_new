@@ -1,4 +1,4 @@
-"last_seen","name","surname","id","address_id","image_id"
-"2022-08-21T14:09:00.000000","Петя","Иванов","1","-1","1"
-"2022-08-21T14:10:00.000000","Иван","Петров","2","-1","1"
-"2022-08-21T14:11:00.000000","Кот","Собачков","3","-1","1"
+"last_seen","name","surname","id","address_id","image_url"
+"2022-08-21T14:09:00.000000","Петя","Иванов","1",0,"https://storage.yandexcloud.net/zveron-profile/random.jpeg"
+"2022-08-21T14:10:00.000000","Иван","Петров","2",0,"https://storage.yandexcloud.net/zveron-profile/random.jpeg"
+"2022-08-21T14:11:00.000000","Кот","Собачков","3",0,"https://storage.yandexcloud.net/zveron-profile/random.jpeg"
