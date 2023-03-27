@@ -43,6 +43,6 @@ object LotsFavoritesRecordEntitiesGenerator {
         price = PrimitivesGenerator.generateString(10)
         publicationDate = PrimitivesGenerator.generateString(10)
         this.status = status
-        photoId = PrimitivesGenerator.generateUserId()
+        imageUrl = PrimitivesGenerator.generateString(10)
     }
 }
