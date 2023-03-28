@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import ru.zveron.authservice.component.auth.Authenticator
 import ru.zveron.authservice.component.thirdparty.GmailProvider
 import ru.zveron.authservice.component.thirdparty.contant.ThirdPartyProviderType
-import ru.zveron.authservice.exception.SocialMediaException
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
@@ -46,7 +45,7 @@ class LoginBySocialMediaServiceTest {
 
 
         //prepare env
-        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
+        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo()
 
         coEvery { profileServiceClient.findProfileBySocialMedia(any(), any()) } returns ProfileNotFound
 
@@ -64,24 +63,6 @@ class LoginBySocialMediaServiceTest {
     }
 
     @Test
-    fun `given login by social request, when userId does not match, then throw exception`() {
-        //prepare data
-        val request = testLoginBySocialMediaRequest()
-
-
-        //prepare env
-        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo()
-
-        //when
-        runBlocking {
-            //then
-            shouldThrow<SocialMediaException> {
-                service.loginBySocialMedia(request)
-            }
-        }
-    }
-
-    @Test
     fun `given login by social request, when userId matches and profile exists, then login`() {
         //prepare data
         val profileId = randomId()
@@ -93,7 +74,7 @@ class LoginBySocialMediaServiceTest {
         val request = testLoginBySocialMediaRequest()
 
         //prepare env
-        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
+        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo()
 
         coEvery { profileServiceClient.findProfileBySocialMedia(any(), any()) } returns profileFoundResponse
 
@@ -116,7 +97,7 @@ class LoginBySocialMediaServiceTest {
         val request = testLoginBySocialMediaRequest()
 
         //prepare env
-        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo().copy(userId = request.providerUserId)
+        coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo()
 
         coEvery { profileServiceClient.findProfileBySocialMedia(any(), any()) } returns ProfileNotFound
 

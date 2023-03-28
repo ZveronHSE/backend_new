@@ -14,7 +14,6 @@ import ru.zveron.authservice.util.randomId
 import ru.zveron.authservice.util.testLoginBySocialGrpcRequest
 import ru.zveron.authservice.util.testUserInfoGoogle
 import ru.zveron.authservice.webclient.ThirdPartyStubs
-import ru.zveron.contract.auth.external.copy
 
 class LoginBySocialMediaControllerTest : BaseAuthTest() {
 
@@ -32,9 +31,7 @@ class LoginBySocialMediaControllerTest : BaseAuthTest() {
         val googleUserInfo = testUserInfoGoogle().copy(
             sub = providerUserId.toString()
         )
-        val request = testLoginBySocialGrpcRequest().copy {
-            this.providerUserId = providerUserId.toString()
-        }
+        val request = testLoginBySocialGrpcRequest()
 
         //prep env
         coEvery { profileClient.findProfileBySocialMedia(any(), any()) } returns ProfileNotFound
@@ -64,9 +61,7 @@ class LoginBySocialMediaControllerTest : BaseAuthTest() {
             sub = providerUserId.toString()
         )
         val profile = ProfileFound(id = profileId, name = googleUserInfo.name, surname = googleUserInfo.family_name)
-        val request = testLoginBySocialGrpcRequest().copy {
-            this.providerUserId = providerUserId.toString()
-        }
+        val request = testLoginBySocialGrpcRequest()
 
         //prep env
         coEvery { profileClient.findProfileBySocialMedia(any(), any()) } returns profile
