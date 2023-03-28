@@ -101,7 +101,6 @@ object GrpcMapper {
     fun LoginBySocialRequest.toServiceRequest() = LoginBySocialMediaRequest(
         accessToken = this.accessToken,
         providerType = this.authProvider.toServiceProvider(),
-        providerUserId = this.providerUserId,
         fingerprint = this.deviceFp,
     )
 

@@ -12,7 +12,6 @@ fun testLoginBySocialMediaRequest() = LoginBySocialMediaRequest(
     accessToken = randomAccessToken().token,
     //todo: change when other providers are introduced
     providerType = ThirdPartyProviderType.GMAIL,
-    providerUserId = randomId().toString(),
     fingerprint = randomDeviceFp(),
 )
 
@@ -37,7 +36,6 @@ fun testUserInfoGoogle() = UserInfoGoogle(
 fun testLoginBySocialGrpcRequest() = loginBySocialRequest {
     this.deviceFp  = randomDeviceFp()
     this.accessToken = randomAccessToken().token
-    this.providerUserId = randomId().toString()
     //todo: other providers
     this.authProvider = AuthProvider.GMAIL
 }

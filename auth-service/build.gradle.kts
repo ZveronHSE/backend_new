@@ -31,7 +31,7 @@ dependencies {
 
     //contracts
     implementation("com.github.zveronHSe.contract:profile:1.9.1")
-    implementation("com.github.zveronHSe.contract:auth:1.9.1")
+    implementation("com.github.zveronHSe.contract:auth:1.9.5")
 
     //testing
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
