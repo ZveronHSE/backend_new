@@ -14,8 +14,8 @@ import ru.zveron.authservice.exception.ChannelNotVerifiedException
 import ru.zveron.authservice.exception.ContextExpiredException
 import ru.zveron.authservice.exception.FingerprintException
 import ru.zveron.authservice.exception.RegistrationException
-import ru.zveron.authservice.grpc.client.model.PhoneNumber
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
+import ru.zveron.authservice.grpc.client.model.PhoneNumber
 import ru.zveron.authservice.grpc.client.model.RegisterProfileAlreadyExists
 import ru.zveron.authservice.grpc.client.model.RegisterProfileSuccess
 import ru.zveron.authservice.persistence.FlowStateStorage
@@ -85,6 +85,7 @@ class RegistrationServiceTest {
                 name = name,
                 phone = PhoneNumber.of(phoneNumber),
                 hash = hash,
+                surname = surname,
             )
 
             coEvery {
@@ -184,6 +185,7 @@ class RegistrationServiceTest {
                 name = name,
                 phone = PhoneNumber.of(phoneNumber),
                 hash = hash,
+                surname = surname,
             )
 
             coEvery {
