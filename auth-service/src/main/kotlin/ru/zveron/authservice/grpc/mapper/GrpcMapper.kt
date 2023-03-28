@@ -83,6 +83,7 @@ object GrpcMapper {
 
     fun ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest.toClientRequest() = createProfileRequest {
         this.name = this@toClientRequest.name
+        this.surname = this@toClientRequest.surname
         this.links = links {
             this.phone = phone {
                 this.number = this@toClientRequest.phone.toRequest()
