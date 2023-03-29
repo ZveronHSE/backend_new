@@ -120,6 +120,7 @@ object LotMapper {
                 favorites?.let { favorite = it[index] }
                 status = Status.forNumber(lot.status.ordinal)
                 categoryId = if (lot.gender == null) CATEGORY_ID_GOOD else CATEGORY_ID_ANIMAL
+                lot.photos.firstOrNull()?.apply { this@lot.imageUrl = imageUrl }
             }
         }
 }
