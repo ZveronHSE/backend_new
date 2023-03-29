@@ -13,12 +13,16 @@ import ru.zveron.contract.lot.lotsIdResponse
 import ru.zveron.mapper.LotMapper
 import ru.zveron.service.LotService
 import ru.zveron.util.ValidateUtils.validatePositive
+import javax.transaction.Transactional
 
 @GrpcService
 class LotInternalController(
     private val lotService: LotService,
     private val lotFavoriteClient: LotFavoriteClient
 ) : LotInternalServiceGrpcKt.LotInternalServiceCoroutineImplBase() {
+
+    // TODO temp fix
+    @Transactional
     override suspend fun getLotsById(request: LotsIdRequest): LotsIdResponse {
         if (request.lotIdsCount == 0) {
             return lotsIdResponse { }
@@ -40,6 +44,8 @@ class LotInternalController(
         }
     }
 
+    // TODO temp fix
+    @Transactional
     override suspend fun getLotsBySellerId(request: ProfileLotsRequest): ProfileLotsResponse {
         request.sellerId.validatePositive("sellerId")
 
