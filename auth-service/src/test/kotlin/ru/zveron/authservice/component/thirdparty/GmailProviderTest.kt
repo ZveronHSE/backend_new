@@ -43,9 +43,9 @@ class GmailProviderTest {
 
         //then
         response.asClue {
-            it.firstName shouldBe userInfo.name
-            it.lastName shouldBe userInfo.family_name
-            it.userId shouldBe userInfo.sub
+            it.firstName shouldBe userInfo.firstName
+            it.lastName shouldBe userInfo.lastName
+            it.userId shouldBe userInfo.providerUserId
             it.email shouldBe userInfo.email
         }
     }

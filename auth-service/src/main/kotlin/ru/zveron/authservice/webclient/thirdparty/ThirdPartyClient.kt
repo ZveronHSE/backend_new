@@ -2,6 +2,7 @@ package ru.zveron.authservice.webclient.thirdparty
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
+import net.logstash.logback.marker.Markers.append
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -36,11 +37,9 @@ class ThirdPartyClient(
             .uri(uri)
             .retrieve()
             .awaitBody<String>()
-            .also { logger.info { "Vk get access token response is $it" } }
+            .also { logger.debug(append("response", it)) { "Get user info client response" } }
             .let {
                 jsonObjectMapper.readValue(it, responseClass)
             }
     }
 }
-
-

@@ -29,7 +29,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //prepare data
         val accessToken = randomAccessToken().token
         val host = server.getHost()
-        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.USERS_GET_PATH)
+        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.GET_USER_INFO_PATH)
             .queryParam("access_token", accessToken)
             .build()
             .toUri()
@@ -57,7 +57,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //prepare data
         val accessToken = randomAccessToken().token
         val host = server.getHost()
-        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.USERS_GET_PATH)
+        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.GET_USER_INFO_PATH)
             .queryParam("access_token", accessToken)
             .build()
             .toUri()
@@ -73,7 +73,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //then
         response.shouldNotBeNull()
         val responseAsGoogle = response as GetThirdPartyUserInfoFailure<UserInfoGoogle>
-        responseAsGoogle.code shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+        responseAsGoogle.getHttpStatusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
     }
 
     @Test
@@ -81,7 +81,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //prepare data
         val accessToken = randomAccessToken().token
         val host = server.getHost()
-        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.USERS_GET_PATH)
+        val uri = UriComponentsBuilder.fromHttpUrl(host + GmailProvider.GET_USER_INFO_PATH)
             .queryParam("access_token", accessToken)
             .build()
             .toUri()
@@ -97,6 +97,6 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //then
         response.shouldNotBeNull()
         val responseAsGoogle = response as GetThirdPartyUserInfoFailure<UserInfoGoogle>
-        responseAsGoogle.code shouldBe HttpStatus.BAD_REQUEST
+        responseAsGoogle.getHttpStatusCode shouldBe HttpStatus.BAD_REQUEST
     }
 }

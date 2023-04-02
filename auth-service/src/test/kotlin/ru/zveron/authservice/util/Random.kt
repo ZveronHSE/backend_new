@@ -102,3 +102,5 @@ fun randomPersistencePhone() = ru.zveron.authservice.persistence.model.PhoneNumb
 fun randomEmail() = "${randomAlphabetic(10)}@mail.ru"
 
 inline fun <reified T : Enum<T>> randomEnum() = enumValues<T>().random()
+
+fun randomBirthday() = Instant.now().minusSeconds(RandomUtils.nextLong(0, 1000L * 60 * 60 * 24 * 365 * 18))

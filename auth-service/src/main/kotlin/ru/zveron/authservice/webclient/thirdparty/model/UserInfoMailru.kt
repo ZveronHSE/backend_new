@@ -2,23 +2,24 @@ package ru.zveron.authservice.webclient.thirdparty.model
 
 import com.fasterxml.jackson.annotation.JsonAlias
 
-data class UserInfoGoogle(
-    @JsonAlias("sub")
+data class UserInfoMailru(
+    @JsonAlias("id")
     override val providerUserId: String,
 
-    @JsonAlias("family_name")
     override val firstName: String?,
 
-    @JsonAlias("name")
-    override val lastName: String,
+    override val lastName: String?,
 
-    override val picture: String,
+    override val email: String?,
 
-    override val email: String,
+    @JsonAlias("image")
+    override val picture: String?,
 
-    val email_verified: Boolean,
-    val given_name: String,
-    val locale: String,
+    val nickname: String?,
+    val name: String?,
+    val locale: String?,
+    val gender: String?,
+    val birthday: String?,
 ) : UserInfo(
     providerUserId = providerUserId,
     firstName = firstName,

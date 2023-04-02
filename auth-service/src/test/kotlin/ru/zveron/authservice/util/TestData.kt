@@ -4,6 +4,7 @@ import ru.zveron.authservice.component.thirdparty.contant.ThirdPartyProviderType
 import ru.zveron.authservice.component.thirdparty.model.ThirdPartyUserInfo
 import ru.zveron.authservice.service.model.LoginBySocialMediaRequest
 import ru.zveron.authservice.webclient.thirdparty.model.UserInfoGoogle
+import ru.zveron.authservice.webclient.thirdparty.model.UserInfoMailru
 import ru.zveron.contract.auth.external.AuthProvider
 import ru.zveron.contract.auth.external.loginBySocialRequest
 import java.util.UUID
@@ -25,16 +26,29 @@ fun testThirdPartyUserInfo() = ThirdPartyUserInfo(
 fun testUserInfoGoogle() = UserInfoGoogle(
     email = randomEmail(),
     email_verified = false,
-    family_name = randomSurname(),
+    lastName = randomSurname(),
     given_name = randomName(),
     locale = "ru",
-    name = randomName(),
+    firstName = randomName(),
     picture = "${UUID.randomUUID()}.png",
-    sub = randomId().toString(),
+    providerUserId = randomId().toString(),
+)
+
+fun testUserInfoMailru() = UserInfoMailru(
+    email = randomEmail(),
+    firstName = randomName(),
+    lastName = randomSurname(),
+    providerUserId = randomId().toString(),
+    picture = "${UUID.randomUUID()}.png",
+    nickname = randomName(),
+    name = randomName(),
+    locale = "ru",
+    gender = "MALE",
+    birthday = randomBirthday().toString(),
 )
 
 fun testLoginBySocialGrpcRequest() = loginBySocialRequest {
-    this.deviceFp  = randomDeviceFp()
+    this.deviceFp = randomDeviceFp()
     this.accessToken = randomAccessToken().token
     //todo: other providers
     this.authProvider = AuthProvider.GMAIL

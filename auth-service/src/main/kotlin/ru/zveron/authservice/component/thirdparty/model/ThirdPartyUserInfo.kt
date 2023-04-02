@@ -6,5 +6,5 @@ data class ThirdPartyUserInfo(
     val userId: String,
     val email: String? = null,
 ) {
-    companion object Factory
+    companion object
 }

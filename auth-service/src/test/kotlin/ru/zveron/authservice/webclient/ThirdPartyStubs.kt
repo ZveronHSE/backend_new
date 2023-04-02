@@ -8,7 +8,7 @@ import ru.zveron.authservice.util.withJsonDto
 object ThirdPartyStubs {
     fun <T : Any> serverStubForGoogleGetUserInfo(result: T) {
         WireMock.stubFor(
-            WireMock.get(WireMock.urlPathMatching(".*${GmailProvider.USERS_GET_PATH}"))
+            WireMock.get(WireMock.urlPathMatching(".*${GmailProvider.GET_USER_INFO_PATH}"))
                 .willReturn(
                     WireMock.aResponse()
                         .withStatus(HttpStatus.OK.value())
@@ -19,7 +19,7 @@ object ThirdPartyStubs {
 
     fun serverStubForGoogleGetUserInfoFail(status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR) {
         WireMock.stubFor(
-            WireMock.get(WireMock.urlPathMatching(".*${GmailProvider.USERS_GET_PATH}"))
+            WireMock.get(WireMock.urlPathMatching(".*${GmailProvider.GET_USER_INFO_PATH}"))
                 .willReturn(
                     WireMock.aResponse()
                         .withStatus(status.value())

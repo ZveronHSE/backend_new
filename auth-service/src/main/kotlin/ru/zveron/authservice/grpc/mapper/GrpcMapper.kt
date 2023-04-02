@@ -120,8 +120,12 @@ object GrpcMapper {
                     id = userInfo.userId
                     email = userInfo.email ?: ""
                 }
+
+                //TODO: add mailru provider
+                else -> {}
             }
         }
+
     }
 
     fun ThirdPartyProviderType.toProfileClientType() = when (this) {
