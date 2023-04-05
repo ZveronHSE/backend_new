@@ -1,2 +1,0 @@
-"alias","service_name","grpc_service_name","grpc_method_name","access_scope"
-"authLoginBySocialMedia","auth-service","AuthServiceExternal","LoginBySocial","ANY"
