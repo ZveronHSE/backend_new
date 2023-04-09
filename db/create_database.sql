@@ -85,7 +85,7 @@ $$;
 DO
 $$
     BEGIN
-        PERFORM dblink_exec('', 'CREATE DATABASE service');
+        PERFORM dblink_exec('', 'CREATE DATABASE "order"');
     EXCEPTION
         WHEN duplicate_database THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
     END

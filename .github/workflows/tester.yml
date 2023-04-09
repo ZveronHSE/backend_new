@@ -46,8 +46,8 @@ jobs:
           - name: Chat Service
             gradle: chat_service
 
-          - name: Service management service
-            gradle: service-management-service
+          - name: Order service
+            gradle: order-service
 
     steps:
       - name: Checkout

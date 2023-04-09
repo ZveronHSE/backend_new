@@ -1,11 +1,11 @@
-package ru.zveron.servicemng
+package ru.zveron.order
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class ServiceManagementServiceApplication
+class OrderServiceApplication
 
 fun main(args: Array<String>) {
-    runApplication<ServiceManagementServiceApplication>(*args)
+    runApplication<OrderServiceApplication>(*args)
 }

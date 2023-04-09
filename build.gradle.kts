@@ -65,7 +65,7 @@ subprojects {
                 (org.yaml.snakeyaml.Yaml().load(it) as Map<*, *>)
             }
         } catch (ex: Exception) {
-            throw IllegalArgumentException("message=${ex.message} projectDir=$projectDir")
+            throw IllegalArgumentException("message=${ex.message}")
         }
 
         try {

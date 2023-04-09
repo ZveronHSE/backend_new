@@ -281,15 +281,15 @@ services:
           cpus: '0.25'
           memory: 128M
 
-  service-management-service:
+  order-service:
     logging: *loki-logging
     restart: always
-    container_name: service-management-service
+    container_name: order-service
     platform: linux/amd64
-    image: ghcr.io/zveronhse/service-management-service
+    image: ghcr.io/zveronhse/order-service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/servicemng
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/order
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
     depends_on:

@@ -1,4 +1,4 @@
-package ru.zveron.servicemng
+package ru.zveron.order
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles
         "spring.main.web-application-type=reactive"
     ]
 )
-class ServiceManagementServiceApplicationTests {
+class OrderServiceApplicationTests {
 
     @Test
     fun contextLoads() {

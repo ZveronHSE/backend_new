@@ -72,10 +72,10 @@ jobs:
             dockerfile: push_notification/Dockerfile
             image: ghcr.io/zveronhse/push_notification:latest
 
-          - name: Service management service
-            env: service-management-service
-            dockerfile: service-management-service/Dockerfile
-            image: ghcr.io/zveronhse/service-management-service:latest
+          - name: Order service
+            env: order-service
+            dockerfile: order-service/Dockerfile
+            image: ghcr.io/zveronhse/order-service:latest
 
     steps:
       - name: Checkout

@@ -2,20 +2,20 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/master.yaml
-    url: jdbc:postgresql://localhost:5555/servicemng
+    url: jdbc:postgresql://localhost:5555/order
     user: zveron_user
     password: zveron_password
   datasource:
-    url: jdbc:postgresql://localhost:5555/servicemng
+    url: jdbc:postgresql://localhost:5555/order
     password: zveron_password
     username: zveron_user
   main:
     banner-mode: off
     web-application-type: reactive
   application:
-    name: service-management-service
+    name: order-service
   r2dbc:
-    url: r2dbc:postgresql://localhost:5555/servicemng
+    url: r2dbc:postgresql://localhost:5555/order
     username: zveron_user
     password: zveron_password
     pool:
