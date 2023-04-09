@@ -12,6 +12,7 @@ object SettingsGenerator {
         addGmail: Boolean = false,
         addPhone: Boolean = false,
         addChat: Boolean = false,
+        addMailRu: Boolean = false,
         addressId: Long = -1
     ) = Settings(
         id = profile.id,
@@ -21,6 +22,7 @@ object SettingsGenerator {
             gmail = addGmail,
             phone = addPhone,
             chat = addChat,
+            mailRu = addMailRu,
         ),
         searchAddressId = addressId
     ).also { profile.settings = it }

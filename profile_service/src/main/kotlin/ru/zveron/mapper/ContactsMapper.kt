@@ -5,6 +5,7 @@ import ru.zveron.contract.profile.model.Links
 import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.contract.profile.model.gmail
 import ru.zveron.contract.profile.model.links
+import ru.zveron.contract.profile.model.mailru
 import ru.zveron.contract.profile.model.phone
 import ru.zveron.contract.profile.model.vk
 import ru.zveron.domain.link.*
@@ -18,6 +19,7 @@ object ContactsMapper {
             phone = phone.number.isNotBlank(),
             vk = vk.ref.isNotBlank(),
             gmail = gmail.email.isNotBlank(),
+            mailRu = mail.email.isNotBlank(),
             chat = true
         )
 
@@ -55,6 +57,17 @@ object ContactsMapper {
                 )
             )
         }
+        if (mail.id.isNotBlank()) {
+            result.add(
+                CommunicationLink(
+                    communicationLinkId = mail.id,
+                    data = MailRuData(
+                        email = mail.email,
+                    ),
+                    profile = profile
+                )
+            )
+        }
         return result
     }
 
@@ -65,6 +78,7 @@ object ContactsMapper {
             phoneLink = map[CommunicationLinkType.PHONE],
             vkLink = map[CommunicationLinkType.VK],
             gmailLink = map[CommunicationLinkType.GMAIL],
+            mailRuLink = map[CommunicationLinkType.MAIL_RU],
         )
     }
 
@@ -86,6 +100,12 @@ object ContactsMapper {
                     email = this@apply.data.email
                 }
             }
+            mailRuLink?.apply {
+                mail = mailru {
+                    id = this@apply.communicationLinkId
+                    email = (this@apply.data as MailRuData).email
+                }
+            }
         }
 
     fun Set<ChannelType>.toDto(): ChannelsDto =
@@ -93,6 +113,7 @@ object ContactsMapper {
             phone = contains(ChannelType.PHONE),
             vk = contains(ChannelType.VK),
             gmail = contains(ChannelType.GOOGLE),
+            mailRu = contains(ChannelType.MAILRU),
             chat = contains(ChannelType.CHAT)
         )
 
@@ -101,6 +122,7 @@ object ContactsMapper {
             if (phone) add(ChannelType.PHONE)
             if (vk) add(ChannelType.VK)
             if (gmail) add(ChannelType.GOOGLE)
+            if (mailRu) add(ChannelType.MAILRU)
             if (chat) add(ChannelType.CHAT)
         }
 }
