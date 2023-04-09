@@ -41,6 +41,6 @@ management:
   endpoint:
     serviceregistry:
       enabled: true
-
+grpc:
   server:
     port: 9092
