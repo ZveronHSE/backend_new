@@ -98,7 +98,7 @@ class ContactsMapperTest {
     fun `linksDto2Model maps correctly`() {
         val profile = ProfileGenerator.generateProfile(Instant.now())
         val expected =
-            CommunicationLinksGenerator.generateLinks(profile, addVk = true, addGmail = true, addPhone = true, addMailRy = true)
+            CommunicationLinksGenerator.generateLinks(profile, addVk = true, addGmail = true, addPhone = true, addMailRu = true)
 
         val actual = expected.toLinks()
 

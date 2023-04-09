@@ -22,7 +22,7 @@ object CommunicationLinksGenerator {
         addGmail: Boolean = false,
         addPhone: Boolean = false,
         skipVkRef: Boolean = false,
-        addMailRy: Boolean = false,
+        addMailRu: Boolean = false,
     ): LinksDto {
         val result = mutableListOf<CommunicationLink>()
         if (addVk) {
@@ -48,7 +48,7 @@ object CommunicationLinksGenerator {
                 )
             )
         }
-        if (addMailRy) {
+        if (addMailRu) {
             result.add(
                 CommunicationLink(
                     communicationLinkId = PropsGenerator.generateString(10),

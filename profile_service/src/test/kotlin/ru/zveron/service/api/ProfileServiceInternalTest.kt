@@ -117,7 +117,7 @@ class ProfileServiceInternalTest : ProfileTest() {
             addMailRu = mailRu,
             addChat = true
         )
-        generateLinks(expectedProfile, addVk = vk, addGmail = gmail, addPhone = phone, addMailRy = mailRu)
+        generateLinks(expectedProfile, addVk = vk, addGmail = gmail, addPhone = phone, addMailRu = mailRu)
         profileRepository.save(expectedProfile)
         val request = generateCreateProfileRequest(expectedProfile)
 
@@ -337,7 +337,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         val now = Instant.now()
         val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        val linksDto = generateLinks(expectedProfile, addPhone = phone, addVk = vk, addMailRy = mailRu, addGmail = gmail)
+        val linksDto = generateLinks(expectedProfile, addPhone = phone, addVk = vk, addMailRu = mailRu, addGmail = gmail)
         profileRepository.save(expectedProfile)
         val request = generateGetProfileByChannelRequest(linksDto, vk, gmail, phone, mailRu)
 

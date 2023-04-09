@@ -427,7 +427,7 @@ class ProfileServiceExternalTest : ProfileTest() {
         val addressId = PropsGenerator.generateLongId()
         val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addChat = true, addressId = addressId)
-        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = !phone, addVk = !vk, addGmail = !gmail, addMailRy = !mailRu)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = !phone, addVk = !vk, addGmail = !gmail, addMailRu = !mailRu)
         val id = profileRepository.save(expectedProfile).id
         val request = setSettingsRequest {
             address = generateAddress()
