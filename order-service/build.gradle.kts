@@ -27,6 +27,4 @@ dependencies {
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
 
-    //ен особо понятно, но если вынести зависимость в рутовый градлг, то падает
-    testImplementation("com.ninja-squad:springmockk:4.0.0")
 }
