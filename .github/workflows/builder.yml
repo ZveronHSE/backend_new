@@ -72,6 +72,11 @@ jobs:
             dockerfile: push_notification/Dockerfile
             image: ghcr.io/zveronhse/push_notification:latest
 
+          - name: Service management service
+            env: service-management-service
+            dockerfile: service-management-service/Dockerfile
+            image: ghcr.io/zveronhse/service-management-service:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
