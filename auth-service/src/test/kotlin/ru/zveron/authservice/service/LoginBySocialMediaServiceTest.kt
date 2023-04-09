@@ -39,10 +39,9 @@ class LoginBySocialMediaServiceTest {
     )
 
     @Test
-    fun `given login by social request, when userId mmatches and profile doesnt exist, then register new profile`() {
+    fun `given login by social request, when userId matches and profile doesnt exist, then register new profile`() {
         //prepare data
         val request = testLoginBySocialMediaRequest()
-
 
         //prepare env
         coEvery { gmailProvider.getUserInfo(any()) } returns testThirdPartyUserInfo()

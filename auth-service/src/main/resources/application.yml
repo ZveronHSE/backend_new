@@ -91,6 +91,8 @@ third-party:
   providers:
     gmail:
       host: https://www.googleapis.com
+    mailru:
+      host: https://oauth.mail.ru
 
 logging:
   level:

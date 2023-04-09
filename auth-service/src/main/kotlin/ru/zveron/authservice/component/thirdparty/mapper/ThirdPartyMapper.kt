@@ -8,6 +8,6 @@ object ThirdPartyMapper {
         firstName = userInfo.firstName ?: "user",
         lastName = userInfo.lastName ?: userInfo.providerUserId,
         userId = userInfo.providerUserId,
-        email = userInfo.email,
+        email = userInfo.email ?: "",
     )
 }

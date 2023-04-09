@@ -37,7 +37,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         val userInfo = testUserInfoGoogle()
 
         //prepare env
-        ThirdPartyStubs.serverStubForGoogleGetUserInfo(userInfo)
+        ThirdPartyStubs.serverStubForUserGetInfo(userInfo, GmailProvider.GET_USER_INFO_PATH)
 
         //when
         val response = runBlocking {
@@ -63,7 +63,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
             .toUri()
 
         //prepare env
-        ThirdPartyStubs.serverStubForGoogleGetUserInfoFail(HttpStatus.INTERNAL_SERVER_ERROR)
+        ThirdPartyStubs.serverStubUserInfoFail(HttpStatus.INTERNAL_SERVER_ERROR, GmailProvider.GET_USER_INFO_PATH)
 
         //when
         val response = runBlocking {
@@ -73,7 +73,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //then
         response.shouldNotBeNull()
         val responseAsGoogle = response as GetThirdPartyUserInfoFailure<UserInfoGoogle>
-        responseAsGoogle.getHttpStatusCode shouldBe HttpStatus.INTERNAL_SERVER_ERROR
+        responseAsGoogle.code shouldBe HttpStatus.INTERNAL_SERVER_ERROR
     }
 
     @Test
@@ -87,7 +87,7 @@ class ThirdPartyClientTest : BaseWiremockTest() {
             .toUri()
 
         //prepare env
-        ThirdPartyStubs.serverStubForGoogleGetUserInfoFail(HttpStatus.BAD_REQUEST)
+        ThirdPartyStubs.serverStubUserInfoFail(HttpStatus.BAD_REQUEST, GmailProvider.GET_USER_INFO_PATH)
 
         //when
         val response = runBlocking {
@@ -97,6 +97,6 @@ class ThirdPartyClientTest : BaseWiremockTest() {
         //then
         response.shouldNotBeNull()
         val responseAsGoogle = response as GetThirdPartyUserInfoFailure<UserInfoGoogle>
-        responseAsGoogle.getHttpStatusCode shouldBe HttpStatus.BAD_REQUEST
+        responseAsGoogle.code shouldBe HttpStatus.BAD_REQUEST
     }
 }

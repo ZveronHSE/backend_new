@@ -36,7 +36,6 @@ class LoginBySocialMediaService(
 
         val profileId: Long = when (response) {
             is ProfileFound -> response.id
-
             ProfileNotFound -> registerNewProfile(request.providerType, userInfo)
 
             is FindProfileUnknownFailure -> throw AuthException(response.message, response.code, response.metadata)
@@ -55,7 +54,6 @@ class LoginBySocialMediaService(
 
         return when (response) {
             is RegisterProfileSuccess -> response.profileId
-            //if account already exists, then we simply find its id and log in
             is RegisterProfileAlreadyExists -> error("Profile not found by social media, but already exists for $userInfo")
 
             is RegisterProfileFailure -> throw RegistrationException(

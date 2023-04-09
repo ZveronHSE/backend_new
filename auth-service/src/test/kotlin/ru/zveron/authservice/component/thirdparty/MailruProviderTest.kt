@@ -2,15 +2,19 @@ package ru.zveron.authservice.component.thirdparty
 
 import io.kotest.assertions.asClue
 import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import org.springframework.http.HttpStatus
 import ru.zveron.authservice.config.ThirdPartyProviderProperties
+import ru.zveron.authservice.exception.SocialMediaException
 import ru.zveron.authservice.util.randomAccessToken
 import ru.zveron.authservice.util.testUserInfoMailru
 import ru.zveron.authservice.webclient.thirdparty.ThirdPartyClient
+import ru.zveron.authservice.webclient.thirdparty.model.GetThirdPartyUserInfoFailure
 import ru.zveron.authservice.webclient.thirdparty.model.GetThirdPartyUserInfoSuccess
 import ru.zveron.authservice.webclient.thirdparty.model.UserInfoMailru
 
@@ -46,6 +50,27 @@ class MailruProviderTest {
             it.userId shouldBe userInfo.providerUserId
             it.email shouldBe userInfo.email
         }
+    }
 
+    @Test
+    fun `given access token in request, when client responds with failure, then throw exception`() {
+        //prep data
+        val accessToken = randomAccessToken().token
+
+        //prep env
+        coEvery {
+            client.getUserInfo<UserInfoMailru>(
+                any(),
+                any()
+            )
+        } returns GetThirdPartyUserInfoFailure(HttpStatus.BAD_REQUEST, "something went wrong")
+
+        //when
+        runBlocking {
+            //then
+            shouldThrow<SocialMediaException> {
+                provider.getUserInfo(accessToken)
+            }
+        }
     }
 }

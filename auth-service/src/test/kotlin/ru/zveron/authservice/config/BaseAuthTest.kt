@@ -16,8 +16,8 @@ import ru.zveron.authservice.cron.StateContextCronScheduler
 import ru.zveron.authservice.grpc.client.ProfileServiceClient
 import ru.zveron.authservice.webclient.notifier.NotifierClient
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class BaseAuthTest : ContainerConfigurer() {
 

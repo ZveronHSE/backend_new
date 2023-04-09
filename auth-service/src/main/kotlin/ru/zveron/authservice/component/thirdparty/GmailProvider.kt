@@ -30,7 +30,7 @@ class GmailProvider(
     override val providerType: ThirdPartyProviderType = ThirdPartyProviderType.GMAIL
 
     override suspend fun getUserInfo(accessToken: String): ThirdPartyUserInfo {
-        val uri = buildGetUserInfoUrl(props.host + MailruProvider.GET_USER_INFO_PATH, accessToken)
+        val uri = buildGetUserInfoUrl(props.host + GET_USER_INFO_PATH, accessToken)
             .also { logger.debug(append("uri", it)) { "Get user info request" } }
 
         return when (val response = client.getUserInfo(uri, UserInfoGoogle::class.java)) {

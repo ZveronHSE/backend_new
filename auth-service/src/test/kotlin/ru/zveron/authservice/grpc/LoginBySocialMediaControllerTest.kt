@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.authservice.component.jwt.JwtDecoder
+import ru.zveron.authservice.component.thirdparty.GmailProvider
 import ru.zveron.authservice.config.BaseAuthTest
 import ru.zveron.authservice.grpc.client.model.ProfileFound
 import ru.zveron.authservice.grpc.client.model.ProfileNotFound
@@ -29,7 +30,7 @@ class LoginBySocialMediaControllerTest : BaseAuthTest() {
         val profileId = randomId()
         val providerUserId = randomId()
         val googleUserInfo = testUserInfoGoogle().copy(
-            sub = providerUserId.toString()
+            providerUserId = providerUserId.toString()
         )
         val request = testLoginBySocialGrpcRequest()
 
@@ -37,7 +38,7 @@ class LoginBySocialMediaControllerTest : BaseAuthTest() {
         coEvery { profileClient.findProfileBySocialMedia(any(), any()) } returns ProfileNotFound
         coEvery { profileClient.registerProfileBySocialMedia(any()) } returns RegisterProfileSuccess(profileId)
 
-        ThirdPartyStubs.serverStubForGoogleGetUserInfo(googleUserInfo)
+        ThirdPartyStubs.serverStubForUserGetInfo(googleUserInfo, GmailProvider.GET_USER_INFO_PATH)
 
         //when
         val response = runBlocking {
@@ -58,15 +59,16 @@ class LoginBySocialMediaControllerTest : BaseAuthTest() {
         val profileId = randomId()
         val providerUserId = randomId()
         val googleUserInfo = testUserInfoGoogle().copy(
-            sub = providerUserId.toString()
+            providerUserId = providerUserId.toString()
         )
-        val profile = ProfileFound(id = profileId, name = googleUserInfo.name, surname = googleUserInfo.family_name)
+        val profile =
+            ProfileFound(id = profileId, name = googleUserInfo.firstName!!, surname = googleUserInfo.lastName!!)
         val request = testLoginBySocialGrpcRequest()
 
         //prep env
         coEvery { profileClient.findProfileBySocialMedia(any(), any()) } returns profile
 
-        ThirdPartyStubs.serverStubForGoogleGetUserInfo(googleUserInfo)
+        ThirdPartyStubs.serverStubForUserGetInfo(googleUserInfo, GmailProvider.GET_USER_INFO_PATH)
 
         //when
         val response = runBlocking {

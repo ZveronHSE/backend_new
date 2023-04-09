@@ -27,3 +27,5 @@ third-party:
   providers:
     gmail:
       host: http://localhost:${wiremock.server.port}
+    mailru:
+      host: http://localhost:${wiremock.server.port}

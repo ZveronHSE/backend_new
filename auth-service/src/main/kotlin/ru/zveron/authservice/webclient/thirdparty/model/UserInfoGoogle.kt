@@ -6,19 +6,19 @@ data class UserInfoGoogle(
     @JsonAlias("sub")
     override val providerUserId: String,
 
-    @JsonAlias("family_name")
+    @JsonAlias("name")
     override val firstName: String?,
 
-    @JsonAlias("name")
-    override val lastName: String,
+    @JsonAlias("family_name")
+    override val lastName: String?,
 
-    override val picture: String,
+    override val picture: String?,
 
-    override val email: String,
+    override val email: String?,
 
     val email_verified: Boolean,
-    val given_name: String,
-    val locale: String,
+    val given_name: String?,
+    val locale: String?,
 ) : UserInfo(
     providerUserId = providerUserId,
     firstName = firstName,

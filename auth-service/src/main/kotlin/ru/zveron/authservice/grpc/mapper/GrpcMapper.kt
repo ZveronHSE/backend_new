@@ -31,6 +31,7 @@ import ru.zveron.contract.profile.createProfileRequest
 import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.contract.profile.model.gmail
 import ru.zveron.contract.profile.model.links
+import ru.zveron.contract.profile.model.mailru
 import ru.zveron.contract.profile.model.phone
 import ru.zveron.contract.profile.model.vk
 import java.time.Instant
@@ -108,6 +109,7 @@ object GrpcMapper {
     fun RegisterBySocialMediaRequest.toClientRequest() = createProfileRequest {
         name = userInfo.firstName
         surname = userInfo.lastName
+        imageUrl = userInfo.imageUrl
         links = links {
             when (provider) {
                 ThirdPartyProviderType.VK -> vk {
@@ -121,8 +123,10 @@ object GrpcMapper {
                     email = userInfo.email ?: ""
                 }
 
-                //TODO: add mailru provider
-                else -> {}
+                ThirdPartyProviderType.MAILRU -> mailru {
+                    id = userInfo.userId
+                    email = userInfo.email ?: ""
+                }
             }
         }
 
@@ -131,6 +135,7 @@ object GrpcMapper {
     fun ThirdPartyProviderType.toProfileClientType() = when (this) {
         ThirdPartyProviderType.GMAIL -> ChannelType.GOOGLE
         ThirdPartyProviderType.VK -> ChannelType.VK
+        ThirdPartyProviderType.MAILRU -> ChannelType.MAILRU
     }
 
     private fun AuthProvider.toServiceProvider() = when (this) {

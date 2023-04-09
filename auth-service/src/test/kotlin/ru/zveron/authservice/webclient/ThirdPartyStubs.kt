@@ -2,13 +2,12 @@ package ru.zveron.authservice.webclient
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import org.springframework.http.HttpStatus
-import ru.zveron.authservice.component.thirdparty.GmailProvider
 import ru.zveron.authservice.util.withJsonDto
 
 object ThirdPartyStubs {
-    fun <T : Any> serverStubForGoogleGetUserInfo(result: T) {
+    fun <T : Any> serverStubForUserGetInfo(result: T, path: String) {
         WireMock.stubFor(
-            WireMock.get(WireMock.urlPathMatching(".*${GmailProvider.GET_USER_INFO_PATH}"))
+            WireMock.get(WireMock.urlPathMatching(".*$path"))
                 .willReturn(
                     WireMock.aResponse()
                         .withStatus(HttpStatus.OK.value())
@@ -17,9 +16,9 @@ object ThirdPartyStubs {
         )
     }
 
-    fun serverStubForGoogleGetUserInfoFail(status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR) {
+    fun serverStubUserInfoFail(status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR, path: String) {
         WireMock.stubFor(
-            WireMock.get(WireMock.urlPathMatching(".*${GmailProvider.GET_USER_INFO_PATH}"))
+            WireMock.get(WireMock.urlPathMatching(".*$path"))
                 .willReturn(
                     WireMock.aResponse()
                         .withStatus(status.value())
