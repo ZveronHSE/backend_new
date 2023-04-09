@@ -9,12 +9,13 @@ CREATE TYPE service_delivery_type AS ENUM ('REMOTE', 'IN_PERSON');
 
 CREATE TABLE IF NOT EXISTS "order"
 (
-    id                    INT                   NOT NULL,
-    profile_id            INT                   NOT NULL,
-    pet_id                INT                   NOT NULL,
-    price                 DECIMAL(10, 2)        NOT NULL,
-    address_id            INT,
+    id                    BIGINT                   NOT NULL,
+    profile_id            BIGINT                   NOT NULL,
+    pet_id                BIGINT                   NOT NULL,
+    price                 VARCHAR(20)        NOT NULL,
+    address_id            BIGINT,
     title                 VARCHAR(255)          NOT NULL,
+    description           VARCHAR(255)          NOT NULL,
     service_date_from     DATE                  NOT NULL,
     service_date_to       DATE,
     service_time          TIME,
@@ -23,4 +24,3 @@ CREATE TABLE IF NOT EXISTS "order"
     service_delivery_type service_delivery_type NOT NULL,
     PRIMARY KEY (id)
 );
-
