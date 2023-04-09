@@ -93,3 +93,16 @@ databaseChangeLog:
                   quotchar: '"'
                   separator: ','
                   tableName: method_metadata
+
+  - changeSet:
+      id: mock_order_service
+      author: Schuyweiz
+      changes:
+        - loadUpdateData:
+            encoding: UTF-8
+            file: order_service_init.csv
+            primaryKey: alias
+            relativeToChangelogFile: true
+            quotchar: '"'
+            separator: ','
+            tableName: method_metadata
