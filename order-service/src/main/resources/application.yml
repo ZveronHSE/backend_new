@@ -1,0 +1,46 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:db/master.yaml
+    url: jdbc:postgresql://localhost:5555/order
+    user: zveron_user
+    password: zveron_password
+  datasource:
+    url: jdbc:postgresql://localhost:5555/order
+    password: zveron_password
+    username: zveron_user
+  main:
+    banner-mode: off
+    web-application-type: reactive
+  application:
+    name: order-service
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5555/order
+    username: zveron_user
+    password: zveron_password
+    pool:
+      enabled: true
+
+  netty:
+    leak-detection: advanced
+  jpa:
+    show-sql: true
+
+eureka:
+  client:
+    enabled: true
+    webclient:
+      enabled: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: false
+  instance:
+    prefer-ip-address: true
+management:
+  endpoint:
+    serviceregistry:
+      enabled: true
+grpc:
+  server:
+    port: 9092

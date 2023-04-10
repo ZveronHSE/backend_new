@@ -72,6 +72,11 @@ jobs:
             dockerfile: push_notification/Dockerfile
             image: ghcr.io/zveronhse/push_notification:latest
 
+          - name: Order service
+            env: order-service
+            dockerfile: order-service/Dockerfile
+            image: ghcr.io/zveronhse/order-service:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3

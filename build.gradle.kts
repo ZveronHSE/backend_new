@@ -65,9 +65,7 @@ subprojects {
                 (org.yaml.snakeyaml.Yaml().load(it) as Map<*, *>)
             }
         } catch (ex: Exception) {
-            throw IllegalArgumentException(
-                "в проекте по пути $projectDir не хватает файла или настроек datasource в файле $pathToApplicationYml"
-            )
+            throw IllegalArgumentException("message=${ex.message}")
         }
 
         try {
