@@ -2,12 +2,17 @@ package ru.zveron.apigateway.grpc.service
 
 import com.google.protobuf.Descriptors
 import com.google.protobuf.DynamicMessage
+import com.google.protobuf.kotlin.toByteStringUtf8
+import com.google.protobuf.util.JsonFormat
 import io.grpc.ManagedChannel
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.kotlin.ClientCalls
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.transform
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.keyValue
 import net.logstash.logback.argument.StructuredArguments.value
@@ -19,6 +24,7 @@ import ru.zveron.apigateway.component.ProtoDefinitionRegistry
 import ru.zveron.apigateway.component.model.ResolveForRoleRequest
 import ru.zveron.apigateway.exception.ApiGatewayException
 import ru.zveron.apigateway.grpc.ApiGatewayMapper.toScope
+import ru.zveron.apigateway.grpc.ApiGatewayMapper.toServiceRequest
 import ru.zveron.apigateway.grpc.context.AuthenticationContext
 import ru.zveron.apigateway.grpc.service.dto.GatewayServiceRequest
 import ru.zveron.apigateway.persistence.constant.AccessScope
@@ -28,6 +34,9 @@ import ru.zveron.apigateway.utils.DescriptorsUtil.dynamicMessageBuilder
 import ru.zveron.apigateway.utils.DescriptorsUtil.getGrpcMethodDescriptor
 import ru.zveron.apigateway.utils.DescriptorsUtil.getMethodDescriptor
 import ru.zveron.apigateway.utils.LogstashHelper.toJson
+import ru.zveron.contract.apigateway.ApiGatewayRequest
+import ru.zveron.contract.apigateway.ApigatewayResponse
+import ru.zveron.contract.apigateway.apigatewayResponse
 
 @Service
 class ApiGatewayService(
@@ -40,6 +49,8 @@ class ApiGatewayService(
     companion object : KLogging() {
         private val profileIdKey = Metadata.Key.of("profile_id", Metadata.ASCII_STRING_MARSHALLER)
         private val accessTokenKey = Metadata.Key.of("access_token", Metadata.ASCII_STRING_MARSHALLER)
+
+        private const val BIDI_CHAT_ROUTE_ALIAS = "bidiChatRoute"
     }
 
     suspend fun handleGatewayCall(request: GatewayServiceRequest): DynamicMessage {
@@ -85,6 +96,42 @@ class ApiGatewayService(
         )
     }
 
+    fun handleBidiStream(requests: Flow<ApiGatewayRequest>): Flow<ApigatewayResponse> = flow {
+        logger.debug("Requesting method metadata for {}", value("alias", BIDI_CHAT_ROUTE_ALIAS))
+        val profileId = verifyUserAccess(AccessScope.BUYER).also {
+            logger.debug(
+                "User in context has {}",
+                keyValue("profileId", it)
+            )
+        }
+        val accessToken = AuthenticationContext.accessToken()
+        val metadata = methodMetadataRepository.findByAlias(BIDI_CHAT_ROUTE_ALIAS)!!
+
+        val streamChannel = managedChannelRegistry.getChannel(metadata.serviceName)
+        val protoMethodDescriptor = getProtoMethodDescriptor(metadata)
+        val bidiGrpcMethodDescriptor =
+            protoMethodDescriptor.getGrpcMethodDescriptor(MethodDescriptor.MethodType.BIDI_STREAMING)
+
+        val grpcMessages = requests.transform {
+            emit(protoMethodDescriptor.dynamicMessageBuilder(it.toServiceRequest().requestBody)?.build())
+        }
+
+        tryToStream(
+            streamChannel,
+            bidiGrpcMethodDescriptor,
+            grpcMessages,
+            Metadata().apply {
+                profileId?.let { this.put(profileIdKey, it.toString()) }
+                accessToken?.let { this.put(accessTokenKey, accessToken) }
+            }
+        ).collect { message ->
+            logger.debug(append("response", message)) { "Stream response" }
+            emit(apigatewayResponse {
+                this.responseBody = JsonFormat.printer().print(message).toByteStringUtf8()
+            })
+        }
+    }
+
     private suspend fun tryToCallService(
         channel: ManagedChannel,
         grpcMethodDescriptor: MethodDescriptor<DynamicMessage?, DynamicMessage>,
@@ -108,6 +155,34 @@ class ApiGatewayService(
     } catch (e: Exception) {
         logger.warn(
             append("method", grpcMethodDescriptor.fullMethodName).and(append("message", grpcMessage?.toJson())),
+            "Request failed"
+        )
+
+        throw e
+    }
+
+    private fun tryToStream(
+        streamChannel: ManagedChannel,
+        bidiGrpcMethodDescriptor: MethodDescriptor<DynamicMessage?, DynamicMessage>,
+        grpcMessages: Flow<DynamicMessage?>,
+        metadata: Metadata,
+    ): Flow<DynamicMessage> = try {
+        ClientCalls.bidiStreamingRpc(
+            streamChannel,
+            bidiGrpcMethodDescriptor,
+            grpcMessages,
+            headers = metadata,
+        )
+    } catch (ex: StatusException) {
+        logger.warn(
+            "Response to {} failed. {}",
+            keyValue("method", bidiGrpcMethodDescriptor.fullMethodName),
+            keyValue("code", ex.status.code)
+        )
+        throw ex
+    } catch (e: Exception) {
+        logger.warn(
+            append("method", bidiGrpcMethodDescriptor.fullMethodName),
             "Request failed"
         )
 

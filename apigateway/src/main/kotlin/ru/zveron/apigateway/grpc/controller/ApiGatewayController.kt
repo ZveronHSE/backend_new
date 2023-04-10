@@ -2,6 +2,7 @@ package ru.zveron.apigateway.grpc.controller
 
 import com.google.protobuf.kotlin.toByteStringUtf8
 import com.google.protobuf.util.JsonFormat
+import kotlinx.coroutines.flow.Flow
 import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
 import net.logstash.logback.marker.Markers.append
@@ -27,5 +28,11 @@ class ApiGatewayController(
         return apigatewayResponse {
             this.responseBody = JsonFormat.printer().print(response).toByteStringUtf8()
         }
+    }
+
+    override fun bidiStreamApiGateway(requests: Flow<ApiGatewayRequest>): Flow<ApigatewayResponse> {
+        logger.debug { "Calling service gateway bidirectional stream handler" }
+
+        return service.handleBidiStream(requests)
     }
 }
