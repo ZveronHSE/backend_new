@@ -9,11 +9,11 @@ import java.util.UUID
 interface MessageRepository : CoroutineCrudRepository<Message, String> {
 
     @Query("SELECT * FROM message WHERE chat_id = ?0 AND id = ?1")
-    suspend fun findExact(chatId: UUID, messageId: UUID): Message?
+    suspend fun findByChatIdAndId(chatId: UUID, messageId: UUID): Message?
 
     @Query("SELECT * FROM message WHERE chat_id = ?0 LIMIT ?1")
     fun getChatRecentMessages(chatId: UUID, pageSize: Int): Flow<Message>
 
     @Query("SELECT * FROM message WHERE chat_id = ?0 AND id < ?1 LIMIT ?2")
-    fun getChatRecentMessages(chatId: UUID, before: UUID, pageSize: Int): Flow<Message>
+    fun getChatMessagesBefore(chatId: UUID, before: UUID, pageSize: Int): Flow<Message>
 }

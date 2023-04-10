@@ -31,7 +31,13 @@ object ChatGenerator {
         reviewId = reviewId,
     )
 
-    fun generateChatResponse(chat: Chat, profileSummary: ProfileSummary, lots: List<Lot>, messages: List<Message>) = chat {
+    fun generateChatResponse(
+        chat: Chat,
+        profileSummary: ProfileSummary,
+        lots: List<Lot>,
+        messages: List<Message>,
+        isBlocked: Boolean = false
+    ) = chat {
         chatId = chat.chatId.toString()
         unreadMessages = chat.unreadMessages
         serviceId = chat.serviceId ?: 0L
@@ -41,5 +47,7 @@ object ChatGenerator {
         interlocutorSummary = profileSummary
         this.lots.addAll(lots)
         this.messages.addAll(messages)
+
+        this.isBlocked = isBlocked
     }
 }

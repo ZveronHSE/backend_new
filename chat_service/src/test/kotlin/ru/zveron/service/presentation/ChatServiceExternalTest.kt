@@ -2,7 +2,6 @@ package ru.zveron.service.presentation
 
 import app.cash.turbine.testIn
 import com.datastax.oss.driver.api.core.uuid.Uuids
-import com.ninjasquad.springmockk.MockkBean
 import io.grpc.Status
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -15,17 +14,16 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.ChatServiceApplicationTest
-import ru.zveron.client.blacklist.BlacklistClient
-import ru.zveron.client.lot.LotClient
-import ru.zveron.client.profile.ProfileClient
 import ru.zveron.common.assertion.ChatAssertions.newChatShouldBe
 import ru.zveron.common.assertion.MessageAssertions.messageShouldBe
 import ru.zveron.common.generator.LotGenerator
 import ru.zveron.common.generator.MessageGenerator.generateMessage
 import ru.zveron.common.generator.PrimitivesGenerator
 import ru.zveron.common.generator.ProfileSummaryGenerator
+import ru.zveron.contract.chat.ArticleType
 import ru.zveron.contract.chat.ChatRouteRequest
 import ru.zveron.contract.chat.ChatRouteResponse
+import ru.zveron.contract.chat.article
 import ru.zveron.contract.chat.chatRouteRequest
 import ru.zveron.contract.chat.chatRouteResponse
 import ru.zveron.contract.chat.model.MessageType
@@ -39,7 +37,8 @@ import ru.zveron.mapper.ChatMapper.toChatSummary
 import ru.zveron.mapper.MessageMapper.messageToResponse
 import ru.zveron.repository.ChatRepository
 import ru.zveron.repository.MessageRepository
-import ru.zveron.service.application.ChatPersistenceService
+import ru.zveron.component.ChatPersistence
+import ru.zveron.model.dao.ChatRequestContext
 
 class ChatServiceExternalTest : ChatServiceApplicationTest() {
 
@@ -53,16 +52,7 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
     lateinit var chatServiceExternal: ChatServiceExternal
 
     @Autowired
-    lateinit var chatPersistenceService: ChatPersistenceService
-
-    @MockkBean
-    lateinit var profileClient: ProfileClient
-
-    @MockkBean
-    lateinit var lotClient: LotClient
-
-    @MockkBean
-    lateinit var blacklistClient: BlacklistClient
+    lateinit var chatPersistence: ChatPersistence
 
     @Test
     fun bidiChatRoute() {
@@ -72,6 +62,7 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
         val message1 = PrimitivesGenerator.generateString(30)
         val message2 = PrimitivesGenerator.generateString(30)
         val backgroundScope = CoroutineScope(MetadataElement(Metadata(user1)))
+        val dummyContext = ChatRequestContext(Uuids.timeBased(), user2)
 
         coEvery {
             profileClient.getProfilesSummary(listOf(user2))
@@ -89,7 +80,10 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
             inputFlow.send(chatRouteRequest {
                 startChat = startChatRequest {
                     interlocutorId = user2
-                    lotId = lot1
+                    article = article {
+                        id = lot1
+                        type = ArticleType.LOT
+                    }
                     text = message1
                 }
             })
@@ -108,13 +102,14 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
             })
             val message =
                 messageToResponse(messageRepository.save(generateMessage(chat1.chatId, Uuids.timeBased(), user2)))
-            chatPersistenceService.sendMessageToConnection(
+            chatPersistence.sendMessageToConnection(
                 user1,
                 chatRouteResponse {
                     receiveMessage = receiveMessage {
                         this.message = message
                     }
                 },
+                dummyContext,
             )
             inputFlow.close()
             testedFlow.awaitItem().apply {

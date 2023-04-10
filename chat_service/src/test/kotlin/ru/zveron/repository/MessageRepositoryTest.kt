@@ -42,7 +42,7 @@ class MessageRepositoryTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun `getChatRecentMessages with pagination`() {
+    fun getChatMessagesBefore() {
         val (chatId1, chatId2, chatId3) = generateNUuids(3)
         val (msg1, msg2, msg3, msg4, msg5) = generateNTimeUuids(5)
         val (sender1, sender2, sender3) = generateLongs(3)
@@ -57,7 +57,7 @@ class MessageRepositoryTest : ChatServiceApplicationTest() {
             messageRepository.save(generateMessage(chatId2, msg4, sender2))
             messageRepository.save(generateMessage(chatId3, msg5, sender3))
 
-            messageRepository.getChatRecentMessages(chatId1, msg3, 2).toList().apply {
+            messageRepository.getChatMessagesBefore(chatId1, msg3, 2).toList().apply {
                 size shouldBe 2
                 first() messageShouldBe targetMessage2
                 component2() messageShouldBe targetMessage1

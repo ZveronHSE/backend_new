@@ -11,20 +11,17 @@ import java.util.UUID
 
 interface ChatRepository : CoroutineCrudRepository<Chat, Long> {
 
-    @Query("SELECT * FROM chat WHERE profile_id = ?0 AND chat_id = ?1")
-    suspend fun findExact(userId: Long, chatId: UUID): Chat?
-
-    @Query("SELECT count(*) FROM chat WHERE profile_id = ?0 AND chat_id = ?1")
-    suspend fun exists(userId: Long, chatId: UUID): Long
+    suspend fun findByProfileIdAndChatId(profileId: Long, chatId: UUID): Chat?
+    suspend fun existsByProfileIdAndChatId(profileId: Long, chatId: UUID): Boolean
 
     @Query("SELECT another_profile_id FROM chat where profile_id = ?0 AND chat_id = ?1")
-    suspend fun getInterlocutorId(userId: Long, chatId: UUID): Long?
+    suspend fun getInterlocutorId(profileId: Long, chatId: UUID): Long?
 
     @Query("SELECT * FROM chat WHERE profile_id = ?0 LIMIT 500000")
-    fun findAllByProfileId(userId: Long): Flow<Chat>
+    fun findAllByProfileId(profileId: Long): Flow<Chat>
 
     @Query("SELECT * FROM chat WHERE profile_id = ?0 AND last_update < ?1 LIMIT 500000 ALLOW FILTERING")
-    fun findAllByProfileIdBeforeTimestamp(userId: Long, timestamp: Instant): Flow<Chat>
+    fun findAllByProfileIdBeforeTimestamp(profileId: Long, timestamp: Instant): Flow<Chat>
 
     @Query("""
         BEGIN BATCH
@@ -32,7 +29,7 @@ interface ChatRepository : CoroutineCrudRepository<Chat, Long> {
         UPDATE chat SET lots_ids = lots_ids + { ?0 } WHERE profile_id = ?2 AND chat_id = ?3
         APPLY BATCH
     """)
-    suspend fun attachLot(lotId: Long, firstUserId: Long, secondUSerId: Long, chatId: UUID)
+    suspend fun attachLot(lotId: Long, firstProfileId: Long, secondProfileId: Long, chatId: UUID)
 
     @Query("""
         BEGIN BATCH
@@ -40,7 +37,7 @@ interface ChatRepository : CoroutineCrudRepository<Chat, Long> {
         UPDATE chat SET lots_ids = lots_ids - { ?0 } WHERE profile_id = ?2 AND chat_id = ?3
         APPLY BATCH
     """)
-    suspend fun detachLot(lotId: Long, firstUserId: Long, secondUSerId: Long, chatId: UUID)
+    suspend fun detachLot(lotId: Long, firstProfileId: Long, secondProfileId: Long, chatId: UUID)
 
     @Query(
         """

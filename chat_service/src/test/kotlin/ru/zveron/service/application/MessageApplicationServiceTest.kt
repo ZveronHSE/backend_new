@@ -1,6 +1,5 @@
 package ru.zveron.service.application
 
-import com.ninjasquad.springmockk.MockkBean
 import io.grpc.Status
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
@@ -13,7 +12,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.ChatServiceApplicationTest
-import ru.zveron.client.blacklist.BlacklistClient
 import ru.zveron.common.assertion.MessageAssertions.responseShouldBe
 import ru.zveron.common.generator.ChatGenerator
 import ru.zveron.common.generator.MessageGenerator
@@ -45,9 +43,6 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
 
     @Autowired
     lateinit var messageApplicationService: MessageApplicationService
-
-    @MockkBean
-    lateinit var blacklistClient: BlacklistClient
 
     @Test
     fun getRecentMessagesByChat() {

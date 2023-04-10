@@ -1,8 +1,8 @@
-package ru.zveron.service.domain
+package ru.zveron.component
 
 import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import ru.zveron.contract.chat.model.ChatPagination
 import ru.zveron.mapper.ProtoTypesMapper.toInstant
 import ru.zveron.model.constant.ChatStatus
@@ -12,23 +12,22 @@ import ru.zveron.repository.ChatRepository
 import java.time.Instant
 import java.util.UUID
 
-@Service
-class ChatDomainService(private val repository: ChatRepository) {
+@Component
+class ChatStorage(private val repository: ChatRepository) {
 
     @Value("\${service.persistence.chat.pagination-size}")
     var paginationSize: Int = 0
 
-    suspend fun findExact(profileId: Long, chatId: UUID) = repository.findExact(profileId, chatId)
+    suspend fun findExact(profileId: Long, chatId: UUID) = repository.findByProfileIdAndChatId(profileId, chatId)
 
-    suspend fun chatExists(profileId: Long, chatId: UUID) = repository.exists(profileId, chatId) == 1L
+    suspend fun chatExists(profileId: Long, chatId: UUID) = repository.existsByProfileIdAndChatId(profileId, chatId)
 
     suspend fun getRecentChats(
         profileId: Long,
         pagination: ChatPagination,
     ): List<Chat> {
-        var limit = paginationSize
-        val chats = if (pagination.hasTimeBefore() && pagination.hasSize()) {
-            limit = pagination.size
+        val limit = pagination.takeIf { it.hasSize() }?.size ?: paginationSize
+        val chats = if (pagination.hasTimeBefore()) {
             repository.findAllByProfileIdBeforeTimestamp(profileId, pagination.timeBefore.toInstant())
         } else {
             repository.findAllByProfileId(profileId)

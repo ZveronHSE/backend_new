@@ -2,8 +2,6 @@ package ru.zveron.common.assertion
 
 import io.kotest.matchers.equality.shouldBeEqualToIgnoringFields
 import io.kotest.matchers.shouldBe
-import ru.zveron.common.assertion.ChatAssertions.lotShouldBe
-import ru.zveron.common.assertion.ChatAssertions.profileShouldBe
 import ru.zveron.common.assertion.MessageAssertions.messageShouldBe
 import ru.zveron.common.assertion.ProtoDataTypesAssertions.timestampShouldBe
 import ru.zveron.contract.chat.GetRecentChatsResponse
@@ -11,7 +9,6 @@ import ru.zveron.contract.chat.ReceiveChatSummary
 import ru.zveron.contract.chat.model.ChatFolder
 import ru.zveron.contract.chat.model.ProfileSummary
 import ru.zveron.contract.core.Lot
-import ru.zveron.mapper.ChatMapper.toChatSummary
 import ru.zveron.model.entity.Chat
 import java.time.temporal.ChronoUnit
 
@@ -37,6 +34,8 @@ object ChatAssertions {
             message messageShouldBe expected.messagesList[index]
         }
         folder shouldBe expected.folder
+
+        isBlocked shouldBe expected.isBlocked
     }
 
     infix fun Lot.lotShouldBe(expected: Lot) {
