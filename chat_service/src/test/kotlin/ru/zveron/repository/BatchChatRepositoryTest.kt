@@ -32,9 +32,9 @@ class BatchChatRepositoryTest: ChatServiceApplicationTest() {
 
             batchChatRepository.markMessagesAsRead(chat1.chatId, listOf(msg1, msg2, msg3))
 
-            messageRepository.findExact(chat1.chatId, msg1)!!.isRead shouldBe true
-            messageRepository.findExact(chat1.chatId, msg2)!!.isRead shouldBe true
-            messageRepository.findExact(chat1.chatId, msg3)!!.isRead shouldBe true
+            messageRepository.findByChatIdAndId(chat1.chatId, msg1)!!.isRead shouldBe true
+            messageRepository.findByChatIdAndId(chat1.chatId, msg2)!!.isRead shouldBe true
+            messageRepository.findByChatIdAndId(chat1.chatId, msg3)!!.isRead shouldBe true
         }
     }
 }

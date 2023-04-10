@@ -4,10 +4,10 @@ import com.datastax.oss.driver.api.core.CqlSession
 import com.datastax.oss.driver.api.core.cql.BatchStatement
 import com.datastax.oss.driver.api.core.cql.BatchType
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Repository
 import java.util.*
 
-@Service
+@Repository
 class BatchChatRepository {
 
     private val updateMessagesStatusQuery = "UPDATE message SET is_read = true WHERE chat_id = :chat_id AND id = :id;"

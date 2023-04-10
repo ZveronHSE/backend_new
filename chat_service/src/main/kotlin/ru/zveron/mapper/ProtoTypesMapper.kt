@@ -3,6 +3,7 @@ package ru.zveron.mapper
 import com.google.protobuf.Timestamp
 import com.google.protobuf.timestamp
 import ru.zveron.exception.InvalidParamChatException
+import ru.zveron.model.dao.ChatRequestContext
 import java.lang.IllegalArgumentException
 import java.time.Instant
 import java.util.*
@@ -17,10 +18,10 @@ object ProtoTypesMapper {
         nanos = nano
     }
 
-    fun String.toUUID(): UUID =
+    fun String.toUUID(context: ChatRequestContext): UUID =
         try{
             UUID.fromString(this)
         } catch (e: IllegalArgumentException) {
-            throw InvalidParamChatException("Invalid argument: $this is not valid UUID")
+            throw InvalidParamChatException("Invalid argument: $this is not valid UUID", context)
         }
 }

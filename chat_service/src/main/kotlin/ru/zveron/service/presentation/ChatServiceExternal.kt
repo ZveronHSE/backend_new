@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transform
 import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
+import net.logstash.logback.argument.StructuredArguments.keyValue
 import ru.zveron.contract.chat.ChatRouteRequest
 import ru.zveron.contract.chat.ChatRouteResponse
 import ru.zveron.contract.chat.ChatServiceExternalGrpcKt
@@ -22,7 +23,7 @@ import ru.zveron.model.dao.MultipleConnectionsResponse
 import ru.zveron.model.dao.NoneConnectionResponse
 import ru.zveron.model.dao.SingleConnectionResponse
 import ru.zveron.service.application.ChatApplicationService
-import ru.zveron.service.application.ChatPersistenceService
+import ru.zveron.component.ChatPersistence
 import ru.zveron.service.application.MessageApplicationService
 import java.util.UUID
 import kotlin.coroutines.coroutineContext
@@ -30,7 +31,7 @@ import kotlin.coroutines.coroutineContext
 @GrpcService
 class ChatServiceExternal(
     private val chatApplicationService: ChatApplicationService,
-    private val chatPersistenceService: ChatPersistenceService,
+    private val chatPersistence: ChatPersistence,
     private val messageApplicationService: MessageApplicationService,
 ) : ChatServiceExternalGrpcKt.ChatServiceExternalCoroutineImplBase() {
 
@@ -47,22 +48,23 @@ class ChatServiceExternal(
                 connectionId,
                 GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
             )
-            chatPersistenceService.registerConnection(fixedNodeAddress, chatRequestContext.authorizedProfileId)
+            chatPersistence.registerConnection(fixedNodeAddress, chatRequestContext)
 
             val requestFlow = requests
                 .transform<ChatRouteRequest, ChatRouteResponse> {
-                    logger.info("Process request with type ${it.requestCase.name} for connection $connectionId")
+                    logger.info("Process request with type ${it.requestCase.name} {}", keyValue("connection-id", connectionId))
                     handleRequest(it, chatRequestContext)
                 }
                 .onCompletion {
-                    logger.info("Close connection $connectionId")
-                    chatPersistenceService.closeConnection(chatRequestContext.authorizedProfileId)
+                    logger.info("Close {}", keyValue("connection-id", connectionId))
+                    chatPersistence.closeConnection(chatRequestContext.authorizedProfileId, chatRequestContext)
                 }
             val responseFlow =
-                chatPersistenceService.getChannel(chatRequestContext.authorizedProfileId)?.receiveAsFlow()
+                chatPersistence.getChannel(chatRequestContext.authorizedProfileId)?.receiveAsFlow()
                     ?: throw ChatException(
                         Status.INTERNAL,
                         "Connection for user with id: ${chatRequestContext.authorizedProfileId} not found",
+                        chatRequestContext,
                     )
 
             merge(requestFlow, responseFlow).collect { emit(it) }
@@ -114,23 +116,25 @@ class ChatServiceExternal(
                 context
             )
 
-            else -> throw InvalidParamChatException("'request' property is not set")
+            else -> throw InvalidParamChatException("'request' property is not set", context)
         }
 
-        deliverResponse(response)
+        deliverResponse(response, context)
     }
 
-    private suspend fun deliverResponse(response: ChatRouteResponseWrapper) {
+    private suspend fun deliverResponse(response: ChatRouteResponseWrapper, context: ChatRequestContext) {
         when (response) {
-            is SingleConnectionResponse -> chatPersistenceService.sendMessageToConnection(
+            is SingleConnectionResponse -> chatPersistence.sendMessageToConnection(
                 response.targetProfileId,
-                response.responseBody
+                response.responseBody,
+                context,
             )
 
             is MultipleConnectionsResponse -> response.responses.forEach { (profileId, responseBody) ->
-                chatPersistenceService.sendMessageToConnection(
+                chatPersistence.sendMessageToConnection(
                     profileId,
-                    responseBody
+                    responseBody,
+                    context,
                 )
             }
 

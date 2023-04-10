@@ -1,7 +1,6 @@
 package ru.zveron.service.application
 
 import com.datastax.oss.driver.api.core.uuid.Uuids
-import com.ninjasquad.springmockk.MockkBean
 import io.grpc.Status
 import io.grpc.StatusException
 import io.kotest.assertions.throwables.shouldThrow
@@ -15,9 +14,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.ChatServiceApplicationTest
-import ru.zveron.client.blacklist.BlacklistClient
-import ru.zveron.client.lot.LotClient
-import ru.zveron.client.profile.ProfileClient
 import ru.zveron.common.assertion.ChatAssertions.newChatShouldBe
 import ru.zveron.common.assertion.ChatAssertions.responseShouldBe
 import ru.zveron.common.generator.ChatGenerator
@@ -28,6 +24,8 @@ import ru.zveron.common.generator.PrimitivesGenerator
 import ru.zveron.common.generator.PrimitivesGenerator.generateLongs
 import ru.zveron.common.generator.PrimitivesGenerator.generateString
 import ru.zveron.common.generator.ProfileSummaryGenerator.generateProfile
+import ru.zveron.contract.chat.ArticleType
+import ru.zveron.contract.chat.article
 import ru.zveron.contract.chat.attachLotRequest
 import ru.zveron.contract.chat.detachLotRequest
 import ru.zveron.contract.chat.getRecentChatsRequest
@@ -49,7 +47,6 @@ import ru.zveron.mapper.ChatMapper.toChatSummary
 import ru.zveron.mapper.MessageMapper.messageToResponse
 import ru.zveron.mapper.ProtoTypesMapper.toTimestamp
 import ru.zveron.model.dao.ChatRequestContext
-import ru.zveron.model.dao.SingleConnectionResponse
 import ru.zveron.repository.ChatRepository
 import ru.zveron.repository.MessageRepository
 import java.time.Instant
@@ -65,15 +62,6 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
     @Autowired
     lateinit var chatApplicationService: ChatApplicationService
-
-    @MockkBean
-    lateinit var profileClient: ProfileClient
-
-    @MockkBean
-    lateinit var lotClient: LotClient
-
-    @MockkBean
-    lateinit var blacklistClient: BlacklistClient
 
     @Test
     fun getRecentChats() {
@@ -98,7 +86,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
                     chat3,
                     profile4.toChatSummary(),
                     emptyList(),
-                    listOf(messageToResponse(message3))
+                    listOf(messageToResponse(message3)),
                 )
             )
             chats.add(
@@ -106,7 +94,8 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
                     chat2,
                     profile3.toChatSummary(),
                     listOf(lot),
-                    listOf(messageToResponse(message2))
+                    listOf(messageToResponse(message2)),
+                    isBlocked = true,
                 )
             )
             chats.add(
@@ -114,7 +103,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
                     chat1,
                     profile2.toChatSummary(),
                     emptyList(),
-                    listOf(messageToResponse(message1))
+                    listOf(messageToResponse(message1)),
                 )
             )
         }
@@ -125,6 +114,9 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
         coEvery {
             lotClient.getLotsById(listOf(lot1))
         } returns listOf(lot)
+        coEvery {
+            blacklistClient.existsInMultipleBlacklists(user1, listOf(user4, user3, user2))
+        } returns listOf(false, true, false)
 
         runBlocking(MetadataElement(Metadata(user1))) {
             chatRepository.save(chat1)
@@ -168,7 +160,8 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
                     chat2,
                     profile3.toChatSummary(),
                     listOf(lot),
-                    listOf(messageToResponse(message2))
+                    listOf(messageToResponse(message2)),
+                    isBlocked = true,
                 )
             )
             chats.add(
@@ -176,7 +169,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
                     chat1,
                     profile2.toChatSummary(),
                     emptyList(),
-                    listOf(messageToResponse(message1))
+                    listOf(messageToResponse(message1)),
                 )
             )
         }
@@ -187,6 +180,9 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
         coEvery {
             lotClient.getLotsById(listOf(lot1))
         } returns listOf(lot)
+        coEvery {
+            blacklistClient.existsInMultipleBlacklists(user1, listOf(user3, user2))
+        } returns listOf(true, false)
 
         runBlocking(MetadataElement(Metadata(user1))) {
             chatRepository.save(chat1)
@@ -223,7 +219,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             chatApplicationService.attachLotToChat(request, defaultContext())
 
-            chatRepository.findExact(user1, chat1.chatId)?.lotsIds shouldContainExactly listOf(lot1)
+            chatRepository.findByProfileIdAndChatId(user1, chat1.chatId)?.lotsIds shouldContainExactly listOf(lot1)
         }
     }
 
@@ -345,7 +341,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             chatApplicationService.detachLotFromChat(request, defaultContext())
 
-            chatRepository.findExact(user1, chat1.chatId)?.lotsIds shouldBe null
+            chatRepository.findByProfileIdAndChatId(user1, chat1.chatId)?.lotsIds shouldBe null
         }
     }
 
@@ -416,7 +412,13 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
         }
         val expectedResponse = receiveChatSummary {
             chat =
-                generateChatResponse(chat1, profile2.toChatSummary(), listOf(lot), listOf(messageToResponse(message1)))
+                generateChatResponse(
+                    chat1,
+                    profile2.toChatSummary(),
+                    listOf(lot),
+                    listOf(messageToResponse(message1)),
+                    isBlocked = true
+                )
         }
 
         coEvery {
@@ -460,7 +462,10 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
         val message = generateString(30)
         val request = startChatRequest {
             interlocutorId = user2
-            lotId = lot1
+            article = article {
+                id = lot1
+                type = ArticleType.LOT
+            }
             text = message
         }
         val profile2 = generateProfile(user2)
@@ -503,7 +508,10 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
         val message = generateString(30)
         val request = startChatRequest {
             interlocutorId = user2
-            lotId = lot1
+            article = article {
+                id = lot1
+                type = ArticleType.LOT
+            }
             text = message
         }
 
@@ -543,9 +551,9 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             chatApplicationService.sendEvent(request, defaultContext())
 
-            messageRepository.findExact(chat1.chatId, msg1)!!.isRead shouldBe true
-            messageRepository.findExact(chat1.chatId, msg2)!!.isRead shouldBe true
-            messageRepository.findExact(chat1.chatId, msg3)!!.isRead shouldBe false
+            messageRepository.findByChatIdAndId(chat1.chatId, msg1)!!.isRead shouldBe true
+            messageRepository.findByChatIdAndId(chat1.chatId, msg2)!!.isRead shouldBe true
+            messageRepository.findByChatIdAndId(chat1.chatId, msg3)!!.isRead shouldBe false
         }
     }
 
@@ -561,7 +569,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
         runBlocking(MetadataElement(Metadata(user1))) {
             chatRepository.save(chat1)
 
-            val event = chatApplicationService.sendEvent(request, defaultContext()) as SingleConnectionResponse
+            val event = chatApplicationService.sendEvent(request, defaultContext())
 
             event.responseBody.receiveEvent.disconnectEvent.lastOnlineFormatted shouldBe "Не в сети"
             event.targetProfileId shouldBe user2
@@ -596,7 +604,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
         runBlocking(MetadataElement(Metadata(user1))) {
             chatRepository.save(chat1)
 
-            val event = chatApplicationService.sendEvent(request, defaultContext()) as SingleConnectionResponse
+            val event = chatApplicationService.sendEvent(request, defaultContext())
 
             event.responseBody.receiveEvent.noPayloadEvent.type shouldBe NoPayloadEventType.ONLINE
             event.targetProfileId shouldBe user2
@@ -615,7 +623,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
         runBlocking(MetadataElement(Metadata(user1))) {
             chatRepository.save(chat1)
 
-            val event = chatApplicationService.sendEvent(request, defaultContext()) as SingleConnectionResponse
+            val event = chatApplicationService.sendEvent(request, defaultContext())
 
             event.responseBody.receiveEvent.noPayloadEvent.type shouldBe NoPayloadEventType.TEXTING
             event.targetProfileId shouldBe user2
@@ -648,6 +656,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
         shouldThrow<InvalidParamChatException> {
             runBlocking(MetadataElement(Metadata(user1))) {
+                chatRepository.save(chat1)
                 chatApplicationService.sendEvent(request, defaultContext())
             }
         }.message shouldStartWith "Unsupported event type: ${request.eventCase.name}."

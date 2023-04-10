@@ -1,7 +1,8 @@
-package ru.zveron.service.domain
+package ru.zveron.component
 
 import kotlinx.coroutines.flow.Flow
-import org.springframework.stereotype.Service
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 import ru.zveron.contract.chat.model.MessagePagination
 import ru.zveron.model.constant.MessageType
 import ru.zveron.model.entity.Message
@@ -9,24 +10,26 @@ import ru.zveron.repository.MessageRepository
 import java.time.Instant
 import java.util.*
 
-private const val DEFAULT_MESSAGES_PAGINATION_PAGE_SIZE = 100
+@Component
+class MessageStorage(private val repository: MessageRepository) {
 
-@Service
-class MessageDomainService(private val repository: MessageRepository) {
+    @Value("\${service.persistence.message.pagination-size}")
+    var paginationSize: Int = 0
 
     fun getChatRecentMessages(
         chatId: UUID,
         pagination: MessagePagination? = null
     ): Flow<Message> {
-        if (pagination != null && pagination.hasSize() && pagination.messagesBeforeId.isNotEmpty()) {
-            return repository.getChatRecentMessages(
+        val limit = pagination?.takeIf { it.hasSize() }?.size ?: paginationSize
+        if (pagination != null && pagination.messagesBeforeId.isNotEmpty()) {
+            return repository.getChatMessagesBefore(
                 chatId,
                 UUID.fromString(pagination.messagesBeforeId),
-                pagination.size
+                limit
             )
         }
 
-        return repository.getChatRecentMessages(chatId, DEFAULT_MESSAGES_PAGINATION_PAGE_SIZE)
+        return repository.getChatRecentMessages(chatId, limit)
     }
 
     suspend fun saveMessage(chatId: UUID, messageId: UUID, senderId: Long, text: String, images: List<String>) =

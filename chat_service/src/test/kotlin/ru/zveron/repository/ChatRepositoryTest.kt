@@ -119,8 +119,8 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
 
             chatRepository.attachLot(lot2, user1, user3, chat2.chatId)
 
-            chatRepository.findExact(user1, chat2.chatId)?.lotsIds shouldContainExactlyInAnyOrder listOf(lot1, lot2)
-            chatRepository.findExact(user3, chat2.chatId)?.lotsIds shouldContainExactlyInAnyOrder listOf(lot1, lot2)
+            chatRepository.findByProfileIdAndChatId(user1, chat2.chatId)?.lotsIds shouldContainExactlyInAnyOrder listOf(lot1, lot2)
+            chatRepository.findByProfileIdAndChatId(user3, chat2.chatId)?.lotsIds shouldContainExactlyInAnyOrder listOf(lot1, lot2)
         }
     }
 
@@ -139,8 +139,8 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
 
                 chatRepository.attachLot(lot2, user1, user2, Uuids.timeBased())
 
-                chatRepository.findExact(user1, chat1.chatId)?.lotsIds shouldBe null
-                chatRepository.findExact(user1, chat2.chatId)?.lotsIds shouldContainExactlyInAnyOrder listOf(lot1)
+                chatRepository.findByProfileIdAndChatId(user1, chat1.chatId)?.lotsIds shouldBe null
+                chatRepository.findByProfileIdAndChatId(user1, chat2.chatId)?.lotsIds shouldContainExactlyInAnyOrder listOf(lot1)
 
             }
         }
@@ -162,8 +162,8 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
 
             chatRepository.detachLot(lot1, user1, user2, chat2.chatId)
 
-            chatRepository.findExact(user1, chat2.chatId)?.lotsIds shouldBe null
-            chatRepository.findExact(user2, chat2.chatId)?.lotsIds shouldBe null
+            chatRepository.findByProfileIdAndChatId(user1, chat2.chatId)?.lotsIds shouldBe null
+            chatRepository.findByProfileIdAndChatId(user2, chat2.chatId)?.lotsIds shouldBe null
         }
     }
 
@@ -182,7 +182,7 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
 
                 chatRepository.detachLot(lot1, user1, user2, Uuids.timeBased())
 
-                chatRepository.findExact(user1, chat2.chatId)?.lotsIds shouldBe listOf(lot1)
+                chatRepository.findByProfileIdAndChatId(user1, chat2.chatId)?.lotsIds shouldBe listOf(lot1)
             }
         }
     }
@@ -207,9 +207,9 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
                 lot1,
             )
 
-            chatRepository.findExact(user1, chatId) shouldNotBe null
-            chatRepository.findExact(user2, chatId) shouldNotBe null
-            messageRepository.findExact(chatId, messageId) shouldNotBe null
+            chatRepository.findByProfileIdAndChatId(user1, chatId) shouldNotBe null
+            chatRepository.findByProfileIdAndChatId(user2, chatId) shouldNotBe null
+            messageRepository.findByChatIdAndId(chatId, messageId) shouldNotBe null
         }
     }
 }
