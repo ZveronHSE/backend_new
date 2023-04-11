@@ -3,10 +3,12 @@ package ru.zveron.commons.generator
 import ru.zveron.contract.profile.model.gmail
 import ru.zveron.entity.Profile
 import ru.zveron.contract.profile.model.links
+import ru.zveron.contract.profile.model.mailru
 import ru.zveron.contract.profile.model.phone
 import ru.zveron.contract.profile.model.vk
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.LinksDto
+import ru.zveron.domain.link.MailRuData
 import ru.zveron.domain.link.PhoneData
 import ru.zveron.domain.link.VkData
 import ru.zveron.entity.CommunicationLink
@@ -20,6 +22,7 @@ object CommunicationLinksGenerator {
         addGmail: Boolean = false,
         addPhone: Boolean = false,
         skipVkRef: Boolean = false,
+        addMailRu: Boolean = false,
     ): LinksDto {
         val result = mutableListOf<CommunicationLink>()
         if (addVk) {
@@ -39,6 +42,17 @@ object CommunicationLinksGenerator {
                 CommunicationLink(
                     communicationLinkId = PropsGenerator.generateString(10),
                     data = GmailData(
+                        email = PropsGenerator.generateString(15),
+                    ),
+                    profile = profile,
+                )
+            )
+        }
+        if (addMailRu) {
+            result.add(
+                CommunicationLink(
+                    communicationLinkId = PropsGenerator.generateString(10),
+                    data = MailRuData(
                         email = PropsGenerator.generateString(15),
                     ),
                     profile = profile,
@@ -66,6 +80,8 @@ object CommunicationLinksGenerator {
         additionalEmail: String = "",
         gmailId: String = "",
         gmail: String = "",
+        mailRuId: String = "",
+        mailRuEmail: String= "",
     ) = links {
         this.phone = phone {
             number = phone
@@ -78,6 +94,10 @@ object CommunicationLinksGenerator {
         this.gmail = gmail {
             id = gmailId
             email = gmail
+        }
+        mail = mailru {
+            id = mailRuId
+            email = mailRuEmail
         }
     }
 }
