@@ -17,7 +17,7 @@ class BatchChatRepositoryTest: ChatServiceApplicationTest() {
     lateinit var batchChatRepository: BatchChatRepository
 
     @Test
-    fun markMessagesAsRead() {
+    fun `markMessagesAsRead and messages statuses are changed`() {
         val (msg1, msg2, msg3) = PrimitivesGenerator.generateNTimeUuids(3)
         val (user1, user2) = PrimitivesGenerator.generateLongs(5)
         val chat1 = ChatGenerator.generateChat(user1, user2)

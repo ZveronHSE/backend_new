@@ -30,7 +30,7 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
     lateinit var messageRepository: MessageRepository
 
     @Test
-    fun getInterlocutorId() {
+    fun `getInterlocutorId when chat exists`() {
         val (user1, user2, user3) = generateLongs(3)
         val chat1 = generateChat(user1, user2)
         val chat2 = generateChat(user1, user3, lotsIds = setOf(1))
@@ -60,7 +60,7 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun getChats() {
+    fun `getChats when chats exist`() {
         val (user1, user2, user3) = generateLongs(3)
         val chat1 = generateChat(user1, user2)
         val chat2 = generateChat(user1, user3, lotsIds = setOf(1))
@@ -104,7 +104,7 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun attachLot() {
+    fun `attachLot when chat exists`() {
         val (user1, user2, user3, lot1, lot2) = generateLongs(5)
         val chat1 = generateChat(user1, user2)
         val chat2 = generateChat(user1, user3, lotsIds = setOf(lot1))
@@ -147,7 +147,7 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun detachLot() {
+    fun `detachLot when chat exists`() {
         val (user1, user2, user3, lot1) = generateLongs(4)
         val chat1 = generateChat(user1, user2)
         val chat2 = generateChat(user1, user3, lotsIds = setOf(lot1))
@@ -188,7 +188,7 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun crateChatsPair() {
+    fun `crateChatsPair and both chats are created`() {
         val timestamp = Instant.now()
         val chatId = Uuids.timeBased()
         val messageId = Uuids.timeBased()

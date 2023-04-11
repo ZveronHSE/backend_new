@@ -3,6 +3,7 @@ package ru.zveron.service.presentation
 import com.datastax.oss.driver.api.core.uuid.Uuids
 import io.grpc.Status
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.transform
 import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
 import net.logstash.logback.argument.StructuredArguments.keyValue
+import net.logstash.logback.marker.Markers
 import ru.zveron.contract.chat.ChatRouteRequest
 import ru.zveron.contract.chat.ChatRouteResponse
 import ru.zveron.contract.chat.ChatServiceExternalGrpcKt
@@ -24,6 +26,8 @@ import ru.zveron.model.dao.NoneConnectionResponse
 import ru.zveron.model.dao.SingleConnectionResponse
 import ru.zveron.service.application.ChatApplicationService
 import ru.zveron.component.ChatPersistence
+import ru.zveron.contract.chat.chatRouteResponse
+import ru.zveron.contract.chat.errorMessage
 import ru.zveron.service.application.MessageApplicationService
 import java.util.UUID
 import kotlin.coroutines.coroutineContext
@@ -51,9 +55,17 @@ class ChatServiceExternal(
             chatPersistence.registerConnection(fixedNodeAddress, chatRequestContext)
 
             val requestFlow = requests
-                .transform<ChatRouteRequest, ChatRouteResponse> {
-                    logger.info("Process request with type ${it.requestCase.name} {}", keyValue("connection-id", connectionId))
-                    handleRequest(it, chatRequestContext)
+                .transform {
+                    logger.info(
+                        "Process request with type ${it.requestCase.name} {}",
+                        keyValue("connection-id", connectionId)
+                    )
+
+                    try {
+                        handleRequest(it, chatRequestContext)
+                    } catch (ex: Exception) {
+                        suppressChatException(ex)
+                    }
                 }
                 .onCompletion {
                     logger.info("Close {}", keyValue("connection-id", connectionId))
@@ -140,5 +152,24 @@ class ChatServiceExternal(
 
             is NoneConnectionResponse -> {}
         }
+    }
+
+    private suspend fun FlowCollector<ChatRouteResponse>.suppressChatException(ex: Throwable) {
+        if (ex !is ChatException) {
+            throw ex
+        }
+
+        val marker = Markers.append("connection-id", ex.context.connectionId)
+        logger.debug(
+            marker,
+            "Suppress chat exception with status ${ex.status} and send error message connection-id=${ex.context.connectionId}",
+            ex
+        )
+        emit(chatRouteResponse {
+            error = errorMessage {
+                status = ex.status.code.value()
+                message = ex.message!!
+            }
+        })
     }
 }

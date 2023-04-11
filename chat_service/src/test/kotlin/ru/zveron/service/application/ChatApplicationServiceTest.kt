@@ -64,7 +64,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
     lateinit var chatApplicationService: ChatApplicationService
 
     @Test
-    fun getRecentChats() {
+    fun `getRecentChats without pagination`() {
         val timestamp = Instant.now()
         val (msg1, msg2, msg3) = PrimitivesGenerator.generateNTimeUuids(3)
         val (user1, user2, user3, user4, lot1) = generateLongs(5)
@@ -200,7 +200,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun attachLotToChat() {
+    fun `attachLotToChat when chat exists`() {
         val (user1, user2, lot1) = generateLongs(3)
         val chat1 = ChatGenerator.generateChat(user1, user2)
         val request = attachLotRequest {
@@ -327,7 +327,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun detachLotFromChat() {
+    fun `detachLotFromChat when chat exists`() {
         val (user1, user2, lot1) = generateLongs(3)
         val chat1 = ChatGenerator.generateChat(user1, user2, lotsIds = setOf(lot1))
         val request = detachLotRequest {
@@ -398,7 +398,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun getChatSummary() {
+    fun `getChatSummary when chat exists`() {
         val timestamp = Instant.now()
         val (msg1) = PrimitivesGenerator.generateNTimeUuids(1)
         val (user1, user2, lot1) = generateLongs(3)
