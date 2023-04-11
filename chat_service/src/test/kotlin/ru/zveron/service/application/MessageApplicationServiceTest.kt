@@ -45,7 +45,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
     lateinit var messageApplicationService: MessageApplicationService
 
     @Test
-    fun getRecentMessagesByChat() {
+    fun `getRecentMessagesByChat when chat exists`() {
         val (msg1, msg2, msg3) = PrimitivesGenerator.generateNTimeUuids(3)
         val (user1, user2) = PrimitivesGenerator.generateLongs(2)
         val chat1 = ChatGenerator.generateChat(user1, user2)
@@ -75,7 +75,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun `getRecentMessagesByChat with pagination`() {
+    fun `getRecentMessagesByChat with pagination when chat exists`() {
         val timestamp = Instant.now()
         val (msg1, msg2, msg3, msg4) = PrimitivesGenerator.generateNTimeUuids(4)
         val (user1, user2) = PrimitivesGenerator.generateLongs(2)
@@ -132,7 +132,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun sendMessage() {
+    fun `sendMessage when chat exists`() {
         val (msg1) = PrimitivesGenerator.generateNTimeUuids(1)
         val (user1, user2) = PrimitivesGenerator.generateLongs(2)
         val chat1 = ChatGenerator.generateChat(user1, user2)

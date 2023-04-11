@@ -18,7 +18,7 @@ class MessageRepositoryTest : ChatServiceApplicationTest() {
     private lateinit var messageRepository: MessageRepository
 
     @Test
-    fun getChatRecentMessages() {
+    fun `getChatRecentMessages when messages exist`() {
         val (chatId1, chatId2, chatId3) = generateNUuids(3)
         val (msg1, msg2, msg3, msg4, msg5) = generateNTimeUuids(5)
         val (sender1, sender2, sender3) = generateLongs(3)
@@ -42,7 +42,7 @@ class MessageRepositoryTest : ChatServiceApplicationTest() {
     }
 
     @Test
-    fun getChatMessagesBefore() {
+    fun `getChatMessagesBefore when messages exist`() {
         val (chatId1, chatId2, chatId3) = generateNUuids(3)
         val (msg1, msg2, msg3, msg4, msg5) = generateNTimeUuids(5)
         val (sender1, sender2, sender3) = generateLongs(3)

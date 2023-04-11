@@ -1,4 +1,4 @@
-val contractVersion: String = "1.9.5"
+val contractVersion: String by rootProject
 val kotlinxVersion: String by rootProject
 
 dependencies {
@@ -7,10 +7,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinxVersion")
 
-    implementation("com.github.zveronHSe.contract:chat:93d16e6191")
+    implementation("com.github.zveronHSe.contract:chat:feature~ZV-403-chat-error-message-SNAPSHOT")
     implementation("com.github.zveronHSe.contract:profile:$contractVersion")
     implementation("com.github.zveronHSe.contract:lot:$contractVersion")
-    implementation("com.github.zveronHSe.contract:blacklist:66ac0dadd1")
+    implementation("com.github.zveronHSe.contract:blacklist:$contractVersion")
     implementation("com.github.zveronHSe.contract:core:$contractVersion")
 
     testImplementation("org.apache.commons:commons-lang3:3.8.1")

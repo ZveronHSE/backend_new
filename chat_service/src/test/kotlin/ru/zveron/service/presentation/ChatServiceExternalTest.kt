@@ -4,6 +4,7 @@ import app.cash.turbine.testIn
 import com.datastax.oss.driver.api.core.uuid.Uuids
 import io.grpc.Status
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import io.mockk.coEvery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -118,6 +119,57 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
             }
 
 
+            testedFlow.awaitComplete()
+        }
+    }
+
+    @Test
+    fun `bidiChatRoute do not drop connection on ChatException`() {
+        val (user1, lot1) = PrimitivesGenerator.generateLongs(2)
+        val message1 = PrimitivesGenerator.generateString(30)
+        val message2 = PrimitivesGenerator.generateString(30)
+        val backgroundScope = CoroutineScope(MetadataElement(Metadata(user1)))
+
+        runBlocking(MetadataElement(Metadata(user1))) {
+            val inputFlow = Channel<ChatRouteRequest>(2)
+            val responseFlow = chatServiceExternal.bidiChatRoute(inputFlow.consumeAsFlow())
+            val testedFlow = responseFlow.testIn(backgroundScope)
+
+            inputFlow.send(chatRouteRequest {
+                startChat = startChatRequest {
+                    interlocutorId = user1
+                    article = article {
+                        id = lot1
+                        type = ArticleType.LOT
+                    }
+                    text = message1
+                }
+            })
+            testedFlow.awaitItem().apply {
+                this.responseCase shouldBe ChatRouteResponse.ResponseCase.ERROR
+                this.error.apply {
+                    status shouldBe Status.INVALID_ARGUMENT.code.value()
+                    message shouldStartWith  "Cannot start chat with yourself."
+                }
+            }
+
+            val fakeChatId = Uuids.timeBased().toString()
+            inputFlow.send(chatRouteRequest {
+                sendMessage = sendMessageRequest {
+                    chatId = fakeChatId
+                    type = MessageType.DEFAULT
+                    this.text = message2
+                }
+            })
+            testedFlow.awaitItem().apply {
+                this.responseCase shouldBe ChatRouteResponse.ResponseCase.ERROR
+                this.error.apply {
+                    status shouldBe Status.NOT_FOUND.code.value()
+                    message shouldStartWith  "Profile: $user1 does not have chat: $fakeChatId."
+                }
+            }
+
+            inputFlow.close()
             testedFlow.awaitComplete()
         }
     }
