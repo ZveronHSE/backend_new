@@ -11,6 +11,7 @@ import ru.zveron.contract.profile.model.ChannelType
 import ru.zveron.domain.link.CommunicationLinkType
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.LinksDto
+import ru.zveron.domain.link.MailRuData
 import ru.zveron.domain.link.PhoneData
 import ru.zveron.domain.link.VkData
 import ru.zveron.domain.profile.ProfileInitializationType
@@ -49,6 +50,13 @@ class CommunicationLinkService(
                 linksDto,
                 request.links.gmail.id,
                 request.links.gmail.email,
+                profile,
+            )
+
+            ChannelType.MAILRU -> createOrUpdateMailRu(
+                linksDto,
+                request.links.mail.id,
+                request.links.mail.email,
                 profile,
             )
 
@@ -135,10 +143,29 @@ class CommunicationLinkService(
         return link.copy(communicationLinkId = id, data = data)
     }
 
+    private fun createOrUpdateMailRu(
+        links: LinksDto,
+        id: String,
+        email: String,
+        profile: Profile,
+    ): CommunicationLink {
+        val data = MailRuData(
+            email = email,
+        )
+        val link = links.mailRuLink ?: return CommunicationLink(
+            communicationLinkId = id,
+            data = data,
+            profile = profile,
+        )
+
+        return link.copy(communicationLinkId = id, data = data)
+    }
+
     private fun findByChannelOrThrow(channelType: ChannelType, id: String): CommunicationLink = when (channelType) {
         ChannelType.PHONE -> repository.findByCommunicationLinkIdAndType(id, CommunicationLinkType.PHONE)
         ChannelType.GOOGLE -> repository.findByCommunicationLinkIdAndType(id, CommunicationLinkType.GMAIL)
         ChannelType.VK -> repository.findByCommunicationLinkIdAndType(id, CommunicationLinkType.VK)
+        ChannelType.MAILRU -> repository.findByCommunicationLinkIdAndType(id, CommunicationLinkType.MAIL_RU)
         else -> throw ProfileException("Profile can't be find by channel $channelType", Status.INVALID_ARGUMENT.code)
     } ?: throw ProfileNotFoundException("Can't find profile by channel: $channelType and channel id: $id")
 }

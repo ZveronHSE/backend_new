@@ -8,6 +8,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
@@ -411,17 +412,26 @@ class ProfileServiceExternalTest : ProfileTest() {
         }
     }
 
-    @Test
-    fun `setSettings when channels is missed`() {
+    @ParameterizedTest
+    @CsvSource(value = ["true,false,false,false", "false,true,false,false", "false,false,true,false", "false,false,false,true"])
+    fun `setSettings when channels is missed`(vk: Boolean, gmail: Boolean, phone: Boolean, mailRu: Boolean) {
+        var additionalChannelType : ChannelType? = null
+        var linkName = "gmail"
+        when {
+            vk -> { additionalChannelType = ChannelType.VK; linkName = "vk"}
+            gmail -> { additionalChannelType = ChannelType.GOOGLE; linkName = "gmail"}
+            mailRu -> { additionalChannelType = ChannelType.MAILRU; linkName = "mail.ru"}
+            phone -> { additionalChannelType = ChannelType.PHONE; linkName = "phone"}
+        }
         val now = Instant.now()
         val addressId = PropsGenerator.generateLongId()
         val expectedProfile = ProfileGenerator.generateProfile(now)
-        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true, addressId = addressId)
-        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = true, addVk = true)
+        SettingsGenerator.generateSettings(expectedProfile, addChat = true, addressId = addressId)
+        CommunicationLinksGenerator.generateLinks(expectedProfile, addPhone = !phone, addVk = !vk, addGmail = !gmail, addMailRu = !mailRu)
         val id = profileRepository.save(expectedProfile).id
         val request = setSettingsRequest {
             address = generateAddress()
-            channels.addAll(listOf(ChannelType.VK, ChannelType.GOOGLE))
+            channels.addAll(listOf(ChannelType.CHAT, additionalChannelType!!))
         }
 
         val exception = shouldThrow<ProfileException> {
@@ -429,7 +439,7 @@ class ProfileServiceExternalTest : ProfileTest() {
                 service.setSettings(request)
             }
         }
-        exception.message shouldBe "Can't use gmail as communication channel because link is missed"
+        exception.message shouldBe "Can't use $linkName as communication channel because link is missed"
         exception.code shouldBe io.grpc.Status.Code.INVALID_ARGUMENT
     }
 

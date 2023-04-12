@@ -9,7 +9,7 @@ import ru.zveron.exception.ProfileException
 object ContactsValidator {
 
     fun validateNumberOfChannels(ways: ChannelsDto): Unit = ways.run {
-        val numberOfSelectedChannels = arrayOf(phone, vk, gmail, chat).count { it }
+        val numberOfSelectedChannels = arrayOf(phone, vk, gmail, mailRu, chat).count { it }
 
         if (numberOfSelectedChannels !in 1..2) {
             throw ProfileException(
@@ -32,6 +32,12 @@ object ContactsValidator {
                 Status.INVALID_ARGUMENT.code
             )
         }
+        if (mailRu && linksDto.mailRuLink == null) {
+            throw ProfileException(
+                "Can't use mail.ru as communication channel because link is missed",
+                Status.INVALID_ARGUMENT.code
+            )
+        }
         if (phone && linksDto.phoneLink == null) {
             throw ProfileException(
                 "Can't use phone as communication channel because link is missed",
@@ -46,6 +52,9 @@ object ContactsValidator {
         }
         if ((links.gmail.email.isNotBlank() && links.gmail.id.isBlank()) || (links.gmail.email.isBlank() && links.gmail.id.isNotBlank())) {
             throw ProfileException("Gmail id and email should be both present or missed", Status.INVALID_ARGUMENT.code)
+        }
+        if ((links.mail.email.isNotBlank() && links.mail.id.isBlank()) || (links.mail.email.isBlank() && links.mail.id.isNotBlank())) {
+            throw ProfileException("Mail.ru id and email should be both present or missed", Status.INVALID_ARGUMENT.code)
         }
     }
 }

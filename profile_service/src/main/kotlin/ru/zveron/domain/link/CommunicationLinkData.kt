@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         JsonSubTypes.Type(value = VkData::class, name = VK_COMMUNICATION_LINK_TYPE),
         JsonSubTypes.Type(value = GmailData::class, name = GMAIL_COMMUNICATION_LINK_TYPE),
         JsonSubTypes.Type(value = PhoneData::class, name = PHONE_COMMUNICATION_LINK_TYPE),
+        JsonSubTypes.Type(value = MailRuData::class, name = MAIL_RU_COMMUNICATION_LINK_TYPE),
 )
 interface CommunicationLinkData {
 
