@@ -27,7 +27,7 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:auth:99597be969")
+    implementation("com.github.zveronHSe.contract:auth:1.9.7")
     implementation("com.github.zveronHSe.contract:apigateway:1.8.7")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
@@ -35,11 +35,8 @@ dependencies {
     //ен особо понятно, но если вынести зависимость в рутовый градлг, то падает
     testImplementation("com.ninja-squad:springmockk:4.0.0")
 
-    // https://mvnrepository.com/artifact/io.zipkin.brave/brave-instrumentation-grpc
     implementation("io.zipkin.brave:brave-instrumentation-grpc:5.15.0")
-    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-sleuth
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth:3.1.7")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
-
 }
