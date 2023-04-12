@@ -35,6 +35,8 @@ values  ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY')
         ('waterfallGet', 'lot-service', 'LotExternalProtoService', 'GetWaterfall', 'ANY'),
         ('authRegisterByPhone', 'auth-service', 'AuthServiceExternal', 'RegisterByPhone', 'ANY'),
         ('authLoginByPassword', 'auth-service', 'AuthServiceExternal', 'LoginByPassword', 'ANY'),
-        ('authLoginBySocialMedia', 'auth-service', 'AuthServiceExternal', 'LoginBySocial', 'ANY')
+        ('authLoginBySocialMedia', 'auth-service', 'AuthServiceExternal', 'LoginBySocial', 'ANY'),
+        ('orderGetOrder', 'order-service', 'OrderServiceExternal', 'GetOrder', 'ANY'),
+        ('orderGetWaterfall', 'order-service', 'OrderWaterfallServiceExternal', 'GetWaterfall', 'ANY')
 
 ON CONFLICT (alias) DO NOTHING;
