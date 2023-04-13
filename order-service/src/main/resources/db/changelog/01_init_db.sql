@@ -7,12 +7,12 @@ CREATE TYPE status AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'U
 CREATE TYPE service_type AS ENUM ('WALK', 'SITTING', 'BOARDING', 'TRAINING', 'GROOMING', 'OTHER');
 CREATE TYPE service_delivery_type AS ENUM ('REMOTE', 'IN_PERSON');
 
-CREATE TABLE IF NOT EXISTS "order"
+CREATE TABLE IF NOT EXISTS public."order"
 (
-    id                    BIGINT                   NOT NULL,
-    profile_id            BIGINT                   NOT NULL,
-    pet_id                BIGINT                   NOT NULL,
-    price                 VARCHAR(20)        NOT NULL,
+    id                    BIGINT                NOT NULL,
+    profile_id            BIGINT                NOT NULL,
+    pet_id                BIGINT                NOT NULL,
+    price                 VARCHAR(20)           NOT NULL,
     address_id            BIGINT,
     title                 VARCHAR(255)          NOT NULL,
     description           VARCHAR(255)          NOT NULL,
