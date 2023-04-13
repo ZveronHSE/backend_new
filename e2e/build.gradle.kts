@@ -1,4 +1,4 @@
-val contractVersion: String = "1.8.8"
+val contractVersion: String by rootProject
 
 dependencies {
     implementation("io.grpc:grpc-netty:1.52.0")
