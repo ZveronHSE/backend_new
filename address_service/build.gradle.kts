@@ -1,3 +1,3 @@
 dependencies {
-    implementation("com.github.zveronHSe.contract:address:1.9.7")
+    implementation("com.github.zveronHSe.contract:address:07b4bb2d71")
 }
