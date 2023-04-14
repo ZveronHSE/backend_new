@@ -21,6 +21,7 @@ class ContactsValidatorTest {
         private fun getCorrectChanelTypes() = listOf(
             Arguments.of(ChannelsDto(phone = true)),
             Arguments.of(ChannelsDto(vk = true, gmail = true)),
+            Arguments.of(ChannelsDto(mailRu = true)),
         )
 
         @JvmStatic
@@ -28,6 +29,7 @@ class ContactsValidatorTest {
             Arguments.of(ChannelsDto(), 0),
             Arguments.of(ChannelsDto(phone = true, vk = true, gmail = true), 3),
             Arguments.of(ChannelsDto(phone = true, vk = true, gmail = true, chat = true), 4),
+            Arguments.of(ChannelsDto(phone = true, vk = true, gmail = true, chat = true, mailRu = true), 5),
         )
     }
 
@@ -84,6 +86,18 @@ class ContactsValidatorTest {
     }
 
     @Test
+    fun `Validate links and mailRu is missed`() {
+        val profile = ProfileGenerator.generateProfile(Instant.now())
+        val channels = ChannelsDto(mailRu = true)
+        val links = CommunicationLinksGenerator.generateLinks(profile)
+
+        val exception = shouldThrow<ProfileException> {
+            ContactsValidator.validateLinksNotBlank(channels, links)
+        }
+        exception.message shouldBe "Can't use mail.ru as communication channel because link is missed"
+    }
+
+    @Test
     fun `Validate links and phone is missed`() {
         val profile = ProfileGenerator.generateProfile(Instant.now())
         val channels = ChannelsDto(phone = true)
@@ -133,5 +147,25 @@ class ContactsValidatorTest {
             ContactsValidator.validateLinks(links)
         }
         exception.message shouldBe "Gmail id and email should be both present or missed"
+    }
+
+    @Test
+    fun `Validate links and mailRu id is missed`() {
+        val links = CommunicationLinksGenerator.generateLinks(mailRuEmail = PropsGenerator.generateString(10))
+
+        val exception = shouldThrow<ProfileException> {
+            ContactsValidator.validateLinks(links)
+        }
+        exception.message shouldBe "Mail.ru id and email should be both present or missed"
+    }
+
+    @Test
+    fun `Validate links and mailRu email is missed`() {
+        val links = CommunicationLinksGenerator.generateLinks(mailRuId = PropsGenerator.generateString(10))
+
+        val exception = shouldThrow<ProfileException> {
+            ContactsValidator.validateLinks(links)
+        }
+        exception.message shouldBe "Mail.ru id and email should be both present or missed"
     }
 }
