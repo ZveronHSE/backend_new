@@ -9,8 +9,11 @@ import ru.zveron.contract.blacklist.DeleteAllRecordsWhereUserIsBlockedRequest
 import ru.zveron.contract.blacklist.DeleteFromBlacklistRequest
 import ru.zveron.contract.blacklist.ExistInBlacklistRequest
 import ru.zveron.contract.blacklist.ExistInBlacklistResponse
+import ru.zveron.contract.blacklist.ExistInMultipleBlacklistsRequest
+import ru.zveron.contract.blacklist.ExistInMultipleBlacklistsResponse
 import ru.zveron.contract.blacklist.GetBlacklistResponse
 import ru.zveron.contract.blacklist.existInBlacklistResponse
+import ru.zveron.contract.blacklist.existInMultipleBlacklistsResponse
 import ru.zveron.contract.blacklist.getBlacklistResponse
 import ru.zveron.entity.BlacklistRecord
 import ru.zveron.exception.BlacklistException
@@ -30,6 +33,16 @@ class BlacklistService(
                 reportedUserId = request.targetUserId
             )
         }
+
+    suspend fun existInMultipleBlacklists(request: ExistInMultipleBlacklistsRequest): ExistInMultipleBlacklistsResponse {
+        val ownersIndexes = request.ownersIdsList.withIndex().associate { it.value to it.index }
+        val result = MutableList(request.ownersIdsList.size) { false }
+        blacklistRepository.getAllOwnersIdsIfRecordExists(request.targetUserId, request.ownersIdsList).forEach {
+            result[ownersIndexes[it]!!] = true
+        }
+
+        return existInMultipleBlacklistsResponse { exists.addAll(result) }
+    }
 
     suspend fun getBlacklist(authorizedProfileId: Long): GetBlacklistResponse {
         val ids = blacklistRepository.getAllById_OwnerUserId(authorizedProfileId).map { it.id.reportedUserId }
