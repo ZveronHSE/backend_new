@@ -9,15 +9,16 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.support.TransactionTemplate
 import ru.zveron.DataBaseApplicationTest
+import ru.zveron.grpc.InternalSubwayStationEntrypoint
 import ru.zveron.repository.SubwayStationRepository
 import ru.zveron.util.CreateEntitiesUtil.testGetSubwayByIdRequest
 import ru.zveron.util.CreateEntitiesUtil.testGetSubwayStationsRequest
 import ru.zveron.util.CreateEntitiesUtil.testSubwayStation
 
-class InternalSubwayStationServiceTest @Autowired constructor(
+class InternalSubwayStationEntrypointTest @Autowired constructor(
     private val template: TransactionTemplate,
     private val repository: SubwayStationRepository,
-    private val service: InternalSubwayStationService,
+    private val service: InternalSubwayStationEntrypoint,
 ) : DataBaseApplicationTest() {
 
     @Test

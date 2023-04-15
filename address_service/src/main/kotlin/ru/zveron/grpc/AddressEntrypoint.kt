@@ -1,4 +1,4 @@
-package ru.zveron.service
+package ru.zveron.grpc
 
 import net.devh.boot.grpc.server.service.GrpcService
 import ru.zveron.contract.address.AddressIdRequest
@@ -10,9 +10,8 @@ import ru.zveron.mapper.AddressMapper.toResponse
 import ru.zveron.repository.AddressRepository
 import javax.persistence.EntityNotFoundException
 
-@Suppress("BlockingMethodInNonBlockingContext")
 @GrpcService
-class AddressService(
+class AddressEntrypoint(
     private val addressRepository: AddressRepository
 ) : AddressServiceGrpcKt.AddressServiceCoroutineImplBase() {
 
