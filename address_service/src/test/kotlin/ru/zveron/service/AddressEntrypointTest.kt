@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import ru.zveron.DataBaseApplicationTest
+import ru.zveron.grpc.AddressEntrypoint
 import ru.zveron.mapper.AddressMapper.toResponse
 import ru.zveron.repository.AddressRepository
 import ru.zveron.util.CreateEntitiesUtil.mockAddressEntity
@@ -14,13 +15,12 @@ import ru.zveron.util.CreateEntitiesUtil.mockAddressIdRequest
 import ru.zveron.util.CreateEntitiesUtil.mockAddressRequest
 import javax.persistence.EntityNotFoundException
 
-@Suppress("BlockingMethodInNonBlockingContext")
-class AddressServiceTest : DataBaseApplicationTest() {
+class AddressEntrypointTest : DataBaseApplicationTest() {
     @Autowired
     lateinit var addressRepository: AddressRepository
 
     @Autowired
-    lateinit var addressService: AddressService
+    lateinit var addressEntrypoint: AddressEntrypoint
 
     companion object {
         const val MOCK_ADDRESS_ID = 1L
@@ -31,7 +31,7 @@ class AddressServiceTest : DataBaseApplicationTest() {
         val entity = mockAddressEntity(id = MOCK_ADDRESS_ID)
         addressRepository.save(entity)
 
-        val actualResponse = addressService.getAddress(mockAddressIdRequest(MOCK_ADDRESS_ID))
+        val actualResponse = addressEntrypoint.getAddress(mockAddressIdRequest(MOCK_ADDRESS_ID))
 
         actualResponse shouldBe entity.toResponse()
     }
@@ -39,7 +39,7 @@ class AddressServiceTest : DataBaseApplicationTest() {
     @Test
     fun `GetAddress should throw exception if dont find address by id`(): Unit = runBlocking {
         shouldThrow<EntityNotFoundException> {
-            addressService.getAddress(mockAddressIdRequest(MOCK_ADDRESS_ID))
+            addressEntrypoint.getAddress(mockAddressIdRequest(MOCK_ADDRESS_ID))
         }
     }
 
@@ -47,7 +47,7 @@ class AddressServiceTest : DataBaseApplicationTest() {
     @Test
     fun `SaveAddressIfNotExists save new address`(): Unit = runBlocking {
         val request = mockAddressRequest()
-        val response = addressService.saveAddressIfNotExists(request)
+        val response = addressEntrypoint.saveAddressIfNotExists(request)
 
         response.asClue {
             it.house shouldBe request.house
@@ -61,8 +61,8 @@ class AddressServiceTest : DataBaseApplicationTest() {
     fun `SaveAddressIfNotExists get old address, if exists by longitude and latitude`(): Unit = runBlocking {
         val request = mockAddressRequest(region = "region")
         val request1 = mockAddressRequest(region = "region1")
-        addressService.saveAddressIfNotExists(request)
-        val response = addressService.saveAddressIfNotExists(request1)
+        addressEntrypoint.saveAddressIfNotExists(request)
+        val response = addressEntrypoint.saveAddressIfNotExists(request1)
 
 
         response.asClue {

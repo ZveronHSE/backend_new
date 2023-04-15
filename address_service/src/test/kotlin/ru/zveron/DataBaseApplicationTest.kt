@@ -40,7 +40,7 @@ abstract class DataBaseApplicationTest {
         val connection = dataSource.connection
         val statement = connection.createStatement()
         statement.execute(
-            "TRUNCATE address"
+            "TRUNCATE address, subway_station"
         )
 
         statement.close()
