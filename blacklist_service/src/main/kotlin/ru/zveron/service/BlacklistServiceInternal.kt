@@ -8,6 +8,8 @@ import ru.zveron.contract.blacklist.DeleteAllRecordsWhereUserBlocksRequest
 import ru.zveron.contract.blacklist.DeleteAllRecordsWhereUserIsBlockedRequest
 import ru.zveron.contract.blacklist.ExistInBlacklistRequest
 import ru.zveron.contract.blacklist.ExistInBlacklistResponse
+import ru.zveron.contract.blacklist.ExistInMultipleBlacklistsRequest
+import ru.zveron.contract.blacklist.ExistInMultipleBlacklistsResponse
 
 @Service
 class BlacklistServiceInternal(private val blacklistService: BlacklistService) :
@@ -21,4 +23,7 @@ class BlacklistServiceInternal(private val blacklistService: BlacklistService) :
 
     override suspend fun existInBlacklist(request: ExistInBlacklistRequest): ExistInBlacklistResponse =
         blacklistService.existInBlacklist(request)
+
+    override suspend fun existInMultipleBlacklists(request: ExistInMultipleBlacklistsRequest): ExistInMultipleBlacklistsResponse =
+        blacklistService.existInMultipleBlacklists(request)
 }

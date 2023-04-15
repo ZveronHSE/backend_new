@@ -39,7 +39,9 @@ values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('authRegisterByPhone', 'auth-service', 'AuthServiceExternal', 'RegisterByPhone', 'ANY'),
        ('authLoginByPassword', 'auth-service', 'AuthServiceExternal', 'LoginByPassword', 'ANY'),
        ('authLoginBySocialMedia', 'auth-service', 'AuthServiceExternal', 'LoginBySocial', 'ANY'),
-       ('addressGetSubwaysByCity', 'address-service', 'SubwayStationExternalService', 'GetSubwayStationsByCity', 'ANY')
+       ('addressGetSubwaysByCity', 'address-service', 'SubwayStationExternalService', 'GetSubwayStationsByCity', 'ANY'),
+       ('orderGetOrder', 'order-service', 'OrderServiceExternal', 'GetOrder', 'ANY'),
+       ('orderGetWaterfall', 'order-service', 'OrderWaterfallServiceExternal', 'GetWaterfall', 'ANY')
 
 ON CONFLICT (alias) DO UPDATE SET service_name      = EXCLUDED.service_name,
                                   grpc_service_name = EXCLUDED.grpc_service_name,
