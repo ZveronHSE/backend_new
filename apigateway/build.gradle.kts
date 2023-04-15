@@ -2,6 +2,7 @@ val protobufVersion: String by rootProject
 val kotlinxVersion: String by rootProject
 val testcontainersVersion: String by rootProject
 val springVersion: String by rootProject
+val contractVersion: String by rootProject
 
 configurations {
     implementation.get().exclude("org.springframework.boot", "spring-boot-starter-tomcat")
@@ -27,7 +28,7 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:auth:1.9.7")
+    implementation("com.github.zveronHSe.contract:auth:$contractVersion")
     implementation("com.github.zveronHSe.contract:apigateway:1.8.7")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
@@ -35,6 +36,7 @@ dependencies {
     //ен особо понятно, но если вынести зависимость в рутовый градлг, то падает
     testImplementation("com.ninja-squad:springmockk:4.0.0")
 
+    //tracing
     implementation("io.zipkin.brave:brave-instrumentation-grpc:5.15.0")
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth:3.1.7")
 
