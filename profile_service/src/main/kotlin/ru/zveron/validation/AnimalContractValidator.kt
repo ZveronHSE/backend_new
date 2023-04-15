@@ -11,17 +11,13 @@ object AnimalContractValidator {
         this.animalId.takeIf { it > 0 } ?: throw IllegalArgumentException("Animal id must be greater than 0")
 
     fun CreateAnimalRequest.validate() = with(this) {
-        this.age.takeIf { it > 0 } ?: throw IllegalArgumentException("Animal age must be greater than 0")
-        this.breed.takeIf { it.isNotBlank() } ?: throw IllegalArgumentException("Animal breed must be not blank")
-        this.name.takeIf { it.isNotBlank() } ?: throw IllegalArgumentException("Animal name must be not blank")
+        require(age > 0) { "Animal must have a positive age" }
+        require(breed.isNotBlank()) { "Animal must have a breed" }
+        require(name.isNotBlank()) { "Animal must have a name" }
+        require(this.imageUrlsList.isNotEmpty()) { "Animal must have at least 1 image" }
     }
 
-    fun GetAnimalRequestInt.validate() = with(this) {
-        this.animalId.takeIf { it > 0 } ?: throw IllegalArgumentException("Animal id must be greater than 0")
-    }
+    fun GetAnimalRequestInt.validate() = require(this.animalId > 0) { "Animal entity must have a positive id" }
 
-    fun GetAnimalBatchRequest.validate() = with(this) {
-        this.animalIdsList.takeUnless { it.any { id -> id < 1 } }
-            ?: throw IllegalArgumentException("Animal ids must be not empty")
-    }
+    fun GetAnimalBatchRequest.validate() = require(animalIdsList.none { it <= 0 }) { "Animal ids must all be positive" }
 }
