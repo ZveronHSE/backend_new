@@ -2,6 +2,7 @@ val protobufVersion: String by rootProject
 val kotlinxVersion: String by rootProject
 val testcontainersVersion: String by rootProject
 val springVersion: String by rootProject
+val contractVersion: String by rootProject
 
 configurations {
     implementation.get().exclude("org.springframework.boot", "spring-boot-starter-tomcat")
@@ -27,8 +28,8 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
 
     //contracts
-    implementation("com.github.zveronHSe.contract:auth:99597be969")
-    implementation("com.github.zveronHSe.contract:apigateway:1.8.7")
+    implementation("com.github.zveronHSe.contract:auth:$contractVersion")
+    implementation("com.github.zveronHSe.contract:apigateway:$contractVersion")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
 
