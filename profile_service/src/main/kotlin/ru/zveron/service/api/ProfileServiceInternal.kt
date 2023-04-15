@@ -6,7 +6,6 @@ import ru.zveron.contract.profile.CreateProfileRequest
 import ru.zveron.contract.profile.CreateProfileResponse
 import ru.zveron.contract.profile.ExistsByIdRequest
 import ru.zveron.contract.profile.ExistsByIdResponse
-import ru.zveron.contract.profile.createProfileResponse
 import ru.zveron.contract.profile.GetProfileByChannelRequest
 import ru.zveron.contract.profile.GetProfileByChannelResponse
 import ru.zveron.contract.profile.GetProfileRequest
@@ -19,6 +18,7 @@ import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.contract.profile.UpdateContactsRequest
 import ru.zveron.contract.profile.VerifyProfileHashRequest
 import ru.zveron.contract.profile.VerifyProfileHashResponse
+import ru.zveron.contract.profile.createProfileResponse
 import ru.zveron.contract.profile.existsByIdResponse
 import ru.zveron.contract.profile.verifyProfileHashResponse
 import ru.zveron.service.CommunicationLinkService
@@ -60,4 +60,6 @@ class ProfileServiceInternal(
 
     override suspend fun existsById(request: ExistsByIdRequest): ExistsByIdResponse =
         existsByIdResponse { exists = profileService.existsById(request.id) }
+
+    override suspend fun getProfileForOrder(request: GetProfileRequest) = profileService.getProfileForOrder(request)
 }

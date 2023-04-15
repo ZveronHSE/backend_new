@@ -17,4 +17,6 @@ object PropsGenerator {
     fun generateDouble() = RandomUtils.nextDouble(0.0, 180.0) * if (RandomUtils.nextBoolean()) 1 else -1
 
     fun generateImageUrl() = """http://yandex.cloud/${UUID.randomUUID()}.png"""
+
+    fun ratingGenerator() = RandomUtils.nextDouble(0.0, 5.0)
 }
