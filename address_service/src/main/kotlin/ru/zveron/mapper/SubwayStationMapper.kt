@@ -1,20 +1,20 @@
 package ru.zveron.mapper
 
-import ru.zveron.contract.address.external.ExtSubwayStationKt
-import ru.zveron.contract.address.external.extSubwayStation
-import ru.zveron.contract.address.internal.IntSubwayStationKt
-import ru.zveron.contract.address.internal.intSubwayStation
+import ru.zveron.contract.address.external.SubwayStationExtKt
+import ru.zveron.contract.address.external.subwayStationExt
+import ru.zveron.contract.address.internal.SubwayStationIntKt
+import ru.zveron.contract.address.internal.subwayStationInt
 import ru.zveron.entity.SubwayStation
 
 object SubwayStationMapper {
 
-    fun ExtSubwayStationKt.ofEntity(s: SubwayStation) = extSubwayStation {
+    fun SubwayStationIntKt.ofEntity(s: SubwayStation) = subwayStationInt {
         this.id = s.id
         this.name = s.name
         this.colorHex = s.colorHex
     }
 
-    fun IntSubwayStationKt.ofEntity(s: SubwayStation) = intSubwayStation {
+    fun SubwayStationExtKt.ofEntity(s: SubwayStation) = subwayStationExt {
         this.id = s.id
         this.name = s.name
         this.colorHex = s.colorHex
