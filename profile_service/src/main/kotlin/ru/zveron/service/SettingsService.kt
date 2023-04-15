@@ -62,6 +62,12 @@ class SettingsService(
                 Status.INVALID_ARGUMENT.code
             )
         }
+        if (request.channelsList.contains(ChannelType.MAILRU) && links.mailRuLink == null) {
+            throw ProfileException(
+                "Can't use mail.ru as communication channel because link is missed",
+                Status.INVALID_ARGUMENT.code
+            )
+        }
         if (request.channelsList.contains(ChannelType.PHONE) && links.phoneLink == null) {
             throw ProfileException(
                 "Can't use phone as communication channel because link is missed",

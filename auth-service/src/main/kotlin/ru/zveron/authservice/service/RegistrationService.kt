@@ -52,6 +52,7 @@ class RegistrationService(
         val response = profileServiceClient.registerProfileByPhone(
             ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest(
                 request.name,
+                request.surname,
                 PhoneNumber.of(registrationContext.phoneNumber),
                 hash,
             )

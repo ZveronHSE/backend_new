@@ -13,7 +13,7 @@ object SellerMapper {
         id = id,
         name = name,
         surname = surname,
-        imageId = imageId,
+        imageUrl = imageUrl,
         contact = channelsList.toContact(),
         isOnline = lastSeen.isInitialized,
         channelLink = links.toChannelLink()

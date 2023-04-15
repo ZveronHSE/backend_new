@@ -22,6 +22,7 @@ import ru.zveron.contract.profile.model.Links
 import ru.zveron.domain.channel.ChannelsDto
 import ru.zveron.domain.link.GmailData
 import ru.zveron.domain.link.LinksDto
+import ru.zveron.domain.link.MailRuData
 import ru.zveron.domain.link.VkData
 import ru.zveron.entity.CommunicationLink
 import ru.zveron.entity.Profile
@@ -36,7 +37,7 @@ infix fun Profile.profileShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     addressId shouldBe expected.addressId
     passwordHash shouldBe expected.passwordHash
     ChronoUnit.MINUTES.between(expected.lastSeen, lastSeen) shouldBe 0
@@ -46,7 +47,7 @@ infix fun GetProfileResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     addressId shouldBe expected.addressId
     channelsList shouldBe expected.settings.channels.toModel()
 }
@@ -55,7 +56,7 @@ infix fun GetProfileWithContactsResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     addressId shouldBe expected.addressId
     channelsList shouldBe expected.settings.channels.toModel()
     links linksShouldBe expected.communicationLinks.toDto()
@@ -69,6 +70,8 @@ infix fun Links.linksShouldBe(expected: LinksDto) {
     gmail.id shouldBe (expected.gmailLink?.communicationLinkId ?: "")
     gmail.email shouldBe ((expected.gmailLink?.data as? GmailData)?.email ?: "")
     phone.number shouldBe (expected.phoneLink?.communicationLinkId ?: "")
+    mail.id shouldBe (expected.mailRuLink?.communicationLinkId ?: "")
+    mail.email shouldBe ((expected.mailRuLink?.data as? MailRuData)?.email ?: "")
 }
 
 infix fun Settings.settingsShouldBe(expected: Settings) {
@@ -87,6 +90,10 @@ infix fun List<ChannelType>.channelsShouldBe(expected: ChannelsDto) {
         set shouldContain ChannelType.GOOGLE
         set.remove(ChannelType.GOOGLE)
     }
+    if (expected.mailRu) {
+        set shouldContain ChannelType.MAILRU
+        set.remove(ChannelType.MAILRU)
+    }
     if (expected.chat) {
         set shouldContain ChannelType.CHAT
         set.remove(ChannelType.CHAT)
@@ -101,6 +108,7 @@ infix fun List<ChannelType>.channelsShouldBe(expected: ChannelsDto) {
 infix fun ChannelsDto.channelsShouldBe(expected: List<ChannelType>) {
     vk shouldBe expected.contains(ChannelType.VK)
     gmail shouldBe expected.contains(ChannelType.GOOGLE)
+    mailRu shouldBe expected.contains(ChannelType.MAILRU)
     phone shouldBe expected.contains(ChannelType.PHONE)
     chat shouldBe expected.contains(ChannelType.CHAT)
 }
@@ -113,6 +121,10 @@ infix fun LinksDto.linksShouldBe(expected: LinksDto) {
     when (expected.gmailLink) {
         null -> gmailLink?.shouldBeNull()
         else -> gmailLink linkShouldBe expected.gmailLink!!
+    }
+    when (expected.mailRuLink) {
+        null -> mailRuLink?.shouldBeNull()
+        else -> mailRuLink linkShouldBe expected.mailRuLink!!
     }
     when (expected.phoneLink) {
         null -> phoneLink?.shouldBeNull()
@@ -133,7 +145,7 @@ infix fun GetProfilePageResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     contacts.channelsList channelsShouldBe expected.settings.channels
     contacts.links linksShouldBe expected.communicationLinks.toDto()
     lastActivity timestampShouldBe expected.lastSeen
@@ -143,14 +155,14 @@ infix fun GetProfileInfoResponse.responseShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
 }
 
 infix fun GetProfilePageResponse.responseShouldBeBlockedAnd(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     contacts.channelsList.size shouldBe 0
     contacts.links shouldBe Links.getDefaultInstance()
     lastActivity timestampShouldBe expected.lastSeen
@@ -166,7 +178,7 @@ infix fun ProfileSummary.profileShouldBe(expected: Profile) {
     id shouldBe expected.id
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
     addressId shouldBe expected.addressId
 }
 
@@ -193,5 +205,5 @@ infix fun AddressRequest.addressShouldBe(expected: Address) {
 infix fun Profile.profileShouldBe(expected: SetProfileInfoRequest) {
     name shouldBe expected.name
     surname shouldBe expected.surname
-    imageId shouldBe expected.imageId
+    imageUrl shouldBe expected.imageUrl
 }

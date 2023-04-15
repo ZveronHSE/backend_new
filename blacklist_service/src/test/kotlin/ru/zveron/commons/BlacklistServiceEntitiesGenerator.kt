@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomUtils
 import ru.zveron.contract.blacklist.addToBlacklistRequest
 import ru.zveron.contract.blacklist.deleteFromBlacklistRequest
 import ru.zveron.contract.blacklist.existInBlacklistRequest
+import ru.zveron.contract.blacklist.existInMultipleBlacklistsRequest
 import ru.zveron.contract.profile.profileSummary
 import ru.zveron.entity.BlacklistRecord
 
@@ -30,6 +31,12 @@ object BlacklistServiceEntitiesGenerator {
             this.targetUserId = targetUserId
         }
 
+    fun createExistInMultipleBlacklistsRequest(targetUserId: Long, ownerIds: List<Long>) =
+        existInMultipleBlacklistsRequest {
+            this.ownersIds.addAll(ownerIds)
+            this.targetUserId = targetUserId
+        }
+
     fun createAddToBlacklistRequest(targetUserId: Long) =
         addToBlacklistRequest { this.id = targetUserId }
 
@@ -40,7 +47,7 @@ object BlacklistServiceEntitiesGenerator {
         this.id = id
         name = generateString(10)
         surname = generateString(10)
-        imageId = generateUserId()
+        imageUrl = generateString(10)
         addressId = generateUserId()
     }
 }

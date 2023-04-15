@@ -2,6 +2,7 @@ package ru.zveron.test.util
 
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
+import java.util.UUID
 
 object GeneratorUtils {
 
@@ -19,4 +20,6 @@ object GeneratorUtils {
     fun generateString(size: Int = 10): String = RandomStringUtils.randomAlphanumeric(size)
 
     fun generateDouble() = RandomUtils.nextDouble(0.0, 180.0) * if (RandomUtils.nextBoolean()) 1 else -1
+
+    fun generateImageUrl() = """https://yandex.cloud/${UUID.randomUUID()}.jpeg"""
 }

@@ -42,7 +42,7 @@ object ProfilesFavoritesRecordEntitiesGenerator {
         this.id = id
         name = PrimitivesGenerator.generateString(10)
         surname = PrimitivesGenerator.generateString(10)
-        imageId = PrimitivesGenerator.generateUserId()
+        imageUrl = PrimitivesGenerator.generateString(10)
         addressId = PrimitivesGenerator.generateUserId()
     }
 }

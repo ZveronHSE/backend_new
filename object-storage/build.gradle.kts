@@ -13,7 +13,7 @@ dependencies {
 
     implementation("aws.sdk.kotlin:s3:0.20.2-beta")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.10")
-    implementation("com.github.zveronHSe.contract:objectstorage:1.9.3")
+    implementation("com.github.zveronHSe.contract:objectstorage:1.9.7")
 
     implementation("aws.smithy.kotlin:http-client-engine-okhttp-jvm:0.15.2")
 }

@@ -1,6 +1,7 @@
 package ru.zveron.service.api
 
 import io.grpc.Status
+import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
@@ -31,6 +32,8 @@ import ru.zveron.exception.ProfileNotFoundException
 import ru.zveron.contract.profile.getProfilesSummaryRequest
 import ru.zveron.repository.ProfileRepository
 import ru.zveron.domain.link.GmailData
+import ru.zveron.domain.link.LinksDto
+import ru.zveron.domain.link.MailRuData
 import ru.zveron.domain.link.VkData
 import ru.zveron.mapper.ContactsMapper.toDto
 import ru.zveron.mapper.ContactsMapper.toLinks
@@ -102,8 +105,8 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @ParameterizedTest
-    @CsvSource(value = ["true,false,false", "false,true,false", "false,false,true"])
-    fun `createProfile when links are not unique`(vk: Boolean, gmail: Boolean, phone: Boolean) {
+    @CsvSource(value = ["true,false,false,false", "false,true,false,false", "false,false,true,false", "false,false,false,true"])
+    fun `createProfile when links are not unique`(vk: Boolean, gmail: Boolean, phone: Boolean, mailRu: Boolean) {
         val now = Instant.now()
         val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(
@@ -111,9 +114,10 @@ class ProfileServiceInternalTest : ProfileTest() {
             addVk = vk,
             addGmail = gmail,
             addPhone = phone,
+            addMailRu = mailRu,
             addChat = true
         )
-        generateLinks(expectedProfile, addVk = vk, addGmail = gmail, addPhone = phone)
+        generateLinks(expectedProfile, addVk = vk, addGmail = gmail, addPhone = phone, addMailRu = mailRu)
         profileRepository.save(expectedProfile)
         val request = generateCreateProfileRequest(expectedProfile)
 
@@ -187,7 +191,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     }
 
     @Test
-    fun `updateContacts when request is correct and add new link`() {
+    fun `updateContacts when request is correct and add gmail link`() {
         val now = Instant.now()
         val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
@@ -209,6 +213,56 @@ class ProfileServiceInternalTest : ProfileTest() {
         gmail.communicationLinkId shouldBe request.links.gmail.id
         (gmail.data as GmailData)
             .email shouldBe request.links.gmail.email
+    }
+
+    @Test
+    fun `updateContacts when request is correct and add mailRu link`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        generateLinks(expectedProfile, addPhone = true)
+        val id = profileRepository.save(expectedProfile).id
+        val request =
+            generateUpdateContactsRequest(
+                id,
+                ChannelType.MAILRU,
+                mailRuId = PropsGenerator.generateString(15),
+                mailRuEmail = PropsGenerator.generateString(15)
+            )
+
+        runBlocking {
+            service.updateContacts(request)
+        }
+
+        val mail = communicationLinkRepository.findAllByProfileId(id).toDto().mailRuLink!!
+        mail.communicationLinkId shouldBe request.links.mail.id
+        (mail.data as MailRuData)
+            .email shouldBe request.links.mail.email
+    }
+
+    @Test
+    fun `updateContacts when request is correct and add vk link`() {
+        val now = Instant.now()
+        val expectedProfile = ProfileGenerator.generateProfile(now)
+        SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
+        generateLinks(expectedProfile, addPhone = true)
+        val id = profileRepository.save(expectedProfile).id
+        val request =
+            generateUpdateContactsRequest(
+                id,
+                ChannelType.VK,
+                vkId = PropsGenerator.generateString(15),
+                vkRef = PropsGenerator.generateString(15)
+            )
+
+        runBlocking {
+            service.updateContacts(request)
+        }
+
+        val vk = communicationLinkRepository.findAllByProfileId(id).toDto().vkLink!!
+        vk.communicationLinkId shouldBe request.links.vk.id
+        (vk.data as VkData)
+            .ref shouldBe request.links.vk.ref
     }
 
     @Test
@@ -277,17 +331,15 @@ class ProfileServiceInternalTest : ProfileTest() {
         exception.code shouldBe Status.Code.INVALID_ARGUMENT
     }
 
-    @Test
-    fun `profileExistsByLink if correct id`() {
+    @ParameterizedTest
+    @CsvSource(value = ["true,false,false,false", "false,true,false,false", "false,false,true,false", "false,false,false,true"])
+    fun `profileExistsByLink if correct id`(vk: Boolean, gmail: Boolean, phone: Boolean, mailRu: Boolean) {
         val now = Instant.now()
         val expectedProfile = ProfileGenerator.generateProfile(now)
         SettingsGenerator.generateSettings(expectedProfile, addPhone = true, addChat = true)
-        val linksDto = generateLinks(expectedProfile, addPhone = true)
+        val linksDto = generateLinks(expectedProfile, addPhone = phone, addVk = vk, addMailRu = mailRu, addGmail = gmail)
         profileRepository.save(expectedProfile)
-        val request = getProfileByChannelRequest {
-            type = ChannelType.PHONE
-            identifier = linksDto.phoneLink!!.communicationLinkId
-        }
+        val request = generateGetProfileByChannelRequest(linksDto, vk, gmail, phone, mailRu)
 
         runBlocking {
             val response = service.getProfileByChannel(request)
@@ -408,7 +460,7 @@ class ProfileServiceInternalTest : ProfileTest() {
         runBlocking {
             val response = service.getProfilesSummary(request).profilesList
             response.first { it.id == profiles[0].id } profileShouldBe profiles[0]
-            response.first { it.id == profiles[1].id  } profileShouldBe profiles[1]
+            response.first { it.id == profiles[1].id } profileShouldBe profiles[1]
         }
     }
 
@@ -435,7 +487,7 @@ class ProfileServiceInternalTest : ProfileTest() {
     private fun generateCreateProfileRequest(profile: Profile) = createProfileRequest {
         name = profile.name
         surname = profile.surname
-        imageId = profile.imageId
+        imageUrl = profile.imageUrl
         links = profile.communicationLinks.toDto().toLinks()
         passwordHash = profile.passwordHash ?: ""
     }
@@ -448,10 +500,51 @@ class ProfileServiceInternalTest : ProfileTest() {
         vkRef: String = "",
         additionalEmail: String = "",
         gmailId: String = "",
-        gmail: String = ""
+        gmail: String = "",
+        mailRuId: String = "",
+        mailRuEmail: String = "",
     ) = updateContactsRequest {
         profileId = id
         this.type = type
-        links = generateLinks(phone, vkId, vkRef, additionalEmail, gmailId, gmail)
+        links = generateLinks(
+            phone,
+            vkId,
+            vkRef,
+            additionalEmail,
+            gmailId,
+            gmail,
+            mailRuId = mailRuId,
+            mailRuEmail = mailRuEmail
+        )
+    }
+
+    private fun generateGetProfileByChannelRequest(
+        links: LinksDto,
+        vk: Boolean,
+        gmail: Boolean,
+        phone: Boolean,
+        mailRu: Boolean
+    ) = when {
+        vk -> getProfileByChannelRequest {
+            type = ChannelType.VK
+            identifier = links.vkLink!!.communicationLinkId
+        }
+
+        gmail -> getProfileByChannelRequest {
+            type = ChannelType.GOOGLE
+            identifier = links.gmailLink!!.communicationLinkId
+        }
+
+        phone -> getProfileByChannelRequest {
+            type = ChannelType.PHONE
+            identifier = links.phoneLink!!.communicationLinkId
+        }
+
+        mailRu -> getProfileByChannelRequest {
+            type = ChannelType.MAILRU
+            identifier = links.mailRuLink!!.communicationLinkId
+        }
+
+        else -> fail("At least one communication link should be presented")
     }
 }

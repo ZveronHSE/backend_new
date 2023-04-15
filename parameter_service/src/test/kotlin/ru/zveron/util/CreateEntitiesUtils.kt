@@ -10,12 +10,14 @@ import ru.zveron.entity.ParameterFromType
 object CreateEntitiesUtils {
     fun mockCategoryWithParent(category: Category) = Category(
         name = "child",
+        imageUrl = "imageUrl",
         parent = category
     )
 
 
     fun mockRootCategory() = Category(
-        name = "root"
+        name = "root",
+        imageUrl = "imageUrl"
     )
 
 
@@ -35,6 +37,7 @@ object CreateEntitiesUtils {
     private fun mapToExternalCategory(category: Category) = ru.zveron.contract.parameter.external.category {
         id = category.id
         name = category.name
+        imageUrl = category.imageUrl
     }
 
     fun mockParameterFromType(
@@ -45,8 +48,8 @@ object CreateEntitiesUtils {
         type: String
     ) = ParameterFromType(
         ParameterFromType.ParameterFromTypeKey(id, id, id),
-        Category(id, ""),
-        LotForm(id, Category(id, ""), ""),
+        Category(id, "", ""),
+        LotForm(id, Category(id, "", ""), ""),
         Parameter(
             id = id,
             name = name,

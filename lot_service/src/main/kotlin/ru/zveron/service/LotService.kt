@@ -112,7 +112,7 @@ class LotService(
             // Инициализируем по умолчанию статистику с нулевыми параметрами
             statistics = LotStatistics(lot = lot)
             photos = request.photosList
-                .map { LotPhoto(lot = lot, imageId = it.id, orderPhoto = it.order) }
+                .map { LotPhoto(lot = lot, imageUrl = it.url, orderPhoto = it.order) }
         }
 
         // Здесь сохраняем и фотографии, и статистику
@@ -155,7 +155,7 @@ class LotService(
             photos = request.photosList.map {
                 LotPhoto(
                     lot = lot,
-                    imageId = it.id,
+                    imageUrl = it.url,
                     orderPhoto = it.order
                 )
             }

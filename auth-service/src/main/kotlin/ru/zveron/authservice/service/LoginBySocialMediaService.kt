@@ -32,10 +32,6 @@ class LoginBySocialMediaService(
         val provider = getProvider(request.providerType)
         val userInfo = provider.getUserInfo(request.accessToken)
 
-        if (userInfo.userId != request.providerUserId) {
-            throw SocialMediaException("Token user id does not match request user id")
-        }
-
         val response = profileServiceClient.findProfileBySocialMedia(request.providerType, userInfo.userId)
 
         val profileId: Long = when (response) {

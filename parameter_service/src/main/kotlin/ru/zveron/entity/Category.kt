@@ -18,6 +18,8 @@ data class Category(
     var id: Int = -1,
     @Column(length = 100)
     val name: String,
+    @Column(name = "image_url")
+    val imageUrl: String,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_parent")
     var parent: Category? = null

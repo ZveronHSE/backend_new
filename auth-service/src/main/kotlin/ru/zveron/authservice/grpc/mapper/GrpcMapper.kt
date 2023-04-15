@@ -83,6 +83,7 @@ object GrpcMapper {
 
     fun ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest.toClientRequest() = createProfileRequest {
         this.name = this@toClientRequest.name
+        this.surname = this@toClientRequest.surname
         this.links = links {
             this.phone = phone {
                 this.number = this@toClientRequest.phone.toRequest()
@@ -101,7 +102,6 @@ object GrpcMapper {
     fun LoginBySocialRequest.toServiceRequest() = LoginBySocialMediaRequest(
         accessToken = this.accessToken,
         providerType = this.authProvider.toServiceProvider(),
-        providerUserId = this.providerUserId,
         fingerprint = this.deviceFp,
     )
 

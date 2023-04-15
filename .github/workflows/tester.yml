@@ -46,6 +46,9 @@ jobs:
           - name: Chat Service
             gradle: chat_service
 
+          - name: Order service
+            gradle: order-service
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
