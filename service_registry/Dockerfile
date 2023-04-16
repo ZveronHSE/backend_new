@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:experimental
 
 # Build stage
-FROM gradle:7.3.2-jdk17-alpine AS build
+FROM gradle:8.0.2-jdk17-focal AS build
 WORKDIR /app
 
 # Use buildkit's new cache mount to cache gradle dependencies
