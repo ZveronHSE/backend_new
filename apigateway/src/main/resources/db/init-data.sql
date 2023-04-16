@@ -41,7 +41,11 @@ values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('authLoginBySocialMedia', 'auth-service', 'AuthServiceExternal', 'LoginBySocial', 'ANY'),
        ('addressGetSubwaysByCity', 'address-service', 'SubwayStationExternalService', 'GetSubwayStationsByCity', 'ANY'),
        ('orderGetOrder', 'order-service', 'OrderServiceExternal', 'GetOrder', 'ANY'),
-       ('orderGetWaterfall', 'order-service', 'OrderWaterfallServiceExternal', 'GetWaterfall', 'ANY')
+       ('orderGetWaterfall', 'order-service', 'OrderWaterfallServiceExternal', 'GetWaterfall', 'ANY'),
+        ('authLoginBySocialMedia', 'auth-service', 'AuthServiceExternal', 'LoginBySocial', 'ANY'),
+        ('profileCreateAnimal', 'profile-service', 'AnimalGrpcExternal', 'CreateAnimal', 'BUYER'),
+        ('profileGetAnimal', 'profile-service', 'AnimalGrpcExternal', 'GetAnimal', 'BUYER'),
+        ('profileGetAnimalsByProfile', 'profile-service', 'AnimalGrpcExternal', 'GetAnimalsByProfile', 'BUYER')
 
 ON CONFLICT (alias) DO UPDATE SET service_name      = EXCLUDED.service_name,
                                   grpc_service_name = EXCLUDED.grpc_service_name,
