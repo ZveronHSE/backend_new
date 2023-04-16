@@ -1,19 +1,24 @@
 spring:
+
   liquibase:
     enabled: true
     change-log: classpath:db/master.yaml
     url: jdbc:postgresql://localhost:5555/order-service
     user: zveron_user
     password: zveron_password
+
   datasource:
     url: jdbc:postgresql://localhost:5555/order-service
     password: zveron_password
     username: zveron_user
+
   main:
     banner-mode: off
     web-application-type: reactive
+
   application:
     name: order-service
+
   r2dbc:
     url: r2dbc:postgresql://localhost:5555/order-service
     username: zveron_user
@@ -23,10 +28,12 @@ spring:
 
   netty:
     leak-detection: advanced
+
   jpa:
     show-sql: true
 
 eureka:
+
   client:
     enabled: true
     webclient:
@@ -35,12 +42,13 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
+
   instance:
     metadata-map:
       OrderWaterfallServiceExternal: 'external/external_order_waterfall.proto'
       OrderServiceExternal: 'external/external_order_crud.proto'
-
     prefer-ip-address: true
+
 management:
   endpoint:
     serviceregistry:
@@ -48,7 +56,26 @@ management:
 
 grpc:
   server:
-    port: 9092
+    port: 0
+
+  client:
+    profile:
+      address: 'discovery:///profile-service'
+      enableKeepAlive: true # пока не оч ясно будет ли влиять я бы посмотрел
+      keepAliveWithoutCalls: true # то же самое
+      negotiationType: plaintext # пока что так, потом добавим всякие сертификаты
+
+    animal:
+      address: 'discovery:///profile-service'
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
+    subway:
+      address: 'discovery:///address-service'
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
 
 server:
   port: 0
