@@ -29,7 +29,7 @@ dependencies {
     //contract
     implementation("com.github.zveronHSe.contract:order:$contractVersion")
     implementation("com.github.zveronHSe.contract:profile:$contractVersion")
-    implementation("com.github.zveronHSe.contract:address:$contractVersion")
+    implementation("com.github.zveronHSe.contract:address:eb0e975d51")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
 

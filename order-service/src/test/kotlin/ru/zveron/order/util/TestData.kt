@@ -13,6 +13,7 @@ fun testSubwayStation() = subwayStationInt {
     this.id = randomId().toInt()
     this.name = RandomStringUtils.randomAlphabetic(10)
     this.colorHex = RandomStringUtils.randomAlphabetic(8)
+    this.town = RandomStringUtils.randomAlphabetic(10)
 }
 
 fun testFindProfileResponse() = getProfileResponse {

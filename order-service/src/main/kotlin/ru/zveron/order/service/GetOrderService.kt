@@ -73,8 +73,7 @@ class GetOrderService(
             is GetSubwayStationApiResponse.Success -> SubwayStation(
                 name = response.subwayStation.name,
                 colorHex = response.subwayStation.colorHex,
-                //todo добавить в дто ответа
-                town = "г. Москва"
+                town = response.subwayStation.town,
             )
         }
 

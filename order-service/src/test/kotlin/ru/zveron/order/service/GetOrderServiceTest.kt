@@ -69,7 +69,7 @@ class GetOrderServiceTest {
         val subway = SubwayStation(
             name = subwayInt.name,
             colorHex = subwayInt.colorHex,
-            town = "г. Москва"
+            town = subwayInt.town
         )
 
         //prep env
