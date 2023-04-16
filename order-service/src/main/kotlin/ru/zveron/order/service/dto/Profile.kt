@@ -5,4 +5,6 @@ data class Profile(
     val name: String,
     val imageUrl: String,
     val rating: Double,
-)
+){
+    companion object
+}

@@ -11,6 +11,7 @@ import ru.zveron.order.client.profile.dto.GetProfileApiResponse
 import ru.zveron.order.exception.ClientException
 import ru.zveron.order.exception.OrderNotFoundException
 import ru.zveron.order.mapper.service.mapToGetOrderResponse
+import ru.zveron.order.mapper.service.of
 import ru.zveron.order.persistence.repository.OrderLotRepository
 import ru.zveron.order.service.dto.Animal
 import ru.zveron.order.service.dto.GetOrderResponse
@@ -48,12 +49,7 @@ class GetOrderService(
                 status = Status.NOT_FOUND
             )
 
-            is GetProfileApiResponse.Success -> Profile(
-                id = response.profile.id,
-                name = response.profile.name,
-                imageUrl = response.profile.imageUrl,
-                rating = rating,
-            )
+            is GetProfileApiResponse.Success -> Profile.of(response.profile, rating)
         }
 
     private suspend fun getRating(profileId: Long): Double = 4.5
@@ -70,11 +66,7 @@ class GetOrderService(
                 status = Status.NOT_FOUND
             )
 
-            is GetSubwayStationApiResponse.Success -> SubwayStation(
-                name = response.subwayStation.name,
-                colorHex = response.subwayStation.colorHex,
-                town = response.subwayStation.town,
-            )
+            is GetSubwayStationApiResponse.Success -> SubwayStation.of(response.subwayStation)
         }
 
     private suspend fun getAnimal(animalId: Long): Animal =
@@ -89,12 +81,6 @@ class GetOrderService(
                 status = Status.NOT_FOUND
             )
 
-            is GetAnimalApiResponse.Success -> Animal(
-                id = response.animal.id,
-                name = response.animal.name,
-                imageUrl = response.animal.imageUrlsList.first(),
-                species = response.animal.species,
-                breed = response.animal.breed,
-            )
+            is GetAnimalApiResponse.Success -> Animal.of(response.animal)
         }
 }
