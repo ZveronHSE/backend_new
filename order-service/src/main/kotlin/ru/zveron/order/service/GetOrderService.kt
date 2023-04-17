@@ -1,6 +1,8 @@
 package ru.zveron.order.service
 
 import io.grpc.Status
+import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 import org.springframework.stereotype.Service
 import ru.zveron.order.client.address.SubwayGrpcClient
 import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
@@ -17,7 +19,6 @@ import ru.zveron.order.service.dto.Animal
 import ru.zveron.order.service.dto.GetOrderResponse
 import ru.zveron.order.service.dto.Profile
 import ru.zveron.order.service.dto.SubwayStation
-import ru.zveron.order.util.CoroutineUtil.withCancellableContext
 
 @Service
 class GetOrderService(
@@ -27,14 +28,14 @@ class GetOrderService(
     private val animalGrpcClient: AnimalGrpcClient,
 ) {
 
-    suspend fun getOrder(orderId: Long): GetOrderResponse {
+    suspend fun getOrder(orderId: Long): GetOrderResponse = supervisorScope {
         val order = orderLotRepository.findById(orderId) ?: throw OrderNotFoundException(orderId)
-        val rating = withCancellableContext { getRating(order.profileId) }
-        val profile = withCancellableContext { getProfile(order.profileId, rating) }
-        val subwayStation = withCancellableContext { getSubwayStation(order.subwayId) }
-        val animal = withCancellableContext { getAnimal(order.animalId) }
+        val rating = async { getRating(order.profileId) }
+        val profile = async { getProfile(order.profileId, rating.await()) }
+        val subwayStation = async { getSubwayStation(order.subwayId) }
+        val animal = async { getAnimal(order.animalId) }
 
-        return mapToGetOrderResponse(order, subwayStation, profile, animal)
+        mapToGetOrderResponse(order, subwayStation.await(), profile.await(), animal.await())
     }
 
     private suspend fun getProfile(profileId: Long, rating: Double): Profile =
