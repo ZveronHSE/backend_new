@@ -41,7 +41,7 @@ class ProfileTest {
         val connection = dataSource.connection
         val statement = connection.createStatement()
         statement.execute(
-            "TRUNCATE settings, communication_link, profile"
+            "TRUNCATE settings, communication_link, profile, animal"
         )
 
         statement.close()
