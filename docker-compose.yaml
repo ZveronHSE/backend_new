@@ -71,10 +71,7 @@ services:
     restart: always
     container_name: registry
     platform: linux/amd64
-    build:
-      context: .
-      dockerfile: service_registry/Dockerfile
-
+    image: ghcr.io/zveronhse/service_registry
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/blacklist
