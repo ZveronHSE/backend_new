@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.supervisorScope
 import mu.KLogging
-import net.logstash.logback.argument.StructuredArguments.keyValue
 import org.springframework.stereotype.Service
 import ru.zveron.client.blacklist.BlacklistClient
 import ru.zveron.client.lot.LotClient
@@ -42,13 +41,13 @@ import ru.zveron.mapper.ChatMapper.toChatSummary
 import ru.zveron.mapper.MessageMapper.messageToResponse
 import ru.zveron.mapper.ProtoTypesMapper.toTimestamp
 import ru.zveron.mapper.ProtoTypesMapper.toUUID
-import ru.zveron.model.dao.ChatRequestContext
 import ru.zveron.model.dao.MultipleConnectionsResponse
 import ru.zveron.model.dao.NoneConnectionResponse
 import ru.zveron.model.dao.SingleConnectionResponse
 import ru.zveron.repository.BatchChatRepository
 import ru.zveron.component.ChatStorage
 import ru.zveron.component.MessageStorage
+import ru.zveron.model.dao.ChatRequestContext
 import java.time.Instant
 import java.util.*
 
@@ -66,24 +65,30 @@ class ChatApplicationService(
     companion object : KLogging()
 
     suspend fun getRecentChats(request: GetRecentChatsRequest, context: ChatRequestContext): SingleConnectionResponse {
-        logger.debug("Get recent chats for {}", keyValue("connection-id", context.connectionId))
+        logger.debug("Get recent chats")
         val recentChats = chatStorage.getRecentChats(
             context.authorizedProfileId,
             request.pagination,
-        ).toList()
-        val profileIds = recentChats.map { it.anotherProfileId }
-        val lotsIds = recentChats.flatMap { it.lotsIds ?: emptyList() }
-        val chatIds = recentChats.map { it.chatId }
+        )
+        val profileIds = mutableListOf<Long>()
+        val lotsIds = mutableListOf<Long>()
+        val chatIds = mutableListOf<UUID>()
+
+        for (chat in recentChats) {
+            profileIds.add(chat.anotherProfileId)
+            chat.lotsIds?.apply { lotsIds.addAll(this) }
+            chatIds.add(chat.chatId)
+        }
 
         val chats = supervisorScope {
-            val profilesSummary = getProfilesSummary(profileIds)
-            val lotsSummary = getLotsSummary(lotsIds)
-            val blacklistRecords = existsInMultipleBlacklists(context.authorizedProfileId, profileIds)
+            val profilesSummary = getProfilesSummaryAsync(profileIds)
+            val lotsSummary = getLotsSummaryAsync(lotsIds)
+            val blacklistRecords = existsInMultipleBlacklistsAsync(context.authorizedProfileId, profileIds)
             val messages = getChatsMessages(chatIds)
 
-            val profileSummaryMap = profilesSummary.awaitProfilesSummary(context)
-            val lotsSummaryMap = lotsSummary.awaitLotsSummary(context)
-            val blacklistsExist = blacklistRecords.awaitMultipleBlacklistRecords(context)
+            val profileSummaryMap = profilesSummary.awaitProfilesSummary()
+            val lotsSummaryMap = lotsSummary.awaitLotsSummary()
+            val blacklistsExist = blacklistRecords.awaitMultipleBlacklistRecords()
 
             recentChats.mapIndexed { index, chat ->
                 chatToChatResponse(
@@ -101,21 +106,17 @@ class ChatApplicationService(
     }
 
     suspend fun attachLotToChat(request: AttachLotRequest, context: ChatRequestContext): NoneConnectionResponse {
-        logger.debug(
-            "Attach lot: ${request.lotId} to chat: ${request.chatId} {}",
-            keyValue("connection-id", context.connectionId)
-        )
+        logger.debug("Attach lot: ${request.lotId} to chat: ${request.chatId}")
         val profileId = context.authorizedProfileId
-        val chatId = request.chatId.toUUID(context)
-        val chat = getChatIfValid(context.authorizedProfileId, request.interlocutorId, chatId, context)
+        val chatId = request.chatId.toUUID()
+        val chat = getChatIfValid(context.authorizedProfileId, request.interlocutorId, chatId)
 
         if (chat.lotsIds?.contains(request.lotId) == true) {
             throw InvalidParamChatException(
                 "Chat with id $chatId already has lot with id: ${request.lotId}.",
-                context
             )
         }
-        getLotIfValid(request.lotId, context)
+        getLotIfValid(request.lotId)
 
         chatStorage.attachLotToChat(request.lotId, profileId, request.interlocutorId, chatId)
 
@@ -123,17 +124,13 @@ class ChatApplicationService(
     }
 
     suspend fun detachLotFromChat(request: DetachLotRequest, context: ChatRequestContext): NoneConnectionResponse {
-        logger.debug(
-            "Detach lot: ${request.lotId} to chat: ${request.chatId} {}",
-            keyValue("connection-id", context.connectionId)
-        )
-        val chatId = request.chatId.toUUID(context)
-        val chat = getChatIfValid(context.authorizedProfileId, request.interlocutorId, chatId, context)
+        logger.debug("Detach lot: ${request.lotId} to chat: ${request.chatId}")
+        val chatId = request.chatId.toUUID()
+        val chat = getChatIfValid(context.authorizedProfileId, request.interlocutorId, chatId)
 
         if (chat.lotsIds?.contains(request.lotId) != true) {
             throw InvalidParamChatException(
                 "Chat with id $chatId does not contains lot with id: ${request.lotId}.",
-                context
             )
         }
 
@@ -143,17 +140,14 @@ class ChatApplicationService(
     }
 
     suspend fun sendEvent(request: SendEventRequest, context: ChatRequestContext): SingleConnectionResponse {
-        logger.debug(
-            "Send event ${request.eventCase.name} to chat: ${request.chatId} {}",
-            keyValue("connection-id", context.connectionId)
-        )
-        val chatId = request.chatId.toUUID(context)
+        logger.debug("Send event ${request.eventCase.name} to chat: ${request.chatId}")
+        val chatId = request.chatId.toUUID()
         val profileId = context.authorizedProfileId
-        val interlocutorId = getInterlocutorId(profileId, chatId, context)
+        val interlocutorId = getInterlocutorId(profileId, chatId)
 
         return when (request.eventCase) {
             SendEventRequest.EventCase.CHANGED_STATUS_EVENT -> {
-                val ids = request.changedStatusEvent.idsList.map { it.toUUID(context) }
+                val ids = request.changedStatusEvent.idsList.map { it.toUUID() }
                 batchChatRepository.markMessagesAsRead(chatId, ids)
                 val response = chatRouteResponse {
                     receiveEvent =
@@ -182,34 +176,28 @@ class ChatApplicationService(
             }
 
             else -> throw InvalidParamChatException(
-                "Unsupported event type: ${request.eventCase.name}.",
-                context
-            )
+                "Unsupported event type: ${request.eventCase.name}.")
         }
     }
 
     suspend fun startChat(request: StartChatRequest, context: ChatRequestContext): MultipleConnectionsResponse {
-        logger.debug(
-            "Start chat with profile: ${request.interlocutorId} {}",
-            keyValue("connection-id", context.connectionId)
-        )
+        logger.debug("Start chat with profile: ${request.interlocutorId}")
         if (request.article.type != ArticleType.LOT) {
-            throw ChatException(Status.UNIMPLEMENTED, "Orders are not supported yet in chat service", context)
+            throw ChatException(Status.UNIMPLEMENTED, "Orders are not supported yet in chat service")
         }
         if (context.authorizedProfileId == request.interlocutorId) {
-            throw InvalidParamChatException("Cannot start chat with yourself.", context)
+            throw InvalidParamChatException("Cannot start chat with yourself.")
         }
         if (blacklistClient.existsInBlacklist(request.interlocutorId, context.authorizedProfileId)) {
             throw InvalidParamChatException(
                 "Cannot start chat with profile: ${request.interlocutorId} because you are in the blacklist.",
-                context
             )
         }
 
         val lotId = request.article.id
-        val lotSummary = getLotIfValid(lotId, context)
+        val lotSummary = getLotIfValid(lotId)
         val chat = supervisorScope {
-            val interlocutorSummary = getProfilesSummary(listOf(request.interlocutorId))
+            val interlocutorSummary = getProfilesSummaryAsync(listOf(request.interlocutorId))
             val chatId = snowflakeClient.fetchUuid()
             val messageId = snowflakeClient.fetchUuid()
             val receivedAt = Instant.now()
@@ -253,23 +241,22 @@ class ChatApplicationService(
     }
 
     suspend fun getChatSummary(request: GetChatSummary, context: ChatRequestContext): SingleConnectionResponse {
-        val chatId = request.chatId.toUUID(context)
+        val chatId = request.chatId.toUUID()
 
         val chatResponse = supervisorScope {
             val chat = chatStorage.findExact(context.authorizedProfileId, chatId)
                 ?: throw InvalidParamChatException(
-                    "Profile with id ${context.authorizedProfileId} does not have chat with id: $chatId.",
-                    context
+                    "Profile with id ${context.authorizedProfileId} does not have chat with id: $chatId."
                 )
 
-            val profilesSummary = getProfilesSummary(listOf(chat.anotherProfileId))
-            val lotsSummary = chat.lotsIds?.let { getLotsSummary(it.toList()) }
+            val profilesSummary = getProfilesSummaryAsync(listOf(chat.anotherProfileId))
+            val lotsSummary = chat.lotsIds?.let { getLotsSummaryAsync(it.toList()) }
             val blacklistRecord = existsInBlacklist(chat.anotherProfileId, context.authorizedProfileId)
             val messages = getChatsMessages(listOf(chatId))
 
-            val profileSummaryMap = profilesSummary.awaitProfilesSummary(context)
-            val lotsSummaryMap = lotsSummary?.awaitLotsSummary(context) ?: emptyMap()
-            val isInBlacklist = blacklistRecord.awaitBlacklistRecord(context)
+            val profileSummaryMap = profilesSummary.awaitProfilesSummary()
+            val lotsSummaryMap = lotsSummary?.awaitLotsSummary() ?: emptyMap()
+            val isInBlacklist = blacklistRecord.awaitBlacklistRecord()
 
             chatToChatResponse(
                 chat,
@@ -285,17 +272,17 @@ class ChatApplicationService(
         return SingleConnectionResponse(context.authorizedProfileId, response)
     }
 
-    private fun CoroutineScope.getProfilesSummary(ids: List<Long>) =
+    private fun CoroutineScope.getProfilesSummaryAsync(ids: List<Long>) =
         async(CoroutineName("Get-Profiles-Summary-Coroutine")) {
             profileClient.getProfilesSummary(ids)
         }
 
-    private fun CoroutineScope.getLotsSummary(ids: List<Long>) =
+    private fun CoroutineScope.getLotsSummaryAsync(ids: List<Long>) =
         async(CoroutineName("Get-Lots-Summary-Coroutine")) {
             lotClient.getLotsById(ids)
         }
 
-    private fun CoroutineScope.existsInMultipleBlacklists(targetProfileId: Long, ownersIds: List<Long>) =
+    private fun CoroutineScope.existsInMultipleBlacklistsAsync(targetProfileId: Long, ownersIds: List<Long>) =
         async(CoroutineName("Exists-In-Multiple-Blacklists-Coroutine")) {
             blacklistClient.existsInMultipleBlacklists(targetProfileId, ownersIds)
         }
@@ -310,60 +297,53 @@ class ChatApplicationService(
             messageStorage.getChatRecentMessages(it).map { message -> messageToResponse(message) }
         }
 
-    private suspend fun Deferred<List<ProfileSummary>>.awaitProfilesSummary(context: ChatRequestContext): Map<Long, ru.zveron.contract.chat.model.ProfileSummary> =
+    private suspend fun Deferred<List<ProfileSummary>>.awaitProfilesSummary(): Map<Long, ru.zveron.contract.chat.model.ProfileSummary> =
         try {
             val profiles = await()
             profiles.associate { it.id to it.toChatSummary() }
         } catch (ex: StatusException) {
             logger.error(
-                "Cannot load profiles summary. Got ${ex.status} from profile service. Message: ${ex.message}",
-                keyValue("connection-id", context.connectionId)
+                "Cannot load profiles summary. Got ${ex.status} from profile service. Message: ${ex.message}"
             )
             emptyMap()
         }
 
-    private suspend fun Deferred<List<Lot>>.awaitLotsSummary(context: ChatRequestContext): Map<Long, Lot> =
+    private suspend fun Deferred<List<Lot>>.awaitLotsSummary(): Map<Long, Lot> =
         try {
             val lots = await()
             lots.associateBy { it.id }
         } catch (ex: StatusException) {
-            logger.error(
-                "Cannot load lots summary. Got ${ex.status} from lot service. Message: ${ex.message}",
-                keyValue("connection-id", context.connectionId)
-            )
+            logger.error("Cannot load lots summary. Got ${ex.status} from lot service. Message: ${ex.message}")
             emptyMap()
         }
 
-    private suspend fun Deferred<List<Boolean>>.awaitMultipleBlacklistRecords(context: ChatRequestContext): List<Boolean> =
+    private suspend fun Deferred<List<Boolean>>.awaitMultipleBlacklistRecords(): List<Boolean> =
         try {
             await()
         } catch (ex: StatusException) {
             logger.error(
-                "Cannot load blacklist records. Got ${ex.status} from blacklist service. Message: ${ex.message}",
-                keyValue("connection-id", context.connectionId)
+                "Cannot load blacklist records. Got ${ex.status} from blacklist service. Message: ${ex.message}"
             )
             emptyList()
         }
 
-    private suspend fun Deferred<Boolean>.awaitBlacklistRecord(context: ChatRequestContext): Boolean =
+    private suspend fun Deferred<Boolean>.awaitBlacklistRecord(): Boolean =
         try {
             await()
         } catch (ex: StatusException) {
             logger.error(
-                "Cannot get blacklist record. Got ${ex.status} from blacklist service. Message: ${ex.message}",
-                keyValue("connection-id", context.connectionId)
+                "Cannot get blacklist record. Got ${ex.status} from blacklist service. Message: ${ex.message}"
             )
             false
         }
 
-    private fun StatusException.wrapIfAppropriate(lotId: Long, context: ChatRequestContext): ChatException {
+    private fun StatusException.wrapIfAppropriate(lotId: Long): ChatException {
         return when (status) {
-            Status.NOT_FOUND -> ChatException(Status.NOT_FOUND, "lot with id: $lotId does not exists", context)
-            Status.INVALID_ARGUMENT -> InvalidParamChatException("lot id: $lotId is invalid", context)
+            Status.NOT_FOUND -> ChatException(Status.NOT_FOUND, "lot with id: $lotId does not exists")
+            Status.INVALID_ARGUMENT -> InvalidParamChatException("lot id: $lotId is invalid")
             else -> ChatException(
                 Status.FAILED_PRECONDITION,
                 "Cannot validate lot: $lotId. Got $status from lot service.",
-                context
             )
         }
     }
@@ -372,37 +352,33 @@ class ChatApplicationService(
         authorizedProfileId: Long,
         anotherProfileId: Long,
         chatId: UUID,
-        context: ChatRequestContext,
     ): ru.zveron.model.entity.Chat {
         val chat = chatStorage.findExact(authorizedProfileId, chatId)
             ?: throw InvalidParamChatException(
                 "Chat with id: $chatId does not exists for user $authorizedProfileId",
-                context
             )
 
         if (chat.anotherProfileId != anotherProfileId) {
             throw InvalidParamChatException(
                 "Chat with id $chatId does not contains user with id: $anotherProfileId",
-                context
             )
         }
 
         return chat
     }
 
-    private suspend fun getLotIfValid(lotId: Long, context: ChatRequestContext): Lot =
+    private suspend fun getLotIfValid(lotId: Long): Lot =
         try {
             lotClient.getLotsById(listOf(lotId)).firstOrNull()
-                ?: throw InvalidParamChatException("Lot with id $lotId does not exists", context)
+                ?: throw InvalidParamChatException("Lot with id $lotId does not exists")
         } catch (ex: StatusException) {
             logger.error(ex.message)
-            throw ex.wrapIfAppropriate(lotId, context)
+            throw ex.wrapIfAppropriate(lotId)
         }
 
-    private suspend fun getInterlocutorId(profileId: Long, chatId: UUID, context: ChatRequestContext) =
+    private suspend fun getInterlocutorId(profileId: Long, chatId: UUID) =
         chatStorage.getInterlocutorId(profileId, chatId)
             ?: throw InvalidParamChatException(
-                "Chat: $chatId does not exists for profile: $profileId.",
-                context
+                "Chat: $chatId does not exists for profile: $profileId."
             )
 }

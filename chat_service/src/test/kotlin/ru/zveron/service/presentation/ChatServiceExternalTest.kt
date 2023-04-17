@@ -39,7 +39,6 @@ import ru.zveron.mapper.MessageMapper.messageToResponse
 import ru.zveron.repository.ChatRepository
 import ru.zveron.repository.MessageRepository
 import ru.zveron.component.ChatPersistence
-import ru.zveron.model.dao.ChatRequestContext
 
 class ChatServiceExternalTest : ChatServiceApplicationTest() {
 
@@ -63,7 +62,6 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
         val message1 = PrimitivesGenerator.generateString(30)
         val message2 = PrimitivesGenerator.generateString(30)
         val backgroundScope = CoroutineScope(MetadataElement(Metadata(user1)))
-        val dummyContext = ChatRequestContext(Uuids.timeBased(), user2)
 
         coEvery {
             profileClient.getProfilesSummary(listOf(user2))
@@ -110,7 +108,6 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
                         this.message = message
                     }
                 },
-                dummyContext,
             )
             inputFlow.close()
             testedFlow.awaitItem().apply {

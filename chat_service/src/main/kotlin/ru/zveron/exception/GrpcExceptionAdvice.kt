@@ -4,7 +4,6 @@ import io.grpc.Status
 import mu.KLogging
 import net.devh.boot.grpc.server.advice.GrpcAdvice
 import net.devh.boot.grpc.server.advice.GrpcExceptionHandler
-import net.logstash.logback.marker.Markers.append
 import ru.zveron.library.grpc.exception.PlatformException
 
 @GrpcAdvice
@@ -22,8 +21,7 @@ class GrpcExceptionAdvice {
 
     @GrpcExceptionHandler(ChatException::class)
     fun handleChatExceptionException(e: ChatException): Status {
-        val marker = append("connection-id", e.context.connectionId)
-        logger.error(marker, "Failed to handle request connection-id=${e.context.connectionId}", e)
+        logger.error(e) { "Failed to handle request" }
         return Status.fromCode(e.status.code ?: Status.Code.INTERNAL)
             .withDescription(e.message)
     }

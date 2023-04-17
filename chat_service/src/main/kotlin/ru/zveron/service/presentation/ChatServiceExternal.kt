@@ -1,6 +1,5 @@
 package ru.zveron.service.presentation
 
-import com.datastax.oss.driver.api.core.uuid.Uuids
 import io.grpc.Status
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -11,15 +10,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transform
 import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
-import net.logstash.logback.argument.StructuredArguments.keyValue
-import net.logstash.logback.marker.Markers
 import ru.zveron.contract.chat.ChatRouteRequest
 import ru.zveron.contract.chat.ChatRouteResponse
 import ru.zveron.contract.chat.ChatServiceExternalGrpcKt
 import ru.zveron.exception.ChatException
 import ru.zveron.exception.InvalidParamChatException
-import ru.zveron.library.grpc.util.GrpcUtils
-import ru.zveron.model.dao.ChatRequestContext
 import ru.zveron.model.dao.ChatRouteResponseWrapper
 import ru.zveron.model.dao.MultipleConnectionsResponse
 import ru.zveron.model.dao.NoneConnectionResponse
@@ -28,6 +23,8 @@ import ru.zveron.service.application.ChatApplicationService
 import ru.zveron.component.ChatPersistence
 import ru.zveron.contract.chat.chatRouteResponse
 import ru.zveron.contract.chat.errorMessage
+import ru.zveron.library.grpc.util.GrpcUtils
+import ru.zveron.model.dao.ChatRequestContext
 import ru.zveron.service.application.MessageApplicationService
 import java.util.UUID
 import kotlin.coroutines.coroutineContext
@@ -43,44 +40,34 @@ class ChatServiceExternal(
 
     private val fixedNodeAddress = UUID.fromString("3e199891-cff7-11ed-bd31-479ce559ae0d")
 
-    override fun bidiChatRoute(requests: Flow<ChatRouteRequest>): Flow<ChatRouteResponse> {
-        val connectionId = Uuids.timeBased()
+    override fun bidiChatRoute(requests: Flow<ChatRouteRequest>): Flow<ChatRouteResponse> = flow {
+        logger.info("Start connection")
+        val chatRequestContext = ChatRequestContext(
+            GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
+        )
+        chatPersistence.registerConnection(fixedNodeAddress, chatRequestContext)
 
-        return flow {
-            logger.info("Start connection $connectionId")
-            val chatRequestContext = ChatRequestContext(
-                connectionId,
-                GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
-            )
-            chatPersistence.registerConnection(fixedNodeAddress, chatRequestContext)
+        val requestFlow = requests
+            .transform {
+                logger.info("Process request with type ${it.requestCase.name} {}")
 
-            val requestFlow = requests
-                .transform {
-                    logger.info(
-                        "Process request with type ${it.requestCase.name} {}",
-                        keyValue("connection-id", connectionId)
-                    )
-
-                    try {
-                        handleRequest(it, chatRequestContext)
-                    } catch (ex: Exception) {
-                        suppressChatException(ex)
-                    }
+                try {
+                    handleRequest(it, chatRequestContext)
+                } catch (ex: Exception) {
+                    suppressChatException(ex)
                 }
-                .onCompletion {
-                    logger.info("Close {}", keyValue("connection-id", connectionId))
-                    chatPersistence.closeConnection(chatRequestContext.authorizedProfileId, chatRequestContext)
-                }
-            val responseFlow =
-                chatPersistence.getChannel(chatRequestContext.authorizedProfileId)?.receiveAsFlow()
-                    ?: throw ChatException(
-                        Status.INTERNAL,
-                        "Connection for user with id: ${chatRequestContext.authorizedProfileId} not found",
-                        chatRequestContext,
-                    )
+            }
+            .onCompletion {
+                chatPersistence.closeConnection(chatRequestContext.authorizedProfileId)
+            }
+        val responseFlow =
+            chatPersistence.getChannel(chatRequestContext.authorizedProfileId)?.receiveAsFlow()
+                ?: throw ChatException(
+                    Status.INTERNAL,
+                    "Connection for user with id: ${chatRequestContext.authorizedProfileId} not found",
+                )
 
-            merge(requestFlow, responseFlow).collect { emit(it) }
-        }
+        merge(requestFlow, responseFlow).collect { emit(it) }
     }
 
     private suspend fun handleRequest(
@@ -128,25 +115,23 @@ class ChatServiceExternal(
                 context
             )
 
-            else -> throw InvalidParamChatException("'request' property is not set", context)
+            else -> throw InvalidParamChatException("'request' property is not set")
         }
 
-        deliverResponse(response, context)
+        deliverResponse(response)
     }
 
-    private suspend fun deliverResponse(response: ChatRouteResponseWrapper, context: ChatRequestContext) {
+    private suspend fun deliverResponse(response: ChatRouteResponseWrapper) {
         when (response) {
             is SingleConnectionResponse -> chatPersistence.sendMessageToConnection(
                 response.targetProfileId,
                 response.responseBody,
-                context,
             )
 
             is MultipleConnectionsResponse -> response.responses.forEach { (profileId, responseBody) ->
                 chatPersistence.sendMessageToConnection(
                     profileId,
                     responseBody,
-                    context,
                 )
             }
 
@@ -159,12 +144,7 @@ class ChatServiceExternal(
             throw ex
         }
 
-        val marker = Markers.append("connection-id", ex.context.connectionId)
-        logger.debug(
-            marker,
-            "Suppress chat exception with status ${ex.status} and send error message connection-id=${ex.context.connectionId}",
-            ex
-        )
+        logger.debug(ex) { "Suppress chat exception with status ${ex.status} and send error message" }
         emit(chatRouteResponse {
             error = errorMessage {
                 status = ex.status.code.value()

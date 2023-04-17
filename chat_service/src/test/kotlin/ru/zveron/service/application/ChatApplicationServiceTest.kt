@@ -50,7 +50,6 @@ import ru.zveron.model.dao.ChatRequestContext
 import ru.zveron.repository.ChatRepository
 import ru.zveron.repository.MessageRepository
 import java.time.Instant
-import java.util.UUID
 
 class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
@@ -663,7 +662,6 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
     }
 
     private fun CoroutineScope.defaultContext() = ChatRequestContext(
-        UUID.randomUUID(),
         GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!,
     )
 }

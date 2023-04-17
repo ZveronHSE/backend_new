@@ -24,9 +24,8 @@ class ChatPersistence {
 
     fun registerConnection(nodeAddress: UUID, context: ChatRequestContext) {
         logger.debug(
-            "Register connection {} {} {}",
+            "Register connection {} {}",
             keyValue("profile-id", context.authorizedProfileId),
-            keyValue("connection-id", context.connectionId),
             keyValue("node-id", nodeAddress)
         )
         connections[context.authorizedProfileId] = Channel(bufferSize)
@@ -36,21 +35,20 @@ class ChatPersistence {
         return connections[userId]
     }
 
-    suspend fun sendMessageToConnection(profileId: Long, message: ChatRouteResponse, context: ChatRequestContext) {
-        logger.debug("Send message to profile: $profileId {}", keyValue("connection-id", context.connectionId))
+    suspend fun sendMessageToConnection(profileId: Long, message: ChatRouteResponse) {
+        logger.debug("Send message to profile: $profileId")
         try {
             connections[profileId]?.send(message)
         } catch (e: CancellationException) {
             logger.debug(
-                "Got CancellationException while sending message to profile: $profileId {}",
-                keyValue("connection-id", context.connectionId)
+                "Got CancellationException while sending message to profile: $profileId {}"
             )
             connections.remove(profileId)
         }
     }
 
-    fun closeConnection(profileId: Long, context: ChatRequestContext) {
-        logger.debug("Close connection with profile: $profileId {}", keyValue("connection-id", context.connectionId))
+    fun closeConnection(profileId: Long) {
+        logger.debug("Close connection with profile: $profileId")
         connections.remove(profileId)?.close()
     }
 }
