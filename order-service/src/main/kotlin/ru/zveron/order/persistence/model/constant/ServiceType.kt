@@ -1,4 +1,4 @@
-package ru.zveron.order.persistence.model
+package ru.zveron.order.persistence.model.constant
 
 import com.fasterxml.jackson.annotation.JsonCreator
 

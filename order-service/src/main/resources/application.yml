@@ -61,9 +61,9 @@ grpc:
   client:
     profile:
       address: 'discovery:///profile-service'
-      enableKeepAlive: true # пока не оч ясно будет ли влиять я бы посмотрел
-      keepAliveWithoutCalls: true # то же самое
-      negotiationType: plaintext # пока что так, потом добавим всякие сертификаты
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
     animal:
       address: 'discovery:///profile-service'

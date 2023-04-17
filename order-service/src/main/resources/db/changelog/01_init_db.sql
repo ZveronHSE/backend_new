@@ -3,7 +3,6 @@
 --changeset Schuyweiz:init_order_table
 
 CREATE TYPE status AS ENUM ('PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'UPDATING');
-
 CREATE TYPE service_type AS ENUM ('WALK', 'SITTING', 'BOARDING', 'TRAINING', 'GROOMING', 'OTHER');
 CREATE TYPE service_delivery_type AS ENUM ('REMOTE', 'IN_PERSON');
 

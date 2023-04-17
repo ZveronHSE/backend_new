@@ -3,9 +3,9 @@ package ru.zveron.order.persistence.entity
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import ru.zveron.order.persistence.model.ServiceDeliveryType
-import ru.zveron.order.persistence.model.ServiceType
-import ru.zveron.order.persistence.model.Status
+import ru.zveron.order.persistence.model.constant.ServiceDeliveryType
+import ru.zveron.order.persistence.model.constant.ServiceType
+import ru.zveron.order.persistence.model.constant.Status
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime

@@ -1,10 +1,13 @@
-package ru.zveron.order.persistence.model
+package ru.zveron.order.persistence.model.constant
 
 import com.fasterxml.jackson.annotation.JsonCreator
 
-enum class ServiceDeliveryType {
-    REMOTE,
-    IN_PERSON,
+enum class Status {
+    PENDING,
+    CONFIRMED,
+    COMPLETED,
+    CANCELLED,
+    UPDATING,
     ;
 
     companion object {
@@ -12,7 +15,8 @@ enum class ServiceDeliveryType {
         @JsonCreator
         fun byAlias(alias: String) {
             values().singleOrNull { it.name.equals(alias, true) }
-                ?: error("Non existent ServiceDeliveryType for alias=$alias")
+                ?: error("Non existent Status for alias=$alias")
         }
     }
 }
+
