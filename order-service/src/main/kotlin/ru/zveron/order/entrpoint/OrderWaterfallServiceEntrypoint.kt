@@ -29,7 +29,7 @@ class OrderWaterfallServiceEntrypoint :
             this.station = "Площадь Революции"
             this.color = "#0047AB"
         }
-        this.serviceDatetime = "2021-01-01 10:00"
+        this.serviceDate = "2021-01-01"
         this.animal = animal {
             this.id = 1
             this.name = "Ежик"
