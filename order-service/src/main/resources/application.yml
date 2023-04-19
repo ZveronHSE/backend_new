@@ -31,11 +31,13 @@ spring:
 
   jpa:
     show-sql: true
+  jooq:
+    sql-dialect: postgres
 
 eureka:
 
   client:
-    enabled: true
+    enabled: false
     webclient:
       enabled: true
     fetch-registry: true
@@ -56,7 +58,7 @@ management:
 
 grpc:
   server:
-    port: 0
+    port: 9092
 
   client:
     profile:

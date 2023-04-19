@@ -9,15 +9,17 @@ import ru.zveron.contract.order.external.getWaterfallResponse
 import ru.zveron.contract.order.external.waterfallOrder
 import ru.zveron.contract.order.model.address
 import ru.zveron.contract.order.model.animal
+import ru.zveron.order.persistence.repository.WaterfallStorage
 
 @GrpcService
-class OrderWaterfallServiceEntrypoint :
-    OrderWaterfallServiceExternalGrpcKt.OrderWaterfallServiceExternalCoroutineImplBase() {
+class OrderWaterfallServiceEntrypoint(private val waterfallStorage: WaterfallStorage) :
+        OrderWaterfallServiceExternalGrpcKt.OrderWaterfallServiceExternalCoroutineImplBase() {
 
     override suspend fun getWaterfall(request: GetWaterfallRequest): GetWaterfallResponse {
+        waterfallStorage.findAll(request.lastOrderId, request.pageSize)
         return getWaterfallResponse {
             this.orders.addAll(
-                List(request.pageSize) { generateWaterfall() }
+                    List(request.pageSize) { generateWaterfall() }
             )
         }
     }
