@@ -222,7 +222,7 @@ class ChatApplicationService(
                     senderId = context.authorizedProfileId
                     sentAt = receivedAt.toTimestamp()
                 })
-                unreadMessages = 1
+                unreadMessages = 0
                 lastUpdate = receivedAt.toTimestamp()
                 lots.add(lotSummary)
                 folder = ChatFolder.NONE

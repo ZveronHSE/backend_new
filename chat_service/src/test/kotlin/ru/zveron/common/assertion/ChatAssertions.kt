@@ -74,7 +74,7 @@ object ChatAssertions {
         message: String,
         userId: Long
     ) {
-        unreadMessages shouldBe 1
+        unreadMessages shouldBe 0
         serviceId shouldBe 0L
         reviewId shouldBe 0L
         folder shouldBe ChatFolder.NONE

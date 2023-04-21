@@ -29,6 +29,7 @@ dependencies {
 
     //contracts
     implementation("com.github.zveronHSe.contract:auth:$contractVersion")
+    implementation("com.github.zveronHSe.contract:chat:$contractVersion")
     implementation("com.github.zveronHSe.contract:apigateway:$contractVersion")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")

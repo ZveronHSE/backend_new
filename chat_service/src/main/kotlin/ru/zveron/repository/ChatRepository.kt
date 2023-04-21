@@ -43,7 +43,7 @@ interface ChatRepository : CoroutineCrudRepository<Chat, Long> {
         """
         BEGIN BATCH
         INSERT INTO chat (profile_id, chat_id, last_update, another_profile_id, chat_status, unread_messages, lots_ids) VALUES (?0, ?1, ?2, ?3, ?4, 0, { ?8 });
-        INSERT INTO chat (profile_id, chat_id, last_update, another_profile_id, chat_status, unread_messages, lots_ids) VALUES (?3, ?1, ?2, ?0, ?4, 0, { ?8 });
+        INSERT INTO chat (profile_id, chat_id, last_update, another_profile_id, chat_status, unread_messages, lots_ids) VALUES (?3, ?1, ?2, ?0, ?4, 1, { ?8 });
         INSERT INTO message (chat_id, id, received_at, sender_id, text, is_read, type) VALUES (?1, ?5, ?2, ?0, ?6, false, ?7);
         APPLY BATCH
     """
