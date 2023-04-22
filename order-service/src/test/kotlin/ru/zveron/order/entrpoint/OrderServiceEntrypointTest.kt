@@ -61,7 +61,7 @@ class OrderServiceEntrypointTest @Autowired constructor(
             it.profile.id shouldBe profileResponse.id
             it.animal.id shouldBe animal.id
             it.address.station shouldBe subway.name
-            it.price shouldBe orderLotEntity.price
+            it.price shouldBe """${orderLotEntity.price} ₽"""
             it.title shouldBe orderLotEntity.title
             it.description shouldBe orderLotEntity.description
         }
