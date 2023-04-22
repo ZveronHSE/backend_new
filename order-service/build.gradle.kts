@@ -27,7 +27,7 @@ dependencies {
     implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
 
     //contract
-    implementation("com.github.zveronHSe.contract:order:$contractVersion")
+    implementation("com.github.zveronHSe.contract:order:aac8ca2811")
     implementation("com.github.zveronHSe.contract:profile:$contractVersion")
     implementation("com.github.zveronHSe.contract:address:eb0e975d51")
 

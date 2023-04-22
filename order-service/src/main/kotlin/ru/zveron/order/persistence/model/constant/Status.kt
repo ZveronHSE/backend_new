@@ -11,11 +11,14 @@ enum class Status {
     ;
 
     companion object {
+
+        fun canAcceptOrder(status: Status) = !(status == CANCELLED || status == COMPLETED)
+
         @JvmStatic
         @JsonCreator
         fun byAlias(alias: String) {
             values().singleOrNull { it.name.equals(alias, true) }
-                ?: error("Non existent Status for alias=$alias")
+                    ?: error("Non existent Status for alias=$alias")
         }
     }
 }

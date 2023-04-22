@@ -6,17 +6,20 @@ import ru.zveron.order.service.dto.Animal
 import ru.zveron.order.service.dto.GetOrderResponse
 import ru.zveron.order.service.dto.Profile
 import ru.zveron.order.service.dto.SubwayStation
-import java.time.format.DateTimeFormatter
 
 fun mapToGetOrderResponse(o: OrderLot, subway: SubwayStation, profile: Profile, animal: Animal) = GetOrderResponse(
-    id = o.id ?: error("Illegal entity state, id is null"),
-    profile = profile,
-    title = o.title,
-    animal = animal,
-    price = o.price,
-    subwayStation = subway,
-    serviceDate = """${o.serviceDateFrom} - ${o.serviceDateTo}""",
-    serviceTime = o.serviceTime?.format(DateTimeFormatter.ISO_LOCAL_TIME)?.toString() ?: "",
-    description = o.description,
-    serviceDeliveryType = ServiceDeliveryType.ofName(o.serviceDeliveryType.name),
+        id = o.id ?: error("Illegal entity state, id is null"),
+        profile = profile,
+        title = o.title,
+        animal = animal,
+        price = o.price,
+        subwayStation = subway,
+        serviceDateFrom = o.serviceDateFrom,
+        serviceDateTo = o.serviceDateTo,
+        timeWindowFrom = o.timeWindowFrom,
+        timeWindowTo = o.timeWindowTo,
+        description = o.description,
+        serviceDeliveryType = ServiceDeliveryType.valueOf(o.serviceDeliveryType.name),
+        orderStatus = o.status,
+        createdAt = o.createdAt,
 )
