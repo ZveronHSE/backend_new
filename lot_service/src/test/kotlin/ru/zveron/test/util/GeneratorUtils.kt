@@ -17,7 +17,7 @@ object GeneratorUtils {
 
     fun generateLong(start: Long = 0) = RandomUtils.nextLong(start, Long.MAX_VALUE)
 
-    fun generateString(size: Int = 10): String = RandomStringUtils.randomAlphanumeric(size)
+    fun generateString(size: Int = 10): String = RandomStringUtils.randomAlphabetic(size)
 
     fun generateDouble() = RandomUtils.nextDouble(0.0, 180.0) * if (RandomUtils.nextBoolean()) 1 else -1
 

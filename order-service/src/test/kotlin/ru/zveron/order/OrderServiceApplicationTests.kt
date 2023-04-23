@@ -2,15 +2,14 @@ package ru.zveron.order
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import ru.zveron.order.config.ContainerConfiguration
 
-@ActiveProfiles("test")
 @SpringBootTest(
     properties = [
         "spring.main.web-application-type=reactive"
     ]
 )
-class OrderServiceApplicationTests {
+class OrderServiceApplicationTests : ContainerConfiguration() {
 
     @Test
     fun contextLoads() {
