@@ -54,6 +54,7 @@ eureka:
   instance:
     metadata-map:
       ChatServiceExternal: 'chat_external.proto'
+      PingServiceExternal: 'ping_external.proto'
 
 
 
