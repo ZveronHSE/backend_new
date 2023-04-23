@@ -8,12 +8,14 @@ import io.grpc.protobuf.lite.ProtoLiteUtils
 
 object DescriptorsUtil {
 
-    fun Descriptors.MethodDescriptor.getGrpcMethodDescriptor() =
+    fun Descriptors.MethodDescriptor.getGrpcMethodDescriptor(
+        type: MethodDescriptor.MethodType = MethodDescriptor.MethodType.UNARY
+    ): MethodDescriptor<DynamicMessage?, DynamicMessage> =
         MethodDescriptor.newBuilder<DynamicMessage, DynamicMessage>()
             .setFullMethodName(MethodDescriptor.generateFullMethodName(this.service.fullName, this.name))
             .setRequestMarshaller(ProtoLiteUtils.marshaller(DynamicMessage.getDefaultInstance(this.inputType)))
             .setResponseMarshaller(ProtoLiteUtils.marshaller(DynamicMessage.getDefaultInstance(this.outputType)))
-            .setType(MethodDescriptor.MethodType.UNARY)
+            .setType(type)
             .build()
 
     fun Descriptors.FileDescriptor.getMethodDescriptor(

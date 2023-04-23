@@ -17,6 +17,7 @@ import ru.zveron.contract.core.Lot
 import ru.zveron.contract.lot.ProfileLotsResponse
 import ru.zveron.contract.profile.Contacts
 import ru.zveron.contract.profile.CreateProfileRequest
+import ru.zveron.contract.profile.GetProfileForOrderResponse
 import ru.zveron.contract.profile.GetProfileInfoResponse
 import ru.zveron.contract.profile.GetProfilePageRequest
 import ru.zveron.contract.profile.GetProfilePageResponse
@@ -28,6 +29,7 @@ import ru.zveron.contract.profile.GetProfilesSummaryRequest
 import ru.zveron.contract.profile.GetProfilesSummaryResponse
 import ru.zveron.contract.profile.SetProfileInfoRequest
 import ru.zveron.contract.profile.contacts
+import ru.zveron.contract.profile.getProfileForOrderResponse
 import ru.zveron.contract.profile.getProfileInfoResponse
 import ru.zveron.contract.profile.getProfilePageResponse
 import ru.zveron.contract.profile.getProfileResponse
@@ -150,6 +152,15 @@ class ProfileService(
             rating = reviewCoroutine.awaitRatingResponse()
         }
     }
+
+    suspend fun getProfileForOrder(request: GetProfileRequest): GetProfileForOrderResponse =
+        getProfileForOrderResponse {
+            val profile = findByIdOrThrow(request.id, ProfileInitializationType.DEFAULT)
+            id = request.id
+            name = profile.name
+            imageUrl = profile.imageUrl
+            rating = reviewClient.getRating(request.id).toFloat()
+        }
 
     suspend fun getProfile(request: GetProfileRequest): GetProfileResponse =
         getProfileResponse {

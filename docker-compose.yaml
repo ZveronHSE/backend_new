@@ -38,21 +38,24 @@ services:
     restart: always
     container_name: scylla_db
     image: 'scylladb/scylla:5.1'
-    profiles:
-      - "unreleased"
     volumes:
       - type: volume
         source: db_scylla
         target: /var/lib/scylla
         volume:
           nocopy: true
-      - ./chat_service/src/main/resources/db/changelog:/docker-entrypoint-initdb.d
     expose:
-      - 7000
       - 9042
     ports:
-      - "7000:7000"
       - "9042:9042"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 3G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
 
   pgadmin:
     restart: always
@@ -327,6 +330,27 @@ services:
         reservations:
           cpus: '0.25'
           memory: 128M
+
+  chat_service:
+    logging: *loki-logging
+    restart: always
+    container_name: chat_service
+    platform: linux/amd64
+    image: ghcr.io/zveronhse/chat_service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATA_CASSANDRA_CONTACT-POINTS=scylla_db
+    depends_on:
+      - scylla_db
+      - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
 
 volumes:
   db_data:

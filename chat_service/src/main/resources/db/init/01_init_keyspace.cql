@@ -1,0 +1,1 @@
+CREATE KEYSPACE IF NOT EXISTS zveron_chat WITH replication = {'class': 'NetworkTopologyStrategy', 'replication_factor' : 1};

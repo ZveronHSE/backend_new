@@ -1,5 +1,25 @@
 databaseChangeLog:
   - includeAll:
       path: db/changelog/
-  - includeAll:
-      path: db/init/
+  - changeSet:
+      id: include-data-sql
+      runAlways: true
+      author: Schuyweiz
+      validCheckSum: ANY
+      failOnError: false
+      changes:
+        - sqlFile:
+            path: init-data-profile.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-data-contact.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-data-link.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-data-settings.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-data-animal.sql
+            relativeToChangelogFile: true

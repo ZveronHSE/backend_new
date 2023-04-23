@@ -1,13 +1,13 @@
 package ru.zveron.service
 
 import org.springframework.stereotype.Service
-import ru.zveron.contract.address.external.ExtSubwayStationKt
 import ru.zveron.contract.address.external.GetSubwayStationsByCityExtRequest
+import ru.zveron.contract.address.external.SubwayStationExtKt
 import ru.zveron.contract.address.external.getSubwayStationsExtResponse
 import ru.zveron.contract.address.internal.GetSubwayStationRequest
 import ru.zveron.contract.address.internal.GetSubwayStationResponse
 import ru.zveron.contract.address.internal.GetSubwayStationsRequest
-import ru.zveron.contract.address.internal.IntSubwayStationKt
+import ru.zveron.contract.address.internal.SubwayStationIntKt
 import ru.zveron.contract.address.internal.getSubwayStationResponse
 import ru.zveron.contract.address.internal.getSubwayStationsResponse
 import ru.zveron.exception.SubwayNotFoundException
@@ -21,19 +21,19 @@ class GetSubwayStationService(
 
     suspend fun getSubwayStation(request: GetSubwayStationRequest): GetSubwayStationResponse =
         repository.findById(request.id)
-            ?.let { IntSubwayStationKt.ofEntity(it) }
+            ?.let { SubwayStationIntKt.ofEntity(it) }
             ?.let { getSubwayStationResponse { this.subwayStation = it } }
             ?: throw SubwayNotFoundException(request.id)
 
     suspend fun getSubwayStationsByIds(request: GetSubwayStationsRequest) = repository.findAllByIdIn(request.idsList)
-        .map { IntSubwayStationKt.ofEntity(it) }
+        .map { SubwayStationIntKt.ofEntity(it) }
         .let { getSubwayStationsResponse { subwayStations.addAll(it) } }
 
     suspend fun getSubwayStationsRequest(request: GetSubwayStationsByCityExtRequest) =
         repository.findAllByCity(request.city)
             .let {
                 getSubwayStationsExtResponse {
-                    this.subwayStations.addAll(it.map { entity -> ExtSubwayStationKt.ofEntity(entity) })
+                    this.subwayStations.addAll(it.map { entity -> SubwayStationExtKt.ofEntity(entity) })
                 }
             }
 
