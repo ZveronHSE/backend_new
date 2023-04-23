@@ -3,39 +3,52 @@
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-    <springProfile name="prod">
-        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-                <findAndRegisterJacksonModules>true</findAndRegisterJacksonModules>
-                <providers>
-                    <timestamp>
-                        <fieldName>ts</fieldName>
-                        <timeZone>UTC</timeZone>
-                    </timestamp>
-                    <threadName>
-                        <fieldName>thread</fieldName>
-                    </threadName>
-                    <logLevel/>
-                    <loggerName>
-                        <fieldName>logger</fieldName>
-                    </loggerName>
-                    <message/>
-                    <arguments>
-                        <includeStructuredArguments>true</includeStructuredArguments>
-                    </arguments>
-                    <logstashMarkers/>
-                    <rootStackTraceElement/>
-                    <stackTrace/>
-                    <throwableRootCauseClassName/>
-                    <throwableClassName/>
-                </providers>
-            </encoder>
-        </appender>
-    </springProfile>
+    <!--    <springProfile name="local">-->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <findAndRegisterJacksonModules>true</findAndRegisterJacksonModules>
+            <providers>
+                <timestamp>
+                    <fieldName>ts</fieldName>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <pattern>
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>
+                        {
+                        "trace_id": "%mdc{trace_id}"
+                        }
+                    </pattern>
+                </pattern>
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+                <logLevel/>
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+                <message/>
+                <arguments>
+                    <includeStructuredArguments>true</includeStructuredArguments>
+                </arguments>
+                <logstashMarkers/>
+                <rootStackTraceElement/>
+                <stackTrace/>
+                <throwableRootCauseClassName/>
+                <throwableClassName/>
+            </providers>
+        </encoder>
+    </appender>
+    <!--    </springProfile>-->
+
+    <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.mdc.v1_0.OpenTelemetryAppender">
+        <appender-ref ref="CONSOLE"/>
+    </appender>
 
     <root level="info">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="OTEL"/>
     </root>
+
     <logger name="ru.zveron" level="DEBUG"/>
 
 </configuration>

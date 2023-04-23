@@ -90,6 +90,8 @@ platform:
     apigateway:
       metadata: true
     client:
+      tracing-enabled: false
       logging-enabled: false
     server:
+      tracing-enabled: true
       logging-enabled: true

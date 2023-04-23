@@ -6,8 +6,20 @@ x-logging:
   options:
     loki-url: https://378511:${GRAFANA_API_TOKEN}@logs-prod-013.grafana.net/loki/api/v1/push
 
-
 services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "14250:14250"
+      - "16686:16686"
+      - "14268:14268"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - LOG_LEVEL=debug
+      - OTEL_TRACES_EXPORTER=jaeger
+
   db:
     logging: *loki-logging
     restart: always
@@ -443,3 +455,4 @@ services:
 volumes:
   db_data:
   db_scylla:
+  otel_collector:

@@ -24,6 +24,14 @@
                             }
                         </pattern>
                     </pattern>
+                    <pattern>
+                        <omitEmptyFields>true</omitEmptyFields>
+                        <pattern>
+                            {
+                            "trace_id": "%mdc{trace_id}"
+                            }
+                        </pattern>
+                    </pattern>
                     <timestamp>
                         <fieldName>ts</fieldName>
                         <timeZone>UTC</timeZone>
@@ -49,9 +57,14 @@
         </appender>
     </springProfile>
 
-    <root level="info">
+    <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.mdc.v1_0.OpenTelemetryAppender">
         <appender-ref ref="CONSOLE"/>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="OTEL"/>
     </root>
+
     <logger name="ru.zveron" level="DEBUG"/>
 
 </configuration>

@@ -1,8 +1,0 @@
-eureka:
-  client:
-    service-url:
-      defaultZone: http://registry:8761/eureka
-
-grpc:
-  server:
-    port: 6061
