@@ -1,3 +1,13 @@
 databaseChangeLog:
   - includeAll:
       path: db/changelog/
+  - changeSet:
+      id: include-data-sql
+      runAlways: true
+      author: Schuyweiz
+      validCheckSum: ANY
+      failOnError: false
+      changes:
+        - sqlFile:
+            path: init-data.sql
+            relativeToChangelogFile: true

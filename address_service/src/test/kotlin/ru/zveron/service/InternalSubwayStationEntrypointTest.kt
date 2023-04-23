@@ -42,6 +42,7 @@ class InternalSubwayStationEntrypointTest @Autowired constructor(
             it.id shouldBe station.id
             it.name shouldBe station.name
             it.colorHex shouldBe station.colorHex
+            it.town shouldBe station.city
         }
     }
 

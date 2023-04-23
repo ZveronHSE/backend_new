@@ -1,8 +1,8 @@
 package ru.zveron.authservice.util
 
-import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
-import org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric
-import org.apache.commons.lang3.RandomStringUtils.randomNumeric
+import org.apache.commons.lang.RandomStringUtils.randomAlphabetic
+import org.apache.commons.lang.RandomStringUtils.randomAlphanumeric
+import org.apache.commons.lang.RandomStringUtils.randomNumeric
 import org.apache.commons.lang3.RandomUtils
 import ru.zveron.authservice.component.jwt.model.AccessToken
 import ru.zveron.authservice.component.jwt.model.DecodedToken
