@@ -1,3 +1,5 @@
+val contractVersion: String by rootProject
+
 dependencies {
-    implementation("com.github.zveronHSe.contract:address:eb0e975d51")
+    implementation("com.github.zveronHSe.contract:address:$contractVersion")
 }
