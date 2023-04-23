@@ -36,7 +36,7 @@ class ChatMapperTest {
         val message2 = messageToResponse(MessageGenerator.generateMessage(chat1.chatId, msg2, user1))
         val expectedChat = chat {
             chatId = chat1.chatId.toString()
-            interlocutorSummary = profile2.toChatSummary()
+            interlocutorSummary = profile2.toChatSummary(false, timestamp)
             messages.addAll(listOf(message1, message2))
             lastUpdate = timestamp.toTimestamp()
             this.serviceId = serviceId
@@ -48,7 +48,7 @@ class ChatMapperTest {
 
         val actualChat = ChatMapper.chatToChatResponse(
             chat1,
-            profile2.toChatSummary(),
+            profile2.toChatSummary(false, timestamp),
             listOf(lot),
             listOf(message1, message2),
             true
@@ -59,6 +59,7 @@ class ChatMapperTest {
 
     @Test
     fun toChatSummary() {
+        val timestamp = Instant.now()
         val user1 = PrimitivesGenerator.generateLong()
         val profile2 = ProfileSummaryGenerator.generateProfile(user1)
         val expectedProfile = profileSummary {
@@ -68,9 +69,11 @@ class ChatMapperTest {
             surname = profile2.surname
             isOnline = false
             formattedOnlineStatus = "Не в сети"
+            lastOnline = timestamp.toTimestamp()
+
         }
 
-        val actualProfile = profile2.toChatSummary()
+        val actualProfile = profile2.toChatSummary(false, timestamp)
 
         actualProfile profileShouldBe expectedProfile
     }

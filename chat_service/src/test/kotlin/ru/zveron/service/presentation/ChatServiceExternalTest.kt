@@ -39,6 +39,9 @@ import ru.zveron.mapper.MessageMapper.messageToResponse
 import ru.zveron.repository.ChatRepository
 import ru.zveron.repository.MessageRepository
 import ru.zveron.component.ChatPersistence
+import ru.zveron.model.entity.Connection
+import ru.zveron.repository.ConnectionRepository
+import java.time.Instant
 
 class ChatServiceExternalTest : ChatServiceApplicationTest() {
 
@@ -54,8 +57,12 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
     @Autowired
     lateinit var chatPersistence: ChatPersistence
 
+    @Autowired
+    lateinit var connectionRepository: ConnectionRepository
+
     @Test
     fun bidiChatRoute() {
+        val timestamp = Instant.now()
         val (user1, user2, lot1) = PrimitivesGenerator.generateLongs(3)
         val profile2 = ProfileSummaryGenerator.generateProfile(user2)
         val lot = LotGenerator.generateLot(lot1)
@@ -75,6 +82,7 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
             val inputFlow = Channel<ChatRouteRequest>(2)
             val responseFlow = chatServiceExternal.bidiChatRoute(inputFlow.consumeAsFlow())
             val testedFlow = responseFlow.testIn(backgroundScope)
+            connectionRepository.save(Connection(user2, Uuids.timeBased(), false, timestamp))
 
             inputFlow.send(chatRouteRequest {
                 startChat = startChatRequest {
@@ -88,7 +96,7 @@ class ChatServiceExternalTest : ChatServiceApplicationTest() {
             })
             testedFlow.awaitItem().apply {
                 this.responseCase shouldBe ChatRouteResponse.ResponseCase.CHATSUMMARY
-                this.chatSummary.chat.newChatShouldBe(profile2.toChatSummary(), lot, message1, user1)
+                this.chatSummary.chat.newChatShouldBe(profile2.toChatSummary(true, timestamp), lot, message1, user1)
             }
 
             val chat1 = chatRepository.findAllByProfileId(user1).first()

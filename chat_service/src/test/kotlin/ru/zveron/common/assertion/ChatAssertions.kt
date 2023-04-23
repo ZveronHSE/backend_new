@@ -66,13 +66,14 @@ object ChatAssertions {
         imageUrl shouldBe expected.imageUrl
         isOnline shouldBe expected.isOnline
         formattedOnlineStatus shouldBe expected.formattedOnlineStatus
+        lastOnline timestampShouldBe expected.lastOnline
     }
 
     fun ru.zveron.contract.chat.model.Chat.newChatShouldBe(
         profileSummary: ProfileSummary,
         lotSummary: Lot,
         message: String,
-        userId: Long
+        userId: Long,
     ) {
         unreadMessages shouldBe 0
         serviceId shouldBe 0L

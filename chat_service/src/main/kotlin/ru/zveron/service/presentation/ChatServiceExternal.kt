@@ -1,5 +1,6 @@
 package ru.zveron.service.presentation
 
+import com.datastax.oss.driver.api.core.uuid.Uuids
 import io.grpc.Status
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -25,8 +26,8 @@ import ru.zveron.contract.chat.chatRouteResponse
 import ru.zveron.contract.chat.errorMessage
 import ru.zveron.library.grpc.util.GrpcUtils
 import ru.zveron.model.dao.ChatRequestContext
+import ru.zveron.service.application.ConnectionApplicationService
 import ru.zveron.service.application.MessageApplicationService
-import java.util.UUID
 import kotlin.coroutines.coroutineContext
 
 @GrpcService
@@ -34,18 +35,19 @@ class ChatServiceExternal(
     private val chatApplicationService: ChatApplicationService,
     private val chatPersistence: ChatPersistence,
     private val messageApplicationService: MessageApplicationService,
+    private val connectionApplicationService: ConnectionApplicationService,
 ) : ChatServiceExternalGrpcKt.ChatServiceExternalCoroutineImplBase() {
 
     companion object : KLogging()
 
-    private val fixedNodeAddress = UUID.fromString("3e199891-cff7-11ed-bd31-479ce559ae0d")
+    private val nodeAddress = Uuids.timeBased()
 
     override fun bidiChatRoute(requests: Flow<ChatRouteRequest>): Flow<ChatRouteResponse> = flow {
         logger.info("Start connection")
         val chatRequestContext = ChatRequestContext(
             GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
         )
-        chatPersistence.registerConnection(fixedNodeAddress, chatRequestContext)
+        connectionApplicationService.registerConnection(nodeAddress, chatRequestContext)
 
         val requestFlow = requests
             .transform {
@@ -58,7 +60,7 @@ class ChatServiceExternal(
                 }
             }
             .onCompletion {
-                chatPersistence.closeConnection(chatRequestContext.authorizedProfileId)
+                connectionApplicationService.closeConnection(nodeAddress, chatRequestContext)
             }
         val responseFlow =
             chatPersistence.getChannel(chatRequestContext.authorizedProfileId)?.receiveAsFlow()

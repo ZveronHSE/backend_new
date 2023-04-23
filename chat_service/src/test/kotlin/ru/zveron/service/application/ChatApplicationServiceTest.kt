@@ -83,7 +83,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
             chats.add(
                 generateChatResponse(
                     chat3,
-                    profile4.toChatSummary(),
+                    profile4.toChatSummary(false),
                     emptyList(),
                     listOf(messageToResponse(message3)),
                 )
@@ -91,7 +91,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
             chats.add(
                 generateChatResponse(
                     chat2,
-                    profile3.toChatSummary(),
+                    profile3.toChatSummary(false),
                     listOf(lot),
                     listOf(messageToResponse(message2)),
                     isBlocked = true,
@@ -100,7 +100,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
             chats.add(
                 generateChatResponse(
                     chat1,
-                    profile2.toChatSummary(),
+                    profile2.toChatSummary(false),
                     emptyList(),
                     listOf(messageToResponse(message1)),
                 )
@@ -157,7 +157,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
             chats.add(
                 generateChatResponse(
                     chat2,
-                    profile3.toChatSummary(),
+                    profile3.toChatSummary(false),
                     listOf(lot),
                     listOf(messageToResponse(message2)),
                     isBlocked = true,
@@ -166,7 +166,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
             chats.add(
                 generateChatResponse(
                     chat1,
-                    profile2.toChatSummary(),
+                    profile2.toChatSummary(false),
                     emptyList(),
                     listOf(messageToResponse(message1)),
                 )
@@ -413,7 +413,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
             chat =
                 generateChatResponse(
                     chat1,
-                    profile2.toChatSummary(),
+                    profile2.toChatSummary(false),
                     listOf(lot),
                     listOf(messageToResponse(message1)),
                     isBlocked = true
@@ -483,7 +483,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
         runBlocking(MetadataElement(Metadata(user1))) {
             chatApplicationService.startChat(request, defaultContext())
-                .responses[user1]!!.chatSummary.chat.newChatShouldBe(profile2.toChatSummary(), lot, message, user1)
+                .responses[user1]!!.chatSummary.chat.newChatShouldBe(profile2.toChatSummary(false), lot, message, user1)
         }
     }
 

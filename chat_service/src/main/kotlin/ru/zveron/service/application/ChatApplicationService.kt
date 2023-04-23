@@ -46,6 +46,7 @@ import ru.zveron.model.dao.NoneConnectionResponse
 import ru.zveron.model.dao.SingleConnectionResponse
 import ru.zveron.repository.BatchChatRepository
 import ru.zveron.component.ChatStorage
+import ru.zveron.component.ConnectionStorage
 import ru.zveron.component.MessageStorage
 import ru.zveron.model.dao.ChatRequestContext
 import java.time.Instant
@@ -60,6 +61,7 @@ class ChatApplicationService(
     private val chatStorage: ChatStorage,
     private val batchChatRepository: BatchChatRepository,
     private val messageStorage: MessageStorage,
+    private val connectionStorage: ConnectionStorage,
 ) {
 
     companion object : KLogging()
@@ -212,9 +214,13 @@ class ChatApplicationService(
                 receivedAt,
             )
 
+            val interlocutorConnection = connectionStorage.getConnectionWithNewestStatusChange(request.interlocutorId)
             chat {
                 this.chatId = chatId.toString()
-                this.interlocutorSummary = interlocutorSummary.await().first().toChatSummary()
+                this.interlocutorSummary = interlocutorSummary.await().first().toChatSummary(
+                    interlocutorConnection?.isClosed == false,
+                    interlocutorConnection?.lastStatusChange,
+                )
                 messages.add(message {
                     id = messageId.toString()
                     text = request.text
@@ -300,7 +306,15 @@ class ChatApplicationService(
     private suspend fun Deferred<List<ProfileSummary>>.awaitProfilesSummary(): Map<Long, ru.zveron.contract.chat.model.ProfileSummary> =
         try {
             val profiles = await()
-            profiles.associate { it.id to it.toChatSummary() }
+            profiles.associate {
+                // TODO очень плохое решение, надо бы что-то другое придумать
+                val interlocutorConnection = connectionStorage.getConnectionWithNewestStatusChange(it.id)
+
+                it.id to it.toChatSummary(
+                    interlocutorConnection?.isClosed == false,
+                    interlocutorConnection?.lastStatusChange,
+                )
+            }
         } catch (ex: StatusException) {
             logger.error(
                 "Cannot load profiles summary. Got ${ex.status} from profile service. Message: ${ex.message}"

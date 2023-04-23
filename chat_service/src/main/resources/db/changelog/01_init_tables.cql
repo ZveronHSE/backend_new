@@ -27,5 +27,6 @@ CREATE TABLE IF NOT EXISTS zveron_chat.connection (
     profile_id bigint,
     node_address uuid,
     is_closed boolean,
-    PRIMARY KEY ((profile_id, node_address))
+    last_status_change timestamp,
+    PRIMARY KEY ((profile_id), node_address)
 );
