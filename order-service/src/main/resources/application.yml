@@ -58,7 +58,26 @@ management:
 
 grpc:
   server:
-    port: 9092
+    port: 0
+
+  client:
+    profile:
+      address: 'discovery:///profile-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+    animal:
+      address: 'discovery:///profile-service'
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
+    subway:
+      address: 'discovery:///address-service'
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
 
   client:
     profile:
