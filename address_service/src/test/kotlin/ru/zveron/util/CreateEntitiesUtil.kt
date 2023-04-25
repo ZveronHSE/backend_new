@@ -49,8 +49,8 @@ object CreateEntitiesUtil {
     }
 
     fun testSubwayStation() = SubwayStation(
-        name = RandomStringUtils.random(10),
-        city = RandomStringUtils.random(10),
-        colorHex = RandomStringUtils.random(8)
+        name = RandomStringUtils.randomAlphabetic(10),
+        city = RandomStringUtils.randomAlphabetic(10),
+        colorHex = RandomStringUtils.randomAlphabetic(8)
     )
 }

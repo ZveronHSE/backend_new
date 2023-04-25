@@ -70,7 +70,10 @@ values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('specialistAddService', 'specialist-service', 'ManageSpecialistExternalService', 'AddService', 'BUYER'),
        ('specialistEditService', 'specialist-service', 'ManageSpecialistExternalService', 'EditService', 'BUYER'),
        ('specialistDeleteService', 'specialist-service', 'ManageSpecialistExternalService', 'DeleteService', 'BUYER'),
-       ('specialistEditDocuments', 'specialist-service', 'ManageSpecialistExternalService', 'EditDocuments', 'BUYER')
+       ('specialistEditDocuments', 'specialist-service', 'ManageSpecialistExternalService', 'EditDocuments', 'BUYER'),
+        ('profileCreateAnimal', 'profile-service', 'AnimalGrpcExternal', 'CreateAnimal', 'BUYER'),
+        ('profileGetAnimal', 'profile-service', 'AnimalGrpcExternal', 'GetAnimal', 'BUYER'),
+        ('profileGetAnimalsByProfile', 'profile-service', 'AnimalGrpcExternal', 'GetAnimalsByProfile', 'BUYER')
 
 ON CONFLICT (alias) DO UPDATE SET service_name      = EXCLUDED.service_name,
                                   grpc_service_name = EXCLUDED.grpc_service_name,

@@ -9,5 +9,17 @@ databaseChangeLog:
       failOnError: false
       changes:
         - sqlFile:
-            path: init-data.sql
+            path: init-data-profile.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-data-contact.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-data-link.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-data-settings.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-data-animal.sql
             relativeToChangelogFile: true

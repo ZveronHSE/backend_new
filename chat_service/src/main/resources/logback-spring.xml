@@ -8,6 +8,14 @@
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
                 <findAndRegisterJacksonModules>true</findAndRegisterJacksonModules>
                 <providers>
+                    <pattern>
+                        <omitEmptyFields>true</omitEmptyFields>
+                        <pattern>
+                            {
+                            "connection-id": "%mdc{connection-id}"
+                            }
+                        </pattern>
+                    </pattern>
                     <timestamp>
                         <fieldName>ts</fieldName>
                         <timeZone>UTC</timeZone>

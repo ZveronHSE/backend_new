@@ -12,6 +12,7 @@ object SubwayStationMapper {
         this.id = s.id
         this.name = s.name
         this.colorHex = s.colorHex
+        this.town = s.city
     }
 
     fun SubwayStationExtKt.ofEntity(s: SubwayStation) = subwayStationExt {
