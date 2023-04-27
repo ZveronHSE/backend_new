@@ -1,13 +1,6 @@
 spring:
-  main:
-    banner-mode: off
-    allow-bean-definition-overriding: true
-
   liquibase:
     change-log: classpath:db/master.yaml
-
-  application:
-    name: specialist-service
 
   datasource:
     url: jdbc:postgresql://localhost:5555/specialist
@@ -20,6 +13,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+
+  application:
+    name: specialist-service
+
+  main:
+    banner-mode: off
+    allow-bean-definition-overriding: true
 
 grpc:
   server:
@@ -47,3 +47,5 @@ platform:
 
 server:
   port: 0
+
+debug: true

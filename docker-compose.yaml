@@ -343,7 +343,6 @@ services:
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/specialist
-      - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/specialist
     depends_on:
       - db
       - registry
