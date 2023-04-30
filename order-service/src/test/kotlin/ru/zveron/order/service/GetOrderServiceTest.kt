@@ -19,11 +19,11 @@ import ru.zveron.order.persistence.repository.OrderLotRepository
 import ru.zveron.order.service.dto.Animal
 import ru.zveron.order.service.dto.Profile
 import ru.zveron.order.service.dto.SubwayStation
-import ru.zveron.order.util.randomId
-import ru.zveron.order.util.testFindProfileResponse
-import ru.zveron.order.util.testFullAnimal
-import ru.zveron.order.util.testOrderLotEntity
-import ru.zveron.order.util.testSubwayStation
+import ru.zveron.order.test.util.randomId
+import ru.zveron.order.test.util.testFindProfileResponse
+import ru.zveron.order.test.util.testFullAnimal
+import ru.zveron.order.test.util.testOrderLotEntity
+import ru.zveron.order.test.util.testSubwayStation
 
 class GetOrderServiceTest {
 

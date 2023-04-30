@@ -16,11 +16,11 @@ import ru.zveron.order.client.animal.dto.GetAnimalApiResponse
 import ru.zveron.order.client.profile.dto.GetProfileApiResponse
 import ru.zveron.order.config.BaseOrderApplicationTest
 import ru.zveron.order.exception.ClientException
-import ru.zveron.order.util.randomId
-import ru.zveron.order.util.testFindProfileResponse
-import ru.zveron.order.util.testFullAnimal
-import ru.zveron.order.util.testOrderLotEntity
-import ru.zveron.order.util.testSubwayStation
+import ru.zveron.order.test.util.randomId
+import ru.zveron.order.test.util.testFindProfileResponse
+import ru.zveron.order.test.util.testFullAnimal
+import ru.zveron.order.test.util.testOrderLotEntity
+import ru.zveron.order.test.util.testSubwayStation
 
 class OrderServiceEntrypointTest @Autowired constructor(
     private val entrypoint: OrderServiceEntrypoint,

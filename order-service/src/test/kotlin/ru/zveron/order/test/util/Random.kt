@@ -1,4 +1,4 @@
-package ru.zveron.order.util
+package ru.zveron.order.test.util
 
 import org.apache.commons.lang3.RandomUtils
 import java.util.UUID
