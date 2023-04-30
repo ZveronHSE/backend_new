@@ -3,6 +3,8 @@ package ru.zveron.order.service
 import io.grpc.Status
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
+import mu.KLogging
+import net.logstash.logback.marker.Markers.append
 import org.springframework.stereotype.Service
 import ru.zveron.order.client.address.SubwayGrpcClient
 import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
@@ -28,8 +30,13 @@ class GetOrderService(
     private val animalGrpcClient: AnimalGrpcClient,
 ) {
 
+    companion object: KLogging()
+
     suspend fun getOrder(orderId: Long): GetOrderResponse = supervisorScope {
         val order = orderLotRepository.findById(orderId) ?: throw OrderNotFoundException(orderId)
+
+        logger.debug(append("orderId", order.id)) { "Got order and calling clients to collect data" }
+
         val rating = async { getRating(order.profileId) }
         val profile = async { getProfile(order.profileId, rating.await()) }
         val subwayStation = async { getSubwayStation(order.subwayId) }

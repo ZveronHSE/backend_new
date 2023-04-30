@@ -11,8 +11,8 @@ import ru.zveron.contract.address.internal.GetSubwayStationRequest
 import ru.zveron.contract.address.internal.SubwayStationInternalServiceGrpcKt
 import ru.zveron.contract.address.internal.getSubwayStationResponse
 import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
-import ru.zveron.order.util.randomId
-import ru.zveron.order.util.testSubwayStation
+import ru.zveron.order.test.util.randomId
+import ru.zveron.order.test.util.testSubwayStation
 
 class SubwayGrpcClientTest {
 
