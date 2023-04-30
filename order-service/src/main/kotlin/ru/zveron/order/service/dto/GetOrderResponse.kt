@@ -8,17 +8,20 @@ import java.time.LocalTime
 
 data class GetOrderResponse(
         val id: Long,
+
         val profile: Profile,
         val animal: Animal,
+        val subwayStation: SubwayStation,
+
         val title: String,
         val price: String,
-        val subwayStation: SubwayStation,
         // date of order delivery formatted as dd.MM.yyyy - dd.MM.yyyy
         val serviceDateFrom: LocalDate,
         val serviceDateTo: LocalDate? = null,
         // time of order delivery formatted as HH:mm (- HH:mm)
         val timeWindowFrom: LocalTime? = null,
         val timeWindowTo: LocalTime? = null,
+
         val description: String,
         // delivery type, in person or remote
         val serviceDeliveryType: ServiceDeliveryType,

@@ -32,7 +32,7 @@ eureka:
     webclient:
       enabled: true
 
-
+# noinspection SpringBootApplicationYaml
 platform:
   grpc:
     apigateway:

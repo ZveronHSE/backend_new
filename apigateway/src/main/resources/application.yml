@@ -40,7 +40,17 @@ eureka:
     register-with-eureka: false
   instance:
     prefer-ip-address: true
+
+
 management:
+  endpoints:
+    jmx:
+      exposure:
+        exclude: "*"
+    web:
+      exposure:
+        include: [ loggers, loggers-name, health, health-path, prometheus, info ]
+
   endpoint:
     serviceregistry:
       enabled: true
@@ -49,6 +59,11 @@ grpc:
   client:
     auth-service:
       address: 'discovery:///auth-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    chat-service:
+      address: 'discovery:///chat-service'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext

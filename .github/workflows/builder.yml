@@ -76,6 +76,21 @@ jobs:
             env: order-service
             dockerfile: order-service/Dockerfile
             image: ghcr.io/zveronhse/order-service:latest
+            
+          - name: Chat Service
+            env: chat_service
+            dockerfile: chat_service/Dockerfile
+            image: ghcr.io/zveronhse/chat_service:latest
+
+          - name: Chat Service
+            env: chat_service
+            dockerfile: chat_service/Dockerfile
+            image: ghcr.io/zveronhse/chat_service:latest
+
+          - name: Specialist service
+            env: specialist-service
+            dockerfile: specialist-service/Dockerfile
+            image: ghcr.io/zveronhse/specialist-service:latest
 
     steps:
       - name: Checkout

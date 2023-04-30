@@ -2,17 +2,17 @@ grpc:
   server:
     port: 0
   client:
-    blacklist-service:
+    blacklist-client:
       address: 'discovery:///blacklist-service'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
-    profile-service:
+    profile-client:
       address: 'discovery:///profile-service'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
-    lot-service:
+    lot-client:
       address: 'discovery:///lot-service'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
@@ -22,7 +22,14 @@ grpc:
 server:
   port: 0
 
-
+service:
+  persistence:
+    chat:
+      pagination-size: 100
+    message:
+      pagination-size: 100
+    connection:
+      buffer-size: 50
 
 spring:
   main:
@@ -31,7 +38,6 @@ spring:
     name: chat-service
   data:
     cassandra:
-      keyspace-name: zveron_chat
       contact-points: localhost
       port: 9042
       local-datacenter: datacenter1
@@ -48,6 +54,7 @@ eureka:
   instance:
     metadata-map:
       ChatServiceExternal: 'chat_external.proto'
+      PingServiceExternal: 'ping_external.proto'
 
 
 

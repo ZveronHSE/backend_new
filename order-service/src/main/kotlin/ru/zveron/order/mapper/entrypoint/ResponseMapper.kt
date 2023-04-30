@@ -1,56 +1,51 @@
 package ru.zveron.order.mapper.entrypoint
 
-import ru.zveron.contract.order.external.GetOrderResponseKt
-import ru.zveron.contract.order.external.fullOrder
-import ru.zveron.contract.order.external.getOrderResponse
-import ru.zveron.contract.order.external.profile
+import ru.zveron.contract.order.external.*
+import ru.zveron.contract.order.model.AddressKt
+import ru.zveron.contract.order.model.AnimalKt
 import ru.zveron.contract.order.model.address
 import ru.zveron.contract.order.model.animal
 import ru.zveron.order.persistence.model.constant.Status
+import ru.zveron.order.service.dto.Animal
+import ru.zveron.order.service.dto.Profile
+import ru.zveron.order.service.dto.SubwayStation
 import ru.zveron.order.util.ChronoFormatter
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
+import ru.zveron.order.util.PriceFormatter
 
 @Suppress("unused")
 fun GetOrderResponseKt.of(response: ru.zveron.order.service.dto.GetOrderResponse) = getOrderResponse {
     this.order = fullOrder {
         id = response.id
-        profile = profile {
-            id = response.profile.id
-            name = response.profile.name
-            rating = response.profile.rating.toFloat()
-        }
-        animal = animal {
-            id = response.animal.id
-            name = response.animal.name
-            breed = response.animal.breed
-            species = response.animal.species
-            imageUrl = response.animal.imageUrl
-        }
-        address = address {
-            station = response.subwayStation.name
-            town = response.subwayStation.town
-            color = response.subwayStation.colorHex
-        }
+        profile = ProfileKt.of(response.profile)
+        animal = AnimalKt.of(response.animal)
+        address = AddressKt.of(response.subwayStation)
         description = response.description
         title = response.title
-        serviceDate = """${ChronoFormatter.toDdMmYyyy(response.serviceDateFrom)}${response.serviceDateTo?.let { " - ${ChronoFormatter.toDdMmYyyy(it)}" } ?: ""}"""
-        price = """${response.price} ₽"""
-        serviceTime = response.timeWindowFrom?.let { from -> "$from${response.timeWindowTo?.let { to -> " - $to" } ?: ""}" }
-                ?: ""
+        serviceDate = ChronoFormatter.formatServiceDate(response.serviceDateFrom, response.serviceDateTo)
+        price = PriceFormatter.formatToPrice(response.price)
+        serviceTime = ChronoFormatter.formatServiceTime(response.timeWindowFrom, response.timeWindowTo)
         canAccept = Status.canAcceptOrder(response.orderStatus)
-        createdAt = if (Instant.now().truncatedTo(ChronoUnit.HOURS) == response.createdAt.truncatedTo(ChronoUnit.HOURS)) {
-            "Сегодня в ${
-                response.createdAt
-                        .let { ZonedDateTime.ofInstant(it, ZoneId.of("Europe/Moscow")) }
-                        .let { ChronoFormatter.toHhMm(it) }
-            }"
-        } else {
-            response.createdAt
-                    .let { ZonedDateTime.ofInstant(it, ZoneId.of("Europe/Moscow")) }
-                    .let { ChronoFormatter.toDdMmYyyy(it) }
-        }
+        createdAt = ChronoFormatter.formatCreatedAt(response.createdAt)
     }
+}
+
+fun ProfileKt.of(p: Profile) = profile {
+    id = p.id
+    name = p.name
+    rating = p.rating.toFloat()
+    imageUrl = p.imageUrl
+}
+
+fun AnimalKt.of(a: Animal) = animal {
+    id = a.id
+    name = a.name
+    breed = a.breed
+    species = a.species
+    imageUrl = a.imageUrl
+}
+
+fun AddressKt.of(a: SubwayStation) = address {
+    station = a.name
+    town = a.town
+    color = a.colorHex
 }

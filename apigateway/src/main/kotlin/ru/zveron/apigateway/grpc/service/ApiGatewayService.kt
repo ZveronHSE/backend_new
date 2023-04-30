@@ -2,12 +2,17 @@ package ru.zveron.apigateway.grpc.service
 
 import com.google.protobuf.Descriptors
 import com.google.protobuf.DynamicMessage
+import com.google.protobuf.kotlin.toByteStringUtf8
+import com.google.protobuf.util.JsonFormat
 import io.grpc.ManagedChannel
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.kotlin.ClientCalls
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.transform
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.keyValue
 import net.logstash.logback.argument.StructuredArguments.value
@@ -19,6 +24,8 @@ import ru.zveron.apigateway.component.ProtoDefinitionRegistry
 import ru.zveron.apigateway.component.model.ResolveForRoleRequest
 import ru.zveron.apigateway.exception.ApiGatewayException
 import ru.zveron.apigateway.grpc.ApiGatewayMapper.toScope
+import ru.zveron.apigateway.grpc.ApiGatewayMapper.toServiceRequest
+import ru.zveron.apigateway.grpc.client.ChatGrpcClient
 import ru.zveron.apigateway.grpc.context.AuthenticationContext
 import ru.zveron.apigateway.grpc.service.dto.GatewayServiceRequest
 import ru.zveron.apigateway.persistence.constant.AccessScope
@@ -28,6 +35,10 @@ import ru.zveron.apigateway.utils.DescriptorsUtil.dynamicMessageBuilder
 import ru.zveron.apigateway.utils.DescriptorsUtil.getGrpcMethodDescriptor
 import ru.zveron.apigateway.utils.DescriptorsUtil.getMethodDescriptor
 import ru.zveron.apigateway.utils.LogstashHelper.toJson
+import ru.zveron.contract.apigateway.ApiGatewayRequest
+import ru.zveron.contract.apigateway.ApigatewayResponse
+import ru.zveron.contract.apigateway.apigatewayResponse
+import ru.zveron.contract.chat.ChatRouteRequest
 
 @Service
 class ApiGatewayService(
@@ -35,6 +46,7 @@ class ApiGatewayService(
     private val protoDefinitionRegistry: ProtoDefinitionRegistry,
     private val methodMetadataRepository: MethodMetadataRepository,
     private val authResolver: AuthResolver,
+    private val chatGrpcClient: ChatGrpcClient,
 ) {
 
     companion object : KLogging() {
@@ -83,6 +95,43 @@ class ApiGatewayService(
                 accessToken?.let { this.put(accessTokenKey, accessToken) }
             }
         )
+    }
+
+    fun handleBidiStream(requests: Flow<ApiGatewayRequest>): Flow<ApigatewayResponse> = flow {
+        val profileId = verifyUserAccess(AccessScope.BUYER).also {
+            logger.debug(
+                "User in context has {}",
+                keyValue("profileId", it)
+            )
+        }
+        val accessToken = AuthenticationContext.accessToken()
+
+        val chatRouteRequests = requests.transform<ApiGatewayRequest, ChatRouteRequest> {
+            val requestBuilder = ChatRouteRequest.newBuilder()
+            JsonFormat.parser().merge(it.toServiceRequest().requestBody, requestBuilder)
+            emit(requestBuilder.build())
+        }
+
+        try {
+            chatGrpcClient.bidiChatRoute(
+                chatRouteRequests,
+                Metadata().apply {
+                    profileId?.let { this.put(profileIdKey, it.toString()) }
+                    accessToken?.let { this.put(accessTokenKey, accessToken) }
+                }
+            ).collect { message ->
+                logger.debug(append("response", message)) { "Stream response" }
+                emit(apigatewayResponse {
+                    this.responseBody = JsonFormat.printer().print(message).toByteStringUtf8()
+                })
+            }
+        } catch (ex: StatusException) {
+            logger.warn("Response to chat service failed. {}", keyValue("code", ex.status.code))
+            throw ex
+        } catch (e: Exception) {
+            logger.warn("Request failed")
+            throw e
+        }
     }
 
     private suspend fun tryToCallService(

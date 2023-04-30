@@ -9,6 +9,7 @@ configurations {
 }
 
 dependencies {
+    //reactive
     implementation("org.springframework.boot:spring-boot-starter-reactor-netty:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")
 
@@ -16,6 +17,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinxVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$kotlinxVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
 
     //utils
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
@@ -29,7 +31,8 @@ dependencies {
 
     //contracts
     implementation("com.github.zveronHSe.contract:auth:$contractVersion")
-    implementation("com.github.zveronHSe.contract:apigateway:1.8.7")
+    implementation("com.github.zveronHSe.contract:chat:$contractVersion")
+    implementation("com.github.zveronHSe.contract:apigateway:$contractVersion")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
 
@@ -40,5 +43,7 @@ dependencies {
     implementation("io.zipkin.brave:brave-instrumentation-grpc:5.15.0")
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth:3.1.7")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
+    //metrics
+    implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.10.6")
 }

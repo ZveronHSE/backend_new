@@ -9,8 +9,8 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import ru.zveron.contract.profile.ProfileServiceInternalGrpcKt
 import ru.zveron.order.client.profile.dto.GetProfileApiResponse
-import ru.zveron.order.util.randomId
-import ru.zveron.order.util.testFindProfileResponse
+import ru.zveron.order.test.util.randomId
+import ru.zveron.order.test.util.testFindProfileResponse
 
 class ProfileGrpcClientTest {
 

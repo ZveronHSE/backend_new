@@ -100,3 +100,11 @@ grpc:
 
 server:
   port: 0
+
+# noinspection SpringBootApplicationYaml
+platform:
+  grpc:
+    client:
+      logging-enabled: false
+    server:
+      logging-enabled: true
