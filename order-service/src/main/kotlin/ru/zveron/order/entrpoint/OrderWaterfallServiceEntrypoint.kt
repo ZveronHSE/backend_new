@@ -1,44 +1,37 @@
 package ru.zveron.order.entrpoint
 
+import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
-import org.apache.commons.lang3.RandomUtils
+import net.logstash.logback.marker.Markers.append
 import ru.zveron.contract.order.external.GetWaterfallRequest
 import ru.zveron.contract.order.external.GetWaterfallResponse
+import ru.zveron.contract.order.external.GetWaterfallResponseKt
 import ru.zveron.contract.order.external.OrderWaterfallServiceExternalGrpcKt
-import ru.zveron.contract.order.external.getWaterfallResponse
-import ru.zveron.contract.order.external.waterfallOrder
-import ru.zveron.contract.order.model.address
-import ru.zveron.contract.order.model.animal
-import ru.zveron.order.persistence.repository.WaterfallStorage
+import ru.zveron.order.entrpoint.mapper.RequestMapper.toServiceRequest
+import ru.zveron.order.entrpoint.mapper.ResponseMapper.of
+import ru.zveron.order.entrpoint.validator.ServiceRequestValidator.validate
+import ru.zveron.order.service.GetWaterfallService
 
 @GrpcService
-class OrderWaterfallServiceEntrypoint(private val waterfallStorage: WaterfallStorage) :
-        OrderWaterfallServiceExternalGrpcKt.OrderWaterfallServiceExternalCoroutineImplBase() {
+class OrderWaterfallServiceEntrypoint(
+    private val service: GetWaterfallService
+) : OrderWaterfallServiceExternalGrpcKt.OrderWaterfallServiceExternalCoroutineImplBase() {
+
+    companion object : KLogging()
 
     override suspend fun getWaterfall(request: GetWaterfallRequest): GetWaterfallResponse {
-        waterfallStorage.findAll(request.lastOrderId, request.pageSize)
-        return getWaterfallResponse {
-            this.orders.addAll(
-                    List(request.pageSize) { generateWaterfall() }
-            )
-        }
-    }
+        validate(request)
 
-    private fun generateWaterfall(id: Long = RandomUtils.nextLong()) = waterfallOrder {
-        this.id = id
-        this.address = address {
-            this.town = "Москва"
-            this.station = "Площадь Революции"
-            this.color = "#0047AB"
-        }
-        this.serviceDate = "2021-01-01"
-        this.animal = animal {
-            this.id = 1
-            this.name = "Ежик"
-            this.breed = "Кот"
-            this.imageUrl = "https://storage.yandexcloud.net/zveron-animal/cat.jpeg"
-        }
-        this.price = RandomUtils.nextLong(100, 10_000).toString()
-        this.title = "Заголовок"
+        val serviceRequest = request.toServiceRequest()
+        logger.debug(
+            append(
+                "serviceRequest",
+                serviceRequest
+            )
+        ) { "Making get waterfall request in order waterfall entrypoint" }
+        val waterfallOrders = service.getWaterfall(serviceRequest)
+
+        logger.debug(append("response", waterfallOrders)) { "Returning response from the service" }
+        return GetWaterfallResponseKt.of(waterfallOrders)
     }
 }

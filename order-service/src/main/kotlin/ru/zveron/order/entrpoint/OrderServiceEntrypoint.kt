@@ -7,7 +7,7 @@ import ru.zveron.contract.order.external.GetOrderRequest
 import ru.zveron.contract.order.external.GetOrderResponse
 import ru.zveron.contract.order.external.GetOrderResponseKt
 import ru.zveron.contract.order.external.OrderServiceExternalGrpcKt
-import ru.zveron.order.mapper.entrypoint.of
+import ru.zveron.order.entrpoint.mapper.ResponseMapper.of
 import ru.zveron.order.service.GetOrderService
 
 @GrpcService

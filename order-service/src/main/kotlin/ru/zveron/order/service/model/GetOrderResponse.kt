@@ -1,4 +1,4 @@
-package ru.zveron.order.service.dto
+package ru.zveron.order.service.model
 
 import ru.zveron.order.persistence.model.constant.Status
 import ru.zveron.order.service.constant.ServiceDeliveryType

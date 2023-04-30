@@ -35,9 +35,7 @@ class OrderServiceEntrypointTest @Autowired constructor(
         val subway = testSubwayStation()
         val profileResponse = testFindProfileResponse()
         val animal = testFullAnimal()
-
         val orderLotEntity = testOrderLotEntity().copy(id = orderId)
-
         val subwayResponse = GetSubwayStationApiResponse.Success(subway)
 
         //prep env

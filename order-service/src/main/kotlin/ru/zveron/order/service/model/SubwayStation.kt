@@ -1,4 +1,4 @@
-package ru.zveron.order.service.dto
+package ru.zveron.order.service.model
 
 data class SubwayStation(
     val town: String,

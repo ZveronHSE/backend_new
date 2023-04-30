@@ -43,7 +43,7 @@ object ChronoFormatter {
      * @param createdAt
      */
     fun formatCreatedAt(createdAt: Instant) =
-        if (Instant.now().truncatedTo(ChronoUnit.HOURS) == createdAt.truncatedTo(ChronoUnit.HOURS)) {
+        if (Instant.now().truncatedTo(ChronoUnit.DAYS) == createdAt.truncatedTo(ChronoUnit.DAYS)) {
             "Сегодня в ${
                 createdAt
                     .let { ZonedDateTime.ofInstant(it, MOSCOW_ZONE_ID) }
@@ -55,9 +55,9 @@ object ChronoFormatter {
                 .let { toDdMmYyyy(it) }
         }
 
-    fun toDdMmYyyy(date: LocalDate): String = dayMonthYearFormatter.format(date)
+    private fun toDdMmYyyy(date: LocalDate): String = dayMonthYearFormatter.format(date)
 
-    fun toDdMmYyyy(date: ZonedDateTime): String = date.let { dayMonthYearFormatter.format(it) }
+    private fun toDdMmYyyy(date: ZonedDateTime): String = date.let { dayMonthYearFormatter.format(it) }
 
-    fun toHhMm(date: ZonedDateTime): String = date.let { hourMinuteFormatter.format(it) }
+    private fun toHhMm(date: ZonedDateTime): String = date.let { hourMinuteFormatter.format(it) }
 }
