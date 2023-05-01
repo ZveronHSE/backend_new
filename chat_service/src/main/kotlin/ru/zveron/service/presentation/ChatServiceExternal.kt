@@ -1,6 +1,5 @@
 package ru.zveron.service.presentation
 
-import com.datastax.oss.driver.api.core.uuid.Uuids
 import io.grpc.Status
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -11,6 +10,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transform
 import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
+import org.springframework.beans.factory.annotation.Value
 import ru.zveron.contract.chat.ChatRouteRequest
 import ru.zveron.contract.chat.ChatRouteResponse
 import ru.zveron.contract.chat.ChatServiceExternalGrpcKt
@@ -22,32 +22,36 @@ import ru.zveron.model.dao.NoneConnectionResponse
 import ru.zveron.model.dao.SingleConnectionResponse
 import ru.zveron.service.application.ChatApplicationService
 import ru.zveron.component.ChatPersistence
+import ru.zveron.component.kafka.NodeMessageProducer
 import ru.zveron.contract.chat.chatRouteResponse
 import ru.zveron.contract.chat.errorMessage
 import ru.zveron.library.grpc.util.GrpcUtils
 import ru.zveron.model.dao.ChatRequestContext
 import ru.zveron.service.application.ConnectionApplicationService
 import ru.zveron.service.application.MessageApplicationService
+import java.util.UUID
 import kotlin.coroutines.coroutineContext
 
 @GrpcService
 class ChatServiceExternal(
-    private val chatApplicationService: ChatApplicationService,
     private val chatPersistence: ChatPersistence,
+    private val nodeMessageProducer: NodeMessageProducer,
+    private val chatApplicationService: ChatApplicationService,
     private val messageApplicationService: MessageApplicationService,
     private val connectionApplicationService: ConnectionApplicationService,
 ) : ChatServiceExternalGrpcKt.ChatServiceExternalCoroutineImplBase() {
 
     companion object : KLogging()
 
-    private val nodeAddress = Uuids.timeBased()
+    @Value("#{chatConfigBean.nodeUuid}")
+    lateinit var instanceId: UUID
 
     override fun bidiChatRoute(requests: Flow<ChatRouteRequest>): Flow<ChatRouteResponse> = flow {
         logger.info("Start connection")
         val chatRequestContext = ChatRequestContext(
             GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
         )
-        connectionApplicationService.registerConnection(nodeAddress, chatRequestContext)
+        connectionApplicationService.registerConnection(instanceId, chatRequestContext)
 
         val requestFlow = requests
             .transform {
@@ -60,7 +64,7 @@ class ChatServiceExternal(
                 }
             }
             .onCompletion {
-                connectionApplicationService.closeConnection(nodeAddress, chatRequestContext)
+                connectionApplicationService.closeConnection(instanceId, chatRequestContext)
             }
         val responseFlow =
             chatPersistence.getChannel(chatRequestContext.authorizedProfileId)?.receiveAsFlow()
@@ -125,16 +129,13 @@ class ChatServiceExternal(
 
     private suspend fun deliverResponse(response: ChatRouteResponseWrapper) {
         when (response) {
-            is SingleConnectionResponse -> chatPersistence.sendMessageToConnection(
+            is SingleConnectionResponse -> nodeMessageProducer.sendMessage(
                 response.targetProfileId,
                 response.responseBody,
             )
 
             is MultipleConnectionsResponse -> response.responses.forEach { (profileId, responseBody) ->
-                chatPersistence.sendMessageToConnection(
-                    profileId,
-                    responseBody,
-                )
+                nodeMessageProducer.sendMessage(profileId, responseBody)
             }
 
             is NoneConnectionResponse -> {}

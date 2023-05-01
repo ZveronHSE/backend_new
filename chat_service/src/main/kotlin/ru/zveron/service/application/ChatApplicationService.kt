@@ -241,7 +241,10 @@ class ChatApplicationService(
                 chatSummary = receiveChatSummary { this.chat = chat }
             },
             request.interlocutorId to chatRouteResponse {
-                receiveMessage = receiveMessage { message = chat.messagesList.first() }
+                receiveMessage = receiveMessage {
+                    message = chat.messagesList.first()
+                    chatId = chat.chatId
+                }
             }
         ))
     }

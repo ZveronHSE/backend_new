@@ -1,5 +1,6 @@
 package ru.zveron.component
 
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Component
 import ru.zveron.model.entity.Connection
@@ -15,11 +16,17 @@ class ConnectionStorage(val connectionRepository: ConnectionRepository) {
         .toList()
         .maxByOrNull { it.lastStatusChange }
 
+    suspend fun getActiveConnectionWithNewestStatusChange(profileId: Long) = connectionRepository
+        .findAllOpenConnectionsByProfile(profileId)
+        .filter { !it.isClosed }
+        .toList()
+        .maxByOrNull { it.lastStatusChange }
+
     suspend fun registerConnection(profileId: Long, nodeAddress: UUID) = connectionRepository.save(
         Connection(
             profileId,
             nodeAddress,
-            true,
+            false,
             Instant.now(),
         )
     )
@@ -28,7 +35,7 @@ class ConnectionStorage(val connectionRepository: ConnectionRepository) {
         Connection(
             profileId,
             nodeAddress,
-            false,
+            true,
             Instant.now(),
         )
     )

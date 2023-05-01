@@ -25,6 +25,7 @@ object MessageAssertions {
     }
 
     infix fun GetChatMessagesResponse.responseShouldBe(expected: GetChatMessagesResponse) {
+        chatId shouldBe expected.chatId
         this.messagesList.size shouldBe expected.messagesList.size
 
         this.messagesList.forEachIndexed { index, message ->
