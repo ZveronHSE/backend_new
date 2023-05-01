@@ -7,7 +7,6 @@ import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.zveron.order.persistence.model.constant.Status
 
 @Configuration
 class JooqConfiguration(
@@ -21,10 +20,6 @@ class JooqConfiguration(
         val dsl = DSL
             .using(connectionFactory, SQLDialect.POSTGRES, settings)
             .dsl()
-
-        dsl.createType("status")
-            .asEnum(Status.values().map { it.name })
-            .executeAsync()
 
         return dsl
     }

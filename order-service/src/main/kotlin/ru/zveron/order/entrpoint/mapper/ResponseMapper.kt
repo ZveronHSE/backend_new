@@ -1,10 +1,7 @@
 package ru.zveron.order.entrpoint.mapper
 
 import ru.zveron.contract.order.external.*
-import ru.zveron.contract.order.model.AddressKt
-import ru.zveron.contract.order.model.AnimalKt
-import ru.zveron.contract.order.model.address
-import ru.zveron.contract.order.model.animal
+import ru.zveron.contract.order.model.*
 import ru.zveron.order.persistence.model.constant.Status
 import ru.zveron.order.service.model.Profile
 import ru.zveron.order.service.model.SubwayStation
@@ -38,10 +35,17 @@ object ResponseMapper {
         imageUrl = a.imageUrl
     }
 
-    fun AddressKt.of(s: SubwayStation) = address {
-        station = s.name
-        town = s.town
-        color = s.colorHex
+    fun AddressKt.of(s: SubwayStation?): Address {
+        return if (s == null) address {
+            station = ""
+            town = ""
+            color = ""
+        } else
+            address {
+                station = s.name
+                town = s.town
+                color = s.colorHex
+            }
     }
 
     fun ProfileKt.of(p: Profile) = profile {

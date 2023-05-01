@@ -11,7 +11,7 @@ data class GetOrderResponse(
 
         val profile: Profile,
         val animal: Animal,
-        val subwayStation: SubwayStation,
+        val subwayStation: SubwayStation? = null,
 
         val title: String,
         val price: String,

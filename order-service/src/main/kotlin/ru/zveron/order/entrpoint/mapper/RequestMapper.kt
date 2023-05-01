@@ -18,7 +18,12 @@ object RequestMapper {
         filters = this.filtersList.map { it.toServiceFilter() }
     )
 
-    private fun SortBy.toServiceSortBy() = ru.zveron.order.service.constant.SortBy.valueOf(this.name)
+    private fun SortBy.toServiceSortBy() = when (this) {
+        SortBy.BY_DISTANCE -> ru.zveron.order.service.constant.SortBy.ByDistance()
+        SortBy.BY_PRICE -> ru.zveron.order.service.constant.SortBy.ByPrice()
+        SortBy.BY_DATE_CREATED -> ru.zveron.order.service.constant.SortBy.ByServiceDate()
+        else -> error("Wrong sort by type")
+    }
 
     private fun SortDir.toServiceDirection() = SortDirection.valueOf(this.name)
 

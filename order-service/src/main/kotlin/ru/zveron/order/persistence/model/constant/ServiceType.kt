@@ -3,18 +3,18 @@ package ru.zveron.order.persistence.model.constant
 import com.fasterxml.jackson.annotation.JsonCreator
 import org.jooq.EnumType
 
-enum class ServiceType : EnumType {
-    WALK,
-    SITTING,
-    BOARDING,
-    TRAINING,
-    GROOMING,
-    OTHER,
+enum class ServiceType(val alias: String) : EnumType {
+    WALK("WALK"),
+    SITTING("SITTING"),
+    BOARDING("BOARDING"),
+    TRAINING("TRAINING"),
+    GROOMING("GROOMING"),
+    OTHER("OTHER"),
     ;
 
 
     override fun getLiteral(): String {
-        return name
+        return alias
     }
 
     override fun getName(): String? {
