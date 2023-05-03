@@ -9,16 +9,24 @@ object RequestMapper {
     fun GetWaterfallRequest.toServiceRequest() = ru.zveron.order.service.model.GetWaterfallRequest(
         pageSize = pageSize,
         lastOrderId = takeIf { it.hasLastOrderId() }?.let { this.lastOrderId },
-        sort = this.sort.let {
-            Sort(
-                sortBy = it.sortBy.toServiceSortBy(),
-                sortDirection = it.sortDir.toServiceDirection()
-            )
-        },
+        sort = this.sort.toServiceSort(),
         filters = this.filtersList.map { it.toServiceFilter() }
     )
 
-    private fun SortBy.toServiceSortBy() = ru.zveron.order.service.constant.SortBy.valueOf(this.name)
+    private fun ru.zveron.contract.order.external.Sort.toServiceSort() = this.sortBy.toServiceSortBy()?.let {
+        Sort(
+            sortBy = it,
+            sortDirection = this.sortDir.toServiceDirection()
+        )
+    }
+
+    private fun SortBy.toServiceSortBy() = when (this) {
+        SortBy.BY_DISTANCE -> ru.zveron.order.service.constant.SortBy.ByDistance()
+        SortBy.BY_PRICE -> ru.zveron.order.service.constant.SortBy.ByPrice()
+        SortBy.BY_DATE_CREATED -> ru.zveron.order.service.constant.SortBy.ByServiceDate()
+        SortBy.BY_ID -> null //todo: replace with default for default values
+        else -> error("Wrong sort by type")
+    }
 
     private fun SortDir.toServiceDirection() = SortDirection.valueOf(this.name)
 

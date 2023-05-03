@@ -11,3 +11,4 @@ eureka:
 grpc:
   server:
     port: 0
+debug: true

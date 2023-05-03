@@ -67,6 +67,7 @@ fun testOrderWrapper() = OrderLotWrapper(
     serviceDateTo = LocalDate.now(),
     serviceType = randomEnum(),
     createdAt = Instant.now(),
+    serviceDeliveryType = randomEnum(),
 )
 
 fun testGetAnimalResponse() = GetAnimalApiResponse.Success(testFullAnimal())

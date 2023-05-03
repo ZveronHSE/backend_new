@@ -9,60 +9,70 @@ import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
 import ru.zveron.order.client.animal.AnimalGrpcClient
 import ru.zveron.order.client.animal.dto.GetAnimalApiResponse
 import ru.zveron.order.exception.ClientException
+import ru.zveron.order.persistence.model.constant.Status
 import ru.zveron.order.persistence.repository.WaterfallStorage
-import ru.zveron.order.service.model.Animal
-import ru.zveron.order.service.model.GetWaterfallRequest
-import ru.zveron.order.service.model.SubwayStation
-import ru.zveron.order.service.model.WaterfallOrderLot
+import ru.zveron.order.service.constant.Field
+import ru.zveron.order.service.constant.Operation
 import ru.zveron.order.service.mapper.ModelMapper.of
 import ru.zveron.order.service.mapper.ResponseMapper.toGetOrderWaterfallResponse
+import ru.zveron.order.service.model.*
 
 
 @Service
 class GetWaterfallService(
-    private val waterfallStorage: WaterfallStorage,
-    private val subwayGrpcClient: SubwayGrpcClient,
-    private val animalGrpcClient: AnimalGrpcClient,
+        private val waterfallStorage: WaterfallStorage,
+        private val subwayGrpcClient: SubwayGrpcClient,
+        private val animalGrpcClient: AnimalGrpcClient,
 ) {
 
     suspend fun getWaterfall(request: GetWaterfallRequest): List<WaterfallOrderLot> {
         val orderLotRecords = waterfallStorage.findAllPaginated(
-            lastId = request.lastOrderId,
-            pageSize = request.pageSize,
+                lastId = request.lastOrderId,
+                pageSize = request.pageSize,
+                filters = request.filters + listOf(
+                        Filter(
+                                Field.STATUS,
+                                Operation.NOT_IN,
+                                Status.terminalStatuses().joinToString(",")
+                        )
+                ),
         )
 
         val subwayStation =
-            coroutineScope { orderLotRecords.map { async { it.subwayId to getSubwayStation(it.subwayId) } } }
+                coroutineScope { orderLotRecords.map { async { it.subwayId to getSubwayStation(it.subwayId) } } }
         val animals = coroutineScope { orderLotRecords.map { async { it.animalId to getAnimal(it.animalId) } } }
 
         return toGetOrderWaterfallResponse(
-            orderLotRecords,
-            subwayStation.awaitAll().toMap(),
-            animals.awaitAll().toMap()
+                orderLotRecords,
+                subwayStation.awaitAll().filter { it.first != null && it.second != null }
+                        .associate { it.first!! to it.second!! },
+                animals.awaitAll().toMap()
         )
     }
 
-    private suspend fun getSubwayStation(subwayId: Int): SubwayStation? =
-        when (val response = subwayGrpcClient.getSubwayStation(subwayId)) {
+    private suspend fun getSubwayStation(subwayId: Int?): SubwayStation? {
+        if (subwayId == null) return null
+        return when (val response = subwayGrpcClient.getSubwayStation(subwayId)) {
             is GetSubwayStationApiResponse.Error -> throw ClientException(
-                message = "Get subway station client request failed",
-                status = response.error
+                    message = "Get subway station client request failed",
+                    status = response.error
             )
 
             GetSubwayStationApiResponse.NotFound -> null
 
             is GetSubwayStationApiResponse.Success -> SubwayStation.of(response.subwayStation)
         }
+    }
 
     private suspend fun getAnimal(animalId: Long): Animal? =
-        when (val response = animalGrpcClient.getAnimal(animalId)) {
-            is GetAnimalApiResponse.Error -> throw ClientException(
-                message = "Get animal client request failed",
-                status = response.error
-            )
+            when (val response = animalGrpcClient.getAnimal(animalId)) {
+                is GetAnimalApiResponse.Error -> throw ClientException(
+                        message = "Get animal client request failed",
+                        status = response.error
+                )
 
-            GetAnimalApiResponse.NotFound -> null
+                GetAnimalApiResponse.NotFound -> null
 
-            is GetAnimalApiResponse.Success -> Animal.of(response.animal)
-        }
+                is GetAnimalApiResponse.Success -> Animal.of(response.animal)
+            }
 }

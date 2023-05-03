@@ -17,7 +17,7 @@ data class OrderLot(
         //customer profile id
         val profileId: Long,
         val animalId: Long,
-        val subwayId: Int,
+        val subwayId: Int? = null,
 
         val price: Long,
         val title: String,

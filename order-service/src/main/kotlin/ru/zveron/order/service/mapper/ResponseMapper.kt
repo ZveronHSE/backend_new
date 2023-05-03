@@ -6,7 +6,7 @@ import ru.zveron.order.service.constant.ServiceDeliveryType
 import ru.zveron.order.service.model.*
 
 object ResponseMapper {
-    fun mapToGetOrderResponse(o: OrderLot, subway: SubwayStation, profile: Profile, animal: Animal) = GetOrderResponse(
+    fun mapToGetOrderResponse(o: OrderLot, subway: SubwayStation?, profile: Profile, animal: Animal) = GetOrderResponse(
         id = o.id ?: error("Illegal entity state, id is null"),
         profile = profile,
         title = o.title,
@@ -29,14 +29,14 @@ object ResponseMapper {
         animals: Map<Long, Animal?>
     ) =
         orderLotRecords.map {
-            if (animals[it.animalId] == null || subwayStations[it.subwayId] == null) {
+            if (animals[it.animalId] == null) {
                 return@map null
             } else {
                 WaterfallOrderLot(
                     id = it.id,
                     animal = animals[it.animalId] ?: error("Animal should be present"),
                     title = it.title,
-                    subway = subwayStations[it.subwayId] ?: error("Subway should be present"),
+                    subway = subwayStations[it.subwayId],
                     createdAt = it.createdAt,
                     serviceDateFrom = it.serviceDateFrom,
                     serviceDateTo = it.serviceDateTo,
