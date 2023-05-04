@@ -527,6 +527,34 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
     }
 
     @Test
+    fun `startChat when invalid interlocutor id`() {
+        val (user1, user2, lot1) = generateLongs(3)
+        val message = generateString(30)
+        val request = startChatRequest {
+            interlocutorId = user2
+            article = article {
+                id = lot1
+                type = ArticleType.LOT
+            }
+            text = message
+        }
+
+        coEvery {
+            blacklistClient.existsInBlacklist(user2, user1)
+        } returns false
+        coEvery {
+            profileClient.getProfilesSummary(listOf(user2))
+        } returns emptyList()
+
+
+        assertThrows<InvalidParamChatException> {
+            runBlocking(MetadataElement(Metadata(user1))) {
+                chatApplicationService.startChat(request, defaultContext())
+            }
+        }.message shouldStartWith "Profile with id $user2 does not exists"
+    }
+
+    @Test
     fun `sendEvent when changed status event`() {
         val (msg1, msg2, msg3) = PrimitivesGenerator.generateNTimeUuids(3)
         val (user1, user2) = generateLongs(5)

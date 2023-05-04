@@ -178,7 +178,8 @@ class ChatApplicationService(
             }
 
             else -> throw InvalidParamChatException(
-                "Unsupported event type: ${request.eventCase.name}.")
+                "Unsupported event type: ${request.eventCase.name}."
+            )
         }
     }
 
@@ -196,44 +197,43 @@ class ChatApplicationService(
             )
         }
 
+        val interlocutorSummary = getProfileSummaryIfValid(request.interlocutorId)
         val lotId = request.article.id
         val lotSummary = getLotIfValid(lotId)
-        val chat = supervisorScope {
-            val interlocutorSummary = getProfilesSummaryAsync(listOf(request.interlocutorId))
-            val chatId = snowflakeClient.fetchUuid()
-            val messageId = snowflakeClient.fetchUuid()
-            val receivedAt = Instant.now()
 
-            chatStorage.createChatsPair(
-                context.authorizedProfileId,
-                request.interlocutorId,
-                chatId,
-                lotId,
-                messageId,
-                request.text,
-                receivedAt,
+        val chatId = snowflakeClient.fetchUuid()
+        val messageId = snowflakeClient.fetchUuid()
+        val receivedAt = Instant.now()
+
+        chatStorage.createChatsPair(
+            context.authorizedProfileId,
+            request.interlocutorId,
+            chatId,
+            lotId,
+            messageId,
+            request.text,
+            receivedAt,
+        )
+
+        val interlocutorConnection = connectionStorage.getConnectionWithNewestStatusChange(request.interlocutorId)
+        val chat = chat {
+            this.chatId = chatId.toString()
+            this.interlocutorSummary = interlocutorSummary.toChatSummary(
+                interlocutorConnection?.isClosed == false,
+                interlocutorConnection?.lastStatusChange,
             )
-
-            val interlocutorConnection = connectionStorage.getConnectionWithNewestStatusChange(request.interlocutorId)
-            chat {
-                this.chatId = chatId.toString()
-                this.interlocutorSummary = interlocutorSummary.await().first().toChatSummary(
-                    interlocutorConnection?.isClosed == false,
-                    interlocutorConnection?.lastStatusChange,
-                )
-                messages.add(message {
-                    id = messageId.toString()
-                    text = request.text
-                    isRead = false
-                    senderId = context.authorizedProfileId
-                    sentAt = receivedAt.toTimestamp()
-                })
-                unreadMessages = 0
-                lastUpdate = receivedAt.toTimestamp()
-                lots.add(lotSummary)
-                folder = ChatFolder.NONE
-                isBlocked = false
-            }
+            messages.add(message {
+                id = messageId.toString()
+                text = request.text
+                isRead = false
+                senderId = context.authorizedProfileId
+                sentAt = receivedAt.toTimestamp()
+            })
+            unreadMessages = 0
+            lastUpdate = receivedAt.toTimestamp()
+            lots.add(lotSummary)
+            folder = ChatFolder.NONE
+            isBlocked = false
         }
 
         return MultipleConnectionsResponse(mapOf(
@@ -243,7 +243,7 @@ class ChatApplicationService(
             request.interlocutorId to chatRouteResponse {
                 receiveMessage = receiveMessage {
                     message = chat.messagesList.first()
-                    chatId = chat.chatId
+                    this.chatId = chat.chatId
                 }
             }
         ))
@@ -311,6 +311,7 @@ class ChatApplicationService(
             val profiles = await()
             profiles.associate {
                 // TODO очень плохое решение, надо бы что-то другое придумать
+                //  https://zveron.atlassian.net/browse/ZV-423?atlOrigin=eyJpIjoiNDcyY2MwMmU2MzY1NDE2MGE4ZmU4YWM3ZTI0MmViMWMiLCJwIjoiaiJ9
                 val interlocutorConnection = connectionStorage.getConnectionWithNewestStatusChange(it.id)
 
                 it.id to it.toChatSummary(
@@ -383,6 +384,15 @@ class ChatApplicationService(
 
         return chat
     }
+
+    private suspend fun getProfileSummaryIfValid(profileId: Long): ProfileSummary =
+        try {
+            profileClient.getProfilesSummary(listOf(profileId)).firstOrNull()
+                ?: throw InvalidParamChatException("Profile with id $profileId does not exists")
+        } catch (ex: StatusException) {
+            logger.error(ex.message)
+            throw ex.wrapIfAppropriate(profileId)
+        }
 
     private suspend fun getLotIfValid(lotId: Long): Lot =
         try {

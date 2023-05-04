@@ -1,10 +1,9 @@
 package ru.zveron.config.kafka
 
 import com.google.protobuf.util.JsonFormat
-import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.LongDeserializer
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.annotation.EnableKafka
@@ -19,22 +18,14 @@ import java.nio.charset.Charset
 @Configuration
 class ConsumerConfig {
 
-    @Value(value = "\${spring.kafka.bootstrap-servers}")
-    lateinit var bootstrapAddress: String
+    @Bean
+    fun consumerFactory(kafkaProperties: KafkaProperties): ConsumerFactory<Long, ChatRouteResponse> =
+        DefaultKafkaConsumerFactory(kafkaProperties.buildConsumerProperties(), LongDeserializer(), ChatRouteDeserializer())
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<Long, ChatRouteResponse> {
-        val config = mapOf(
-            ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to bootstrapAddress,
-        )
-
-        return DefaultKafkaConsumerFactory(config, LongDeserializer(), ChatRouteDeserializer())
-    }
-
-    @Bean
-    fun listenerFactory(): ConcurrentKafkaListenerContainerFactory<Long, ChatRouteResponse> =
+    fun listenerFactory(kafkaProperties: KafkaProperties): ConcurrentKafkaListenerContainerFactory<Long, ChatRouteResponse> =
         ConcurrentKafkaListenerContainerFactory<Long, ChatRouteResponse>().apply {
-            consumerFactory = consumerFactory()
+            consumerFactory = consumerFactory(kafkaProperties)
         }
 
     class ChatRouteDeserializer: Deserializer<ChatRouteResponse> {

@@ -27,7 +27,7 @@ class NodeMessageProducer(
     }
 
     suspend fun forwardMessage(profileId: Long, message: ChatRouteResponse) {
-        val connection = connectionStorage.getActiveConnectionWithNewestStatusChange(profileId)
+        val connection = connectionStorage.getActiveConnectionWithLatestStatusChange(profileId)
         if (connection == null) {
             logger.debug("No active connections with profile {}", keyValue("profile-id", profileId.toString()))
             return

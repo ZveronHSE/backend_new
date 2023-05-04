@@ -14,7 +14,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinxVersion")
 
     // Contracts
-    implementation("com.github.zveronHSe.contract:chat:feature~ZV-344-chat-mq-SNAPSHOT")
+    implementation("com.github.zveronHSe.contract:chat:$contractVersion")
     implementation("com.github.zveronHSe.contract:profile:$contractVersion")
     implementation("com.github.zveronHSe.contract:lot:$contractVersion")
     implementation("com.github.zveronHSe.contract:blacklist:$contractVersion")

@@ -2,10 +2,10 @@ package ru.zveron.config
 
 import com.datastax.oss.driver.api.core.uuid.Uuids
 import org.slf4j.MDC
-import org.springframework.stereotype.Component
+import org.springframework.context.annotation.Configuration
 
-@Component("chatConfigBean")
-@Suppress("unused")
+@Configuration("chatConfigBean")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 class ChatConfig {
 
     final val nodeUuid = Uuids.timeBased()
