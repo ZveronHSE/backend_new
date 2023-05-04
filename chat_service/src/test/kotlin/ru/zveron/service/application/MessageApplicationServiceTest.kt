@@ -58,6 +58,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
             messages.add(generateMessageResponse(message3))
             messages.add(generateMessageResponse(message2))
             messages.add(generateMessageResponse(message1))
+            chatId = chat1.chatId.toString()
         }
 
         runBlocking(MetadataElement(Metadata(user1))) {
@@ -96,6 +97,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
         val expectedResponse = getChatMessagesResponse {
             messages.add(generateMessageResponse(message3))
             messages.add(generateMessageResponse(message2))
+            chatId = chat1.chatId.toString()
         }
 
         runBlocking(MetadataElement(Metadata(user1))) {
@@ -153,7 +155,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
             messageRepository.save(message1)
             chatRepository.save(chat1)
 
-            messageApplicationService.sendMessage(request, defaultContext())
+            val response = messageApplicationService.sendMessage(request, defaultContext())
 
             messageRepository.findAll().first().apply {
                 chatId shouldBe chat1.chatId
@@ -163,6 +165,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
                 isRead shouldBe false
                 type shouldBe ru.zveron.model.constant.MessageType.DEFAULT
             }
+            response.responseBody.receiveMessage.chatId shouldBe chat1.chatId.toString()
         }
     }
 

@@ -31,20 +31,24 @@ class ChatPersistence {
         connections[context.authorizedProfileId] = Channel(bufferSize)
     }
 
-    fun getChannel(userId: Long): Channel<ChatRouteResponse>? {
-        return connections[userId]
+    fun getChannel(profileId: Long): Channel<ChatRouteResponse>? {
+        return connections[profileId]
     }
 
-    suspend fun sendMessageToConnection(profileId: Long, message: ChatRouteResponse) {
+    suspend fun sendMessageToConnection(profileId: Long, message: ChatRouteResponse): Boolean {
         logger.debug("Send message to profile: $profileId")
+        val channel = connections[profileId] ?: return false
+
         try {
-            connections[profileId]?.send(message)
+            channel.send(message)
         } catch (e: CancellationException) {
             logger.debug(
                 "Got CancellationException while sending message to profile: $profileId {}"
             )
             connections.remove(profileId)
         }
+
+        return true
     }
 
     fun closeConnection(profileId: Long) {

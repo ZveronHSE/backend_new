@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 import ru.zveron.client.blacklist.BlacklistClient
@@ -24,13 +25,16 @@ abstract class ChatServiceApplicationTest {
     companion object {
         private val scyllaDb = GenericContainer(DockerImageName.parse("scylladb/scylla:5.1"))
             .withExposedPorts(9042)
+        private val kafka = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.1"))
 
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             scyllaDb.start()
+            kafka.start()
 
             registry.add("spring.data.cassandra.contact-points") { scyllaDb.host + ":" + scyllaDb.firstMappedPort }
+            registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers)
         }
     }
 

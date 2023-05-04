@@ -16,6 +16,14 @@
                             }
                         </pattern>
                     </pattern>
+                    <pattern>
+                        <omitEmptyFields>true</omitEmptyFields>
+                        <pattern>
+                            {
+                            "node-id": "%mdc{node-id}"
+                            }
+                        </pattern>
+                    </pattern>
                     <timestamp>
                         <fieldName>ts</fieldName>
                         <timeZone>UTC</timeZone>

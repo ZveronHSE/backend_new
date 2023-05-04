@@ -16,5 +16,5 @@ data class Connection(
     @field:Column("is_closed")
     val isClosed: Boolean,
     @field:Column("last_status_change")
-    val lastStatusChange: Instant,
+    val lastStatusChange: Instant = Instant.now(),
 )
