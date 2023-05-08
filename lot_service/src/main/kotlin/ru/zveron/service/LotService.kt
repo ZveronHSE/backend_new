@@ -61,14 +61,14 @@ class LotService(
         }
 
 
-        return lotRepository.findAllById(ids)
+        return lotRepository.findAllLotsByIds(ids)
     }
 
 
     fun getLotsBySellerId(sellerId: Long): List<Lot> {
         sellerId.validatePositive("sellerId")
 
-        return lotRepository.findAllBySellerIdOrderByCreatedAtDesc(sellerId)
+        return lotRepository.findAllLotsBySellerId(sellerId)
     }
 
     suspend fun getWaterfall(request: WaterfallRequest, sellerId: Long?): List<SummaryLot> {
