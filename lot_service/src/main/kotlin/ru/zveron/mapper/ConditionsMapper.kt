@@ -5,9 +5,16 @@ import org.jooq.Record
 import org.jooq.SortOrder
 import org.jooq.TableField
 import org.jooq.impl.DSL
-import ru.zveron.contract.lot.*
+import ru.zveron.contract.lot.Field
+import ru.zveron.contract.lot.Filter
+import ru.zveron.contract.lot.GetOwnLotsRequest
+import ru.zveron.contract.lot.Operation
+import ru.zveron.contract.lot.Sort
+import ru.zveron.contract.lot.TypeSort
+import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.model.Parameter
 import ru.zveron.model.enum.Gender
+import ru.zveron.model.enum.LotStatus
 import ru.zveron.model.search.ConditionsSearch
 import ru.zveron.model.search.ParametersSearch
 import ru.zveron.model.search.ParametersSeekMethod
@@ -45,6 +52,28 @@ object ConditionsMapper {
         if (sellerId != null) {
             conditionsSearch.conditions.add(LOT.SELLER_ID.notEqual(sellerId))
         }
+
+        conditionsSearch.statuses.add(LotStatus.ACTIVE.name)
+
+        return conditionsSearch
+    }
+
+    fun parseForSeller(request: GetOwnLotsRequest, sellerId: Long): ConditionsSearch {
+        val conditionsSearch = ConditionsSearch()
+
+        // 1. Сортировка и пагинация с помощью seek method
+        conditionsSearch.addSortAndPagination(request)
+
+        // 2. возвращаем те объявления, которые принадлежат продавцу
+        conditionsSearch.conditions.add(LOT.SELLER_ID.equal(sellerId))
+
+        conditionsSearch.statuses.add(
+            if (request.onlyActive) {
+                LotStatus.ACTIVE.name
+            } else {
+                LotStatus.CLOSED.name
+            }
+        )
 
         return conditionsSearch
     }
@@ -143,6 +172,32 @@ object ConditionsMapper {
             listOf(
                 fieldName!!.sort(sortOrder), // Всегда !!, тк сортировка всегда передана
                 LOT.ID.sort(sortOrder)
+            )
+        )
+
+        this.seekMethod = seekMethod
+    }
+
+    private fun ConditionsSearch.addSortAndPagination(
+        request: GetOwnLotsRequest
+    ) {
+        val seekMethod = ParametersSeekMethod()
+        if (request.hasLastLot()) {
+            seekMethod.values.addAll(
+                listOf(
+                    Instant.ofEpochSecond(
+                        request.lastLot.date.seconds,
+                        request.lastLot.date.nanos.toLong()
+                    ),
+                    request.lastLot.id
+                )
+            )
+        }
+
+        seekMethod.sorts.addAll(
+            listOf(
+                LOT.CREATED_AT.sort(SortOrder.DESC),
+                LOT.ID.sort(SortOrder.DESC)
             )
         )
 

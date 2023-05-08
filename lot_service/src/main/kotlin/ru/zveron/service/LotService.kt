@@ -9,6 +9,7 @@ import ru.zveron.contract.lot.CloseLotRequest
 import ru.zveron.contract.lot.ClosingLotReason
 import ru.zveron.contract.lot.CreateLotRequest
 import ru.zveron.contract.lot.EditLotRequest
+import ru.zveron.contract.lot.GetOwnLotsRequest
 import ru.zveron.contract.lot.WaterfallRequest
 import ru.zveron.contract.lot.model.CommunicationChannel
 import ru.zveron.contract.lot.model.Photo
@@ -79,6 +80,12 @@ class LotService(
             }
 
         val conditions = ConditionsMapper.parse(request, categories, sellerId)
+
+        return waterfallRepository.findAll(conditions)
+    }
+
+    fun getWaterfallBySellerId(request: GetOwnLotsRequest, sellerId: Long): List<SummaryLot> {
+        val conditions = ConditionsMapper.parseForSeller(request, sellerId)
 
         return waterfallRepository.findAll(conditions)
     }
