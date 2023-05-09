@@ -24,6 +24,12 @@ spring:
 grpc:
   server:
     port: 0
+  client:
+    order-service:
+      address: 'discovery:///order-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
 eureka:
   client:
@@ -35,6 +41,7 @@ eureka:
   instance:
     metadata-map:
       ManageSpecialistExternalService: 'external/manage_specialist_external.proto'
+      SpecialistServiceExternal: 'external/specialist_external.proto'
 
 platform:
   grpc:

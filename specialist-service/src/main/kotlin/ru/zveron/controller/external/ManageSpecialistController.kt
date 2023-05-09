@@ -19,8 +19,8 @@ import ru.zveron.contract.specialist.manage.FullOther
 import ru.zveron.contract.specialist.manage.FullService
 import ru.zveron.contract.specialist.manage.FullWorkExperience
 import ru.zveron.contract.specialist.manage.GetProfileResponse
-import ru.zveron.contract.specialist.manage.InfoEntity
 import ru.zveron.contract.specialist.manage.ManageSpecialistExternalServiceGrpcKt
+import ru.zveron.contract.specialist.manage.ProfileInfo
 import ru.zveron.library.grpc.util.GrpcUtils
 import ru.zveron.service.ManageSpecialistService
 import ru.zveron.service.SpecialistService
@@ -38,13 +38,13 @@ class ManageSpecialistController(
         return specialistService.getProfileSpecialist(specialistID)
     }
 
-    override suspend fun addAchievement(request: FullAchievement): InfoEntity {
+    override suspend fun addAchievement(request: FullAchievement): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.addAchievement(specialistID, request)
     }
 
-    override suspend fun editAchievement(request: EditAchievementRequest): InfoEntity {
+    override suspend fun editAchievement(request: EditAchievementRequest): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.editAchievement(specialistID, request)
@@ -59,13 +59,13 @@ class ManageSpecialistController(
     }
 
 
-    override suspend fun addEducation(request: FullEducation): InfoEntity {
+    override suspend fun addEducation(request: FullEducation): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.addEducation(specialistID, request)
     }
 
-    override suspend fun editEducation(request: EditEducationRequest): InfoEntity {
+    override suspend fun editEducation(request: EditEducationRequest): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.editEducation(specialistID, request)
@@ -80,13 +80,13 @@ class ManageSpecialistController(
     }
 
 
-    override suspend fun addOther(request: FullOther): InfoEntity {
+    override suspend fun addOther(request: FullOther): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.addOther(specialistID, request)
     }
 
-    override suspend fun editOther(request: EditOtherRequest): InfoEntity {
+    override suspend fun editOther(request: EditOtherRequest): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.editOther(specialistID, request)
@@ -99,13 +99,13 @@ class ManageSpecialistController(
         return empty {}
     }
 
-    override suspend fun addService(request: FullService): InfoEntity {
+    override suspend fun addService(request: FullService): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.addService(specialistID, request)
     }
 
-    override suspend fun editService(request: EditServiceRequest): InfoEntity {
+    override suspend fun editService(request: EditServiceRequest): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.editService(specialistID, request)
@@ -118,13 +118,13 @@ class ManageSpecialistController(
         return empty {}
     }
 
-    override suspend fun addWorkExperience(request: FullWorkExperience): InfoEntity {
+    override suspend fun addWorkExperience(request: FullWorkExperience): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.addWorkExperience(specialistID, request)
     }
 
-    override suspend fun editWorkExperience(request: EditWorkExperienceRequest): InfoEntity {
+    override suspend fun editWorkExperience(request: EditWorkExperienceRequest): ProfileInfo {
         val specialistID = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
 
         return manageSpecialistService.editWorkExperience(specialistID, request)

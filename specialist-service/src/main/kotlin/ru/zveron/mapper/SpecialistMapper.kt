@@ -27,11 +27,11 @@ object SpecialistMapper {
         imgUrl = specialist.imgUrl
         description = specialist.description.take(DEFAULT_SIZE_OF_DESCRIPTION)
 
-        educations.addAll(specialist.educations.map { InfoEntityMapper.of(it) })
-        workExperiences.addAll(specialist.workExperiences.map { InfoEntityMapper.of(it) })
-        achievements.addAll(specialist.achievements.map { InfoEntityMapper.of(it) })
-        others.addAll(specialist.otherInfo.map { InfoEntityMapper.of(it) })
-        services.addAll(specialist.services.map { InfoEntityMapper.of(it) })
+        educations.addAll(specialist.educations.map { ProfileInfoMapper.of(it) })
+        workExperiences.addAll(specialist.workExperiences.map { ProfileInfoMapper.of(it) })
+        achievements.addAll(specialist.achievements.map { ProfileInfoMapper.of(it) })
+        others.addAll(specialist.otherInfo.map { ProfileInfoMapper.of(it) })
+        services.addAll(specialist.services.map { ProfileInfoMapper.of(it) })
 
         documentUrls.addAll(specialist.documents.map { it.url })
     }

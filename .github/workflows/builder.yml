@@ -82,16 +82,6 @@ jobs:
             dockerfile: chat_service/Dockerfile
             image: ghcr.io/zveronhse/chat_service:latest
 
-          - name: Chat Service
-            env: chat_service
-            dockerfile: chat_service/Dockerfile
-            image: ghcr.io/zveronhse/chat_service:latest
-
-          - name: Specialist service
-            env: specialist-service
-            dockerfile: specialist-service/Dockerfile
-            image: ghcr.io/zveronhse/specialist-service:latest
-
           - name: Specialist service
             env: specialist-service
             dockerfile: specialist-service/Dockerfile

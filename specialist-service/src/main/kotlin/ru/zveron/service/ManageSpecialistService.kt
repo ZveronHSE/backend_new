@@ -15,12 +15,12 @@ import ru.zveron.contract.specialist.manage.FullEducation
 import ru.zveron.contract.specialist.manage.FullOther
 import ru.zveron.contract.specialist.manage.FullService
 import ru.zveron.contract.specialist.manage.FullWorkExperience
-import ru.zveron.contract.specialist.manage.InfoEntity
+import ru.zveron.contract.specialist.manage.ProfileInfo
 import ru.zveron.contract.specialist.manage.documents
 import ru.zveron.entity.Document
 import ru.zveron.expection.SpecialistIllegalArgumentException
 import ru.zveron.expection.SpecialistOutOfRangeException
-import ru.zveron.mapper.InfoEntityMapper
+import ru.zveron.mapper.ProfileInfoMapper
 import ru.zveron.mapper.SpecialistMapper.toEntity
 import ru.zveron.mapper.SpecialistMapper.toNameSpecialist
 import ru.zveron.model.NameSpecialist
@@ -60,25 +60,25 @@ class ManageSpecialistService(
         return description
     }
 
-    fun addAchievement(specialistID: Long, request: FullAchievement): InfoEntity {
+    fun addAchievement(specialistID: Long, request: FullAchievement): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         request.validate()
 
         val achievement = achievementRepository.save(request.toEntity(specialist))
 
-        return InfoEntityMapper.of(achievement)
+        return ProfileInfoMapper.of(achievement)
     }
 
     @Transactional
-    fun editAchievement(specialistID: Long, request: EditAchievementRequest): InfoEntity {
+    fun editAchievement(specialistID: Long, request: EditAchievementRequest): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         request.achievement.validate()
 
         val achievement = achievementRepository.save(request.achievement.toEntity(specialist, request.id))
 
-        return InfoEntityMapper.of(achievement)
+        return ProfileInfoMapper.of(achievement)
     }
 
     @Transactional
@@ -88,18 +88,18 @@ class ManageSpecialistService(
         achievementRepository.deleteById(id)
     }
 
-    fun addEducation(specialistID: Long, fullEducation: FullEducation): InfoEntity {
+    fun addEducation(specialistID: Long, fullEducation: FullEducation): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         fullEducation.validate()
 
         val education = educationRepository.save(fullEducation.toEntity(specialist))
 
-        return InfoEntityMapper.of(education)
+        return ProfileInfoMapper.of(education)
     }
 
     @Transactional
-    fun editEducation(specialistID: Long, educationRequest: EditEducationRequest): InfoEntity {
+    fun editEducation(specialistID: Long, educationRequest: EditEducationRequest): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         educationRequest.education.validate()
@@ -110,7 +110,7 @@ class ManageSpecialistService(
                 educationRepository.save(it)
             }
 
-        return InfoEntityMapper.of(education)
+        return ProfileInfoMapper.of(education)
     }
 
     fun deleteEducation(specialistID: Long, id: Long) {
@@ -119,7 +119,7 @@ class ManageSpecialistService(
         educationRepository.deleteById(id)
     }
 
-    fun addOther(specialistID: Long, fullOther: FullOther): InfoEntity {
+    fun addOther(specialistID: Long, fullOther: FullOther): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         fullOther.validate()
@@ -128,11 +128,11 @@ class ManageSpecialistService(
             otherInfoRepository.save(it)
         }
 
-        return InfoEntityMapper.of(otherInfo)
+        return ProfileInfoMapper.of(otherInfo)
     }
 
     @Transactional
-    fun editOther(specialistID: Long, request: EditOtherRequest): InfoEntity {
+    fun editOther(specialistID: Long, request: EditOtherRequest): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
 
@@ -142,7 +142,7 @@ class ManageSpecialistService(
                 otherInfoRepository.save(it)
             }
 
-        return InfoEntityMapper.of(otherInfo)
+        return ProfileInfoMapper.of(otherInfo)
     }
 
     @Transactional
@@ -152,7 +152,7 @@ class ManageSpecialistService(
         educationRepository.deleteById(id)
     }
 
-    fun addService(specialistID: Long, serviceRequest: FullService): InfoEntity {
+    fun addService(specialistID: Long, serviceRequest: FullService): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         serviceRequest.validate()
@@ -163,11 +163,11 @@ class ManageSpecialistService(
                 serviceRepository.save(it)
             }
 
-        return InfoEntityMapper.of(service)
+        return ProfileInfoMapper.of(service)
     }
 
     @Transactional
-    fun editService(specialistID: Long, serviceRequest: EditServiceRequest): InfoEntity {
+    fun editService(specialistID: Long, serviceRequest: EditServiceRequest): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         serviceRequest.service.validate()
@@ -178,7 +178,7 @@ class ManageSpecialistService(
                 serviceRepository.save(it)
             }
 
-        return InfoEntityMapper.of(service)
+        return ProfileInfoMapper.of(service)
     }
 
     @Transactional
@@ -189,7 +189,7 @@ class ManageSpecialistService(
     }
 
 
-    fun addWorkExperience(specialistID: Long, workRequest: FullWorkExperience): InfoEntity {
+    fun addWorkExperience(specialistID: Long, workRequest: FullWorkExperience): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         workRequest.validate()
@@ -200,11 +200,11 @@ class ManageSpecialistService(
                 workExperienceRepository.save(it)
             }
 
-        return InfoEntityMapper.of(workExperience)
+        return ProfileInfoMapper.of(workExperience)
     }
 
     @Transactional
-    fun editWorkExperience(specialistID: Long, workRequest: EditWorkExperienceRequest): InfoEntity {
+    fun editWorkExperience(specialistID: Long, workRequest: EditWorkExperienceRequest): ProfileInfo {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
         workRequest.work.validate()
@@ -215,7 +215,7 @@ class ManageSpecialistService(
                 workExperienceRepository.save(it)
             }
 
-        return InfoEntityMapper.of(workExperience)
+        return ProfileInfoMapper.of(workExperience)
     }
 
     @Transactional
