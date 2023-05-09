@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test
 import ru.zveron.contract.profile.AnimalServiceInternalGrpcKt
 import ru.zveron.contract.profile.getAnimalResponseInt
 import ru.zveron.order.client.animal.dto.GetAnimalApiResponse
-import ru.zveron.order.util.randomId
-import ru.zveron.order.util.testFullAnimal
+import ru.zveron.order.test.util.randomId
+import ru.zveron.order.test.util.testFullAnimal
 
 class AnimalGrpcClientTest {
 

@@ -14,16 +14,12 @@ import ru.zveron.order.client.profile.ProfileGrpcClient
 import ru.zveron.order.client.profile.dto.GetProfileApiResponse
 import ru.zveron.order.exception.ClientException
 import ru.zveron.order.exception.OrderNotFoundException
-import ru.zveron.order.mapper.service.mapToGetOrderResponse
 import ru.zveron.order.persistence.repository.OrderLotRepository
-import ru.zveron.order.service.dto.Animal
-import ru.zveron.order.service.dto.Profile
-import ru.zveron.order.service.dto.SubwayStation
-import ru.zveron.order.util.randomId
-import ru.zveron.order.util.testFindProfileResponse
-import ru.zveron.order.util.testFullAnimal
-import ru.zveron.order.util.testOrderLotEntity
-import ru.zveron.order.util.testSubwayStation
+import ru.zveron.order.service.mapper.ResponseMapper.mapToGetOrderResponse
+import ru.zveron.order.service.model.Animal
+import ru.zveron.order.service.model.Profile
+import ru.zveron.order.service.model.SubwayStation
+import ru.zveron.order.test.util.*
 
 class GetOrderServiceTest {
 

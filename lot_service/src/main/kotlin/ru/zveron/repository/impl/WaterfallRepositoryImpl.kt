@@ -27,8 +27,8 @@ class WaterfallRepositoryImpl(
             whereConditions.add(LOT.CATEGORY_ID.`in`(conditionsSearch.categories))
         }
 
-        // Искать только активные объявления
-        whereConditions.add(LOT.STATUS.eq("ACTIVE"))
+        // Искать объявления по определенным статусам
+        whereConditions.add(LOT.STATUS.`in`(conditionsSearch.statuses))
 
         // Алиасы тут, поскольку из-за джойна были конфликты и скрипт не понимал, по какому столбцу нужно выполнять.
         var sql = context

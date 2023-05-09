@@ -3,6 +3,8 @@ package ru.zveron.order.service
 import io.grpc.Status
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
+import mu.KLogging
+import net.logstash.logback.marker.Markers.append
 import org.springframework.stereotype.Service
 import ru.zveron.order.client.address.SubwayGrpcClient
 import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
@@ -12,13 +14,13 @@ import ru.zveron.order.client.profile.ProfileGrpcClient
 import ru.zveron.order.client.profile.dto.GetProfileApiResponse
 import ru.zveron.order.exception.ClientException
 import ru.zveron.order.exception.OrderNotFoundException
-import ru.zveron.order.mapper.service.mapToGetOrderResponse
-import ru.zveron.order.mapper.service.of
 import ru.zveron.order.persistence.repository.OrderLotRepository
-import ru.zveron.order.service.dto.Animal
-import ru.zveron.order.service.dto.GetOrderResponse
-import ru.zveron.order.service.dto.Profile
-import ru.zveron.order.service.dto.SubwayStation
+import ru.zveron.order.service.mapper.ModelMapper.of
+import ru.zveron.order.service.mapper.ResponseMapper.mapToGetOrderResponse
+import ru.zveron.order.service.model.Animal
+import ru.zveron.order.service.model.GetOrderResponse
+import ru.zveron.order.service.model.Profile
+import ru.zveron.order.service.model.SubwayStation
 
 @Service
 class GetOrderService(
@@ -28,8 +30,13 @@ class GetOrderService(
     private val animalGrpcClient: AnimalGrpcClient,
 ) {
 
+    companion object : KLogging()
+
     suspend fun getOrder(orderId: Long): GetOrderResponse = supervisorScope {
         val order = orderLotRepository.findById(orderId) ?: throw OrderNotFoundException(orderId)
+
+        logger.debug(append("orderId", order.id)) { "Got order and calling clients to collect data" }
+
         val rating = async { getRating(order.profileId) }
         val profile = async { getProfile(order.profileId, rating.await()) }
         val subwayStation = async { getSubwayStation(order.subwayId) }

@@ -26,6 +26,7 @@ val eurekaVersion: String by project
 val kotlinxVersion: String by project
 val testcontainersVersion: String by project
 val arch = System.getProperty("os.arch")
+val jooqVersion: String = "3.16.6"
 
 val modulesWithoutPostgreSql = setOf("e2e", "chat_service")
 
