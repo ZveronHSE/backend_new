@@ -19,7 +19,7 @@ data class OrderLot(
         val animalId: Long,
         val subwayId: Int,
 
-        val price: String,
+        val price: Long,
         val title: String,
         val description: String,
 
@@ -30,10 +30,9 @@ data class OrderLot(
         val timeWindowTo: LocalTime?,
 
         val status: Status,
-        val type: ServiceType,
+        val serviceType: ServiceType,
         val serviceDeliveryType: ServiceDeliveryType,
 
         @CreatedDate
         val createdAt: Instant = Instant.now(),
 )
-

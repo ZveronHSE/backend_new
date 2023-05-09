@@ -7,3 +7,7 @@ spring:
 eureka:
   client:
     enabled: false
+
+grpc:
+  server:
+    port: 0

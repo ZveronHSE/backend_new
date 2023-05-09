@@ -31,6 +31,8 @@ spring:
 
   jpa:
     show-sql: true
+  jooq:
+    sql-dialect: postgres
 
 eureka:
 
@@ -56,7 +58,7 @@ management:
 
 grpc:
   server:
-    port: 0
+    port: 9093
 
   client:
     profile:
@@ -76,6 +78,7 @@ grpc:
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
+
 
 server:
   port: 0
