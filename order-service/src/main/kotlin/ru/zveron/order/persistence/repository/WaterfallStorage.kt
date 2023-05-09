@@ -69,6 +69,7 @@ class WaterfallStorage(
         return result
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun applySort(
         queryBuilder: JooqOrderLotQueryBuilder,
         sort: Sort?,

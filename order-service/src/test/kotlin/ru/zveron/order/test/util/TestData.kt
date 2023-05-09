@@ -16,14 +16,14 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 fun testSubwayStation() = subwayStationInt {
-    this.id = randomId().toInt()
+    this.id = RandomUtils.nextInt()
     this.name = RandomStringUtils.randomAlphabetic(10)
     this.colorHex = RandomStringUtils.randomAlphabetic(8)
     this.town = RandomStringUtils.randomAlphabetic(10)
 }
 
-fun testFindProfileResponse() = getProfileResponse {
-    this.id = randomId()
+fun testFindProfileResponse(id: Long = randomId()) = getProfileResponse {
+    this.id = id
     this.name = randomName()
     this.imageUrl = RandomStringUtils.randomAlphabetic(10)
     this.addressId = randomId()
@@ -75,6 +75,7 @@ fun testGetAnimalResponse() = GetAnimalApiResponse.Success(testFullAnimal())
 fun testGetSubwayResponse() = GetSubwayStationApiResponse.Success(testSubwayStation())
 
 fun testServiceSubwayStation() = SubwayStation(
+    id = RandomUtils.nextInt(),
     name = RandomStringUtils.randomAlphabetic(10),
     colorHex = RandomStringUtils.randomAlphabetic(8),
     town = RandomStringUtils.randomAlphabetic(10),

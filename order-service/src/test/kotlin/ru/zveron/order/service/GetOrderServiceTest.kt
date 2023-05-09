@@ -19,14 +19,9 @@ import ru.zveron.order.service.mapper.ResponseMapper.mapToGetOrderResponse
 import ru.zveron.order.service.model.Animal
 import ru.zveron.order.service.model.Profile
 import ru.zveron.order.service.model.SubwayStation
-import ru.zveron.order.test.util.randomId
-import ru.zveron.order.test.util.testFindProfileResponse
-import ru.zveron.order.test.util.testFullAnimal
-import ru.zveron.order.test.util.testOrderLotEntity
-import ru.zveron.order.test.util.testSubwayStation
+import ru.zveron.order.test.util.*
 
 class GetOrderServiceTest {
-
 
     private val orderLotRepository = mockk<OrderLotRepository>()
 
@@ -44,7 +39,7 @@ class GetOrderServiceTest {
     )
 
     @Test
-    fun `given correct request, when all clients and respoitory respond correctly, then return get order response`() {
+    fun `given correct request, when all clients and repository respond correctly, then return get order response`() {
         //prep data
         val orderId = randomId()
         val subwayInt = testSubwayStation()
@@ -66,6 +61,7 @@ class GetOrderServiceTest {
             imageUrl = fullAnimal.imageUrlsList.first()
         )
         val subway = SubwayStation(
+            id = subwayInt.id,
             name = subwayInt.name,
             colorHex = subwayInt.colorHex,
             town = subwayInt.town
@@ -105,11 +101,10 @@ class GetOrderServiceTest {
         val orderId = randomId()
         val subwayInt = testSubwayStation()
         val profileResponse = testFindProfileResponse()
-        val subwayResponse = GetSubwayStationApiResponse.Success(subwayInt)
         val orderLotEntity = testOrderLotEntity()
 
         //prep env
-        coEvery { subwayGrpcClient.getSubwayStation(any()) } returns subwayResponse
+        coEvery { subwayGrpcClient.getSubwayStation(any()) } returns GetSubwayStationApiResponse.Success(subwayInt)
         coEvery { profileGrpcClient.getProfile(any()) } returns GetProfileApiResponse.Success(profileResponse)
         coEvery { animalGrpcClient.getAnimal(any()) } returns GetAnimalApiResponse.NotFound
         coEvery { orderLotRepository.findById(any()) } returns orderLotEntity
