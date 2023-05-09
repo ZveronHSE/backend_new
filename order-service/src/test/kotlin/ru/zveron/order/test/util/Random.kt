@@ -7,6 +7,8 @@ import java.util.UUID
 
 fun randomId() = RandomUtils.nextLong()
 
+fun randomSubwayId() = RandomUtils.nextInt()
+
 fun randomName() = "name-${UUID.randomUUID()}"
 
 fun randomSurname() = "surname-${UUID.randomUUID()}"

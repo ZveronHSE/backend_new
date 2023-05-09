@@ -19,9 +19,9 @@ import ru.zveron.order.test.util.testFullAnimal
 import ru.zveron.order.test.util.testOrderLotEntity
 import ru.zveron.order.test.util.testSubwayStation
 
-class OrderWaterfallServiceEntrypointTest @Autowired constructor(
+class GetOrderWaterfallEntrypointTest @Autowired constructor(
     private val template: R2dbcEntityTemplate,
-    private val entrypoint: OrderWaterfallServiceEntrypoint,
+    private val entrypoint: GetOrderWaterfallEntrypoint,
 ) : BaseOrderApplicationTest() {
 
     @Test

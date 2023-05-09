@@ -6,7 +6,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 
-data class GetOrderResponse(
+data class FullOrderData(
         val id: Long,
 
         val profile: Profile,

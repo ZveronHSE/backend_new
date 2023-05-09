@@ -17,8 +17,8 @@ import ru.zveron.order.config.BaseOrderApplicationTest
 import ru.zveron.order.persistence.model.constant.Status
 import ru.zveron.order.test.util.*
 
-class CustomerServiceEntrypointTest @Autowired constructor(
-    private val entrypoint: CustomerServiceEntrypoint,
+class GetCustomerEntrypointTest @Autowired constructor(
+    private val entrypoint: GetCustomerEntrypoint,
     private val template: R2dbcEntityTemplate,
 ) : BaseOrderApplicationTest() {
 
@@ -52,15 +52,15 @@ class CustomerServiceEntrypointTest @Autowired constructor(
         }
 
         //then
-        response.shouldNotBeNull().asClue { response ->
-            response.customer.asClue { customer ->
+        response.shouldNotBeNull().asClue { res ->
+            res.customer.asClue { customer ->
                 customer.id shouldBe customerId
                 customer.name shouldBe profileResponse.name
                 customer.imageUrl shouldBe profileResponse.imageUrl
             }
 
-            response.customer.activeOrdersCount shouldBe orders.count { order -> Status.canAcceptOrder(order.status) }
-            response.customer.completedOrdersCount shouldBe orders.count { order -> order.status == Status.COMPLETED }
+            res.customer.activeOrdersCount shouldBe orders.count { order -> Status.canAcceptOrder(order.status) }
+            res.customer.completedOrdersCount shouldBe orders.count { order -> order.status == Status.COMPLETED }
         }
     }
 }

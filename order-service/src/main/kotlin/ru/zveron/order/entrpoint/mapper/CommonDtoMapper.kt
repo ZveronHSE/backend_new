@@ -1,5 +1,7 @@
 package ru.zveron.order.entrpoint.mapper
 
+import com.google.type.Date
+import com.google.type.TimeOfDay
 import ru.zveron.contract.order.external.ProfileKt
 import ru.zveron.contract.order.external.WaterfallOrderKt
 import ru.zveron.contract.order.external.profile
@@ -14,6 +16,8 @@ import ru.zveron.order.service.model.SubwayStation
 import ru.zveron.order.service.model.WaterfallOrderLot
 import ru.zveron.order.util.ChronoFormatter
 import ru.zveron.order.util.PriceFormatter
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Suppress("unused")
 object CommonDtoMapper {
@@ -54,4 +58,8 @@ object CommonDtoMapper {
         this.createdAt = ChronoFormatter.formatCreatedAt(wo.createdAt)
         this.price = PriceFormatter.formatToPrice(wo.price.toString())
     }
+
+    fun Date.toLocalDate() = LocalDate.of(this.year, this.month, this.day)
+
+    fun TimeOfDay.toLocalTime() = LocalTime.of(this.hours, this.minutes, this.seconds)
 }

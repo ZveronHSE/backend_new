@@ -9,7 +9,7 @@ import ru.zveron.order.entrpoint.mapper.ResponseMapper.of
 import ru.zveron.order.service.CustomerService
 
 @GrpcService
-class CustomerServiceEntrypoint(
+class GetCustomerEntrypoint(
     private val customerService: CustomerService,
 ) : OrderCustomerServiceExternalGrpcKt.OrderCustomerServiceExternalCoroutineImplBase() {
 

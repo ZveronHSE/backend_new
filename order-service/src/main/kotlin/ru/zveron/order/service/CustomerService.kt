@@ -52,6 +52,7 @@ class CustomerService(
         }
     }
 
+    //todo: move to decorator
     private suspend fun getSubways(subwayIds: List<Int>): Map<Int, SubwayStation?> {
         if (subwayIds.isEmpty()) return emptyMap()
         val clientResponse = subwayGrpcClient.getSubways(subwayIds)
