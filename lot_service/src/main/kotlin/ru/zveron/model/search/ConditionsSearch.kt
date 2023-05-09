@@ -25,6 +25,8 @@ data class ConditionsSearch(
      * Фильтрация по параметрам, которые есть у объявления
      */
     var parameters: ParametersSearch? = null,
+
+    var statuses: MutableList<String> = mutableListOf()
 )
 
 data class ParametersSeekMethod(

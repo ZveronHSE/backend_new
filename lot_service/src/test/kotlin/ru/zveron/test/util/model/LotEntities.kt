@@ -7,6 +7,7 @@ import ru.zveron.contract.lot.model.CommunicationChannel
 import ru.zveron.contract.lot.model.photo
 import ru.zveron.contract.parameter.internal.infoCategory
 import ru.zveron.entity.Lot
+import ru.zveron.entity.LotPhoto
 import ru.zveron.entity.LotStatistics
 import ru.zveron.model.ChannelType
 import ru.zveron.model.enum.Gender
@@ -30,7 +31,12 @@ object LotEntities {
         channelType = ChannelType(isChat = true),
         addressId = 1L,
         categoryId = 1
-    )
+    ).apply {
+        photos = listOf(
+            LotPhoto(lot = this, imageUrl = "imageUrl", orderPhoto = 0),
+            LotPhoto(lot = this, imageUrl = "imageUrl1", orderPhoto = 1)
+        )
+    }
 
     fun mockLotStatistics(lot: Lot) = LotStatistics(lot = lot)
 
@@ -77,7 +83,7 @@ object LotEntities {
         this.description = description
         photos.addAll(listOf(photo {
             photo {
-                url= "someurl"
+                url = "someurl"
                 order = 0
             }
         }))
