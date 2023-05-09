@@ -1,5 +1,6 @@
 package ru.zveron.mapper
 
+import ru.zveron.contract.specialist.GetWaterfallResponse
 import ru.zveron.contract.specialist.manage.EditNameRequest
 import ru.zveron.contract.specialist.manage.FullAchievement
 import ru.zveron.contract.specialist.manage.FullEducation
@@ -14,6 +15,7 @@ import ru.zveron.entity.Service
 import ru.zveron.entity.Specialist
 import ru.zveron.entity.WorkExperience
 import ru.zveron.model.NameSpecialist
+import ru.zveron.model.SummarySpecialist
 import java.util.Locale
 
 object SpecialistMapper {
@@ -94,6 +96,10 @@ object SpecialistMapper {
             documentUrl = documentUrl,
             specialist = specialist
         )
+    }
+
+    fun List<SummarySpecialist>.toWaterfallResponse(): GetWaterfallResponse {
+        TODO("Not yet implemented")
     }
 
     fun EditNameRequest.toNameSpecialist() = NameSpecialist(
