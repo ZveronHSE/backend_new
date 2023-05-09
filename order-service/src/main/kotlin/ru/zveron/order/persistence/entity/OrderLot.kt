@@ -12,27 +12,27 @@ import java.time.LocalTime
 
 @Table("order_lot")
 data class OrderLot(
-        @Id
-        val id: Long? = null,
-        //customer profile id
-        val profileId: Long,
-        val animalId: Long,
-        val subwayId: Int? = null,
+    @Id
+    val id: Long? = null,
+    //customer profile id
+    val profileId: Long,
+    val animalId: Long,
+    val subwayId: Int? = null,
 
-        val price: Long,
-        val title: String,
-        val description: String,
+    val price: Long,
+    val title: String,
+    val description: String,
 
-        val serviceDateFrom: LocalDate,
-        val serviceDateTo: LocalDate?,
+    val serviceDateFrom: LocalDate,
+    val serviceDateTo: LocalDate?,
 
-        val timeWindowFrom: LocalTime?,
-        val timeWindowTo: LocalTime?,
+    val timeWindowFrom: LocalTime?,
+    val timeWindowTo: LocalTime?,
 
-        val status: Status,
-        val serviceType: ServiceType,
-        val serviceDeliveryType: ServiceDeliveryType,
+    val status: Status,
+    val serviceType: ServiceType,
+    val serviceDeliveryType: ServiceDeliveryType,
 
-        @CreatedDate
-        val createdAt: Instant = Instant.now(),
+    @CreatedDate
+    val createdAt: Instant = Instant.now(),
 )

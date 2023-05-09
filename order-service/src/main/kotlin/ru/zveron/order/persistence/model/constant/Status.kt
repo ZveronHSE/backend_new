@@ -20,8 +20,7 @@ enum class Status {
         @JsonCreator
         fun byAlias(alias: String) {
             values().singleOrNull { it.name.equals(alias, true) }
-                    ?: error("Non existent Status for alias=$alias")
+                ?: error("Non existent Status for alias=$alias")
         }
     }
 }
-

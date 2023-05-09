@@ -1,6 +1,12 @@
 package ru.zveron.order.entrpoint.mapper
 
-import ru.zveron.contract.order.external.*
+import ru.zveron.contract.order.external.GetOrderResponseKt
+import ru.zveron.contract.order.external.GetWaterfallResponseKt
+import ru.zveron.contract.order.external.ProfileKt
+import ru.zveron.contract.order.external.WaterfallOrderKt
+import ru.zveron.contract.order.external.fullOrder
+import ru.zveron.contract.order.external.getOrderResponse
+import ru.zveron.contract.order.external.getWaterfallResponse
 import ru.zveron.contract.order.model.AddressKt
 import ru.zveron.contract.order.model.AnimalKt
 import ru.zveron.order.entrpoint.mapper.CommonDtoMapper.of
@@ -29,7 +35,7 @@ object ResponseMapper {
 
     fun GetWaterfallResponseKt.of(waterfallOrderLots: List<WaterfallOrderLot>) = getWaterfallResponse {
         this.orders.addAll(
-                waterfallOrderLots.map { WaterfallOrderKt.of(it) }
+            waterfallOrderLots.map { WaterfallOrderKt.of(it) }
         )
     }
 }

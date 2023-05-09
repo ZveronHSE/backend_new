@@ -19,7 +19,11 @@ import ru.zveron.order.service.mapper.ResponseMapper.mapToGetOrderResponse
 import ru.zveron.order.service.model.Animal
 import ru.zveron.order.service.model.Profile
 import ru.zveron.order.service.model.SubwayStation
-import ru.zveron.order.test.util.*
+import ru.zveron.order.test.util.randomId
+import ru.zveron.order.test.util.testFindProfileResponse
+import ru.zveron.order.test.util.testFullAnimal
+import ru.zveron.order.test.util.testOrderLotEntity
+import ru.zveron.order.test.util.testSubwayStation
 
 class GetOrderServiceTest {
 
@@ -38,7 +42,6 @@ class GetOrderServiceTest {
         subwayGrpcClient = subwayGrpcClient,
         animalGrpcClient = animalGrpcClient,
     )
-
 
     @Test
     fun `given correct request, when all clients and respoitory respond correctly, then return get order response`() {

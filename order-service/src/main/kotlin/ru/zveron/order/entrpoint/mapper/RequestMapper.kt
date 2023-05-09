@@ -1,6 +1,10 @@
 package ru.zveron.order.entrpoint.mapper
 
-import ru.zveron.contract.order.external.*
+import ru.zveron.contract.order.external.Filter
+import ru.zveron.contract.order.external.GetWaterfallRequest
+import ru.zveron.contract.order.external.Operation
+import ru.zveron.contract.order.external.SortBy
+import ru.zveron.contract.order.external.SortDir
 import ru.zveron.order.service.constant.Field
 import ru.zveron.order.service.constant.SortDirection
 import ru.zveron.order.service.model.Sort

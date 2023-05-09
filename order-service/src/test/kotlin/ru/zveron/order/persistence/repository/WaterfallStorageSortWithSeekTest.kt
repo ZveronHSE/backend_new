@@ -16,8 +16,8 @@ import ru.zveron.order.test.util.testOrderLotEntity
 import java.time.LocalDate
 
 class WaterfallStorageSortWithSeekTest @Autowired constructor(
-        private val storage: WaterfallStorage,
-        private val template: R2dbcEntityTemplate,
+    private val storage: WaterfallStorage,
+    private val template: R2dbcEntityTemplate,
 ) : BaseOrderApplicationTest() {
 
     @Test
@@ -29,8 +29,8 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
         //prices from 200 to 2_000
         val orderLotEntities = List(10) { index ->
             testOrderLotEntity().copy(
-                    id = index.inc().toLong(),
-                    price = index.inc().times(200).toLong()
+                id = index.inc().toLong(),
+                price = index.inc().times(200).toLong()
             )
         }
 
@@ -42,33 +42,34 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
         //when
         val response = runBlocking {
             storage.findAllPaginated(
-                    lastId = lastId,
-                    pageSize = 10,
-                    filters = emptyList(),
-                    sort = sort,
+                lastId = lastId,
+                pageSize = 10,
+                filters = emptyList(),
+                sort = sort,
             )
         }
 
         //then
         response.size shouldBe orderLotEntities.size - lastId - 1 //1 account for lastId itself
-        response.map { it.id } shouldContainInOrder orderLotEntities.sortedByDescending { it.price }.drop((lastId + 1).toInt()).map { it.id }
+        response.map { it.id } shouldContainInOrder orderLotEntities.sortedByDescending { it.price }
+            .drop((lastId + 1).toInt()).map { it.id }
     }
 
     @Test
     fun `given correct request, when filter by distance asc and lastId is null, then return filtered list of orders accounting for the last id being null value`() {
         //prep data
         val orderLotEntities =
-                List(10) { index ->
-                    testOrderLotEntity().copy(
-                            id = index.inc().toLong(),
-                            subwayId = if (index > 0) index else null
-                    )
-                }
+            List(10) { index ->
+                testOrderLotEntity().copy(
+                    id = index.inc().toLong(),
+                    subwayId = if (index > 0) index else null
+                )
+            }
 
         val lastId = 1L
 
         val sortedIds =
-                listOf(null) + orderLotEntities.filter { it.subwayId != null }.map { it.subwayId!! }.shuffled()
+            listOf(null) + orderLotEntities.filter { it.subwayId != null }.map { it.subwayId!! }.shuffled()
         val sort = Sort(sortBy = SortBy.ByDistance(sortedIds = sortedIds), sortDirection = SortDirection.ASC)
 
         //prep env
@@ -79,10 +80,10 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
         //when
         val response = runBlocking {
             storage.findAllPaginated(
-                    lastId = lastId,
-                    pageSize = 10,
-                    filters = emptyList(),
-                    sort = sort,
+                lastId = lastId,
+                pageSize = 10,
+                filters = emptyList(),
+                sort = sort,
             )
         }
 
@@ -96,13 +97,13 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
     fun `given correct request, when sort by service date desc and with last id, then return sorted order list accounting for the last id`() {
         //prep data
         val orderLotEntities =
-                List(10) { index ->
-                    testOrderLotEntity().copy(
-                            id = randomId(),
-                            serviceDateFrom = LocalDate.of(2021, 1, 1).plusDays(index.toLong()),
-                            serviceDateTo = LocalDate.of(2021, 1, 1).plusDays(index.toLong() + index.mod(2))
-                    )
-                }
+            List(10) { index ->
+                testOrderLotEntity().copy(
+                    id = randomId(),
+                    serviceDateFrom = LocalDate.of(2021, 1, 1).plusDays(index.toLong()),
+                    serviceDateTo = LocalDate.of(2021, 1, 1).plusDays(index.toLong() + index.mod(2))
+                )
+            }
 
         val lastId = orderLotEntities.sortedByDescending { it.serviceDateFrom }.map { it.id }[5]
 
@@ -115,10 +116,10 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
         //when
         val response = runBlocking {
             storage.findAllPaginated(
-                    lastId = lastId,
-                    pageSize = 10,
-                    filters = emptyList(),
-                    sort = sort,
+                lastId = lastId,
+                pageSize = 10,
+                filters = emptyList(),
+                sort = sort,
             )
         }
 
@@ -126,6 +127,6 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
         response.size shouldBe 4
 
         response.map { it.id } shouldContainInOrder orderLotEntities.sortedByDescending { it.serviceDateFrom }
-                .map { it.id }.dropWhile { it != lastId }.drop(1)
+            .map { it.id }.dropWhile { it != lastId }.drop(1)
     }
 }

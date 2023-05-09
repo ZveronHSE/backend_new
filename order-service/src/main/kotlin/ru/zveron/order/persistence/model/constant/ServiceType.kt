@@ -17,7 +17,7 @@ enum class ServiceType {
         @JsonCreator
         fun byAlias(alias: String): ServiceType {
             return values().singleOrNull { it.name.equals(alias, true) }
-                    ?: error("Non existent ServiceType for alias=$alias")
+                ?: error("Non existent ServiceType for alias=$alias")
         }
     }
 }

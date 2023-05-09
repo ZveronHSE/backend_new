@@ -26,9 +26,7 @@ class OrderWaterfallServiceEntrypoint(
         logger.debug(
             append(
                 "serviceRequest",
-                serviceRequest
-            )
-        ) { "Making get waterfall request in order waterfall entrypoint" }
+                serviceRequest)) { "Making get waterfall request in order waterfall entrypoint" }
 
         val waterfallOrders = service.getWaterfall(serviceRequest)
 

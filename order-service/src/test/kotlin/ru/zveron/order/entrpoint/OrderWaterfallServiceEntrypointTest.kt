@@ -20,8 +20,8 @@ import ru.zveron.order.test.util.testOrderLotEntity
 import ru.zveron.order.test.util.testSubwayStation
 
 class OrderWaterfallServiceEntrypointTest @Autowired constructor(
-        private val template: R2dbcEntityTemplate,
-        private val entrypoint: OrderWaterfallServiceEntrypoint,
+    private val template: R2dbcEntityTemplate,
+    private val entrypoint: OrderWaterfallServiceEntrypoint,
 ) : BaseOrderApplicationTest() {
 
     @Test
@@ -55,7 +55,8 @@ class OrderWaterfallServiceEntrypointTest @Autowired constructor(
         }
 
         //then
-        val expectedOrders = orderEntities.filter { Status.canAcceptOrder(it.status) }.map { it.id }.sortedByDescending { it }.take(5)
+        val expectedOrders =
+            orderEntities.filter { Status.canAcceptOrder(it.status) }.map { it.id }.sortedByDescending { it }.take(5)
         response.ordersCount shouldBe expectedOrders.size
         response.ordersList.map { it.id } shouldContainInOrder expectedOrders
     }

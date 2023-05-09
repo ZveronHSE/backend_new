@@ -15,27 +15,27 @@ import ru.zveron.order.persistence.repository.model.JooqOrderLotQueryBuilder
 import ru.zveron.order.persistence.repository.model.OrderLotWrapper
 import ru.zveron.order.service.constant.SortBy
 import ru.zveron.order.service.constant.SortDirection
+import ru.zveron.order.service.mapper.ModelMapper.toJooqFilter
 import ru.zveron.order.service.model.Filter
 import ru.zveron.order.service.model.Sort
-import ru.zveron.order.service.model.toJooqFilter
 
 
 @Component
 class WaterfallStorage(
-        private val ctx: DSLContext,
-        private val repository: OrderLotRepository,
+    private val ctx: DSLContext,
+    private val repository: OrderLotRepository,
 ) {
 
     companion object : KLogging()
 
     suspend fun findAllPaginated(
-            lastId: Long?,
-            pageSize: Int,
-            filters: List<Filter> = emptyList(),
-            sort: Sort? = null,
+        lastId: Long?,
+        pageSize: Int,
+        filters: List<Filter> = emptyList(),
+        sort: Sort? = null,
     ): List<OrderLotWrapper> {
 
-        //todo: should be whole entity
+        //todo: should be whole entity coming from the client
         val lastEntity = lastId?.let {
             repository.findById(it)
         }
@@ -47,41 +47,44 @@ class WaterfallStorage(
         val queryBuilder = applySort(jooqOrderLotQueryBuilder, sort, lastEntity)
 
         val jooqOrderLotQuery: JooqOrderLotQuery = queryBuilder
-                .filterConditions(filterConditions)
-                .pageSize(pageSize)
-                .lastOrderLotId(lastId)
-                .build()
+            .filterConditions(filterConditions)
+            .pageSize(pageSize)
+            .lastOrderLotId(lastId)
+            .build()
 
         val query = jooqOrderLotQuery.getQuery(ctx)
 
         logger.debug(append("query", query.toString())) { "Composed jooq query" }
 
         val result = Flux.from(query)
-                .log()
-                .map {
-                    it.into(OrderLotWrapper::class.java)
-                }
-                .collectList()
-                .awaitSingle() ?: emptyList()
+            .log()
+            .map {
+                it.into(OrderLotWrapper::class.java)
+            }
+            .collectList()
+            .awaitSingle() ?: emptyList()
 
         logger.debug(append("result", result.map { it.toString() })) { "Completed request" }
 
         return result
     }
 
-
-    private fun applySort(queryBuilder: JooqOrderLotQueryBuilder, sort: Sort?, lastEntity: OrderLot?): JooqOrderLotQueryBuilder {
+    private fun applySort(
+        queryBuilder: JooqOrderLotQueryBuilder,
+        sort: Sort?,
+        lastEntity: OrderLot?,
+    ): JooqOrderLotQueryBuilder {
         when (val sortByCasted = sort?.sortBy) {
             is SortBy.ByDistance -> {
-                logger.debug { "Sorting by distance for ids ${sortByCasted.sortedIds}" }
+                logger.debug(append("ids", sortByCasted.sortedIds)) { "Sorting by distance for ids" }
 
                 val sortedSubwayIds =
-                        sortByCasted.sortedIds.let { if (sort.sortDirection == SortDirection.DESC) it.reversed() else it }
+                    sortByCasted.sortedIds.let { if (sort.sortDirection == SortDirection.DESC) it.reversed() else it }
                 val sortField: SortField<Int> = ORDER_LOT.SUBWAY_ID
-                        .sort(sortByCasted.sortedIds.associateWith { sortedSubwayIds.indexOf(it) })
-                        .let {
-                            if (sort.sortDirection == SortDirection.ASC) it.nullsFirst() else it.nullsLast()
-                        }
+                    .sort(sortByCasted.sortedIds.associateWith { sortedSubwayIds.indexOf(it) })
+                    .let {
+                        if (sort.sortDirection == SortDirection.ASC) it.nullsFirst() else it.nullsLast()
+                    }
 
                 queryBuilder.addSortParam(sortField as SortField<Any>)
                 lastEntity?.run {

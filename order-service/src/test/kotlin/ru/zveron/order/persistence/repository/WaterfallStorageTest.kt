@@ -13,8 +13,8 @@ import ru.zveron.order.test.util.shouldBeOrderLot
 import ru.zveron.order.test.util.testOrderLotEntity
 
 class WaterfallStorageTest @Autowired constructor(
-        private val template: R2dbcEntityTemplate,
-        private val waterfallStorage: WaterfallStorage,
+    private val template: R2dbcEntityTemplate,
+    private val waterfallStorage: WaterfallStorage,
 ) : BaseOrderApplicationTest() {
 
     @Test
@@ -31,8 +31,8 @@ class WaterfallStorageTest @Autowired constructor(
         //when
         val response = runBlocking {
             waterfallStorage.findAllPaginated(
-                    lastId = null,
-                    pageSize = pageSize,
+                lastId = null,
+                pageSize = pageSize,
             )
         }
 
@@ -55,8 +55,8 @@ class WaterfallStorageTest @Autowired constructor(
         //when
         val response = runBlocking {
             waterfallStorage.findAllPaginated(
-                    lastId = null,
-                    pageSize = pageSize,
+                lastId = null,
+                pageSize = pageSize,
             )
         }
 
@@ -87,8 +87,8 @@ class WaterfallStorageTest @Autowired constructor(
         //when
         val response = runBlocking {
             waterfallStorage.findAllPaginated(
-                    lastId = lastOrderId,
-                    pageSize = pageSize,
+                lastId = lastOrderId,
+                pageSize = pageSize,
             )
         }
 
@@ -105,9 +105,9 @@ class WaterfallStorageTest @Autowired constructor(
         println(orderLotIds.sortedByDescending { it })
         println(response.map { it.id })
         println(orderLotIds.sortedByDescending { it }
-                .dropWhile { it != lastOrderId }.take(lastOrderId.toInt()))
+            .dropWhile { it != lastOrderId }.take(lastOrderId.toInt()))
 
         response.map { it.id } shouldContainInOrder orderLotIds.sortedByDescending { it }
-                .dropWhile { it!! >= lastOrderId }.take(expectedSize.toInt())
+            .dropWhile { it!! >= lastOrderId }.take(expectedSize.toInt())
     }
 }

@@ -49,7 +49,7 @@ class ResponseMapperTest {
     }
 
     @Test
-    fun `given a null animal in map, then returns emptylist`(){
+    fun `given a null animal in map, then returns emptylist`() {
         //prep data
         val orderLot = testOrderWrapper().copy(id = 1L, subwayId = 1, animalId = 1)
         val orderLotRecords = listOf(orderLot)
@@ -66,7 +66,7 @@ class ResponseMapperTest {
     }
 
     @Test
-    fun `given a null station in map, then returns single element`(){
+    fun `given a null station in map, then returns single element`() {
         //prep data
         val orderLot = testOrderWrapper().copy(id = 1L, subwayId = 1, animalId = 1)
         val orderLotRecords = listOf(orderLot)
