@@ -53,6 +53,7 @@ object ConditionsMapper {
             conditionsSearch.conditions.add(LOT.SELLER_ID.notEqual(sellerId))
         }
 
+        // 8. Фильтруем только по активным объявлениям
         conditionsSearch.statuses.add(LotStatus.ACTIVE.name)
 
         return conditionsSearch

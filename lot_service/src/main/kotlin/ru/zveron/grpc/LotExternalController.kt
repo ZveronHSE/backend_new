@@ -238,6 +238,6 @@ class LotExternalController(
 
         val lots = lotService.getWaterfallBySellerId(request, sellerId)
 
-        return LotMapper.buildWaterfallResponse(lots, null)
+        return LotMapper.buildWaterfallResponse(lots, favorites = null)
     }
 }

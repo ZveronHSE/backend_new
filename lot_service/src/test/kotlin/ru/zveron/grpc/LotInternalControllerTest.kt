@@ -25,15 +25,12 @@ import ru.zveron.test.util.GeneratorUtils.generateLong
 import ru.zveron.test.util.model.LotEntities
 
 
-class LotInternalControllerTest : DataBaseTest() {
-    @Autowired
-    lateinit var lotInternalController: LotInternalController
-
-    @Autowired
-    lateinit var lotRepository: LotRepository
-
+class LotInternalControllerTest @Autowired constructor(
+    var lotInternalController: LotInternalController,
+    var lotRepository: LotRepository,
     @MockkBean
-    lateinit var lotFavoriteClient: LotFavoriteClient
+    var lotFavoriteClient: LotFavoriteClient
+) : DataBaseTest() {
 
     companion object {
         const val QUANTITY_OF_LOTS = 5
