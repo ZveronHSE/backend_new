@@ -12,9 +12,6 @@ databaseChangeLog:
             path: init-data-profile.sql
             relativeToChangelogFile: true
         - sqlFile:
-            path: init-data-contact.sql
-            relativeToChangelogFile: true
-        - sqlFile:
             path: init-data-link.sql
             relativeToChangelogFile: true
         - sqlFile:

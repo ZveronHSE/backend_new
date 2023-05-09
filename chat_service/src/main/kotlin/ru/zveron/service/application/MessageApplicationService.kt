@@ -49,7 +49,10 @@ class MessageApplicationService(
         val messages = messageStorage.getChatRecentMessages(chatId, request.pagination)
             .toList().map { message -> messageToResponse(message) }
         val response = chatRouteResponse {
-            getMessagesResponse = getChatMessagesResponse { this.messages.addAll(messages) }
+            getMessagesResponse = getChatMessagesResponse {
+                this.messages.addAll(messages)
+                this.chatId = chatId.toString()
+            }
         }
 
         return SingleConnectionResponse(profileId, response)
@@ -83,7 +86,10 @@ class MessageApplicationService(
         )
 
         val response =  chatRouteResponse {
-            receiveMessage = receiveMessage { this.message = messageToResponse(message) }
+            receiveMessage = receiveMessage {
+                this.message = messageToResponse(message)
+                this.chatId = chatId.toString()
+            }
         }
 
         return SingleConnectionResponse(chat.anotherProfileId, response)
