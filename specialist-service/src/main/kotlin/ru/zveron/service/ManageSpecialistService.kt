@@ -47,6 +47,7 @@ class ManageSpecialistService(
     private val workExperienceRepository: WorkExperienceRepository,
     private val specialistComponent: SpecialistComponent
 ) {
+    @Transactional
     fun editDescription(specialistID: Long, description: String): String {
         specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -69,7 +70,7 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(achievement)
     }
 
-
+    @Transactional
     fun editAchievement(specialistID: Long, request: EditAchievementRequest): InfoEntity {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -80,6 +81,7 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(achievement)
     }
 
+    @Transactional
     fun deleteAchievement(specialistID: Long, id: Long) {
         specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -96,6 +98,7 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(education)
     }
 
+    @Transactional
     fun editEducation(specialistID: Long, educationRequest: EditEducationRequest): InfoEntity {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -128,6 +131,7 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(otherInfo)
     }
 
+    @Transactional
     fun editOther(specialistID: Long, request: EditOtherRequest): InfoEntity {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -141,6 +145,7 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(otherInfo)
     }
 
+    @Transactional
     fun deleteOther(specialistID: Long, id: Long) {
         specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -161,6 +166,7 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(service)
     }
 
+    @Transactional
     fun editService(specialistID: Long, serviceRequest: EditServiceRequest): InfoEntity {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -175,11 +181,13 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(service)
     }
 
+    @Transactional
     fun deleteService(specialistID: Long, id: Long) {
         specialistComponent.getSpecialistOrThrow(specialistID)
 
         serviceRepository.deleteById(id)
     }
+
 
     fun addWorkExperience(specialistID: Long, workRequest: FullWorkExperience): InfoEntity {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
@@ -195,6 +203,7 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(workExperience)
     }
 
+    @Transactional
     fun editWorkExperience(specialistID: Long, workRequest: EditWorkExperienceRequest): InfoEntity {
         val specialist = specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -209,6 +218,7 @@ class ManageSpecialistService(
         return InfoEntityMapper.of(workExperience)
     }
 
+    @Transactional
     fun deleteWorkExperience(specialistID: Long, id: Long) {
         specialistComponent.getSpecialistOrThrow(specialistID)
 
@@ -233,6 +243,7 @@ class ManageSpecialistService(
         }
     }
 
+    @Transactional
     fun editName(specialistID: Long, request: EditNameRequest): NameSpecialist {
         specialistComponent.getSpecialistOrThrow(specialistID)
 

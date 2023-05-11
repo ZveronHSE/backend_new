@@ -17,6 +17,7 @@ import ru.zveron.order.service.mapper.ModelMapper.of
 import ru.zveron.order.service.mapper.ResponseMapper.toGetOrderWaterfallResponse
 import ru.zveron.order.service.model.Animal
 import ru.zveron.order.service.model.Filter
+import ru.zveron.order.service.model.FilterParam
 import ru.zveron.order.service.model.GetWaterfallRequest
 import ru.zveron.order.service.model.SubwayStation
 import ru.zveron.order.service.model.WaterfallOrderLot
@@ -33,8 +34,8 @@ class GetWaterfallService(
         val orderLotRecords = waterfallStorage.findAllPaginated(
             lastId = request.lastOrderId,
             pageSize = request.pageSize,
-            filters = request.filters + listOf(
-                Filter(
+            filterParams = request.filterParams + listOf(
+                FilterParam(
                     Field.STATUS,
                     Operation.NOT_IN,
                     Status.terminalStatuses().joinToString(",")

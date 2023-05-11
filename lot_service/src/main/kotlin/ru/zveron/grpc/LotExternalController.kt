@@ -17,6 +17,7 @@ import ru.zveron.contract.lot.CardLotRequest
 import ru.zveron.contract.lot.CloseLotRequest
 import ru.zveron.contract.lot.CreateLotRequest
 import ru.zveron.contract.lot.EditLotRequest
+import ru.zveron.contract.lot.GetOwnLotsRequest
 import ru.zveron.contract.lot.LotExternalProtoServiceGrpcKt
 import ru.zveron.contract.lot.Sort
 import ru.zveron.contract.lot.WaterfallRequest
@@ -230,5 +231,13 @@ class LotExternalController(
 
 
         return LotMapper.buildWaterfallResponse(lots, favorites)
+    }
+
+    override suspend fun getOwnLots(request: GetOwnLotsRequest): WaterfallResponse {
+        val sellerId = GrpcUtils.getMetadata(coroutineContext, requiredAuthorized = true).profileId!!
+
+        val lots = lotService.getWaterfallBySellerId(request, sellerId)
+
+        return LotMapper.buildWaterfallResponse(lots, favorites = null)
     }
 }

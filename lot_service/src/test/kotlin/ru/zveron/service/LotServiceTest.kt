@@ -57,6 +57,10 @@ class LotServiceTest : DataBaseTest() {
         val lots = lotService.getLotsByIds(listOf(lot1.id, lot2.id, GeneratorUtils.generateLong(1)))
 
         lots shouldContainExactlyInAnyOrder listOf(lot1, lot2)
+        lots.forEach {
+            it.photos.size shouldBe 1
+            it.photos[0].imageUrl shouldBe "imageUrl"
+        }
     }
 
 
@@ -81,6 +85,10 @@ class LotServiceTest : DataBaseTest() {
         val lots = lotService.getLotsBySellerId(sellerId)
 
         lots shouldContainExactly listOf(lot2, lot1)
+        lots.forEach {
+            it.photos.size shouldBe 1
+            it.photos[0].imageUrl shouldBe "imageUrl"
+        }
     }
 
     @ParameterizedTest

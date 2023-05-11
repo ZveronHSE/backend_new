@@ -11,12 +11,10 @@ import reactor.core.publisher.Flux
 import ru.zveron.order.persistence.entity.OrderLot
 import ru.zveron.order.persistence.jooq.models.ORDER_LOT
 import ru.zveron.order.persistence.repository.model.JooqOrderLotQuery
-import ru.zveron.order.persistence.repository.model.JooqOrderLotQueryBuilder
 import ru.zveron.order.persistence.repository.model.OrderLotWrapper
 import ru.zveron.order.service.constant.SortBy
-import ru.zveron.order.service.constant.SortDirection
 import ru.zveron.order.service.mapper.ModelMapper.toJooqFilter
-import ru.zveron.order.service.model.Filter
+import ru.zveron.order.service.model.FilterParam
 import ru.zveron.order.service.model.Sort
 
 
@@ -31,7 +29,7 @@ class WaterfallStorage(
     suspend fun findAllPaginated(
         lastId: Long?,
         pageSize: Int,
-        filters: List<Filter> = emptyList(),
+        filterParams: List<FilterParam> = emptyList(),
         sort: Sort? = null,
     ): List<OrderLotWrapper> {
 
@@ -40,27 +38,24 @@ class WaterfallStorage(
             repository.findById(it)
         }
 
-        val filterConditions = filters.map { it.toJooqFilter() }
+        val filterConditions = filterParams.map { it.toJooqFilter() }
+        val sortParams = getSortParams(sort)
+        val seekParams = lastEntity?.let { getSeekParams(sort, it) } ?: emptyList()
 
-        val jooqOrderLotQueryBuilder = JooqOrderLotQueryBuilder()
+        val jooqQuery = JooqOrderLotQuery(
+            seekParams = seekParams,
+            filterConditions = filterConditions,
+            sortParams = sortParams,
+            pageSize = pageSize,
+        )
 
-        val queryBuilder = applySort(jooqOrderLotQueryBuilder, sort, lastEntity)
-
-        val jooqOrderLotQuery: JooqOrderLotQuery = queryBuilder
-            .filterConditions(filterConditions)
-            .pageSize(pageSize)
-            .lastOrderLotId(lastId)
-            .build()
-
-        val query = jooqOrderLotQuery.getQuery(ctx)
+        val query = jooqQuery.toSortedQuery(ctx)
 
         logger.debug(append("query", query.toString())) { "Composed jooq query" }
 
         val result = Flux.from(query)
             .log()
-            .map {
-                it.into(OrderLotWrapper::class.java)
-            }
+            .map { it.into(OrderLotWrapper::class.java) }
             .collectList()
             .awaitSingle() ?: emptyList()
 
@@ -70,49 +65,32 @@ class WaterfallStorage(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun applySort(
-        queryBuilder: JooqOrderLotQueryBuilder,
-        sort: Sort?,
-        lastEntity: OrderLot?,
-    ): JooqOrderLotQueryBuilder {
-        when (val sortByCasted = sort?.sortBy) {
-            is SortBy.ByDistance -> {
-                logger.debug(append("ids", sortByCasted.sortedIds)) { "Sorting by distance for ids" }
+    private fun getSortParams(sort: Sort?): List<SortField<Any>> {
+        return when (val sortCasted = sort?.sortBy) {
+            is SortBy.ByDistance -> listOf(sortCasted.getSortField(sort.sortDirection) as SortField<Any>)
+            is SortBy.ByPrice -> listOf(sort.sortDirection.sort(sortCasted.priceField as Field<Any>))
+            is SortBy.ByServiceDate -> listOf(
+                sort.sortDirection.sort(sortCasted.dateFromField as Field<Any>),
+                sort.sortDirection.sort(sortCasted.dateToField as Field<Any>),
+            )
 
-                val sortedSubwayIds =
-                    sortByCasted.sortedIds.let { if (sort.sortDirection == SortDirection.DESC) it.reversed() else it }
-                val sortField: SortField<Int> = ORDER_LOT.SUBWAY_ID
-                    .sort(sortByCasted.sortedIds.associateWith { sortedSubwayIds.indexOf(it) })
-                    .let {
-                        if (sort.sortDirection == SortDirection.ASC) it.nullsFirst() else it.nullsLast()
-                    }
-
-                queryBuilder.addSortParam(sortField as SortField<Any>)
-                lastEntity?.run {
-                    queryBuilder.addSeekParam(sortedSubwayIds.indexOf(lastEntity.subwayId) as Any)
-                }
-            }
-
-            is SortBy.ByPrice -> {
-                queryBuilder.addSortParam(sort.sortDirection.dir(sortByCasted.priceField as Field<Any>))
-                lastEntity?.run {
-                    queryBuilder.addSeekParam(lastEntity.price as Any)
-                }
-            }
-
-            is SortBy.ByServiceDate -> {
-                queryBuilder.addSortParam(sort.sortDirection.dir(sortByCasted.dateFromField as Field<Any>))
-                queryBuilder.addSortParam(sort.sortDirection.dir(sortByCasted.dateToField as Field<Any>))
-
-                lastEntity?.run {
-                    queryBuilder.addSeekParam(lastEntity.serviceDateFrom as Any)
-                    queryBuilder.addSeekParam(lastEntity.serviceDateTo as Any)
-                }
-            }
-
-            null -> {} //do nothing
+            null -> emptyList()
+        }.let {
+            it + ORDER_LOT.ID.desc() as SortField<Any>
         }
+    }
 
-        return queryBuilder
+    private fun getSeekParams(sort: Sort?, lastEntity: OrderLot): List<Any> {
+        return when (val sortCasted = sort?.sortBy) {
+            is SortBy.ByDistance -> listOf(
+                sortCasted.getSortedIds(sort.sortDirection).indexOf(lastEntity.subwayId) as Any
+            )
+
+            is SortBy.ByPrice -> listOf(lastEntity.price as Any)
+            is SortBy.ByServiceDate -> listOf(lastEntity.serviceDateFrom as Any, lastEntity.serviceDateTo as Any)
+            null -> emptyList()
+        }.let {
+            it + lastEntity.id as Any
+        }
     }
 }
