@@ -38,7 +38,7 @@ class WaterfallSortStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }
@@ -66,7 +66,7 @@ class WaterfallSortStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }
@@ -94,7 +94,7 @@ class WaterfallSortStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }
@@ -138,7 +138,7 @@ class WaterfallSortStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }
@@ -185,7 +185,7 @@ class WaterfallSortStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }
@@ -220,7 +220,7 @@ class WaterfallSortStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }
@@ -265,7 +265,7 @@ class WaterfallSortStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }

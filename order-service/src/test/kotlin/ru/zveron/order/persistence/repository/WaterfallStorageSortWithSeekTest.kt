@@ -44,7 +44,7 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = lastId,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }
@@ -82,7 +82,7 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = lastId,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }
@@ -118,7 +118,7 @@ class WaterfallStorageSortWithSeekTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = lastId,
                 pageSize = 10,
-                filters = emptyList(),
+                filterParams = emptyList(),
                 sort = sort,
             )
         }

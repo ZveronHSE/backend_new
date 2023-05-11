@@ -13,7 +13,7 @@ object RequestMapper {
         pageSize = pageSize,
         lastOrderId = takeIf { it.hasLastOrderId() }?.let { this.lastOrderId },
         sort = this.sort.toServiceSort(),
-        filters = this.filtersList.map { it.toServiceFilter() }
+        filterParams = this.filtersList.map { it.toServiceFilter() }
     )
 
     fun CreateOrderRequest.toServiceRequest() = ru.zveron.order.service.model.CreateOrderRequest(
@@ -39,16 +39,16 @@ object RequestMapper {
     }
 
     private fun SortBy.toServiceSortBy() = when (this) {
-        SortBy.DEFAULT -> null
         SortBy.BY_DISTANCE -> ru.zveron.order.service.constant.SortBy.ByDistance()
         SortBy.BY_PRICE -> ru.zveron.order.service.constant.SortBy.ByPrice()
         SortBy.BY_SERVICE_DELIVERY -> ru.zveron.order.service.constant.SortBy.ByServiceDate()
-        else -> error("Wrong sort by type for $this")
+        SortBy.DEFAULT -> null
+        else -> error("Wrong sort by type")
     }
 
     private fun SortDir.toServiceDirection() = SortDirection.valueOf(this.name)
 
-    private fun Filter.toServiceFilter() = ru.zveron.order.service.model.Filter(
+    private fun Filter.toServiceFilter() = ru.zveron.order.service.model.FilterParam(
         field = Field.ofName(this.field.name),
         operation = this.operation.toServiceOperation(),
         value = this.value,

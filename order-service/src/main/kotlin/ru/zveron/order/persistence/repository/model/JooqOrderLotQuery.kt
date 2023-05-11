@@ -1,40 +1,16 @@
 package ru.zveron.order.persistence.repository.model
 
-import org.jooq.Condition
-import org.jooq.DSLContext
-import org.jooq.Record
-import org.jooq.SelectField
-import org.jooq.SortField
-import org.jooq.Table
+import org.jooq.*
 import ru.zveron.order.persistence.jooq.models.ORDER_LOT
 
 data class JooqOrderLotQuery(
     val seekParams: List<Any>,
     val filterConditions: List<Condition>,
     val sortParams: List<SortField<Any>>,
-    val selectParams: List<SelectField<*>>,
     val pageSize: Int = 10,
-    val table: Table<Record>,
 ) {
-    fun getQuery(ctx: DSLContext) = ctx.select(selectParams)
-        .from(ORDER_LOT)
-        .where(filterConditions)
-        .orderBy(sortParams)
-        .let {
-            if (seekParams.isNotEmpty()) it.seek(*seekParams.toTypedArray()).limit(pageSize)
-            else it.limit(pageSize)
-        }
-}
-
-class JooqOrderLotQueryBuilder {
-    private val seekParams: MutableList<Any> = mutableListOf()
-    private val filterConditions: MutableList<Condition> = mutableListOf()
-    private val sortParams: MutableList<SortField<Any>> = mutableListOf()
-    private var pageSize: Int = 10
-    private var lastId: Long? = null
-
     companion object {
-        private val selectionFields = mutableListOf<SelectField<*>>(
+        private val SELECTION_FIELDS = mutableListOf<SelectField<*>>(
             ORDER_LOT.ID,
             ORDER_LOT.ANIMAL_ID,
             ORDER_LOT.PRICE,
@@ -50,49 +26,12 @@ class JooqOrderLotQueryBuilder {
         private val TABLE = ORDER_LOT
     }
 
-    fun addSeekParam(seekParam: Any): JooqOrderLotQueryBuilder {
-        this.seekParams.add(seekParam)
-        return this
-    }
-
-    fun filterConditions(filterConditions: List<Condition>): JooqOrderLotQueryBuilder {
-        this.filterConditions.addAll(filterConditions)
-        return this
-    }
-
-    fun addSortParam(sortParam: SortField<Any>): JooqOrderLotQueryBuilder {
-        this.sortParams.add(sortParam)
-        return this
-    }
-
-    fun pageSize(pageSize: Int): JooqOrderLotQueryBuilder {
-        this.pageSize = pageSize
-        return this
-    }
-
-    fun lastOrderLotId(lastId: Long?): JooqOrderLotQueryBuilder {
-        this.lastId = lastId
-        return this
-    }
-
-    fun build(): JooqOrderLotQuery {
-        //default sort for no sort or when records are equal
-        @Suppress("UNCHECKED_CAST")
-        sortParams.add(ORDER_LOT.ID.desc() as SortField<Any>)
-
-        //todo: map would probably suit it better
-        //if last record is present, then add it to seek params as lsat param to match sorting
-        lastId?.let {
-            seekParams.add(it)
+    fun toSortedQuery(ctx: DSLContext): SelectForUpdateStep<Record> = ctx.select(SELECTION_FIELDS)
+        .from(TABLE)
+        .where(filterConditions)
+        .orderBy(sortParams)
+        .let {
+            if (seekParams.isNotEmpty()) it.seek(*seekParams.toTypedArray()).limit(pageSize)
+            else it.limit(pageSize)
         }
-
-        return JooqOrderLotQuery(
-            seekParams = seekParams,
-            filterConditions = filterConditions,
-            sortParams = sortParams,
-            selectParams = selectionFields,
-            pageSize = pageSize,
-            table = TABLE,
-        )
-    }
 }

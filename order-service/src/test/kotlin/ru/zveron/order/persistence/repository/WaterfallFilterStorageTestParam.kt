@@ -22,7 +22,7 @@ import ru.zveron.order.test.util.shouldBeBeforeOrEqual
 import ru.zveron.order.test.util.testOrderLotEntity
 import java.time.LocalDate
 
-class WaterfallFilterParamStorageTest @Autowired constructor(
+class WaterfallFilterStorageTestParam @Autowired constructor(
     private val template: R2dbcEntityTemplate,
     private val storage: WaterfallStorage,
 ) : BaseOrderApplicationTest() {
@@ -30,7 +30,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
     @Test
     fun `given correct request, when filter by price less than, then return filtered list of order`() {
         //prep data
-        val filtersParams = listOf(FilterParam(field = Field.PRICE, operation = Operation.LESS_THAN, value = "1000"))
+        val filterParams = listOf(FilterParam(field = Field.PRICE, operation = Operation.LESS_THAN, value = "1000"))
 
         //prices from 200 to 2_000
         val orderLotEntities = List(10) { index -> testOrderLotEntity().copy(price = index.inc().times(200).toLong()) }
@@ -45,7 +45,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filterParams = filtersParams,
+                filterParams = filterParams,
             )
         }
 
@@ -58,7 +58,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
     @Test
     fun `given correct request, whehn filter by price greater than, then return filtered list of orders`() {
         //prep data
-        val filtersParams = listOf(FilterParam(field = Field.PRICE, operation = Operation.GREATER_THAN, value = "1000"))
+        val filterParams = listOf(FilterParam(field = Field.PRICE, operation = Operation.GREATER_THAN, value = "1000"))
 
         //prices from 200 to 2_000
         val orderLotEntities = List(10) { index -> testOrderLotEntity().copy(price = index.inc().times(200).toLong()) }
@@ -73,7 +73,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filterParams = filtersParams,
+                filterParams = filterParams,
             )
         }
 
@@ -86,7 +86,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
     @Test
     fun `given correct request, when filter by price greater than and less than, then return filtered list of orders`() {
         //prep data
-        val filtersParams = listOf(
+        val filterParams = listOf(
             FilterParam(field = Field.PRICE, operation = Operation.GREATER_THAN, value = "1000"),
             FilterParam(field = Field.PRICE, operation = Operation.LESS_THAN, value = "1500"),
         )
@@ -104,7 +104,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filterParams = filtersParams,
+                filterParams = filterParams,
             )
         }
 
@@ -118,12 +118,8 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
     @Test
     fun `given correct request, when filter by service date from and service date to, then return filtered list`() {
         //prep data
-        val filtersParams = listOf(
-            FilterParam(
-                field = Field.SERVICE_DATE_FROM,
-                operation = Operation.GREATER_THAN_EQUALITY,
-                value = "2021-01-03"
-            ),
+        val filterParams = listOf(
+            FilterParam(field = Field.SERVICE_DATE_FROM, operation = Operation.GREATER_THAN_EQUALITY, value = "2021-01-03"),
             FilterParam(field = Field.SERVICE_DATE_TO, operation = Operation.LESS_THAN_EQUALITY, value = "2021-01-05"),
         )
 
@@ -150,7 +146,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filterParams = filtersParams,
+                filterParams = filterParams,
             )
         }
 
@@ -170,7 +166,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
     fun `given correct request, when filter by service type, then return filtered list`() {
         //prep data
         val serviceTypes = "WALK,SITTING,BOARDING"
-        val filtersParams = listOf(
+        val filterParams = listOf(
             FilterParam(field = Field.SERVICE_TYPE, operation = Operation.IN, value = serviceTypes),
         )
 
@@ -187,7 +183,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filterParams = filtersParams,
+                filterParams = filterParams,
             )
         }
 
@@ -201,7 +197,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
     fun `given correct request, when filter by service delivery type, then return filtered list`() {
         //prep data
         val serviceDeliveryTypes = "IN_PERSON"
-        val filtersParams = listOf(
+        val filterParams = listOf(
             FilterParam(field = Field.SERVICE_DELIVERY_TYPE, operation = Operation.IN, value = serviceDeliveryTypes),
         )
 
@@ -218,7 +214,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filterParams = filtersParams,
+                filterParams = filterParams,
             )
         }
 
@@ -232,7 +228,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
     fun `given correct request, when filter by status, then return filtered list of orders`() {
         //prep data
         val statuses = "CANCELLED,COMPLETED"
-        val filtersParams = listOf(
+        val filterParams = listOf(
             FilterParam(field = Field.STATUS, operation = Operation.NOT_IN, value = statuses),
         )
 
@@ -257,7 +253,7 @@ class WaterfallFilterParamStorageTest @Autowired constructor(
             storage.findAllPaginated(
                 lastId = null,
                 pageSize = 10,
-                filterParams = filtersParams,
+                filterParams = filterParams,
             )
         }
 
