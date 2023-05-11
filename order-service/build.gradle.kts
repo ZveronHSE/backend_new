@@ -1,5 +1,3 @@
-import org.gradle.api.internal.tasks.testing.report.DefaultTestReport.generator
-
 val protobufVersion: String by rootProject
 val kotlinxVersion: String by rootProject
 val testcontainersVersion: String by rootProject
@@ -30,17 +28,13 @@ dependencies {
     implementation("io.r2dbc:r2dbc-pool:1.0.0.RELEASE")
     implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
 
-    // filtering, pagination
+    // jooq
     implementation("org.springframework.boot:spring-boot-starter-jooq:$springVersion")
     implementation("org.jooq:jooq:$jooqVersion")
     implementation("org.jooq:jooq-meta:$jooqVersion")
-    // https://mvnrepository.com/artifact/org.jooq/jooq-meta-extensions
     implementation("org.jooq:jooq-meta-extensions:$jooqVersion")
-    // https://mvnrepository.com/artifact/org.jooq/jooq-codegen
-    implementation("org.jooq:jooq-codegen:$jooqVersion")
     implementation("org.jooq:jooq-kotlin-coroutines:3.18.3")
     implementation("org.jooq:jooq-kotlin:3.18.3")
-
 
     //contract
     implementation("com.github.zveronHSe.contract:order:aac8ca2811")
@@ -49,4 +43,3 @@ dependencies {
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")
 }
-

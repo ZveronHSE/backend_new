@@ -8,7 +8,7 @@ data class WaterfallOrderLot(
         val animal: Animal,
         val price: Long,
         val title: String,
-        val subway: SubwayStation,
+        val subway: SubwayStation?,
         val createdAt: Instant,
         val serviceDateFrom: LocalDate,
         val serviceDateTo: LocalDate?,

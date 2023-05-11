@@ -35,7 +35,7 @@ class GetWaterfallServiceTest {
         )
 
         //prep env
-        coEvery { waterfallStorage.findAllPaginated(any(), any()) } returns emptyList()
+        coEvery { waterfallStorage.findAllPaginated(null, request.pageSize, any(), null) } returns emptyList()
 
         //when
         val response = runBlocking {
@@ -57,7 +57,7 @@ class GetWaterfallServiceTest {
         val getSubwayResponse = testGetSubwayResponse()
 
         //prep env
-        coEvery { waterfallStorage.findAllPaginated(any(), any()) } returns orderWrapperList
+        coEvery { waterfallStorage.findAllPaginated(null, request.pageSize, any(), null) } returns orderWrapperList
         coEvery { animalClient.getAnimal(any()) } returns getAnimalResponse
         coEvery { subwayClient.getSubwayStation(any()) } returns getSubwayResponse
 
@@ -73,15 +73,16 @@ class GetWaterfallServiceTest {
     @Test
     fun `given request to get waterfall without last id, when storage returns 10 elements and client cannot find them, then return emptylist`() {
         //prep data
+        val pageSize = 10
         val request = GetWaterfallRequest(
-            pageSize = 10,
+            pageSize = pageSize,
         )
         val orderWrapperList = List(10) { testOrderWrapper() }
         val getAnimalResponse = GetAnimalApiResponse.NotFound
         val getSubwayResponse = GetSubwayStationApiResponse.NotFound
 
         //prep env
-        coEvery { waterfallStorage.findAllPaginated(any(), any()) } returns orderWrapperList
+        coEvery { waterfallStorage.findAllPaginated(null, pageSize, any(), null) } returns orderWrapperList
         coEvery { animalClient.getAnimal(any()) } returns getAnimalResponse
         coEvery { subwayClient.getSubwayStation(any()) } returns getSubwayResponse
 
@@ -105,7 +106,7 @@ class GetWaterfallServiceTest {
         val getSubwayResponseOk = testGetSubwayResponse()
 
         //prep env
-        coEvery { waterfallStorage.findAllPaginated(any(), any()) } returns orderWrapperList
+        coEvery { waterfallStorage.findAllPaginated(null, request.pageSize, any(), null) } returns orderWrapperList
         coEvery { animalClient.getAnimal(any()) } returnsMany listOf(getAnimalResponseOk, GetAnimalApiResponse.NotFound)
         coEvery { subwayClient.getSubwayStation(any()) } returnsMany listOf(
             getSubwayResponseOk,

@@ -10,9 +10,7 @@ enum class ServiceDeliveryType {
     companion object {
         @JvmStatic
         @JsonCreator
-        fun byAlias(alias: String) {
-            values().singleOrNull { it.name.equals(alias, true) }
-                ?: error("Non existent ServiceDeliveryType for alias=$alias")
-        }
+        fun byAlias(alias: String): ServiceDeliveryType = values().singleOrNull { it.name.equals(alias, true) }
+            ?: error("Non existent ServiceDeliveryType for alias=$alias")
     }
 }

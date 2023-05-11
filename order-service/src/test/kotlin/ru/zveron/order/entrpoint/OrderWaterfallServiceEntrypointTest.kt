@@ -1,6 +1,6 @@
 package ru.zveron.order.entrpoint
 
-import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldContainInOrder
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -13,6 +13,7 @@ import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
 import ru.zveron.order.client.animal.dto.GetAnimalApiResponse
 import ru.zveron.order.client.profile.dto.GetProfileApiResponse
 import ru.zveron.order.config.BaseOrderApplicationTest
+import ru.zveron.order.persistence.model.constant.Status
 import ru.zveron.order.test.util.testFindProfileResponse
 import ru.zveron.order.test.util.testFullAnimal
 import ru.zveron.order.test.util.testOrderLotEntity
@@ -35,14 +36,15 @@ class OrderWaterfallServiceEntrypointTest @Autowired constructor(
         val subwayResponse = GetSubwayStationApiResponse.Success(subway)
         val animal = testFullAnimal()
 
-        val orderEntities = List(10) { testOrderLotEntity() }
-        val orderIds = runBlocking {
+        val orderEntities = List(10) { index -> testOrderLotEntity().copy(id = index.inc().toLong()) }
+
+        //prep env
+        runBlocking {
             orderEntities.map {
                 template.insert(it).awaitSingleOrNull()?.id
             }
         }
 
-        //prep env
         coEvery { subwayGrpcClient.getSubwayStation(any()) } returns subwayResponse
         coEvery { profileGrpcClient.getProfile(any()) } returns GetProfileApiResponse.Success(profileResponse)
         coEvery { animalGrpcClient.getAnimal(any()) } returns GetAnimalApiResponse.Success(animal)
@@ -53,7 +55,9 @@ class OrderWaterfallServiceEntrypointTest @Autowired constructor(
         }
 
         //then
-        response.ordersCount shouldBe 5
-        response.ordersList.map { it.id } shouldContainExactlyInAnyOrder orderIds.sortedByDescending { it }.take(5)
+        val expectedOrders =
+            orderEntities.filter { Status.canAcceptOrder(it.status) }.map { it.id }.sortedByDescending { it }.take(5)
+        response.ordersCount shouldBe expectedOrders.size
+        response.ordersList.map { it.id } shouldContainInOrder expectedOrders
     }
 }

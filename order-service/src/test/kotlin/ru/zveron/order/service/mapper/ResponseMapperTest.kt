@@ -29,9 +29,9 @@ class ResponseMapperTest {
         singleResponse.shouldNotBeNull().asClue {
             it.id shouldBe orderLot.id
             it.subway.asClue { s ->
-                s.name shouldBe subwayStation.name
-                s.colorHex shouldBe subwayStation.colorHex
-                s.town shouldBe subwayStation.town
+                s?.name shouldBe subwayStation.name
+                s?.colorHex shouldBe subwayStation.colorHex
+                s?.town shouldBe subwayStation.town
             }
             it.price shouldBe orderLot.price
             it.createdAt shouldBe orderLot.createdAt
@@ -49,7 +49,7 @@ class ResponseMapperTest {
     }
 
     @Test
-    fun `given a null animal in map, then returns emptylist`(){
+    fun `given a null animal in map, then returns emptylist`() {
         //prep data
         val orderLot = testOrderWrapper().copy(id = 1L, subwayId = 1, animalId = 1)
         val orderLotRecords = listOf(orderLot)
@@ -66,7 +66,7 @@ class ResponseMapperTest {
     }
 
     @Test
-    fun `given a null station in map, then returns emptylist`(){
+    fun `given a null station in map, then returns single element`() {
         //prep data
         val orderLot = testOrderWrapper().copy(id = 1L, subwayId = 1, animalId = 1)
         val orderLotRecords = listOf(orderLot)
@@ -79,6 +79,6 @@ class ResponseMapperTest {
         val response = ResponseMapper.toGetOrderWaterfallResponse(orderLotRecords, subwayStations, animals)
 
         //then
-        response.size shouldBe 0
+        response.size shouldBe 1
     }
 }

@@ -1,23 +1,27 @@
 package ru.zveron.order.persistence.repository
 
+import kotlinx.coroutines.reactor.awaitSingle
 import mu.KLogging
 import net.logstash.logback.marker.Markers.append
 import org.jooq.DSLContext
-import org.jooq.Record
-import org.jooq.TableField
+import org.jooq.Field
+import org.jooq.SortField
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
+import ru.zveron.order.persistence.entity.OrderLot
 import ru.zveron.order.persistence.jooq.models.ORDER_LOT
+import ru.zveron.order.persistence.repository.model.JooqOrderLotQuery
 import ru.zveron.order.persistence.repository.model.OrderLotWrapper
 import ru.zveron.order.service.constant.SortBy
-import ru.zveron.order.service.constant.SortDirection
-import ru.zveron.order.service.model.Filter
+import ru.zveron.order.service.mapper.ModelMapper.toJooqFilter
+import ru.zveron.order.service.model.FilterParam
 import ru.zveron.order.service.model.Sort
 
 
 @Component
 class WaterfallStorage(
     private val ctx: DSLContext,
+    private val repository: OrderLotRepository,
 ) {
 
     companion object : KLogging()
@@ -25,52 +29,68 @@ class WaterfallStorage(
     suspend fun findAllPaginated(
         lastId: Long?,
         pageSize: Int,
-        filters: List<Filter> = emptyList(),
-        sort: Sort = Sort(SortBy.BY_ID, SortDirection.DESC)
+        filterParams: List<FilterParam> = emptyList(),
+        sort: Sort? = null,
     ): List<OrderLotWrapper> {
 
-        @Suppress("UNCHECKED_CAST")
-        val filterConditions =
-            filters.map { it.operation.operation(it.field.field as TableField<Record, Any>, it.value) }
+        //todo: should be whole entity coming from the client
+        val lastEntity = lastId?.let {
+            repository.findById(it)
+        }
 
-        @Suppress("UNCHECKED_CAST")
-        val sortConditions =
-            mutableSetOf(sort.sortDirection.sortOrder(sort.sortBy.field as TableField<Record, Any>))
+        val filterConditions = filterParams.map { it.toJooqFilter() }
+        val sortParams = getSortParams(sort)
+        val seekParams = lastEntity?.let { getSeekParams(sort, it) } ?: emptyList()
 
-        val seek = mutableSetOf<Any>()
-        lastId?.let { seek.add(it) }
-
-        val query = ctx.select(
-            ORDER_LOT.ID,
-            ORDER_LOT.ANIMAL_ID,
-            ORDER_LOT.PRICE,
-            ORDER_LOT.CREATED_AT,
-            ORDER_LOT.SUBWAY_ID,
-            ORDER_LOT.TITLE,
-            ORDER_LOT.SERVICE_DATE_FROM,
-            ORDER_LOT.SERVICE_DATE_TO,
-            ORDER_LOT.SERVICE_TYPE,
+        val jooqQuery = JooqOrderLotQuery(
+            seekParams = seekParams,
+            filterConditions = filterConditions,
+            sortParams = sortParams,
+            pageSize = pageSize,
         )
-            .from(ORDER_LOT)
-            .where(*filterConditions.toTypedArray())
-            .orderBy(sortConditions)
-            .let {
-                if (lastId != null) it.seek(*seek.toTypedArray()).limit(pageSize)
-                else it.limit(pageSize)
-            }
+
+        val query = jooqQuery.toSortedQuery(ctx)
 
         logger.debug(append("query", query.toString())) { "Composed jooq query" }
 
         val result = Flux.from(query)
             .log()
-            .map {
-                it.into(OrderLotWrapper::class.java)
-            }
+            .map { it.into(OrderLotWrapper::class.java) }
             .collectList()
-            .block() ?: emptyList()
+            .awaitSingle() ?: emptyList()
 
         logger.debug(append("result", result.map { it.toString() })) { "Completed request" }
 
         return result
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun getSortParams(sort: Sort?): List<SortField<Any>> {
+        return when (val sortCasted = sort?.sortBy) {
+            is SortBy.ByDistance -> listOf(sortCasted.getSortField(sort.sortDirection) as SortField<Any>)
+            is SortBy.ByPrice -> listOf(sort.sortDirection.sort(sortCasted.priceField as Field<Any>))
+            is SortBy.ByServiceDate -> listOf(
+                sort.sortDirection.sort(sortCasted.dateFromField as Field<Any>),
+                sort.sortDirection.sort(sortCasted.dateToField as Field<Any>),
+            )
+
+            null -> emptyList()
+        }.let {
+            it + ORDER_LOT.ID.desc() as SortField<Any>
+        }
+    }
+
+    private fun getSeekParams(sort: Sort?, lastEntity: OrderLot): List<Any> {
+        return when (val sortCasted = sort?.sortBy) {
+            is SortBy.ByDistance -> listOf(
+                sortCasted.getSortedIds(sort.sortDirection).indexOf(lastEntity.subwayId) as Any
+            )
+
+            is SortBy.ByPrice -> listOf(lastEntity.price as Any)
+            is SortBy.ByServiceDate -> listOf(lastEntity.serviceDateFrom as Any, lastEntity.serviceDateTo as Any)
+            null -> emptyList()
+        }.let {
+            it + lastEntity.id as Any
+        }
     }
 }

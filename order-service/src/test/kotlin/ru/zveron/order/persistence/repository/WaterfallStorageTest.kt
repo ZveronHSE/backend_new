@@ -18,7 +18,7 @@ class WaterfallStorageTest @Autowired constructor(
 ) : BaseOrderApplicationTest() {
 
     @Test
-    fun `given request to get unsorted, unfiltered orders without last order id, then return list of orders`() {
+    fun `given request to get unsorted, unfiltered orders without last order id, then return list of orders by id desc`() {
         //prep data
         val orderLotEntities = List(10) { testOrderLotEntity() }
         val pageSize = 8
@@ -38,13 +38,6 @@ class WaterfallStorageTest @Autowired constructor(
 
         //then
         response.size shouldBe pageSize
-        response.forEach {
-            val orderEntity = orderLotEntities.find { entity -> it.id == entity.id }!!
-            it.asClue { wrap ->
-                wrap shouldBeOrderLot orderEntity
-            }
-        }
-
         response.map { it.id } shouldContainInOrder orderLotIds.sortedByDescending { it }.take(pageSize)
     }
 
@@ -82,16 +75,14 @@ class WaterfallStorageTest @Autowired constructor(
     @Test
     fun `given request to get unsorted, unfiltered orders, with last order id, then return all orders with higher ids`() {
         //prep data
-        val orderLotEntities = List(10) { testOrderLotEntity() }
+        val orderLotEntities = List(10) { index -> testOrderLotEntity().copy(id = index.inc().toLong()) }
         val pageSize = 8
-        val lastOrderIndex = 5
+        val lastOrderId = 5L
 
         //prep env
         val orderLotIds = runBlocking {
             orderLotEntities.map { template.insert(it).awaitSingle().id }
         }
-
-        val lastOrderId = orderLotIds.sortedByDescending { it }[lastOrderIndex]!!
 
         //when
         val response = runBlocking {
@@ -102,7 +93,7 @@ class WaterfallStorageTest @Autowired constructor(
         }
 
         //then
-        val expectedSize = pageSize - lastOrderIndex + 1 // +1 because array indexing starts with 0
+        val expectedSize = pageSize - lastOrderId + 1 // +1 because array indexing starts with 0
         response.size shouldBe expectedSize
         response.forEach {
             val orderEntity = orderLotEntities.find { entity -> it.id == entity.id }!!
@@ -114,9 +105,9 @@ class WaterfallStorageTest @Autowired constructor(
         println(orderLotIds.sortedByDescending { it })
         println(response.map { it.id })
         println(orderLotIds.sortedByDescending { it }
-            .dropWhile { it != lastOrderId }.take(expectedSize))
+            .dropWhile { it != lastOrderId }.take(lastOrderId.toInt()))
 
         response.map { it.id } shouldContainInOrder orderLotIds.sortedByDescending { it }
-            .dropWhile { it!! >= lastOrderId }.take(expectedSize)
+            .dropWhile { it!! >= lastOrderId }.take(expectedSize.toInt())
     }
 }

@@ -3,7 +3,11 @@ package ru.zveron.order.entrpoint
 import net.devh.boot.grpc.server.service.GrpcService
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
-import ru.zveron.contract.order.external.*
+import ru.zveron.contract.order.external.GetCustomerRequest
+import ru.zveron.contract.order.external.GetCustomerResponse
+import ru.zveron.contract.order.external.OrderCustomerServiceExternalGrpcKt
+import ru.zveron.contract.order.external.customer
+import ru.zveron.contract.order.external.getCustomerResponse
 
 @GrpcService
 class CustomerServiceEntrypoint() : OrderCustomerServiceExternalGrpcKt.OrderCustomerServiceExternalCoroutineImplBase() {

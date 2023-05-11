@@ -1,9 +1,8 @@
 package ru.zveron.order.persistence.model.constant
 
 import com.fasterxml.jackson.annotation.JsonCreator
-import org.jooq.EnumType
 
-enum class ServiceType : EnumType {
+enum class ServiceType {
     WALK,
     SITTING,
     BOARDING,
@@ -11,15 +10,6 @@ enum class ServiceType : EnumType {
     GROOMING,
     OTHER,
     ;
-
-
-    override fun getLiteral(): String {
-        return name
-    }
-
-    override fun getName(): String? {
-        return "service_type"
-    }
 
 
     companion object {

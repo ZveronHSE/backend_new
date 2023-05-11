@@ -62,8 +62,9 @@ class GetOrderService(
 
     private suspend fun getRating(profileId: Long): Double = 4.5
 
-    private suspend fun getSubwayStation(subwayId: Int): SubwayStation =
-        when (val response = subwayGrpcClient.getSubwayStation(subwayId)) {
+    private suspend fun getSubwayStation(subwayId: Int?): SubwayStation? {
+        if (subwayId == null) return null
+        return when (val response = subwayGrpcClient.getSubwayStation(subwayId)) {
             is GetSubwayStationApiResponse.Error -> throw ClientException(
                 message = "Get subway station client request failed",
                 status = response.error
@@ -76,6 +77,7 @@ class GetOrderService(
 
             is GetSubwayStationApiResponse.Success -> SubwayStation.of(response.subwayStation)
         }
+    }
 
     private suspend fun getAnimal(animalId: Long): Animal =
         when (val response = animalGrpcClient.getAnimal(animalId)) {
