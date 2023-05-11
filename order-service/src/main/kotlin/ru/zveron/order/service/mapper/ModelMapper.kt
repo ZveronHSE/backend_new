@@ -6,7 +6,7 @@ import ru.zveron.contract.address.internal.SubwayStationInt
 import ru.zveron.contract.profile.GetProfileResponse
 import ru.zveron.contract.profile.model.FullAnimal
 import ru.zveron.order.service.model.Animal
-import ru.zveron.order.service.model.Filter
+import ru.zveron.order.service.model.FilterParam
 import ru.zveron.order.service.model.Profile
 import ru.zveron.order.service.model.SubwayStation
 
@@ -34,5 +34,5 @@ object ModelMapper {
     )
 
     @Suppress("UNCHECKED_CAST")
-    fun Filter.toJooqFilter() = operation.operation(field.field as TableField<Record, Any>, value)
+    fun FilterParam.toJooqFilter() = operation.operator(field.tableField as TableField<Record, Any>, value)
 }

@@ -5,7 +5,7 @@ import org.jooq.Record
 import org.jooq.TableField
 import ru.zveron.order.persistence.jooq.models.ORDER_LOT
 
-enum class Field(val field: TableField<Record, *>) {
+enum class Field(val tableField: TableField<Record, *>) {
     ID(ORDER_LOT.ID),
     CREATED_AT(ORDER_LOT.CREATED_AT),
     PRICE(ORDER_LOT.PRICE),

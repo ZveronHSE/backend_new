@@ -22,14 +22,17 @@ object ResponseMapper {
             id = response.id
             profile = ProfileKt.of(response.profile)
             animal = AnimalKt.of(response.animal)
-            address = AddressKt.of(response.subwayStation)
+            response.subwayStation?.let { address = AddressKt.of(it) }
+
             description = response.description
             title = response.title
-            serviceDate = ChronoFormatter.formatServiceDate(response.serviceDateFrom, response.serviceDateTo)
             price = PriceFormatter.formatToPrice(response.price)
+
+            serviceDate = ChronoFormatter.formatServiceDate(response.serviceDateFrom, response.serviceDateTo)
             serviceTime = ChronoFormatter.formatServiceTime(response.timeWindowFrom, response.timeWindowTo)
-            canAccept = Status.canAcceptOrder(response.orderStatus)
             createdAt = ChronoFormatter.formatCreatedAt(response.createdAt)
+
+            canAccept = Status.canAcceptOrder(response.orderStatus)
         }
     }
 

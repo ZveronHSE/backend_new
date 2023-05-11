@@ -14,7 +14,7 @@ object RequestMapper {
         pageSize = pageSize,
         lastOrderId = takeIf { it.hasLastOrderId() }?.let { this.lastOrderId },
         sort = this.sort.toServiceSort(),
-        filters = this.filtersList.map { it.toServiceFilter() }
+        filterParams = this.filtersList.map { it.toServiceFilter() }
     )
 
     private fun ru.zveron.contract.order.external.Sort.toServiceSort() = this.sortBy.toServiceSortBy()?.let {
@@ -34,7 +34,7 @@ object RequestMapper {
 
     private fun SortDir.toServiceDirection() = SortDirection.valueOf(this.name)
 
-    private fun Filter.toServiceFilter() = ru.zveron.order.service.model.Filter(
+    private fun Filter.toServiceFilter() = ru.zveron.order.service.model.FilterParam(
         field = Field.ofName(this.field.name),
         operation = this.operation.toServiceOperation(),
         value = this.value,

@@ -5,7 +5,7 @@ import org.jooq.Record
 import org.jooq.TableField
 import ru.zveron.order.util.StringUtil.toList
 
-enum class Operation(val operation: (field: TableField<Record, Any>, value: String) -> Condition) {
+enum class Operation(val operator: (tableField: TableField<Record, Any>, value: String) -> Condition) {
     EQUALITY({ field, value -> field.eq(value) }),
     NEGATION({ field, value -> field.ne(value) }),
     GREATER_THAN({ field, value -> field.gt(value) }),

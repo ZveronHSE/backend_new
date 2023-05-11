@@ -4,7 +4,6 @@ import ru.zveron.contract.order.external.ProfileKt
 import ru.zveron.contract.order.external.WaterfallOrderKt
 import ru.zveron.contract.order.external.profile
 import ru.zveron.contract.order.external.waterfallOrder
-import ru.zveron.contract.order.model.Address
 import ru.zveron.contract.order.model.AddressKt
 import ru.zveron.contract.order.model.AnimalKt
 import ru.zveron.contract.order.model.address
@@ -26,17 +25,10 @@ object CommonDtoMapper {
         imageUrl = a.imageUrl
     }
 
-    fun AddressKt.of(s: SubwayStation?): Address {
-        return if (s == null) address {
-            station = ""
-            town = ""
-            color = ""
-        } else
-            address {
-                station = s.name
-                town = s.town
-                color = s.colorHex
-            }
+    fun AddressKt.of(s: SubwayStation) = address {
+        station = s.name
+        town = s.town
+        color = s.colorHex
     }
 
     fun ProfileKt.of(p: Profile) = profile {
@@ -46,12 +38,12 @@ object CommonDtoMapper {
     }
 
     fun WaterfallOrderKt.of(wo: WaterfallOrderLot) = waterfallOrder {
-        this.id = wo.id
-        this.animal = AnimalKt.of(wo.animal)
-        this.title = wo.title
-        this.address = AddressKt.of(wo.subway)
-        this.serviceDate = ChronoFormatter.formatServiceDate(wo.serviceDateFrom, wo.serviceDateTo)
-        this.createdAt = ChronoFormatter.formatCreatedAt(wo.createdAt)
-        this.price = PriceFormatter.formatToPrice(wo.price.toString())
+        id = wo.id
+        animal = AnimalKt.of(wo.animal)
+        title = wo.title
+        wo.subway?.let { address = AddressKt.of(it) }
+        serviceDate = ChronoFormatter.formatServiceDate(wo.serviceDateFrom, wo.serviceDateTo)
+        createdAt = ChronoFormatter.formatCreatedAt(wo.createdAt)
+        price = PriceFormatter.formatToPrice(wo.price.toString())
     }
 }
