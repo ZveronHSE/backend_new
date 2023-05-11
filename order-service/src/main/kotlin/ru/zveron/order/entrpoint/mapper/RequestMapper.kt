@@ -1,10 +1,6 @@
 package ru.zveron.order.entrpoint.mapper
 
-import ru.zveron.contract.order.external.Filter
-import ru.zveron.contract.order.external.GetWaterfallRequest
-import ru.zveron.contract.order.external.Operation
-import ru.zveron.contract.order.external.SortBy
-import ru.zveron.contract.order.external.SortDir
+import ru.zveron.contract.order.external.*
 import ru.zveron.order.service.constant.Field
 import ru.zveron.order.service.constant.SortDirection
 import ru.zveron.order.service.model.Sort
@@ -28,7 +24,7 @@ object RequestMapper {
         SortBy.BY_DISTANCE -> ru.zveron.order.service.constant.SortBy.ByDistance()
         SortBy.BY_PRICE -> ru.zveron.order.service.constant.SortBy.ByPrice()
         SortBy.BY_DATE_CREATED -> ru.zveron.order.service.constant.SortBy.ByServiceDate()
-        SortBy.BY_ID -> null //todo: replace with default for default values
+        SortBy.DEFAULT -> null
         else -> error("Wrong sort by type")
     }
 

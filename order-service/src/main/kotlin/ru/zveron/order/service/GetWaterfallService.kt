@@ -15,12 +15,7 @@ import ru.zveron.order.service.constant.Field
 import ru.zveron.order.service.constant.Operation
 import ru.zveron.order.service.mapper.ModelMapper.of
 import ru.zveron.order.service.mapper.ResponseMapper.toGetOrderWaterfallResponse
-import ru.zveron.order.service.model.Animal
-import ru.zveron.order.service.model.Filter
-import ru.zveron.order.service.model.FilterParam
-import ru.zveron.order.service.model.GetWaterfallRequest
-import ru.zveron.order.service.model.SubwayStation
-import ru.zveron.order.service.model.WaterfallOrderLot
+import ru.zveron.order.service.model.*
 
 
 @Service
