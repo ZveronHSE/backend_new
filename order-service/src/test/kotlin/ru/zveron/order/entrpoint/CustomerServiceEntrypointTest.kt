@@ -52,15 +52,15 @@ class CustomerServiceEntrypointTest @Autowired constructor(
         }
 
         //then
-        response.shouldNotBeNull().asClue { response ->
-            response.customer.asClue { customer ->
+        response.shouldNotBeNull().asClue { res ->
+            res.customer.asClue { customer ->
                 customer.id shouldBe customerId
                 customer.name shouldBe profileResponse.name
                 customer.imageUrl shouldBe profileResponse.imageUrl
             }
 
-            response.customer.activeOrdersCount shouldBe orders.count { order -> Status.canAcceptOrder(order.status) }
-            response.customer.completedOrdersCount shouldBe orders.count { order -> order.status == Status.COMPLETED }
+            res.customer.activeOrdersCount shouldBe orders.count { order -> Status.canAcceptOrder(order.status) }
+            res.customer.completedOrdersCount shouldBe orders.count { order -> order.status == Status.COMPLETED }
         }
     }
 }

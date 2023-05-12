@@ -6,75 +6,42 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
-import ru.zveron.order.client.address.SubwayGrpcClient
-import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
-import ru.zveron.order.client.animal.AnimalGrpcClient
-import ru.zveron.order.client.animal.dto.GetAnimalApiResponse
-import ru.zveron.order.client.profile.ProfileGrpcClient
-import ru.zveron.order.client.profile.dto.GetProfileApiResponse
+import ru.zveron.order.component.ClientDecorator
+import ru.zveron.order.component.FullOrderExtraData
 import ru.zveron.order.exception.ClientException
 import ru.zveron.order.exception.OrderNotFoundException
 import ru.zveron.order.persistence.repository.OrderLotRepository
-import ru.zveron.order.service.mapper.ResponseMapper.mapToGetOrderResponse
-import ru.zveron.order.service.model.Animal
-import ru.zveron.order.service.model.Profile
-import ru.zveron.order.service.model.SubwayStation
-import ru.zveron.order.test.util.randomId
-import ru.zveron.order.test.util.testFindProfileResponse
-import ru.zveron.order.test.util.testFullAnimal
-import ru.zveron.order.test.util.testOrderLotEntity
-import ru.zveron.order.test.util.testSubwayStation
+import ru.zveron.order.service.mapper.ResponseMapper.mapToFullOrderData
+import ru.zveron.order.test.util.*
 
 class GetOrderServiceTest {
 
     private val orderLotRepository = mockk<OrderLotRepository>()
-
-    private val profileGrpcClient = mockk<ProfileGrpcClient>()
-
-    private val subwayGrpcClient = mockk<SubwayGrpcClient>()
-
-    private val animalGrpcClient = mockk<AnimalGrpcClient>()
+    private val clientDecorator = mockk<ClientDecorator>()
 
     private val service = GetOrderService(
         orderLotRepository = orderLotRepository,
-        profileGrpcClient = profileGrpcClient,
-        subwayGrpcClient = subwayGrpcClient,
-        animalGrpcClient = animalGrpcClient,
+        clientDecorator = clientDecorator,
     )
 
     @Test
     fun `given correct request, when all clients and repository respond correctly, then return get order response`() {
         //prep data
         val orderId = randomId()
-        val subwayInt = testSubwayStation()
-        val subwayResponse = GetSubwayStationApiResponse.Success(subwayInt)
-        val profileResponse = testFindProfileResponse()
-        val fullAnimal = testFullAnimal()
+
         val orderLotEntity = testOrderLotEntity()
-        val profile = Profile(
-            id = profileResponse.id,
-            name = profileResponse.name,
-            imageUrl = profileResponse.imageUrl,
-            rating = 4.5
-        )
-        val animal = Animal(
-            id = fullAnimal.id,
-            name = fullAnimal.name,
-            species = fullAnimal.species,
-            breed = fullAnimal.breed,
-            imageUrl = fullAnimal.imageUrlsList.first()
-        )
-        val subway = SubwayStation(
-            id = subwayInt.id,
-            name = subwayInt.name,
-            colorHex = subwayInt.colorHex,
-            town = subwayInt.town
+        val profile = testProfile()
+        val animal = testServiceAnimal()
+        val subway = testServiceSubwayStation()
+
+        val decoratorResponse = FullOrderExtraData(
+            profile = profile,
+            subwayStation = subway,
+            animal = animal,
         )
 
         //prep env
-        coEvery { subwayGrpcClient.getSubwayStation(any()) } returns subwayResponse
-        coEvery { profileGrpcClient.getProfile(any()) } returns GetProfileApiResponse.Success(profileResponse)
-        coEvery { animalGrpcClient.getAnimal(any()) } returns GetAnimalApiResponse.Success(fullAnimal)
+        coEvery { clientDecorator.getFullOrderData(any(), any(), any()) } returns decoratorResponse
         coEvery { orderLotRepository.findById(any()) } returns orderLotEntity
 
         //when
@@ -83,7 +50,7 @@ class GetOrderServiceTest {
         }
 
         //then
-        response shouldBe mapToGetOrderResponse(orderLotEntity, subway, profile, animal)
+        response shouldBe mapToFullOrderData(orderLotEntity, subway, profile, animal)
     }
 
     @Test
@@ -103,15 +70,11 @@ class GetOrderServiceTest {
     fun `given get order request, when profile client responds not found, then throw client exception`() {
         //prep data
         val orderId = randomId()
-        val subwayInt = testSubwayStation()
-        val profileResponse = testFindProfileResponse()
         val orderLotEntity = testOrderLotEntity()
 
         //prep env
-        coEvery { subwayGrpcClient.getSubwayStation(any()) } returns GetSubwayStationApiResponse.Success(subwayInt)
-        coEvery { profileGrpcClient.getProfile(any()) } returns GetProfileApiResponse.Success(profileResponse)
-        coEvery { animalGrpcClient.getAnimal(any()) } returns GetAnimalApiResponse.NotFound
         coEvery { orderLotRepository.findById(any()) } returns orderLotEntity
+        coEvery { clientDecorator.getFullOrderData(any(), any(), any()) } throws ClientException.notFound()
 
         //when
         shouldThrow<ClientException> {

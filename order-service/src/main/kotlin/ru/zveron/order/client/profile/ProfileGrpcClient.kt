@@ -12,7 +12,7 @@ class ProfileGrpcClient(
     private val profileGrpcStub: ProfileServiceInternalGrpcKt.ProfileServiceInternalCoroutineStub,
 ) {
 
-    companion object: KLogging()
+    companion object : KLogging()
 
     suspend fun getProfile(profileId: Long): GetProfileApiResponse {
         logger.debug(append("profileId", profileId)) { "Calling get profile from profile client" }
@@ -30,4 +30,3 @@ class ProfileGrpcClient(
         }
     }
 }
-

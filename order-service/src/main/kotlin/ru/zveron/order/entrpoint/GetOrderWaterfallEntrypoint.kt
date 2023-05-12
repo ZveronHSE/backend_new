@@ -13,7 +13,7 @@ import ru.zveron.order.entrpoint.validator.ServiceRequestValidator.validate
 import ru.zveron.order.service.GetWaterfallService
 
 @GrpcService
-class OrderWaterfallServiceEntrypoint(
+class GetOrderWaterfallEntrypoint(
     private val service: GetWaterfallService
 ) : OrderWaterfallServiceExternalGrpcKt.OrderWaterfallServiceExternalCoroutineImplBase() {
 

@@ -5,6 +5,9 @@ import org.jooq.TableField
 import ru.zveron.contract.address.internal.SubwayStationInt
 import ru.zveron.contract.profile.GetProfileResponse
 import ru.zveron.contract.profile.model.FullAnimal
+import ru.zveron.order.persistence.entity.OrderLot
+import ru.zveron.order.persistence.model.constant.Status
+import ru.zveron.order.service.model.CreateOrderRequest
 import ru.zveron.order.service.model.Animal
 import ru.zveron.order.service.model.FilterParam
 import ru.zveron.order.service.model.Profile
@@ -36,4 +39,20 @@ object ModelMapper {
 
     @Suppress("UNCHECKED_CAST")
     fun FilterParam.toJooqFilter() = operation.operator(field.tableField as TableField<Record, Any>, value)
+
+    fun CreateOrderRequest.toOrderLot() = OrderLot(
+        profileId = profileId,
+        animalId = animalId,
+        subwayId = subwayId,
+        description = description,
+        price = price,
+        title = title,
+        serviceDateFrom = serviceDateFrom,
+        serviceDateTo = serviceDateTo,
+        timeWindowFrom = timeWindowFrom,
+        timeWindowTo = timeWindowTo,
+        serviceType = serviceType,
+        serviceDeliveryType = serviceDeliveryType,
+        status = Status.PENDING,
+    )
 }

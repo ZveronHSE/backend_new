@@ -6,7 +6,7 @@ import ru.zveron.order.service.constant.ServiceDeliveryType
 import ru.zveron.order.service.model.*
 
 object ResponseMapper {
-    fun mapToGetOrderResponse(o: OrderLot, subway: SubwayStation?, profile: Profile, animal: Animal) = GetOrderResponse(
+    fun mapToFullOrderData(o: OrderLot, subway: SubwayStation?, profile: Profile, animal: Animal) = FullOrderData(
         id = o.id ?: error("Illegal entity state, id is null"),
         profile = profile,
         title = o.title,

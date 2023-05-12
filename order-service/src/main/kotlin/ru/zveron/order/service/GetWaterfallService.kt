@@ -50,6 +50,7 @@ class GetWaterfallService(
         )
     }
 
+    //todo: move to decorator
     private suspend fun getSubwayStation(subwayId: Int?): SubwayStation? {
         if (subwayId == null) return null
         return when (val response = subwayGrpcClient.getSubwayStation(subwayId)) {
