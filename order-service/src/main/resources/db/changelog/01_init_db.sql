@@ -20,3 +20,5 @@ CREATE TABLE IF NOT EXISTS public.order_lot
     service_delivery_type VARCHAR            NOT NULL,
     created_at            TIMESTAMP          NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS order_lot_profile_id_idx ON public.order_lot (profile_id);

@@ -5,11 +5,14 @@ import io.grpc.StatusException
 import mu.KLogging
 import net.logstash.logback.marker.Markers.append
 import ru.zveron.contract.profile.AnimalServiceInternalGrpcKt
+import ru.zveron.contract.profile.getAnimalBatchRequest
 import ru.zveron.contract.profile.getAnimalRequestInt
 import ru.zveron.order.client.animal.dto.GetAnimalApiResponse
+import ru.zveron.order.service.mapper.ModelMapper.of
+import ru.zveron.order.service.model.Animal
 
 class AnimalGrpcClient(
-    private val animalGrpcStub: AnimalServiceInternalGrpcKt.AnimalServiceInternalCoroutineStub,
+        private val animalGrpcStub: AnimalServiceInternalGrpcKt.AnimalServiceInternalCoroutineStub,
 ) {
 
     companion object : KLogging()
@@ -29,5 +32,17 @@ class AnimalGrpcClient(
             }
         }
     }
-}
 
+    suspend fun getAnimals(animalIds: List<Long>): GetAnimalsApiResponse {
+        logger.debug(append("animalIds", animalIds)) { "Calling get animals batch from animals client" }
+
+        val request = getAnimalBatchRequest { this.animalIds.addAll(animalIds) }
+
+        return try {
+            val response = animalGrpcStub.getAnimalBatch(request)
+            GetAnimalsApiResponse.Success(response.animalsList.map { Animal.of(it) })
+        } catch (ex: StatusException) {
+            GetAnimalsApiResponse.Error(ex.status, ex.message)
+        }
+    }
+}

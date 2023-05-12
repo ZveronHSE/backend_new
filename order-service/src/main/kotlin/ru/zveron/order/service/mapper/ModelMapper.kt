@@ -13,6 +13,7 @@ import ru.zveron.order.service.model.SubwayStation
 @Suppress("unused")
 object ModelMapper {
     fun SubwayStation.Companion.of(s: SubwayStationInt) = SubwayStation(
+        id = s.id,
         town = s.town,
         name = s.name,
         colorHex = s.colorHex,

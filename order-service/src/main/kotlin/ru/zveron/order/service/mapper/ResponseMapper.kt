@@ -3,11 +3,7 @@ package ru.zveron.order.service.mapper
 import ru.zveron.order.persistence.entity.OrderLot
 import ru.zveron.order.persistence.repository.model.OrderLotWrapper
 import ru.zveron.order.service.constant.ServiceDeliveryType
-import ru.zveron.order.service.model.Animal
-import ru.zveron.order.service.model.GetOrderResponse
-import ru.zveron.order.service.model.Profile
-import ru.zveron.order.service.model.SubwayStation
-import ru.zveron.order.service.model.WaterfallOrderLot
+import ru.zveron.order.service.model.*
 
 object ResponseMapper {
     fun mapToGetOrderResponse(o: OrderLot, subway: SubwayStation?, profile: Profile, animal: Animal) = GetOrderResponse(
@@ -31,20 +27,48 @@ object ResponseMapper {
         orderLotRecords: List<OrderLotWrapper>,
         subwayStations: Map<Int, SubwayStation?>,
         animals: Map<Long, Animal?>,
-    ) =
-        orderLotRecords.map {
-            if (animals[it.animalId] == null) {
-                return@map null
+    ): List<WaterfallOrderLot> =
+        orderLotRecords.mapNotNull {
+            animals[it.animalId]?.let { animal ->
+                WaterfallOrderLot(
+                    id = it.id,
+                    animal = animal,
+                    title = it.title,
+                    subway = subwayStations[it.subwayId],
+                    createdAt = it.createdAt,
+                    serviceDateFrom = it.serviceDateFrom,
+                    serviceDateTo = it.serviceDateTo,
+                    price = it.price,
+                )
             }
-            WaterfallOrderLot(
-                id = it.id,
-                animal = animals[it.animalId] ?: error("Animal should be present"),
-                title = it.title,
-                subway = subwayStations[it.subwayId],
-                createdAt = it.createdAt,
-                serviceDateFrom = it.serviceDateFrom,
-                serviceDateTo = it.serviceDateTo,
-                price = it.price,
-            )
-        }.filterNotNull()
+        }
+
+
+    fun toGetCustomerResponse(
+        profile: Profile,
+        orderLots: List<OrderLot> = emptyList(),
+        subwayStations: Map<Int, SubwayStation?> = emptyMap(),
+        animals: Map<Long, Animal?> = emptyMap(),
+    ): GetCustomerResponse {
+        val customerOrderLots = orderLots.mapNotNull {
+            animals[it.animalId]?.let { animal ->
+                CustomerProfileOrder(
+                    id = it.id ?: error("Illegal entity state, id is null"),
+                    animal = animal,
+                    price = it.price,
+                    title = it.title,
+                    subway = subwayStations[it.subwayId],
+                    createdAt = it.createdAt,
+                    serviceDateFrom = it.serviceDateFrom,
+                    serviceDateTo = it.serviceDateTo,
+                    status = it.status
+                )
+            }
+        }
+
+        return GetCustomerResponse(
+            profile = profile,
+            orderLots = customerOrderLots,
+        )
+    }
 }

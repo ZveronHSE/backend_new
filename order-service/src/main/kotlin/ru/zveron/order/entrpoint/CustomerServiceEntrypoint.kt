@@ -1,25 +1,24 @@
 package ru.zveron.order.entrpoint
 
 import net.devh.boot.grpc.server.service.GrpcService
-import org.apache.commons.lang3.RandomStringUtils
-import org.apache.commons.lang3.RandomUtils
 import ru.zveron.contract.order.external.GetCustomerRequest
 import ru.zveron.contract.order.external.GetCustomerResponse
+import ru.zveron.contract.order.external.GetCustomerResponseKt
 import ru.zveron.contract.order.external.OrderCustomerServiceExternalGrpcKt
-import ru.zveron.contract.order.external.customer
-import ru.zveron.contract.order.external.getCustomerResponse
+import ru.zveron.order.entrpoint.mapper.ResponseMapper.of
+import ru.zveron.order.service.CustomerService
 
 @GrpcService
-class CustomerServiceEntrypoint() : OrderCustomerServiceExternalGrpcKt.OrderCustomerServiceExternalCoroutineImplBase() {
+class CustomerServiceEntrypoint(
+    private val customerService: CustomerService,
+) : OrderCustomerServiceExternalGrpcKt.OrderCustomerServiceExternalCoroutineImplBase() {
 
+    //todo: should probably move it to the profile service
     override suspend fun getCustomer(request: GetCustomerRequest): GetCustomerResponse {
-        return getCustomerResponse {
-            this.customer = customer {
-                this.id = RandomUtils.nextLong()
-                this.name = RandomStringUtils.randomAlphanumeric(10)
-                this.imageUrl = "https://storage.yandexcloud.net/zveron-profile/random.jpeg"
-                this.rating = 4.5f
-            }
-        }
+        require(request.profileId > 0) { "Customer id must be positive" }
+
+        val serviceResponse = customerService.getCustomer(request.profileId)
+
+        return GetCustomerResponseKt.of(serviceResponse)
     }
 }
