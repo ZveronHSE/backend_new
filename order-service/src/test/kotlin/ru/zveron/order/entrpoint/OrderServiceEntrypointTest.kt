@@ -103,7 +103,7 @@ class OrderServiceEntrypointTest @Autowired constructor(
         val animal = testFullAnimal()
 
         val request = testCreateOrderEntrypointRequest().copy {
-            subwayStationId = subway.id.toLong()
+            subwayStationId = subway.id
             profileId = profileResponse.id
             animalId = animal.id
         }
