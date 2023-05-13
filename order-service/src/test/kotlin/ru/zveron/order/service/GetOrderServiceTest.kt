@@ -11,6 +11,7 @@ import ru.zveron.order.component.FullOrderExtraData
 import ru.zveron.order.exception.ClientException
 import ru.zveron.order.exception.OrderNotFoundException
 import ru.zveron.order.persistence.repository.OrderLotRepository
+import ru.zveron.order.persistence.repository.StatisticsStorage
 import ru.zveron.order.service.mapper.ResponseMapper.mapToFullOrderData
 import ru.zveron.order.test.util.*
 
@@ -18,10 +19,12 @@ class GetOrderServiceTest {
 
     private val orderLotRepository = mockk<OrderLotRepository>()
     private val clientDecorator = mockk<ClientDecorator>()
+    private val statisticsStorage = mockk<StatisticsStorage>(relaxed = true)
 
     private val service = GetOrderService(
         orderLotRepository = orderLotRepository,
         clientDecorator = clientDecorator,
+        statisticsStorage = statisticsStorage,
     )
 
     @Test

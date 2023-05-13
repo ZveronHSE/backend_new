@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import ru.zveron.order.client.address.SubwayGrpcClient
 import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
 import ru.zveron.order.client.animal.AnimalGrpcClient
+import ru.zveron.order.client.animal.GetAnimalsApiResponse
 import ru.zveron.order.client.animal.dto.GetAnimalApiResponse
 import ru.zveron.order.client.profile.ProfileGrpcClient
 import ru.zveron.order.client.profile.dto.GetProfileApiResponse
@@ -31,6 +32,20 @@ class ClientDecorator(
 
         return@supervisorScope FullOrderExtraData(profile.await(), subwayStation.await(), animal.await())
     }
+
+    private suspend fun getAnimals(ids: List<Long>): List<Animal> {
+        when (val response = animalGrpcClient.getAnimals(ids)) {
+            is GetAnimalsApiResponse.Error -> throw ClientException(
+                message = "Get animals client request failed",
+                status = response.error
+            )
+
+            is GetAnimalsApiResponse.Success -> return response.animals
+        }
+    }
+
+    //todo: request views and likes
+    suspend fun getAnimalsData(animalIds: List<Long>) = getAnimals(animalIds)
 
     private suspend fun getProfile(profileId: Long, rating: Double): Profile =
         when (val response = profileGrpcClient.getProfile(profileId)) {
