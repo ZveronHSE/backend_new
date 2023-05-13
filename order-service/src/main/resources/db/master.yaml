@@ -9,5 +9,8 @@ databaseChangeLog:
       failOnError: false
       changes:
         - sqlFile:
-            path: init-data.sql
+            path: init-order-lot.sql
+            relativeToChangelogFile: true
+        - sqlFile:
+            path: init-statistics.sql
             relativeToChangelogFile: true

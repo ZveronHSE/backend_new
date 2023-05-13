@@ -37,8 +37,8 @@ fun testFindProfileResponse(id: Long = randomId()) = getProfileResponse {
     this.surname = randomSurname()
 }
 
-fun testFullAnimal() = fullAnimal {
-    this.id = randomId()
+fun testFullAnimal(id: Long = randomId()) = fullAnimal {
+    this.id = id
     this.name = randomName()
     this.imageUrls.addAll(listOf(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10)))
     this.age = RandomUtils.nextInt(1, 10)

@@ -4,6 +4,7 @@ import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingle
 import mu.KLogging
 import net.logstash.logback.marker.Markers.append
+import net.logstash.logback.marker.Markers.appendRaw
 import org.jooq.DSLContext
 import org.jooq.Field
 import org.jooq.SortField
@@ -52,7 +53,7 @@ class WaterfallStorage(
 
         val query = jooqQuery.toSortedQuery(ctx)
 
-        logger.debug(append("query", query.toString())) { "Composed jooq query" }
+        logger.debug(appendRaw("query", query.toString())) { "Composed jooq query" }
 
         val result = Flux.from(query)
             .log()

@@ -1,10 +1,32 @@
 package ru.zveron.order.entrpoint.mapper
 
-import ru.zveron.contract.order.external.*
+import ru.zveron.contract.order.external.CreateOrderResponseKt
+import ru.zveron.contract.order.external.CustomerActiveOrder
+import ru.zveron.contract.order.external.CustomerActiveOrderKt
+import ru.zveron.contract.order.external.CustomerCompletedOrder
+import ru.zveron.contract.order.external.CustomerCompletedOrderKt
+import ru.zveron.contract.order.external.GetCustomerResponse
+import ru.zveron.contract.order.external.GetCustomerResponseKt
+import ru.zveron.contract.order.external.GetOrderResponseKt
+import ru.zveron.contract.order.external.GetOrdersByProfileResponseKt
+import ru.zveron.contract.order.external.GetOrdersByProfileResponseKt.order
+import ru.zveron.contract.order.external.GetWaterfallResponseKt
+import ru.zveron.contract.order.external.ProfileKt
+import ru.zveron.contract.order.external.WaterfallOrderKt
+import ru.zveron.contract.order.external.createOrderResponse
+import ru.zveron.contract.order.external.customer
+import ru.zveron.contract.order.external.customerActiveOrder
+import ru.zveron.contract.order.external.customerCompletedOrder
+import ru.zveron.contract.order.external.fullOrder
+import ru.zveron.contract.order.external.getCustomerResponse
+import ru.zveron.contract.order.external.getOrderResponse
+import ru.zveron.contract.order.external.getOrdersByProfileResponse
+import ru.zveron.contract.order.external.getWaterfallResponse
 import ru.zveron.contract.order.model.AddressKt
 import ru.zveron.contract.order.model.AnimalKt
 import ru.zveron.order.entrpoint.mapper.CommonDtoMapper.of
 import ru.zveron.order.persistence.model.constant.Status
+import ru.zveron.order.service.model.ProfileOrder
 import ru.zveron.order.service.model.FullOrderData
 import ru.zveron.order.service.model.WaterfallOrderLot
 import ru.zveron.order.util.ChronoFormatter
@@ -12,6 +34,22 @@ import ru.zveron.order.util.PriceFormatter
 
 @Suppress("unused")
 object ResponseMapper {
+
+    fun GetOrdersByProfileResponseKt.of(data: List<ProfileOrder>) = getOrdersByProfileResponse {
+        this.orders.addAll(
+            data.map { GetOrdersByProfileResponseKt.OrderKt.of(it) }
+        )
+    }
+
+    fun GetOrdersByProfileResponseKt.OrderKt.of(data: ProfileOrder) = order {
+        this.id = data.orderLotId
+        this.imageUrl = data.imageUrl
+        this.title = data.title
+        this.price = data.price
+        this.viewCount = data.viewCount.toInt()
+        this.isFavouriteCount = 0
+    }
+
     fun GetOrderResponseKt.of(response: FullOrderData) = getOrderResponse {
         this.order = fullOrder {
             id = response.id
