@@ -35,10 +35,8 @@ class AnimalService(
     }
 
     suspend fun getAnimal(animalId: Long): Animal {
-        val animal = animalRepository.findById(animalId)
+        return animalRepository.findById(animalId)
             .orElseThrow { AnimalNotFoundException("Animal not found $animalId") }
-
-        return animal
     }
 
     suspend fun getAnimalsByProfile(profileId: Long): GetAnimalsByProfileResponse =

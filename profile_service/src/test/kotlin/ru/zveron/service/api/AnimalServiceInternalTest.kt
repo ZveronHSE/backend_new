@@ -12,6 +12,7 @@ import ru.zveron.commons.generator.AnimalGenerator
 import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.contract.profile.getAnimalBatchRequest
 import ru.zveron.contract.profile.getAnimalRequestInt
+import ru.zveron.mapper.AnimalMapper.toEntityDoc
 import ru.zveron.repository.AnimalRepository
 import ru.zveron.repository.ProfileRepository
 
@@ -51,7 +52,7 @@ class AnimalServiceInternalTest @Autowired constructor(
             it.breed shouldBe animal.breed
             it.name shouldBe animal.name
             it.imageUrlsList shouldBe animal.imageUrls.toList()
-            it.documentUrlsList shouldBe animal.documentUrls.toList()
+            it.documentsList.map { doc -> doc.toEntityDoc() } shouldBe animal.documentUrls.toList()
         }
     }
 
@@ -87,12 +88,12 @@ class AnimalServiceInternalTest @Autowired constructor(
             it[0].breed shouldBe animal1.breed
             it[0].name shouldBe animal1.name
             it[0].imageUrlsList shouldBe animal1.imageUrls.toList()
-            it[0].documentUrlsList shouldBe animal1.documentUrls.toList()
+            it[0].documentsList.map { animalDocument -> animalDocument.toEntityDoc() } shouldBe animal1.documentUrls.toList()
             it[1].age shouldBe animal2.age
             it[1].breed shouldBe animal2.breed
             it[1].name shouldBe animal2.name
             it[1].imageUrlsList shouldBe animal2.imageUrls.toList()
-            it[1].documentUrlsList shouldBe animal2.documentUrls.toList()
+            it[1].documentsList.map { doc -> doc.toEntityDoc() } shouldBe animal2.documentUrls.toList()
         }
     }
 }
