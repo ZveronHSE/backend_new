@@ -9,7 +9,10 @@ import ru.zveron.contract.profile.createAnimalResponse
 import ru.zveron.contract.profile.getAnimalResponseExt
 import ru.zveron.contract.profile.getAnimalResponseInt
 import ru.zveron.contract.profile.listedAnimal
+import ru.zveron.contract.profile.model.AnimalDocument
+import ru.zveron.contract.profile.model.AnimalDocumentKt
 import ru.zveron.contract.profile.model.FullAnimalKt
+import ru.zveron.contract.profile.model.animalDocument
 import ru.zveron.contract.profile.model.fullAnimal
 import ru.zveron.entity.Animal
 import ru.zveron.entity.Profile
@@ -24,8 +27,10 @@ object AnimalMapper {
         profile = profile,
         species = this.species,
         imageUrls = this.imageUrlsList.asByteStringList().map { it.toStringUtf8() }.toTypedArray(),
-        documentUrls = this.documentUrlsList.asByteStringList().map { it.toStringUtf8() }.toTypedArray(),
+        documentUrls = this.documentsList.map { it.toEntityDoc() }.toTypedArray()
     )
+
+    fun AnimalDocument.toEntityDoc() = """${this.name}|${this.url}"""
 
     fun CreateAnimalResponseKt.ofEntity(a: Animal) = createAnimalResponse {
         this.animal = FullAnimalKt.of(a)
@@ -55,6 +60,13 @@ object AnimalMapper {
         this.age = a.age
         this.species = a.species
         this.imageUrls.addAll(a.imageUrls.toList())
-        this.documentUrls.addAll(a.documentUrls.toList())
+        this.documents.addAll(a.documentUrls.map { nameToUrl ->
+            nameToUrl.split("|").let { AnimalDocumentKt.of(it[0], it[1]) }
+        })
+    }
+
+    private fun AnimalDocumentKt.of(name: String, url: String) = animalDocument {
+        this.name = name
+        this.url = url
     }
 }
