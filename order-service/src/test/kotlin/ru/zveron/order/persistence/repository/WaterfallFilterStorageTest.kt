@@ -22,7 +22,7 @@ import ru.zveron.order.test.util.shouldBeBeforeOrEqual
 import ru.zveron.order.test.util.testOrderLotEntity
 import java.time.LocalDate
 
-class WaterfallFilterParamStorageTest @Autowired constructor(
+class WaterfallFilterStorageTest @Autowired constructor(
     private val template: R2dbcEntityTemplate,
     private val storage: WaterfallStorage,
 ) : BaseOrderApplicationTest() {
