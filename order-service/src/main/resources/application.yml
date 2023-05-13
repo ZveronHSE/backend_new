@@ -49,6 +49,7 @@ eureka:
     metadata-map:
       OrderWaterfallServiceExternal: 'external/external_order_waterfall.proto'
       OrderServiceExternal: 'external/external_order_crud.proto'
+      OrderCustomerServiceExternal: 'external/external_customer_crud.proto'
     prefer-ip-address: true
 
 management:
