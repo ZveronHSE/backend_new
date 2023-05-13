@@ -15,7 +15,12 @@ import ru.zveron.order.service.constant.Field
 import ru.zveron.order.service.constant.Operation
 import ru.zveron.order.service.mapper.ModelMapper.of
 import ru.zveron.order.service.mapper.ResponseMapper.toGetOrderWaterfallResponse
-import ru.zveron.order.service.model.*
+import ru.zveron.order.service.model.Animal
+import ru.zveron.order.service.model.FilterParam
+import ru.zveron.order.service.model.GetWaterfallCountRequest
+import ru.zveron.order.service.model.GetWaterfallRequest
+import ru.zveron.order.service.model.SubwayStation
+import ru.zveron.order.service.model.WaterfallOrderLot
 
 
 @Service
@@ -47,6 +52,18 @@ class GetWaterfallService(
             subwayStation.awaitAll().filter { it.first != null && it.second != null }
                 .associate { it.first!! to it.second!! },
             animals.awaitAll().toMap()
+        )
+    }
+
+    suspend fun getWaterfallCount(request: GetWaterfallCountRequest): Int {
+        return waterfallStorage.countFiltered(
+            filterParams = request.filterParams + listOf(
+                FilterParam(
+                    Field.STATUS,
+                    Operation.NOT_IN,
+                    Status.terminalStatuses().joinToString(",")
+                )
+            ),
         )
     }
 

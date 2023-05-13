@@ -1,5 +1,6 @@
 package ru.zveron.order.persistence.repository
 
+import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingle
 import mu.KLogging
 import net.logstash.logback.marker.Markers.append
@@ -60,6 +61,25 @@ class WaterfallStorage(
             .awaitSingle() ?: emptyList()
 
         logger.debug(append("result", result.map { it.toString() })) { "Completed request" }
+
+        return result
+    }
+
+    suspend fun countFiltered(filterParams: List<FilterParam> = emptyList()): Int {
+        val filterConditions = filterParams.map { it.toJooqFilter() }
+
+        val query = ctx.selectCount()
+            .from(ORDER_LOT)
+            .where(filterConditions)
+
+        logger.debug(append("query", query.toString())) { "Composed jooq query" }
+
+        val result: Int = Flux.from(query)
+            .log()
+            .map { it.into(Int::class.java) }
+            .awaitSingle() ?: 0
+
+        logger.debug(append("count", result)) { "Completed count request" }
 
         return result
     }

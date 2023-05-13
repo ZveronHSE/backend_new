@@ -1,10 +1,17 @@
 package ru.zveron.order.entrpoint.mapper
 
-import ru.zveron.contract.order.external.*
+import ru.zveron.contract.order.external.CreateOrderRequest
+import ru.zveron.contract.order.external.Filter
+import ru.zveron.contract.order.external.GetFilteredCountRequest
+import ru.zveron.contract.order.external.GetWaterfallRequest
+import ru.zveron.contract.order.external.Operation
+import ru.zveron.contract.order.external.SortBy
+import ru.zveron.contract.order.external.SortDir
 import ru.zveron.order.entrpoint.mapper.CommonDtoMapper.toLocalDate
 import ru.zveron.order.entrpoint.mapper.CommonDtoMapper.toLocalTime
 import ru.zveron.order.service.constant.Field
 import ru.zveron.order.service.constant.SortDirection
+import ru.zveron.order.service.model.GetWaterfallCountRequest
 import ru.zveron.order.service.model.Sort
 
 @Suppress("unused")
@@ -16,10 +23,14 @@ object RequestMapper {
         filterParams = this.filtersList.map { it.toServiceFilter() }
     )
 
+    fun GetFilteredCountRequest.toServiceRequest() = GetWaterfallCountRequest(
+        filterParams = this.filtersList.map { it.toServiceFilter() }
+    )
+
     fun CreateOrderRequest.toServiceRequest() = ru.zveron.order.service.model.CreateOrderRequest(
         profileId = this.profileId,
         animalId = this.animalId,
-        subwayId = takeIf { this.hasSubwayStationId() }?.let { this.subwayStationId.toInt() },
+        subwayId = takeIf { this.hasSubwayStationId() }?.let { this.subwayStationId },
         description = this.description,
         price = this.price,
         title = this.title,
