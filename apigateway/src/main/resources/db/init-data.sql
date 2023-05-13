@@ -71,9 +71,12 @@ values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('specialistEditService', 'specialist-service', 'ManageSpecialistExternalService', 'EditService', 'BUYER'),
        ('specialistDeleteService', 'specialist-service', 'ManageSpecialistExternalService', 'DeleteService', 'BUYER'),
        ('specialistEditDocuments', 'specialist-service', 'ManageSpecialistExternalService', 'EditDocuments', 'BUYER'),
-        ('profileCreateAnimal', 'profile-service', 'AnimalGrpcExternal', 'CreateAnimal', 'BUYER'),
-        ('profileGetAnimal', 'profile-service', 'AnimalGrpcExternal', 'GetAnimal', 'BUYER'),
-        ('profileGetAnimalsByProfile', 'profile-service', 'AnimalGrpcExternal', 'GetAnimalsByProfile', 'BUYER')
+       ('profileCreateAnimal', 'profile-service', 'AnimalGrpcExternal', 'CreateAnimal', 'BUYER'),
+       ('profileGetAnimal', 'profile-service', 'AnimalGrpcExternal', 'GetAnimal', 'BUYER'),
+       ('profileGetAnimalsByProfile', 'profile-service', 'AnimalGrpcExternal', 'GetAnimalsByProfile', 'BUYER'),
+       ('orderGetCustomerInfo', 'order-service', 'OrderCustomerServiceExternal', 'GetCustomer', 'ANY'),
+       ('orderCreateOrder', 'order-service', 'OrderServiceExternal', 'CreateOrder', 'ANY'),
+       ('orderFilteredCount', 'order-service', 'OrderWaterfallServiceExternal', 'GetFilteredCount', 'ANY')
 
 ON CONFLICT (alias) DO UPDATE SET service_name      = EXCLUDED.service_name,
                                   grpc_service_name = EXCLUDED.grpc_service_name,
