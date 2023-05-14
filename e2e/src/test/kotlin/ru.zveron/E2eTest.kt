@@ -4,6 +4,7 @@ import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusException
 import io.kotest.assertions.retry
 import io.kotest.assertions.throwables.shouldNotThrow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import ru.zveron.contract.apigateway.ApiGatewayRequest
 import ru.zveron.contract.apigateway.ApigatewayServiceGrpcKt
@@ -27,12 +28,26 @@ abstract class E2eTest {
     protected fun assertCallSucceeded(
         apiGatewayRequest: ApiGatewayRequest,
         maxRetry: Int = DEFAULT_RETRIES_NUMBER,
-        delayMinutes: Int = DEFAULT_RETRY_DELAY_MINUTES
+        delayMinutes: Int = DEFAULT_RETRY_DELAY_MINUTES,
     ) {
         runBlocking {
             retry(maxRetry, Duration.INFINITE, delayMinutes.minutes) {
                 shouldNotThrow<StatusException> {
                     client.callApiGateway(apiGatewayRequest)
+                }
+            }
+        }
+    }
+
+    protected fun assertBidiCallSucceeded(
+        apiGatewayRequest: ApiGatewayRequest,
+        maxRetry: Int = DEFAULT_RETRIES_NUMBER,
+        delayMinutes: Int = DEFAULT_RETRY_DELAY_MINUTES,
+    ) {
+        runBlocking {
+            retry(maxRetry, Duration.INFINITE, delayMinutes.minutes) {
+                shouldNotThrow<StatusException> {
+                    client.bidiStreamApiGateway(flowOf(apiGatewayRequest))
                 }
             }
         }
