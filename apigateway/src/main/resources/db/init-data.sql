@@ -1,3 +1,5 @@
+truncate public.method_metadata;
+
 insert into public.method_metadata (alias, service_name, grpc_service_name, grpc_method_name, access_scope)
 values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('authPerformLogout', 'auth-service', 'AuthServiceExternal', 'PerformLogout', 'BUYER'),
@@ -78,7 +80,4 @@ values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('orderCreateOrder', 'order-service', 'OrderServiceExternal', 'CreateOrder', 'ANY'),
        ('orderFilteredCount', 'order-service', 'OrderWaterfallServiceExternal', 'GetFilteredCount', 'ANY')
 
-ON CONFLICT (alias) DO UPDATE SET service_name      = EXCLUDED.service_name,
-                                  grpc_service_name = EXCLUDED.grpc_service_name,
-                                  grpc_method_name  = EXCLUDED.grpc_method_name,
-                                  access_scope      = EXCLUDED.access_scope;
+ON CONFLICT (alias) DO NOTHING;
