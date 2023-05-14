@@ -309,6 +309,31 @@ services:
           cpus: '0.25'
           memory: 128M
 
+  review-service:
+    logging: *loki-logging
+    restart: always
+    container_name: review-service
+    platform: linux/amd64
+    image: ghcr.io/zveronhse/review-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/review-service
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/review-service
+      - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/review-service
+    depends_on:
+      - db
+      - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
 
   object-storage:
     logging: *loki-logging
