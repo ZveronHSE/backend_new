@@ -78,6 +78,7 @@ values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('profileGetAnimalsByProfile', 'profile-service', 'AnimalGrpcExternal', 'GetAnimalsByProfile', 'BUYER'),
        ('orderGetCustomerInfo', 'order-service', 'OrderCustomerServiceExternal', 'GetCustomer', 'ANY'),
        ('orderCreateOrder', 'order-service', 'OrderServiceExternal', 'CreateOrder', 'ANY'),
-       ('orderFilteredCount', 'order-service', 'OrderWaterfallServiceExternal', 'GetFilteredCount', 'ANY')
+       ('orderFilteredCount', 'order-service', 'OrderWaterfallServiceExternal', 'GetFilteredCount', 'ANY'),
+       ('orderGetByProfile', 'order-service', 'OrderServiceExternal', 'GetOrdersByProfile', 'ANY')
 
 ON CONFLICT (alias) DO NOTHING;
