@@ -20,7 +20,6 @@ class AnimalServiceExternal(
     private val animalService: AnimalService,
 ) : AnimalGrpcExternalGrpcKt.AnimalGrpcExternalCoroutineImplBase() {
 
-
     override suspend fun getAnimal(request: GetAnimalRequestExt): GetAnimalResponseExt {
         request.validate()
 

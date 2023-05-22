@@ -52,7 +52,6 @@ object ResponseMapper {
             }
         }
 
-
     fun toGetCustomerResponse(
         profile: Profile,
         orderLots: List<OrderLot> = emptyList(),
@@ -70,7 +69,7 @@ object ResponseMapper {
                     createdAt = it.createdAt,
                     serviceDateFrom = it.serviceDateFrom,
                     serviceDateTo = it.serviceDateTo,
-                    status = it.status
+                    status = it.status,
                 )
             }
         }
@@ -96,10 +95,9 @@ object ResponseMapper {
                     title = it.title,
                     price = PriceFormatter.formatToPrice(it.price),
                     imageUrl = animal.imageUrl,
-                    viewCount = orderIdToViewCount[it.id] ?: 0
+                    viewCount = orderIdToViewCount[it.id] ?: 0,
                 )
             }
         }
     }
 }
-
