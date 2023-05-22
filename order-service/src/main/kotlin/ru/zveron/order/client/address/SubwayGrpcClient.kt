@@ -12,7 +12,7 @@ import ru.zveron.order.service.mapper.ModelMapper.of
 import ru.zveron.order.service.model.SubwayStation
 
 class SubwayGrpcClient(
-        private val subwayGrpcStub: SubwayStationInternalServiceGrpcKt.SubwayStationInternalServiceCoroutineStub,
+    private val subwayGrpcStub: SubwayStationInternalServiceGrpcKt.SubwayStationInternalServiceCoroutineStub,
 ) {
 
     companion object : KLogging()
@@ -23,6 +23,7 @@ class SubwayGrpcClient(
 
         return try {
             val response = subwayGrpcStub.getSubwayStation(request)
+            logger.debug { "Received response=$response for $subwayStationId" }
             GetSubwayStationApiResponse.Success(response.subwayStation)
         } catch (e: StatusException) {
             when (e.status.code) {
@@ -33,7 +34,12 @@ class SubwayGrpcClient(
     }
 
     suspend fun getSubways(subwayStationIds: List<Int>): GetSubwaysApiResponse {
-        logger.debug(append("subwayStationIds", subwayStationIds)) { "Calling get subway stations batch from subway client" }
+        logger.debug(
+            append(
+                "subwayStationIds",
+                subwayStationIds,
+            ),
+        ) { "Calling get subway stations batch from subway client" }
         val request = getSubwayStationsRequest { this.ids.addAll(subwayStationIds) }
 
         return try {

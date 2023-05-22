@@ -12,7 +12,7 @@ import ru.zveron.order.service.mapper.ModelMapper.of
 import ru.zveron.order.service.model.Animal
 
 class AnimalGrpcClient(
-        private val animalGrpcStub: AnimalServiceInternalGrpcKt.AnimalServiceInternalCoroutineStub,
+    private val animalGrpcStub: AnimalServiceInternalGrpcKt.AnimalServiceInternalCoroutineStub,
 ) {
 
     companion object : KLogging()
@@ -24,6 +24,7 @@ class AnimalGrpcClient(
 
         return try {
             val response = animalGrpcStub.getAnimal(request)
+            logger.debug { "Received response=$response for $animalId" }
             GetAnimalApiResponse.Success(response.animal)
         } catch (ex: StatusException) {
             when (ex.status.code) {

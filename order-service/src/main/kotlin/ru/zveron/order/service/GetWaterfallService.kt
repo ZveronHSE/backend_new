@@ -3,6 +3,7 @@ package ru.zveron.order.service
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import mu.KLogging
 import org.springframework.stereotype.Service
 import ru.zveron.order.client.address.SubwayGrpcClient
 import ru.zveron.order.client.address.dto.GetSubwayStationApiResponse
@@ -22,13 +23,14 @@ import ru.zveron.order.service.model.GetWaterfallRequest
 import ru.zveron.order.service.model.SubwayStation
 import ru.zveron.order.service.model.WaterfallOrderLot
 
-
 @Service
 class GetWaterfallService(
     private val waterfallStorage: WaterfallStorage,
     private val subwayGrpcClient: SubwayGrpcClient,
     private val animalGrpcClient: AnimalGrpcClient,
 ) {
+
+    companion object : KLogging()
 
     suspend fun getWaterfall(request: GetWaterfallRequest): List<WaterfallOrderLot> {
         val orderLotRecords = waterfallStorage.findAllPaginated(
@@ -38,8 +40,8 @@ class GetWaterfallService(
                 FilterParam(
                     Field.STATUS,
                     Operation.NOT_IN,
-                    Status.terminalStatuses().joinToString(",")
-                )
+                    Status.terminalStatuses().joinToString(","),
+                ),
             ),
         )
 
@@ -47,11 +49,16 @@ class GetWaterfallService(
             coroutineScope { orderLotRecords.map { async { it.subwayId to getSubwayStation(it.subwayId) } } }
         val animals = coroutineScope { orderLotRecords.map { async { it.animalId to getAnimal(it.animalId) } } }
 
+        logger.debug { "Mapping response to service response" }
         return toGetOrderWaterfallResponse(
             orderLotRecords,
-            subwayStation.awaitAll().filter { it.first != null && it.second != null }
+            subwayStation.awaitAll()
+                .also { logger.debug { "Received all subway station responses" } }
+                .filter { it.first != null && it.second != null }
                 .associate { it.first!! to it.second!! },
-            animals.awaitAll().toMap()
+            animals.awaitAll()
+                .also { logger.debug { "Received all animals" } }
+                .toMap(),
         )
     }
 
@@ -61,19 +68,19 @@ class GetWaterfallService(
                 FilterParam(
                     Field.STATUS,
                     Operation.NOT_IN,
-                    Status.terminalStatuses().joinToString(",")
-                )
+                    Status.terminalStatuses().joinToString(","),
+                ),
             ),
         )
     }
 
-    //todo: move to decorator
+    // todo: move to decorator
     private suspend fun getSubwayStation(subwayId: Int?): SubwayStation? {
         if (subwayId == null) return null
         return when (val response = subwayGrpcClient.getSubwayStation(subwayId)) {
             is GetSubwayStationApiResponse.Error -> throw ClientException(
                 message = "Get subway station client request failed",
-                status = response.error
+                status = response.error,
             )
 
             GetSubwayStationApiResponse.NotFound -> null
@@ -86,7 +93,7 @@ class GetWaterfallService(
         when (val response = animalGrpcClient.getAnimal(animalId)) {
             is GetAnimalApiResponse.Error -> throw ClientException(
                 message = "Get animal client request failed",
-                status = response.error
+                status = response.error,
             )
 
             GetAnimalApiResponse.NotFound -> null
