@@ -152,11 +152,16 @@ class ApiGatewayService(
         )
     } catch (ex: StatusException) {
         logger.warn(
-            "Response for {} to {} failed. {}",
-            keyValue("message", grpcMessage?.toJson()),
-            keyValue("method", grpcMethodDescriptor.fullMethodName),
-            keyValue("code", ex.status.code),
-        )
+            aggregate(
+                append("message", grpcMessage?.toJson()),
+                append("method", grpcMethodDescriptor.fullMethodName),
+                append("code", ex.status.code),
+                append("stacktrace", ex.stackTrace),
+                append("trailers", ex.trailers),
+            ),
+        ) {
+            "Failed request with status exception"
+        }
         throw ex
     } catch (e: Exception) {
         logger.warn(
