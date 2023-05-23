@@ -54,6 +54,7 @@ eureka:
   instance:
     metadata-map:
       ProfileServiceExternal: 'profile_external.proto'
+      AnimalGrpcExternal: 'animal_external.proto'
 
 
 
