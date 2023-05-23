@@ -39,6 +39,7 @@ object CommonDtoMapper {
         id = p.id
         name = p.name
         rating = p.rating.toFloat()
+        imageUrl = p.imageUrl
     }
 
     fun WaterfallOrderKt.of(wo: WaterfallOrderLot) = waterfallOrder {
