@@ -32,4 +32,5 @@ include(
     "chat_service",
     "order-service",
     "specialist-service",
+    "review-service",
 )

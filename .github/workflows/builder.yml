@@ -92,6 +92,11 @@ jobs:
             dockerfile: specialist-service/Dockerfile
             image: ghcr.io/zveronhse/specialist-service:latest
 
+          - name: Review service
+            env: review-service
+            dockerfile: review-service/Dockerfile
+            image: ghcr.io/zveronhse/review-service:latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3

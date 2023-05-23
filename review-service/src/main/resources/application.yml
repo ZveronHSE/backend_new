@@ -1,0 +1,86 @@
+spring:
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/master.yaml
+    url: jdbc:postgresql://localhost:5555/review-service
+    user: zveron_user
+    password: zveron_password
+
+  datasource:
+    url: jdbc:postgresql://localhost:5555/review-service
+    password: zveron_password
+    username: zveron_user
+
+  main:
+    banner-mode: off
+    web-application-type: reactive
+
+  application:
+    name: review-service
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5555/review-service
+    username: zveron_user
+    password: zveron_password
+    pool:
+      enabled: true
+
+  netty:
+    leak-detection: advanced
+
+  jpa:
+    show-sql: true
+  jooq:
+    sql-dialect: postgres
+
+eureka:
+
+  client:
+    enabled: true
+    webclient:
+      enabled: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+
+  instance:
+    metadata-map:
+      RatingServiceInternal: internal/rating_internal.proto
+      ReviewServiceExternal: external/external_review_crud.proto
+    prefer-ip-address: true
+
+management:
+  endpoint:
+    serviceregistry:
+      enabled: true
+
+grpc:
+  server:
+    port: 9093
+
+  client:
+    profile:
+      address: 'discovery:///profile-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+    lot:
+      address: 'discovery:///lot-service'
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
+
+server:
+  port: 0
+
+# noinspection SpringBootApplicationYaml
+platform:
+  grpc:
+    client:
+      logging-enabled: false
+    server:
+      logging-enabled: true
