@@ -27,7 +27,7 @@ object AnimalMapper {
         profile = profile,
         species = this.species,
         imageUrls = this.imageUrlsList.asByteStringList().map { it.toStringUtf8() }.toTypedArray(),
-        documentUrls = this.documentsList.map { it.toEntityDoc() }.toTypedArray()
+        documentUrls = this.documentsList.map { it.toEntityDoc() }.toTypedArray(),
     )
 
     fun AnimalDocument.toEntityDoc() = """${this.name}|${this.url}"""
@@ -57,12 +57,20 @@ object AnimalMapper {
         this.id = a.id
         this.name = a.name
         this.breed = a.breed
-        this.age = a.age
+        this.age = a.age.let {
+            when (it) {
+                1 -> "1 год"
+                2, 3, 4 -> "$it года"
+                else -> "$it лет"
+            }
+        }
         this.species = a.species
         this.imageUrls.addAll(a.imageUrls.toList())
-        this.documents.addAll(a.documentUrls.map { nameToUrl ->
-            nameToUrl.split("|").let { AnimalDocumentKt.of(it[0], it[1]) }
-        })
+        this.documents.addAll(
+            a.documentUrls.map { nameToUrl ->
+                nameToUrl.split("|").let { AnimalDocumentKt.of(it[0], it[1]) }
+            },
+        )
     }
 
     private fun AnimalDocumentKt.of(name: String, url: String) = animalDocument {

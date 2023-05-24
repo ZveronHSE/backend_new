@@ -27,8 +27,8 @@ object RequestMapper {
         filterParams = this.filtersList.map { it.toServiceFilter() }
     )
 
-    fun CreateOrderRequest.toServiceRequest() = ru.zveron.order.service.model.CreateOrderRequest(
-        profileId = this.profileId,
+    fun CreateOrderRequest.toServiceRequest(profileId: Long) = ru.zveron.order.service.model.CreateOrderRequest(
+        profileId = profileId,
         animalId = this.animalId,
         subwayId = takeIf { this.hasSubwayStationId() }?.let { this.subwayStationId },
         description = this.description,

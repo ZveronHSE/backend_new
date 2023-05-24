@@ -9,7 +9,6 @@ import ru.zveron.contract.order.external.GetCustomerResponse
 import ru.zveron.contract.order.external.GetCustomerResponseKt
 import ru.zveron.contract.order.external.GetOrderResponseKt
 import ru.zveron.contract.order.external.GetOrdersByProfileResponseKt
-import ru.zveron.contract.order.external.GetOrdersByProfileResponseKt.order
 import ru.zveron.contract.order.external.GetWaterfallResponseKt
 import ru.zveron.contract.order.external.ProfileKt
 import ru.zveron.contract.order.external.WaterfallOrderKt
@@ -26,8 +25,8 @@ import ru.zveron.contract.order.model.AddressKt
 import ru.zveron.contract.order.model.AnimalKt
 import ru.zveron.order.entrpoint.mapper.CommonDtoMapper.of
 import ru.zveron.order.persistence.model.constant.Status
-import ru.zveron.order.service.model.ProfileOrder
 import ru.zveron.order.service.model.FullOrderData
+import ru.zveron.order.service.model.ProfileOrder
 import ru.zveron.order.service.model.WaterfallOrderLot
 import ru.zveron.order.util.ChronoFormatter
 import ru.zveron.order.util.PriceFormatter
@@ -36,18 +35,33 @@ import ru.zveron.order.util.PriceFormatter
 object ResponseMapper {
 
     fun GetOrdersByProfileResponseKt.of(data: List<ProfileOrder>) = getOrdersByProfileResponse {
-        this.orders.addAll(
-            data.map { GetOrdersByProfileResponseKt.OrderKt.of(it) }
+        this.activeOrders.addAll(
+            data.filter { Status.canAcceptOrder(it.status) }
+                .map { CustomerActiveOrderKt.of(it) },
+        )
+
+        this.completedOrders.addAll(
+            data.filter { !Status.canAcceptOrder(it.status) }
+                .map { CustomerCompletedOrderKt.of(it) },
         )
     }
 
-    fun GetOrdersByProfileResponseKt.OrderKt.of(data: ProfileOrder) = order {
+    fun CustomerCompletedOrderKt.of(data: ProfileOrder) = customerCompletedOrder {
         this.id = data.orderLotId
-        this.imageUrl = data.imageUrl
+        this.animal = AnimalKt.of(data.animal)
         this.title = data.title
         this.price = data.price
-        this.viewCount = data.viewCount.toInt()
-        this.isFavouriteCount = 0
+        this.serviceDate = ChronoFormatter.formatServiceDate(data.serviceDateFrom, data.serviceDateTo)
+        this.createdAt = ChronoFormatter.formatCreatedAt(data.createdAt)
+    }
+
+    fun CustomerActiveOrderKt.of(data: ProfileOrder) = customerActiveOrder {
+        this.id = data.orderLotId
+        this.animal = AnimalKt.of(data.animal)
+        this.title = data.title
+        this.price = data.price
+        this.serviceDate = ChronoFormatter.formatServiceDate(data.serviceDateFrom, data.serviceDateTo)
+        this.createdAt = ChronoFormatter.formatCreatedAt(data.createdAt)
     }
 
     fun GetOrderResponseKt.of(response: FullOrderData) = getOrderResponse {
@@ -87,7 +101,7 @@ object ResponseMapper {
 
     fun GetWaterfallResponseKt.of(waterfallOrderLots: List<WaterfallOrderLot>) = getWaterfallResponse {
         this.orders.addAll(
-            waterfallOrderLots.map { WaterfallOrderKt.of(it) }
+            waterfallOrderLots.map { WaterfallOrderKt.of(it) },
         )
     }
 
@@ -98,10 +112,14 @@ object ResponseMapper {
                 this.name = serviceResponse.profile.name
                 this.rating = serviceResponse.profile.rating.toFloat()
                 this.imageUrl = serviceResponse.profile.imageUrl
-                this.activeOrders.addAll(serviceResponse.orderLots.filter { Status.canAcceptOrder(it.status) }
-                    .map { CustomerActiveOrderKt.of(it) })
-                this.completedOrders.addAll(serviceResponse.orderLots.filter { it.status == Status.COMPLETED }
-                    .map { CustomerCompletedOrderKt.of(it) })
+                this.activeOrders.addAll(
+                    serviceResponse.orderLots.filter { Status.canAcceptOrder(it.status) }
+                        .map { CustomerActiveOrderKt.of(it) },
+                )
+                this.completedOrders.addAll(
+                    serviceResponse.orderLots.filter { it.status == Status.COMPLETED }
+                        .map { CustomerCompletedOrderKt.of(it) },
+                )
             }
         }
     }

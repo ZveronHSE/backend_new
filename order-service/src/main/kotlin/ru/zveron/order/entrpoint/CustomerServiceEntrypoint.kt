@@ -1,18 +1,25 @@
 package ru.zveron.order.entrpoint
 
+import com.google.protobuf.Empty
 import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
 import net.logstash.logback.marker.Markers.append
 import ru.zveron.contract.order.external.GetCustomerRequest
 import ru.zveron.contract.order.external.GetCustomerResponse
 import ru.zveron.contract.order.external.GetCustomerResponseKt
+import ru.zveron.contract.order.external.GetOrdersByProfileResponse
+import ru.zveron.contract.order.external.GetOrdersByProfileResponseKt
 import ru.zveron.contract.order.external.OrderCustomerServiceExternalGrpcKt
+import ru.zveron.library.grpc.util.GrpcUtils
 import ru.zveron.order.entrpoint.mapper.ResponseMapper.of
 import ru.zveron.order.service.CustomerService
+import ru.zveron.order.service.GetOrderService
+import kotlin.coroutines.coroutineContext
 
 @GrpcService
 class CustomerServiceEntrypoint(
     private val customerService: CustomerService,
+    private val getOrderService: GetOrderService,
 ) : OrderCustomerServiceExternalGrpcKt.OrderCustomerServiceExternalCoroutineImplBase() {
 
     companion object : KLogging()
@@ -26,5 +33,13 @@ class CustomerServiceEntrypoint(
 
         logger.debug(append("serviceResponse", serviceResponse)) { "Returning service response" }
         return GetCustomerResponseKt.of(serviceResponse)
+    }
+
+    override suspend fun getOrdersByProfile(request: Empty): GetOrdersByProfileResponse {
+        val profileId = GrpcUtils.getMetadata(coroutineContext).profileId!!
+
+        logger.debug(append("profileId", profileId)) { "Calling get orders by profile service from entrypoint" }
+
+        return GetOrdersByProfileResponseKt.of(getOrderService.getProfileOrders(profileId))
     }
 }

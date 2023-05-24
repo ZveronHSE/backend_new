@@ -120,7 +120,6 @@ fun testProfile() = Profile(
 
 fun testCreateOrderEntrypointRequest() = createOrderRequest {
     this.animalId = randomId()
-    this.profileId = randomId()
     this.subwayStationId = randomSubwayId()
 
     this.price = RandomUtils.nextLong()

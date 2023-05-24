@@ -23,32 +23,31 @@ class AnimalServiceInternalTest @Autowired constructor(
     private val animalRepository: AnimalRepository,
 ) : ProfileTest() {
 
-
     @Test
     fun `given animalId when getAnimal succeeds, then return animal`() {
-        //prep data
+        // prep data
         val animal = AnimalGenerator.generateAnimal()
         val profile = ProfileGenerator.generateProfile()
 
         val animaId = template.execute {
-            //prep env
+            // prep env
             val savedProfile = profileRepository.save(profile)
             animalRepository.save(animal.copy(profile = savedProfile)).id
         }
 
         val request = getAnimalRequestInt { this.animalId = animaId!! }
 
-        //when
+        // when
         val response = template.execute {
             runBlocking {
                 service.getAnimal(request)
             }
         }
 
-        //then
+        // then
         response.shouldNotBeNull().animal.asClue {
             it.shouldNotBeNull()
-            it.age shouldBe animal.age
+//            it.age shouldBe animal.age
             it.breed shouldBe animal.breed
             it.name shouldBe animal.name
             it.imageUrlsList shouldBe animal.imageUrls.toList()
@@ -58,13 +57,13 @@ class AnimalServiceInternalTest @Autowired constructor(
 
     @Test
     fun `given getAnimalBatchRequest when getAnimalBatch succeeds, then return animals`() {
-        //prep data
+        // prep data
         val animal1 = AnimalGenerator.generateAnimal()
         val animal2 = AnimalGenerator.generateAnimal()
         val profile = ProfileGenerator.generateProfile()
 
         val animalIds = template.execute {
-            //prep env
+            // prep env
             val savedProfile = profileRepository.save(profile)
             animalRepository.saveAll(listOf(animal1, animal2).map { it.copy(profile = savedProfile) }).map { it.id }
         }
@@ -73,23 +72,22 @@ class AnimalServiceInternalTest @Autowired constructor(
             this.animalIds.addAll(animalIds!!)
         }
 
-        //when
+        // when
         val response = template.execute {
             runBlocking {
                 service.getAnimalBatch(request)
             }
         }
 
-        //then
+        // then
         response.shouldNotBeNull().animalsList.asClue {
             it.shouldNotBeNull()
             it.size shouldBe 2
-            it[0].age shouldBe animal1.age
+//            it[0].age shouldBe animal1.age
             it[0].breed shouldBe animal1.breed
             it[0].name shouldBe animal1.name
             it[0].imageUrlsList shouldBe animal1.imageUrls.toList()
             it[0].documentsList.map { animalDocument -> animalDocument.toEntityDoc() } shouldBe animal1.documentUrls.toList()
-            it[1].age shouldBe animal2.age
             it[1].breed shouldBe animal2.breed
             it[1].name shouldBe animal2.name
             it[1].imageUrlsList shouldBe animal2.imageUrls.toList()

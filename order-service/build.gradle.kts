@@ -37,8 +37,8 @@ dependencies {
     implementation("org.jooq:jooq-kotlin:3.18.3")
 
     //contract
-    implementation("com.github.zveronHSe.contract:order:45b2d307c1")
-    implementation("com.github.zveronHSe.contract:profile:$contractVersion")
+    implementation("com.github.zveronHSe.contract:order:cff9c9869b")
+    implementation("com.github.zveronHSe.contract:profile:cff9c9869b")
     implementation("com.github.zveronHSe.contract:address:$contractVersion")
 
     testImplementation("org.testcontainers:r2dbc:$testcontainersVersion")

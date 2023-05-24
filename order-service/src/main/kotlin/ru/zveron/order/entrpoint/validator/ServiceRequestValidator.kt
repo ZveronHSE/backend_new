@@ -13,7 +13,6 @@ object ServiceRequestValidator {
     }
 
     fun validate(request: CreateOrderRequest) {
-        require(request.profileId > 0) { "Profile id should be positive. Actual value ${request.profileId}" }
         require(request.animalId > 0) { "Animal id should be positive. Actual value ${request.animalId}" }
         require(request.price >= 0) { "Price should be positive. Actual value ${request.price}" }
         require(request.title.isNotBlank()) { "Title should not be blank. Actual value ${request.title}" }

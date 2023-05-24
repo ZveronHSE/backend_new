@@ -96,6 +96,11 @@ object ResponseMapper {
                     price = PriceFormatter.formatToPrice(it.price),
                     imageUrl = animal.imageUrl,
                     viewCount = orderIdToViewCount[it.id] ?: 0,
+                    status = it.status,
+                    animal = animal,
+                    createdAt = it.createdAt,
+                    serviceDateTo = it.serviceDateTo,
+                    serviceDateFrom = it.serviceDateFrom,
                 )
             }
         }
