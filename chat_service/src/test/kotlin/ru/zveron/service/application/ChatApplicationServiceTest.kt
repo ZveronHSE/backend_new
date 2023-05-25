@@ -576,11 +576,13 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
             messageRepository.save(message2)
             messageRepository.save(message3)
 
-            chatApplicationService.sendEvent(request, defaultContext())
+            val event = chatApplicationService.sendEvent(request, defaultContext())
 
             messageRepository.findByChatIdAndId(chat1.chatId, msg1)!!.isRead shouldBe true
             messageRepository.findByChatIdAndId(chat1.chatId, msg2)!!.isRead shouldBe true
             messageRepository.findByChatIdAndId(chat1.chatId, msg3)!!.isRead shouldBe false
+
+            event.responseBody.receiveEvent.chatId shouldBe chat1.chatId.toString()
         }
     }
 
@@ -600,6 +602,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             event.responseBody.receiveEvent.disconnectEvent.lastOnlineFormatted shouldBe "Не в сети"
             event.targetProfileId shouldBe user2
+            event.responseBody.receiveEvent.chatId shouldBe chat1.chatId.toString()
         }
     }
 
@@ -635,6 +638,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             event.responseBody.receiveEvent.noPayloadEvent.type shouldBe NoPayloadEventType.ONLINE
             event.targetProfileId shouldBe user2
+            event.responseBody.receiveEvent.chatId shouldBe chat1.chatId.toString()
         }
     }
 
@@ -654,6 +658,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             event.responseBody.receiveEvent.noPayloadEvent.type shouldBe NoPayloadEventType.TEXTING
             event.targetProfileId shouldBe user2
+            event.responseBody.receiveEvent.chatId shouldBe chat1.chatId.toString()
         }
     }
 

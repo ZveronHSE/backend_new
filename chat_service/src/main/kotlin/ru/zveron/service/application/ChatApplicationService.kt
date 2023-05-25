@@ -154,6 +154,7 @@ class ChatApplicationService(
                 val response = chatRouteResponse {
                     receiveEvent =
                         receiveEvent {
+                            this.chatId = request.chatId
                             changedStatusEvent = changeMessagesStatusEvent {
                                 this.ids.addAll(request.changedStatusEvent.idsList)
                             }
@@ -164,15 +165,20 @@ class ChatApplicationService(
 
             SendEventRequest.EventCase.DISCONNECT_EVENT -> {
                 val response = chatRouteResponse {
-                    receiveEvent =
-                        receiveEvent { disconnectEvent = disconnectEvent { lastOnlineFormatted = "Не в сети" } }
+                    receiveEvent = receiveEvent {
+                        this.chatId = request.chatId
+                        disconnectEvent = disconnectEvent { lastOnlineFormatted = "Не в сети" }
+                    }
                 }
                 SingleConnectionResponse(interlocutorId, response)
             }
 
             SendEventRequest.EventCase.NO_PAYLOAD_EVENT -> {
                 val response = chatRouteResponse {
-                    receiveEvent = receiveEvent { noPayloadEvent = request.noPayloadEvent }
+                    receiveEvent = receiveEvent {
+                        this.chatId = request.chatId
+                        noPayloadEvent = request.noPayloadEvent
+                    }
                 }
                 SingleConnectionResponse(interlocutorId, response)
             }
