@@ -81,6 +81,7 @@ values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('orderFilteredCount', 'order-service', 'OrderWaterfallServiceExternal', 'GetFilteredCount', 'ANY'),
        ('orderGetByProfile', 'order-service', 'OrderServiceExternal', 'GetOrdersByProfile', 'ANY'),
        ('chatPing', 'chat-service', 'PingServiceExternal', 'Ping', 'ANY'),
-       ('bidiChatRoute', 'chat-service', 'ChatServiceExternal', 'BidiChatRoute', 'BUYER')
+       ('bidiChatRoute', 'chat-service', 'ChatServiceExternal', 'BidiChatRoute', 'BUYER'),
+       ('lotGetOwns', 'lot-service', 'LotExternalProtoService', 'GetOwnLots', 'BUYER'),
 
 ON CONFLICT (alias) DO NOTHING;
