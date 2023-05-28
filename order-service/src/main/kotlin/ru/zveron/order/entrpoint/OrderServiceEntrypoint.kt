@@ -34,7 +34,8 @@ class OrderServiceEntrypoint(
     }
 
     override suspend fun createOrder(request: CreateOrderRequest): CreateOrderResponse {
-        val profileId = GrpcUtils.getMetadata(coroutineContext).profileId!!
+        val profileId =
+            GrpcUtils.getMetadata(coroutineContext = coroutineContext, requiredAuthorized = true).profileId!!
 
         ServiceRequestValidator.validate(request)
 
