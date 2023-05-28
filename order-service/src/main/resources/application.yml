@@ -87,6 +87,8 @@ server:
 # noinspection SpringBootApplicationYaml
 platform:
   grpc:
+    apigateway:
+      metadata: true
     client:
       logging-enabled: false
     server:
