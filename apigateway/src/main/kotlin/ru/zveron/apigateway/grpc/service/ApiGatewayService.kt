@@ -92,7 +92,10 @@ class ApiGatewayService(
             grpcMethodDescriptor = grpcMethodDescriptor,
             grpcMessage = grpcMessage,
             metadata = Metadata().apply {
-                profileId?.let { this.put(profileIdKey, it.toString()) }
+                profileId?.let {
+                    this.put(profileIdKey, it.toString())
+                        .also { logger.debug(append("profileId", profileId)) { "Sending profile id in the header" } }
+                }
                 accessToken?.let { this.put(accessTokenKey, accessToken) }
             },
         )
