@@ -17,7 +17,7 @@ object ChronoFormatter {
 
 
     /**
-     * formats service date to dd.MM.yyyy - dd.MM.yyyy format if serviceDateTo is not null
+     * formats service date to dd.MM.yyyy - dd.MM.yyyy format if serviceDateTo is not null щк
      * dd.MM.yyyy otherwise
      *
      * @param serviceDateFrom

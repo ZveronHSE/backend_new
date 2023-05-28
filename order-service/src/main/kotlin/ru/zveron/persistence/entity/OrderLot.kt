@@ -24,7 +24,7 @@ data class OrderLot(
     val description: String,
 
     val serviceDateFrom: LocalDate,
-    val serviceDateTo: LocalDate?,
+    val serviceDateTo: LocalDate,
 
     val timeWindowFrom: LocalTime?,
     val timeWindowTo: LocalTime?,

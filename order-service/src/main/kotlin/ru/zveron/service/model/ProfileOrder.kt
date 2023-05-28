@@ -14,5 +14,5 @@ data class ProfileOrder(
     val animal: Animal,
     val createdAt: Instant,
     val serviceDateFrom: LocalDate,
-    val serviceDateTo: LocalDate?,
+    val serviceDateTo: LocalDate,
 )

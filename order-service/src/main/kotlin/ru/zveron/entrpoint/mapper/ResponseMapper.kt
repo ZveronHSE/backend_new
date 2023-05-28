@@ -51,7 +51,10 @@ object ResponseMapper {
         this.animal = AnimalKt.of(data.animal)
         this.title = data.title
         this.price = data.price
-        this.serviceDate = ChronoFormatter.formatServiceDate(data.serviceDateFrom, data.serviceDateTo)
+        this.serviceDate = ChronoFormatter.formatServiceDate(
+            data.serviceDateFrom,
+            data.serviceDateTo.takeIf { it != data.serviceDateFrom },
+        )
         this.createdAt = ChronoFormatter.formatCreatedAt(data.createdAt)
     }
 
@@ -60,7 +63,10 @@ object ResponseMapper {
         this.animal = AnimalKt.of(data.animal)
         this.title = data.title
         this.price = data.price
-        this.serviceDate = ChronoFormatter.formatServiceDate(data.serviceDateFrom, data.serviceDateTo)
+        this.serviceDate = ChronoFormatter.formatServiceDate(
+            data.serviceDateFrom,
+            data.serviceDateTo.takeIf { it != data.serviceDateFrom },
+        )
         this.createdAt = ChronoFormatter.formatCreatedAt(data.createdAt)
     }
 
@@ -75,7 +81,10 @@ object ResponseMapper {
             title = response.title
             price = PriceFormatter.formatToPrice(response.price)
 
-            serviceDate = ChronoFormatter.formatServiceDate(response.serviceDateFrom, response.serviceDateTo)
+            serviceDate = ChronoFormatter.formatServiceDate(
+                response.serviceDateFrom,
+                response.serviceDateTo.takeIf { it != response.serviceDateFrom },
+            )
             serviceTime = ChronoFormatter.formatServiceTime(response.timeWindowFrom, response.timeWindowTo)
             createdAt = ChronoFormatter.formatCreatedAt(response.createdAt)
 
@@ -91,7 +100,10 @@ object ResponseMapper {
             response.subwayStation?.let { address = AddressKt.of(it) }
             description = response.description
             title = response.title
-            serviceDate = ChronoFormatter.formatServiceDate(response.serviceDateFrom, response.serviceDateTo)
+            serviceDate = ChronoFormatter.formatServiceDate(
+                response.serviceDateFrom,
+                response.serviceDateTo.takeIf { it != response.serviceDateFrom },
+            )
             price = PriceFormatter.formatToPrice(response.price)
             serviceTime = ChronoFormatter.formatServiceTime(response.timeWindowFrom, response.timeWindowTo)
             canAccept = Status.canAcceptOrder(response.orderStatus)
@@ -133,7 +145,10 @@ object ResponseMapper {
             this.createdAt = ChronoFormatter.formatCreatedAt(serviceResponse.createdAt)
             serviceResponse.subway?.let { this.address = AddressKt.of(it) }
             this.serviceDate =
-                ChronoFormatter.formatServiceDate(serviceResponse.serviceDateFrom, serviceResponse.serviceDateTo)
+                ChronoFormatter.formatServiceDate(
+                    serviceResponse.serviceDateFrom,
+                    serviceResponse.serviceDateTo.takeIf { it != serviceResponse.serviceDateFrom },
+                )
         }
     }
 
@@ -146,7 +161,10 @@ object ResponseMapper {
             this.createdAt = ChronoFormatter.formatCreatedAt(serviceResponse.createdAt)
             serviceResponse.subway?.let { this.address = AddressKt.of(it) }
             this.serviceDate =
-                ChronoFormatter.formatServiceDate(serviceResponse.serviceDateFrom, serviceResponse.serviceDateTo)
+                ChronoFormatter.formatServiceDate(
+                    serviceResponse.serviceDateFrom,
+                    serviceResponse.serviceDateTo.takeIf { it != serviceResponse.serviceDateFrom },
+                )
         }
     }
 }
