@@ -137,6 +137,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
         val (msg1) = PrimitivesGenerator.generateNTimeUuids(1)
         val (user1, user2) = PrimitivesGenerator.generateLongs(2)
         val chat1 = ChatGenerator.generateChat(user1, user2)
+        val chat2 = chat1.copy(profileId = user2, anotherProfileId = user1)
         val message1 = MessageGenerator.generateMessage(chat1.chatId, msg1, user2)
         val text = generateString(30)
         val image1 = generateString(20)
@@ -154,6 +155,7 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
         runBlocking(MetadataElement(Metadata(user1))) {
             messageRepository.save(message1)
             chatRepository.save(chat1)
+            chatRepository.save(chat2)
 
             val response = messageApplicationService.sendMessage(request, defaultContext())
 
@@ -166,6 +168,10 @@ class MessageApplicationServiceTest : ChatServiceApplicationTest() {
                 type shouldBe ru.zveron.model.constant.MessageType.DEFAULT
             }
             response.responseBody.receiveMessage.chatId shouldBe chat1.chatId.toString()
+
+            chatRepository.findByProfileIdAndChatId(user2, chat2.chatId)!!.apply {
+                unreadMessages shouldBe 1
+            }
         }
     }
 

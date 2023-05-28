@@ -84,6 +84,7 @@ class MessageApplicationService(
             request.text,
             request.imagesUrlsList,
         )
+        chatStorage.incrementUnreadCounter(chat.anotherProfileId, chatId, 1)
 
         val response =  chatRouteResponse {
             receiveMessage = receiveMessage {

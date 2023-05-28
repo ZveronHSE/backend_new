@@ -59,4 +59,7 @@ interface ChatRepository : CoroutineCrudRepository<Chat, Long> {
         type: MessageType,
         lotId: Long,
     )
+
+    @Query("UPDATE chat SET unread_messages = ?2 WHERE profile_id = ?0 AND chat_id = ?1")
+    suspend fun changeUnreadMessageNumber(profileId: Long, chatId: UUID, unreadMessageNumber: Int)
 }

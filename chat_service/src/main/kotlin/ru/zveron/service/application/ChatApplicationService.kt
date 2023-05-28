@@ -113,6 +113,7 @@ class ChatApplicationService(
         val chatId = request.chatId.toUUID()
         val chat = getChatIfValid(context.authorizedProfileId, request.interlocutorId, chatId)
 
+        // TODO проверяем что лот принаделжит одному из челов
         if (chat.lotsIds?.contains(request.lotId) == true) {
             throw InvalidParamChatException(
                 "Chat with id $chatId already has lot with id: ${request.lotId}.",
@@ -151,6 +152,7 @@ class ChatApplicationService(
             SendEventRequest.EventCase.CHANGED_STATUS_EVENT -> {
                 val ids = request.changedStatusEvent.idsList.map { it.toUUID() }
                 batchChatRepository.markMessagesAsRead(chatId, ids)
+                chatStorage.decrementUnreadCounter(profileId, chatId, ids.size)
                 val response = chatRouteResponse {
                     receiveEvent =
                         receiveEvent {
@@ -211,6 +213,7 @@ class ChatApplicationService(
         val messageId = snowflakeClient.fetchUuid()
         val receivedAt = Instant.now()
 
+        // TODO проверяем что лот принаделжит собеседнику
         chatStorage.createChatsPair(
             context.authorizedProfileId,
             request.interlocutorId,
