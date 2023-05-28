@@ -212,4 +212,21 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
             messageRepository.findByChatIdAndId(chatId, messageId) shouldNotBe null
         }
     }
+
+    @Test
+    fun `incrementUnreadMessagesCounter when chat exists`() {
+        val (user1, user2) = generateLongs(3)
+        val chat1 = generateChat(user1, user2)
+        val chat2 = generateChat(user2, user1)
+
+        runBlocking {
+            chatRepository.save(chat1)
+            chatRepository.save(chat2)
+
+            chatRepository.changeUnreadMessageNumber(user1, chat1.chatId, 2)
+
+            chatRepository.findByProfileIdAndChatId(user1, chat1.chatId)!!.unreadMessages shouldBe 2
+            chatRepository.findByProfileIdAndChatId(user2, chat2.chatId)!!.unreadMessages shouldBe 0
+        }
+    }
 }
