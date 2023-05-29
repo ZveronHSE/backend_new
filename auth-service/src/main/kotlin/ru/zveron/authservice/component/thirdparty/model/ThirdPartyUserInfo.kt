@@ -5,6 +5,7 @@ data class ThirdPartyUserInfo(
     val lastName: String,
     val userId: String,
     val email: String? = null,
+    val imageUrl: String = "",
 ) {
     companion object Factory
 }

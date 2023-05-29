@@ -44,7 +44,7 @@ object GrpcMapper {
         LoginByPhoneVerifyRequest(
             code = this.code,
             sessionId = UUID.fromString(this.sessionId),
-            fingerprint = this.deviceFp
+            fingerprint = this.deviceFp,
         )
 
     fun JwtMobileTokens.toGrpcToken(): MobileToken = mobileToken {
@@ -78,7 +78,7 @@ object GrpcMapper {
         sessionId = this@toServiceRequest.sessionId.let { UUID.fromString(it) },
         password = this@toServiceRequest.password.toByteArray(),
         name = this@toServiceRequest.name,
-        surname = this@toServiceRequest.surname
+        surname = this@toServiceRequest.surname,
     )
 
     fun ru.zveron.authservice.grpc.client.model.RegisterByPhoneRequest.toClientRequest() = createProfileRequest {
@@ -94,7 +94,7 @@ object GrpcMapper {
     fun LoginByPasswordRequest.toServiceRequest() = ru.zveron.authservice.service.model.LoginByPasswordRequest(
         loginPhone = PhoneNumberParser.stringToServicePhone(this.phoneNumber),
         password = this.password.toByteArray(),
-        fingerprint = this.deviceFp
+        fingerprint = this.deviceFp,
     )
 
     fun PhoneNumber.toRequest() = "$countryCode$phone"
@@ -108,6 +108,7 @@ object GrpcMapper {
     fun RegisterBySocialMediaRequest.toClientRequest() = createProfileRequest {
         name = userInfo.firstName
         surname = userInfo.lastName
+        imageUrl = userInfo.imageUrl
         links = links {
             when (provider) {
                 ThirdPartyProviderType.VK -> vk {
