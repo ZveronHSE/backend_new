@@ -9,5 +9,6 @@ object ThirdPartyMapper {
         lastName = userInfo.family_name,
         userId = userInfo.sub,
         email = userInfo.email,
+        imageUrl = userInfo.picture,
     )
 }

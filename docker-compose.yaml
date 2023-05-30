@@ -6,8 +6,22 @@ x-logging:
   options:
     loki-url: https://378511:${GRAFANA_API_TOKEN}@logs-prod-013.grafana.net/loki/api/v1/push
 
-
 services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "14250:14250"
+      - "16686:16686"
+      - "14268:14268"
+      - "4317:4317"
+      - "4318:4318"
+    expose:
+      - 14250
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - LOG_LEVEL=debug
+      - OTEL_TRACES_EXPORTER=jaeger
+
   db:
     logging: *loki-logging
     restart: always
@@ -116,10 +130,10 @@ services:
       resources:
         limits:
           cpus: '0.50'
-          memory: 512M
+          memory: 1G
         reservations:
           cpus: '0.25'
-          memory: 128M
+          memory: 512M
 
   address_service:
     logging: *loki-logging
@@ -292,11 +306,36 @@ services:
     image: ghcr.io/zveronhse/order-service
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/order
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/order-service
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/order
-      - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/order
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/order-service
+      - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/order-service
+    depends_on:
+      - db
+      - registry
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  review-service:
+    logging: *loki-logging
+    restart: always
+    container_name: review-service
+    platform: linux/amd64
+    image: ghcr.io/zveronhse/review-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/review-service
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://db:5432/review-service
+      - SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/review-service
     depends_on:
       - db
       - registry
@@ -418,3 +457,4 @@ services:
 volumes:
   db_data:
   db_scylla:
+  otel_collector:

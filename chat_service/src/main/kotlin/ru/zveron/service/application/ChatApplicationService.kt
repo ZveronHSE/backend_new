@@ -113,6 +113,7 @@ class ChatApplicationService(
         val chatId = request.chatId.toUUID()
         val chat = getChatIfValid(context.authorizedProfileId, request.interlocutorId, chatId)
 
+        // TODO проверяем что лот принаделжит одному из челов
         if (chat.lotsIds?.contains(request.lotId) == true) {
             throw InvalidParamChatException(
                 "Chat with id $chatId already has lot with id: ${request.lotId}.",
@@ -151,9 +152,11 @@ class ChatApplicationService(
             SendEventRequest.EventCase.CHANGED_STATUS_EVENT -> {
                 val ids = request.changedStatusEvent.idsList.map { it.toUUID() }
                 batchChatRepository.markMessagesAsRead(chatId, ids)
+                chatStorage.decrementUnreadCounter(profileId, chatId, ids.size)
                 val response = chatRouteResponse {
                     receiveEvent =
                         receiveEvent {
+                            this.chatId = request.chatId
                             changedStatusEvent = changeMessagesStatusEvent {
                                 this.ids.addAll(request.changedStatusEvent.idsList)
                             }
@@ -164,15 +167,20 @@ class ChatApplicationService(
 
             SendEventRequest.EventCase.DISCONNECT_EVENT -> {
                 val response = chatRouteResponse {
-                    receiveEvent =
-                        receiveEvent { disconnectEvent = disconnectEvent { lastOnlineFormatted = "Не в сети" } }
+                    receiveEvent = receiveEvent {
+                        this.chatId = request.chatId
+                        disconnectEvent = disconnectEvent { lastOnlineFormatted = "Не в сети" }
+                    }
                 }
                 SingleConnectionResponse(interlocutorId, response)
             }
 
             SendEventRequest.EventCase.NO_PAYLOAD_EVENT -> {
                 val response = chatRouteResponse {
-                    receiveEvent = receiveEvent { noPayloadEvent = request.noPayloadEvent }
+                    receiveEvent = receiveEvent {
+                        this.chatId = request.chatId
+                        noPayloadEvent = request.noPayloadEvent
+                    }
                 }
                 SingleConnectionResponse(interlocutorId, response)
             }
@@ -205,6 +213,7 @@ class ChatApplicationService(
         val messageId = snowflakeClient.fetchUuid()
         val receivedAt = Instant.now()
 
+        // TODO проверяем что лот принаделжит собеседнику
         chatStorage.createChatsPair(
             context.authorizedProfileId,
             request.interlocutorId,

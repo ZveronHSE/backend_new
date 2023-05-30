@@ -27,7 +27,7 @@ dependencies {
     //database
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc:$springVersion")
     implementation("io.r2dbc:r2dbc-pool:1.0.0.RELEASE")
-    implementation("org.postgresql:r2dbc-postgresql:0.9.3.RELEASE")
+    implementation("org.postgresql:r2dbc-postgresql:1.0.1.RELEASE")
 
     //contracts
     implementation("com.github.zveronHSe.contract:auth:$contractVersion")
@@ -38,10 +38,6 @@ dependencies {
 
     //ен особо понятно, но если вынести зависимость в рутовый градлг, то падает
     testImplementation("com.ninja-squad:springmockk:4.0.0")
-
-    //tracing
-    implementation("io.zipkin.brave:brave-instrumentation-grpc:5.15.0")
-    implementation("org.springframework.cloud:spring-cloud-starter-sleuth:3.1.7")
 
     //metrics
     implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")

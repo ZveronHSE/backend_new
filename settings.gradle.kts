@@ -27,9 +27,9 @@ include(
     "profile_service",
     "auth-service",
     "object-storage",
-    "push_notification",
     "e2e",
     "chat_service",
     "order-service",
     "specialist-service",
+    "review-service",
 )

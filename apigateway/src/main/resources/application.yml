@@ -74,3 +74,8 @@ grpc:
 logging:
   level:
     ru.zveron.ru.zveron.apigateway: DEBUG
+
+platform:
+  grpc:
+    server:
+      tracing-enabled: true

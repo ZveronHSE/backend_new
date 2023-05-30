@@ -1,6 +1,5 @@
 package ru.zveron.apigateway.grpc.interceptor
 
-import brave.Tracer
 import com.google.protobuf.GeneratedMessageV3
 import io.grpc.ForwardingServerCall
 import io.grpc.ForwardingServerCallListener
@@ -8,25 +7,25 @@ import io.grpc.Metadata
 import io.grpc.ServerCall
 import io.grpc.ServerCallHandler
 import io.grpc.ServerInterceptor
+import io.opentelemetry.api.trace.Span
 import mu.KLogging
 import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor
 import net.logstash.logback.marker.Markers
 import net.logstash.logback.marker.Markers.append
 import net.logstash.logback.marker.Markers.appendRaw
 import org.apache.commons.lang3.StringUtils
+import org.jboss.logging.MDC
 import ru.zveron.apigateway.utils.LogstashHelper.toJson
 import ru.zveron.contract.apigateway.ApiGatewayRequest
 import ru.zveron.contract.apigateway.ApigatewayResponse
 import ru.zveron.library.grpc.interceptor.model.MethodType
+import ru.zveron.library.grpc.interceptor.tracing.TracingHelper
 
 @GrpcGlobalServerInterceptor
-class LoggingInterceptor(
-    private val tracer: Tracer,
-) : ServerInterceptor {
+class LoggingInterceptor : ServerInterceptor {
 
     companion object : KLogging() {
         const val CALL_TYPE = "callType"
-        private val TRACE_ID_KEY = Metadata.Key.of("x-zv-trace-id", Metadata.ASCII_STRING_MARSHALLER)
     }
 
     final override fun <ReqT : Any, RespT : Any> interceptCall(
@@ -34,18 +33,13 @@ class LoggingInterceptor(
         headers: Metadata?,
         next: ServerCallHandler<ReqT, RespT>,
     ): ServerCall.Listener<ReqT> {
-        val traceId = tracer.currentSpan().context().traceIdString()
+        // Костыль но мне похуй я ебала думать что тут пошло не так и почему нужно ВОТ так делать.
+        MDC.put(TracingHelper.traceIdKey.name(), Span.current().spanContext.traceId)
+
         val wrappedCall = object : ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
             override fun sendMessage(message: RespT) {
                 logResponse(message)
                 super.sendMessage(message)
-            }
-
-            override fun sendHeaders(headers: Metadata?) {
-                super.sendHeaders(headers.apply {
-                    //todo: fix it somehow or move to an appropriate place. Will do for now to pass trace in response
-                    this?.put(TRACE_ID_KEY, traceId)
-                })
             }
         }
 

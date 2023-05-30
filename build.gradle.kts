@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import kotlin.collections.setOf
 
 plugins {
     idea
@@ -145,7 +144,7 @@ subprojects {
         liquibaseRuntime(sourceSets.getByName("main").output)
 
         // Платформенная либа:
-        implementation("com.github.zveronHse:platform-library:1.0.0")
+        implementation("com.github.zveronHse:platform-library:1.1.1")
 
         // Тесты
         testImplementation("io.grpc:grpc-testing:$grpcVersion")

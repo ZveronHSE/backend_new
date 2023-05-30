@@ -34,9 +34,8 @@ eureka:
 
 platform:
   grpc:
-    apigateway:
-      metadata: false
-    client:
-      logging-enabled: false
     server:
+      tracing-enabled: true
       logging-enabled: true
+  tracing:
+    jdbc: true

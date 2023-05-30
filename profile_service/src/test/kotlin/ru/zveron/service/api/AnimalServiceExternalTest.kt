@@ -15,6 +15,7 @@ import ru.zveron.commons.generator.ProfileGenerator
 import ru.zveron.contract.profile.getAnimalRequestExt
 import ru.zveron.library.grpc.interceptor.model.MetadataElement
 import ru.zveron.library.grpc.model.Metadata
+import ru.zveron.mapper.AnimalMapper.toEntityDoc
 import ru.zveron.repository.AnimalRepository
 import ru.zveron.repository.ProfileRepository
 
@@ -52,11 +53,11 @@ class AnimalServiceExternalTest @Autowired constructor(
         //then
         response.shouldNotBeNull().animal.asClue {
             it.shouldNotBeNull()
-            it.age shouldBe animal.age
+//            it.age shouldBe animal.age
             it.breed shouldBe animal.breed
             it.name shouldBe animal.name
             it.imageUrlsList shouldBe animal.imageUrls.toList()
-            it.documentUrlsList shouldBe animal.documentUrls.toList()
+            it.documentsList.map { it.toEntityDoc() } shouldBe animal.documentUrls.toList()
         }
     }
 

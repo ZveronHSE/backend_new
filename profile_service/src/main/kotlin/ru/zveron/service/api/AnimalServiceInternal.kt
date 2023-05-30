@@ -1,6 +1,8 @@
 package ru.zveron.service.api
 
+import mu.KLogging
 import net.devh.boot.grpc.server.service.GrpcService
+import net.logstash.logback.marker.Markers.append
 import ru.zveron.contract.profile.AnimalServiceInternalGrpcKt
 import ru.zveron.contract.profile.GetAnimalBatchRequest
 import ru.zveron.contract.profile.GetAnimalBatchResponse
@@ -16,9 +18,12 @@ class AnimalServiceInternal(
     private val animalService: AnimalService,
 ) : AnimalServiceInternalGrpcKt.AnimalServiceInternalCoroutineImplBase() {
 
+    companion object : KLogging()
+
     override suspend fun getAnimal(request: GetAnimalRequestInt): GetAnimalResponseInt {
         request.validate()
 
+        logger.debug(append("request", request)) { "Request received" }
         return animalService.getAnimal(request.animalId).let { GetAnimalResponseIntKt.ofEntity(it) }
     }
 

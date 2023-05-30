@@ -9,6 +9,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
 import io.mockk.coEvery
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -558,7 +559,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
     fun `sendEvent when changed status event`() {
         val (msg1, msg2, msg3) = PrimitivesGenerator.generateNTimeUuids(3)
         val (user1, user2) = generateLongs(5)
-        val chat1 = ChatGenerator.generateChat(user1, user2)
+        val chat1 = ChatGenerator.generateChat(user1, user2).copy(unreadMessages = 1)
         val message1 = generateMessage(chat1.chatId, msg1, user2)
         val message2 = generateMessage(chat1.chatId, msg2, user2)
         val message3 = generateMessage(chat1.chatId, msg3, user2)
@@ -576,11 +577,14 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
             messageRepository.save(message2)
             messageRepository.save(message3)
 
-            chatApplicationService.sendEvent(request, defaultContext())
+            val event = chatApplicationService.sendEvent(request, defaultContext())
 
             messageRepository.findByChatIdAndId(chat1.chatId, msg1)!!.isRead shouldBe true
             messageRepository.findByChatIdAndId(chat1.chatId, msg2)!!.isRead shouldBe true
             messageRepository.findByChatIdAndId(chat1.chatId, msg3)!!.isRead shouldBe false
+
+            event.responseBody.receiveEvent.chatId shouldBe chat1.chatId.toString()
+            chatRepository.findAll().first().unreadMessages shouldBe 0
         }
     }
 
@@ -600,6 +604,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             event.responseBody.receiveEvent.disconnectEvent.lastOnlineFormatted shouldBe "Не в сети"
             event.targetProfileId shouldBe user2
+            event.responseBody.receiveEvent.chatId shouldBe chat1.chatId.toString()
         }
     }
 
@@ -635,6 +640,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             event.responseBody.receiveEvent.noPayloadEvent.type shouldBe NoPayloadEventType.ONLINE
             event.targetProfileId shouldBe user2
+            event.responseBody.receiveEvent.chatId shouldBe chat1.chatId.toString()
         }
     }
 
@@ -654,6 +660,7 @@ class ChatApplicationServiceTest : ChatServiceApplicationTest() {
 
             event.responseBody.receiveEvent.noPayloadEvent.type shouldBe NoPayloadEventType.TEXTING
             event.targetProfileId shouldBe user2
+            event.responseBody.receiveEvent.chatId shouldBe chat1.chatId.toString()
         }
     }
 

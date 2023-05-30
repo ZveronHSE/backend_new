@@ -1,0 +1,13 @@
+spring:
+  liquibase:
+    enabled: true
+  main:
+    web-application-type: reactive
+
+eureka:
+  client:
+    enabled: false
+
+grpc:
+  server:
+    port: 0

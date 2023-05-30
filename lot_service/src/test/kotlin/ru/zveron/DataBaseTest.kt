@@ -1,5 +1,7 @@
 package ru.zveron
 
+import io.opentelemetry.api.GlobalOpenTelemetry
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -28,6 +30,12 @@ abstract class DataBaseTest {
             registry.add("spring.datasource.url", container::getJdbcUrl)
             registry.add("spring.datasource.password", container::getPassword)
             registry.add("spring.datasource.username", container::getUsername)
+        }
+
+        @JvmStatic
+        @BeforeAll
+        fun setUp() {
+            GlobalOpenTelemetry.resetForTest()
         }
 
         init {

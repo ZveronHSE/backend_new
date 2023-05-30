@@ -9,7 +9,7 @@ class ChatService : E2eTest() {
 
     @Test
     fun `Service response on ping`() {
-        assertCallSucceeded(apiGatewayRequest {
+        assertBidiCallSucceeded(apiGatewayRequest {
             methodAlias = "chatPing"
             requestBody = ByteString.copyFrom("{ }".toByteArray())
         })

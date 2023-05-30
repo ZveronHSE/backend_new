@@ -10,12 +10,14 @@ import io.grpc.MethodDescriptor
 import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.kotlin.ClientCalls
+import io.opentelemetry.api.trace.Span
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.transform
 import mu.KLogging
 import net.logstash.logback.argument.StructuredArguments.keyValue
 import net.logstash.logback.argument.StructuredArguments.value
+import net.logstash.logback.marker.Markers.aggregate
 import net.logstash.logback.marker.Markers.append
 import org.springframework.stereotype.Service
 import ru.zveron.apigateway.component.AuthResolver
@@ -39,6 +41,7 @@ import ru.zveron.contract.apigateway.ApiGatewayRequest
 import ru.zveron.contract.apigateway.ApigatewayResponse
 import ru.zveron.contract.apigateway.apigatewayResponse
 import ru.zveron.contract.chat.ChatRouteRequest
+import ru.zveron.library.grpc.interceptor.tracing.TracingHelper
 
 @Service
 class ApiGatewayService(
@@ -62,7 +65,7 @@ class ApiGatewayService(
         val profileId = verifyUserAccess(metadata.accessScope).also {
             logger.debug(
                 "User in context has {}",
-                keyValue("profileId", it)
+                keyValue("profileId", it),
             )
         }
 
@@ -74,7 +77,7 @@ class ApiGatewayService(
         logger.debug(
             "Looking for proto method descriptor for {} {}",
             keyValue("serviceName", metadata.serviceName),
-            keyValue("grpcServiceName", metadata.grpcServiceName)
+            keyValue("grpcServiceName", metadata.grpcServiceName),
         )
         val protoMethodDescriptor = getProtoMethodDescriptor(metadata)
 
@@ -84,16 +87,24 @@ class ApiGatewayService(
         logger.debug(
             "Prepared {} to call {}",
             keyValue("message", grpcMessage?.toJson()),
-            keyValue("grpcService", metadata.serviceName)
+            keyValue("grpcService", metadata.serviceName),
         )
+
+        val context = Span.current().spanContext
+
         return tryToCallService(
             channel = channel,
             grpcMethodDescriptor = grpcMethodDescriptor,
             grpcMessage = grpcMessage,
             metadata = Metadata().apply {
-                profileId?.let { this.put(profileIdKey, it.toString()) }
+                profileId?.let {
+                    this.put(profileIdKey, it.toString())
+                        .also { logger.debug(append("profileId", profileId)) { "Sending profile id in the header" } }
+                }
                 accessToken?.let { this.put(accessTokenKey, accessToken) }
-            }
+                put(TracingHelper.traceIdKey, context.traceId)
+                put(TracingHelper.spanIdKey, context.spanId)
+            },
         )
     }
 
@@ -101,7 +112,7 @@ class ApiGatewayService(
         val profileId = verifyUserAccess(AccessScope.BUYER).also {
             logger.debug(
                 "User in context has {}",
-                keyValue("profileId", it)
+                keyValue("profileId", it),
             )
         }
         val accessToken = AuthenticationContext.accessToken()
@@ -113,17 +124,22 @@ class ApiGatewayService(
         }
 
         try {
+            val context = Span.current().spanContext
             chatGrpcClient.bidiChatRoute(
                 chatRouteRequests,
                 Metadata().apply {
                     profileId?.let { this.put(profileIdKey, it.toString()) }
                     accessToken?.let { this.put(accessTokenKey, accessToken) }
-                }
+                    put(TracingHelper.traceIdKey, context.traceId)
+                    put(TracingHelper.spanIdKey, context.spanId)
+                },
             ).collect { message ->
                 logger.debug(append("response", message)) { "Stream response" }
-                emit(apigatewayResponse {
-                    this.responseBody = JsonFormat.printer().print(message).toByteStringUtf8()
-                })
+                emit(
+                    apigatewayResponse {
+                        this.responseBody = JsonFormat.printer().print(message).toByteStringUtf8()
+                    },
+                )
             }
         } catch (ex: StatusException) {
             logger.warn("Response to chat service failed. {}", keyValue("code", ex.status.code))
@@ -140,6 +156,7 @@ class ApiGatewayService(
         grpcMessage: DynamicMessage?,
         metadata: Metadata,
     ): DynamicMessage = try {
+        logger.debug { "Calling service" }
         ClientCalls.unaryRpc(
             channel = channel,
             method = grpcMethodDescriptor,
@@ -148,17 +165,28 @@ class ApiGatewayService(
         )
     } catch (ex: StatusException) {
         logger.warn(
-            "Response for {} to {} failed. {}",
-            keyValue("message", grpcMessage?.toJson()),
-            keyValue("method", grpcMethodDescriptor.fullMethodName),
-            keyValue("code", ex.status.code)
-        )
+            aggregate(
+                append("message", grpcMessage?.toJson()),
+                append("method", grpcMethodDescriptor.fullMethodName),
+                append("code", ex.status.code),
+                append("stacktrace", ex.stackTrace),
+                append("trailers", ex.trailers),
+            ),
+        ) {
+            "Failed request with status exception"
+        }
         throw ex
     } catch (e: Exception) {
         logger.warn(
-            append("method", grpcMethodDescriptor.fullMethodName).and(append("message", grpcMessage?.toJson())),
-            "Request failed"
-        )
+            aggregate(
+                append("method", grpcMethodDescriptor.fullMethodName),
+                append("message", grpcMessage?.toJson()),
+                append("exception", e.message),
+                append("stacktrace", e.stackTrace),
+            ),
+        ) {
+            "Failed request with unknown exception"
+        }
 
         throw e
     }
@@ -168,7 +196,7 @@ class ApiGatewayService(
         logger.debug(
             "Resolving the access for {} and {}",
             keyValue("scope", accessScope.name),
-            keyValue("accessToken", accessToken)
+            keyValue("accessToken", accessToken),
         )
 
         return authResolver.resolveForScope(ResolveForRoleRequest(accessScope.toScope(), accessToken))

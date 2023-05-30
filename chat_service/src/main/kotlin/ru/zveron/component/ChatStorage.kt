@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.toList
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import ru.zveron.contract.chat.model.ChatPagination
+import ru.zveron.exception.InvalidParamChatException
 import ru.zveron.mapper.ProtoTypesMapper.toInstant
 import ru.zveron.model.constant.ChatStatus
 import ru.zveron.model.constant.MessageType
@@ -11,6 +12,7 @@ import ru.zveron.model.entity.Chat
 import ru.zveron.repository.ChatRepository
 import java.time.Instant
 import java.util.UUID
+import kotlin.math.max
 
 @Component
 class ChatStorage(private val repository: ChatRepository) {
@@ -64,4 +66,20 @@ class ChatStorage(private val repository: ChatRepository) {
             MessageType.DEFAULT,
             lotId
         )
+
+    suspend fun incrementUnreadCounter(profileId: Long, chatId: UUID, incrementSize: Int) {
+        // TODO переделывать
+        val chat = findExact(profileId, chatId) ?: throw InvalidParamChatException("Chat with id $chatId doe not exists for profile $profileId")
+        repository.changeUnreadMessageNumber(profileId, chatId, chat.unreadMessages + incrementSize)
+    }
+
+    suspend fun decrementUnreadCounter(profileId: Long, chatId: UUID, decrementSize: Int) {
+        // TODO переделывать
+        val chat = findExact(profileId, chatId) ?: throw InvalidParamChatException("Chat with id $chatId doe not exists for profile $profileId")
+        // TODO еще больший кринж чем все остальное, надо смотреть сколько сообщений реально прочиталось
+        repository.changeUnreadMessageNumber(profileId, chatId, max(chat.unreadMessages - decrementSize, 0))
+    }
+
+    suspend fun changeLastUpdate(profileId1: Long, profileId2: Long, chatId: UUID, timestamp: Instant) =
+        repository.changeLastUpdate(profileId1, profileId2, chatId, timestamp)
 }

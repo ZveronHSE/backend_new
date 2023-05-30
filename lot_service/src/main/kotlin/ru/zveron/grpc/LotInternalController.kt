@@ -33,9 +33,7 @@ class LotInternalController(
                     }
                 }
 
-
             val lots = lotService.getLotsByIds(request.lotIdsList)
-
 
             return@coroutineScope LotMapper.buildLotsIdResponse(lots, favorites?.await())
         }

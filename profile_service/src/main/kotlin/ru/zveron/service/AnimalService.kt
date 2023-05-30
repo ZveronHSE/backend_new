@@ -1,5 +1,6 @@
 package ru.zveron.service
 
+import mu.KLogging
 import org.springframework.stereotype.Service
 import ru.zveron.contract.profile.CreateAnimalRequest
 import ru.zveron.contract.profile.CreateAnimalResponse
@@ -25,6 +26,8 @@ class AnimalService(
     private val profileRepository: ProfileRepository,
 ) {
 
+    companion object : KLogging()
+
     suspend fun createAnimal(request: CreateAnimalRequest, profileId: Long): CreateAnimalResponse {
         val profile =
             profileRepository.findById(profileId).orElseThrow { IllegalArgumentException("Profile not found") }
@@ -35,10 +38,9 @@ class AnimalService(
     }
 
     suspend fun getAnimal(animalId: Long): Animal {
-        val animal = animalRepository.findById(animalId)
+        logger.debug { "Calling repository to get an animal by id=$animalId" }
+        return animalRepository.findById(animalId)
             .orElseThrow { AnimalNotFoundException("Animal not found $animalId") }
-
-        return animal
     }
 
     suspend fun getAnimalsByProfile(profileId: Long): GetAnimalsByProfileResponse =

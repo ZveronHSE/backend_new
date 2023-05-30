@@ -20,6 +20,7 @@ import ru.zveron.common.generator.PrimitivesGenerator.generateString
 import ru.zveron.model.constant.ChatStatus
 import ru.zveron.model.constant.MessageType
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 class ChatRepositoryTest : ChatServiceApplicationTest() {
 
@@ -210,6 +211,44 @@ class ChatRepositoryTest : ChatServiceApplicationTest() {
             chatRepository.findByProfileIdAndChatId(user1, chatId) shouldNotBe null
             chatRepository.findByProfileIdAndChatId(user2, chatId) shouldNotBe null
             messageRepository.findByChatIdAndId(chatId, messageId) shouldNotBe null
+        }
+    }
+
+    @Test
+    fun `incrementUnreadMessagesCounter when chat exists`() {
+        val (user1, user2) = generateLongs(2)
+        val chat1 = generateChat(user1, user2)
+        val chat2 = generateChat(user2, user1)
+
+        runBlocking {
+            chatRepository.save(chat1)
+            chatRepository.save(chat2)
+
+            chatRepository.changeUnreadMessageNumber(user1, chat1.chatId, 2)
+
+            chatRepository.findByProfileIdAndChatId(user1, chat1.chatId)!!.unreadMessages shouldBe 2
+            chatRepository.findByProfileIdAndChatId(user2, chat2.chatId)!!.unreadMessages shouldBe 0
+        }
+    }
+
+    @Test
+    fun `changeLastUpdate when chat exists`() {
+        val timestamp = Instant.now()
+        val (user1, user2) = generateLongs(2)
+        val chat1 = generateChat(user1, user2).copy(lastUpdate = timestamp.minusSeconds(10))
+        val chat2 = generateChat(user2, user1).copy(chatId = chat1.chatId, lastUpdate = timestamp.minusSeconds(10))
+
+        runBlocking {
+            chatRepository.save(chat1)
+            chatRepository.save(chat2)
+
+            chatRepository.changeLastUpdate(user1, user2, chat1.chatId, timestamp)
+
+            val firstChatLastUpdate = chatRepository.findByProfileIdAndChatId(user1, chat1.chatId)!!.lastUpdate
+            val secondChatLastUpdate = chatRepository.findByProfileIdAndChatId(user2, chat2.chatId)!!.lastUpdate
+
+            ChronoUnit.SECONDS.between(firstChatLastUpdate, timestamp) shouldBe 0
+            ChronoUnit.SECONDS.between(secondChatLastUpdate, timestamp) shouldBe 0
         }
     }
 }

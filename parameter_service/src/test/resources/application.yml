@@ -1,3 +1,7 @@
 spring:
+  main:
+    banner-mode: off
+  application:
+    name: parameter-service
   liquibase:
     change-log: classpath:db_test/master.yaml

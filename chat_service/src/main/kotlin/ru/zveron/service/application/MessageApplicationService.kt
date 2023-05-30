@@ -84,6 +84,8 @@ class MessageApplicationService(
             request.text,
             request.imagesUrlsList,
         )
+        chatStorage.incrementUnreadCounter(chat.anotherProfileId, chatId, 1)
+        chatStorage.changeLastUpdate(profileId, chat.anotherProfileId, chatId, message.receivedAt)
 
         val response =  chatRouteResponse {
             receiveMessage = receiveMessage {

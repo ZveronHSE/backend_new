@@ -24,7 +24,6 @@ class AuthResolver(
 
     suspend fun resolveForScope(request: ResolveForRoleRequest): Long? {
         if (request.scope == ServiceScope.ANY) {
-
             return request.token
                 ?.takeIf { it.isNotEmpty() }
                 ?.let {
@@ -32,8 +31,8 @@ class AuthResolver(
                         logger.debug(
                             append(
                                 "response",
-                                it
-                            )
+                                it,
+                            ),
                         ) { "Token not required. Received response from auth-client" }
                     }
                         .let {
@@ -43,7 +42,6 @@ class AuthResolver(
         }
 
         if (request.scope == ServiceScope.BUYER) {
-
             if (request.token.isNullOrEmpty()) {
                 throw StatusException(Status.DATA_LOSS)
             }
@@ -58,7 +56,7 @@ class AuthResolver(
                 is AccessTokenUnknown -> throw ApiGatewayException(
                     message = "Unknown auth client error",
                     code = Status.Code.INTERNAL,
-                    metadata = authClientResponse.metadata
+                    metadata = authClientResponse.metadata,
                 )
             }
         }

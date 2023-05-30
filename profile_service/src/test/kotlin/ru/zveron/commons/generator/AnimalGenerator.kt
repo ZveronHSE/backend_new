@@ -17,7 +17,7 @@ object AnimalGenerator {
         age = age,
         species = PropsGenerator.generateString(10),
         imageUrls = arrayOf(PropsGenerator.generateString(10)),
-        documentUrls = arrayOf(PropsGenerator.generateString(10)),
         profile = ProfileGenerator.generateProfile().copy(id = ownerId),
+        documentUrls = arrayOf("""${PropsGenerator.generateString(10)}|${PropsGenerator.generateString(10)}"""),
     )
 }

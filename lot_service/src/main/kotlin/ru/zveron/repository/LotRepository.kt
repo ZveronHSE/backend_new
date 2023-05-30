@@ -11,6 +11,9 @@ interface LotRepository : JpaRepository<Lot, Long> {
     fun findByIdOrThrow(id: Long): Lot =
         findById(id).orElseThrow { LotException(Status.NOT_FOUND, "Объявления с id=$id не существует") }
 
+//    @Query("SELECT l FROM Lot l JOIN FETCH l.photos JOIN FETCH l.statistics JOIN FETCH l.parameters WHERE l.id = :id")
+//    fun findByIdWithRelatedEntities(id: Long): Lot
+
     @Query(
         """
         select distinct l from Lot l

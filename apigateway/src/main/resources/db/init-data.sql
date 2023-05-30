@@ -1,3 +1,5 @@
+truncate public.method_metadata;
+
 insert into public.method_metadata (alias, service_name, grpc_service_name, grpc_method_name, access_scope)
 values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('authPerformLogout', 'auth-service', 'AuthServiceExternal', 'PerformLogout', 'BUYER'),
@@ -71,11 +73,15 @@ values ('uploadImage', 'object-storage', 'BucketService', 'UploadImage', 'ANY'),
        ('specialistEditService', 'specialist-service', 'ManageSpecialistExternalService', 'EditService', 'BUYER'),
        ('specialistDeleteService', 'specialist-service', 'ManageSpecialistExternalService', 'DeleteService', 'BUYER'),
        ('specialistEditDocuments', 'specialist-service', 'ManageSpecialistExternalService', 'EditDocuments', 'BUYER'),
-        ('profileCreateAnimal', 'profile-service', 'AnimalGrpcExternal', 'CreateAnimal', 'BUYER'),
-        ('profileGetAnimal', 'profile-service', 'AnimalGrpcExternal', 'GetAnimal', 'BUYER'),
-        ('profileGetAnimalsByProfile', 'profile-service', 'AnimalGrpcExternal', 'GetAnimalsByProfile', 'BUYER')
+       ('profileCreateAnimal', 'profile-service', 'AnimalGrpcExternal', 'CreateAnimal', 'BUYER'),
+       ('profileGetAnimal', 'profile-service', 'AnimalGrpcExternal', 'GetAnimal', 'BUYER'),
+       ('profileGetAnimalsByProfile', 'profile-service', 'AnimalGrpcExternal', 'GetAnimalsByProfile', 'BUYER'),
+       ('orderGetCustomerInfo', 'order-service', 'OrderCustomerServiceExternal', 'GetCustomer', 'ANY'),
+       ('orderCreateOrder', 'order-service', 'OrderServiceExternal', 'CreateOrder', 'ANY'),
+       ('orderFilteredCount', 'order-service', 'OrderWaterfallServiceExternal', 'GetFilteredCount', 'ANY'),
+       ('orderGetByProfile', 'order-service', 'OrderCustomerServiceExternal', 'GetOrdersByProfile', 'BUYER'),
+       ('chatPing', 'chat-service', 'PingServiceExternal', 'Ping', 'ANY'),
+       ('bidiChatRoute', 'chat-service', 'ChatServiceExternal', 'BidiChatRoute', 'BUYER'),
+       ('lotGetOwns', 'lot-service', 'LotExternalProtoService', 'GetOwnLots', 'BUYER')
 
-ON CONFLICT (alias) DO UPDATE SET service_name      = EXCLUDED.service_name,
-                                  grpc_service_name = EXCLUDED.grpc_service_name,
-                                  grpc_method_name  = EXCLUDED.grpc_method_name,
-                                  access_scope      = EXCLUDED.access_scope;
+ON CONFLICT (alias) DO NOTHING;
