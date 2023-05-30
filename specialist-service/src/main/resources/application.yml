@@ -40,10 +40,11 @@ platform:
   grpc:
     apigateway:
       metadata: true
-    client:
-      logging-enabled: false
     server:
       logging-enabled: true
+      tracing-enabled: true
+  tracing:
+    jdbc: true
 
 server:
   port: 0

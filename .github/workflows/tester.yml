@@ -40,9 +40,6 @@ jobs:
           - name: Object Storage
             gradle: object-storage
 
-          - name: Push Notification
-            gradle: push_notification
-
           - name: Chat Service
             gradle: chat_service
 

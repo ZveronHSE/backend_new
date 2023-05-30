@@ -97,10 +97,13 @@ logging:
     ru.zveron.authservice.cron: INFO
 
 
+platform:
   grpc:
     apigateway:
       metadata: false
     client:
+      tracing-enabled: true
       logging-enabled: true
     server:
+      tracing-enabled: true
       logging-enabled: true

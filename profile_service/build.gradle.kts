@@ -11,4 +11,6 @@ dependencies {
     implementation("com.github.zveronHSe.contract:core:$contractVersion")
     implementation("com.github.zveronHSe.contract:blacklist:$contractVersion")
     implementation("com.github.zveronHSe.contract:address:$contractVersion")
+
+    implementation("io.opentelemetry:opentelemetry-extension-kotlin:1.25.0")
 }

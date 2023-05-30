@@ -17,4 +17,5 @@ configurations {
     implementation.get().exclude("io.grpc")
     implementation.get().exclude("io.projectreactor.netty")
     implementation.get().exclude("org.springframework.boot", "spring-boot-starter-freemarker:2.6.11")
+    implementation.get().exclude("com.github.zveronHse")
 }

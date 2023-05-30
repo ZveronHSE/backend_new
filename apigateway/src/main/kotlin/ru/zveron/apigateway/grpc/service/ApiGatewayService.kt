@@ -10,6 +10,7 @@ import io.grpc.MethodDescriptor
 import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.kotlin.ClientCalls
+import io.opentelemetry.api.trace.Span
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.transform
@@ -40,6 +41,7 @@ import ru.zveron.contract.apigateway.ApiGatewayRequest
 import ru.zveron.contract.apigateway.ApigatewayResponse
 import ru.zveron.contract.apigateway.apigatewayResponse
 import ru.zveron.contract.chat.ChatRouteRequest
+import ru.zveron.library.grpc.interceptor.tracing.TracingHelper
 
 @Service
 class ApiGatewayService(
@@ -87,6 +89,9 @@ class ApiGatewayService(
             keyValue("message", grpcMessage?.toJson()),
             keyValue("grpcService", metadata.serviceName),
         )
+
+        val context = Span.current().spanContext
+
         return tryToCallService(
             channel = channel,
             grpcMethodDescriptor = grpcMethodDescriptor,
@@ -97,6 +102,8 @@ class ApiGatewayService(
                         .also { logger.debug(append("profileId", profileId)) { "Sending profile id in the header" } }
                 }
                 accessToken?.let { this.put(accessTokenKey, accessToken) }
+                put(TracingHelper.traceIdKey, context.traceId)
+                put(TracingHelper.spanIdKey, context.spanId)
             },
         )
     }
@@ -117,11 +124,14 @@ class ApiGatewayService(
         }
 
         try {
+            val context = Span.current().spanContext
             chatGrpcClient.bidiChatRoute(
                 chatRouteRequests,
                 Metadata().apply {
                     profileId?.let { this.put(profileIdKey, it.toString()) }
                     accessToken?.let { this.put(accessTokenKey, accessToken) }
+                    put(TracingHelper.traceIdKey, context.traceId)
+                    put(TracingHelper.spanIdKey, context.spanId)
                 },
             ).collect { message ->
                 logger.debug(append("response", message)) { "Stream response" }

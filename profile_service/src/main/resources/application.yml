@@ -63,6 +63,10 @@ platform:
     apigateway:
       metadata: true
     client:
+      tracing-enabled: true
       logging-enabled: true
     server:
+      tracing-enabled: true
       logging-enabled: true
+  tracing:
+    jdbc: true
