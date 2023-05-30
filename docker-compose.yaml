@@ -15,6 +15,8 @@ services:
       - "14268:14268"
       - "4317:4317"
       - "4318:4318"
+    expose:
+      - 14250
     environment:
       - COLLECTOR_OTLP_ENABLED=true
       - LOG_LEVEL=debug
