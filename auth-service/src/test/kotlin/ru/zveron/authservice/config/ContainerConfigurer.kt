@@ -1,10 +1,14 @@
 package ru.zveron.authservice.config
 
+import io.opentelemetry.api.GlobalOpenTelemetry
 import mu.KLogging
+import org.junit.jupiter.api.BeforeAll
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
+
+
 @AutoConfigureWireMock(port = 0) //random port
 abstract class ContainerConfigurer {
 
@@ -31,5 +35,12 @@ abstract class ContainerConfigurer {
         init {
             postgreSQLContainer.start()
         }
+
+        @JvmStatic
+        @BeforeAll
+        fun setUp() {
+            GlobalOpenTelemetry.resetForTest()
+        }
     }
+
 }
