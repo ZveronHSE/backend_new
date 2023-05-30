@@ -79,4 +79,7 @@ class ChatStorage(private val repository: ChatRepository) {
         // TODO еще больший кринж чем все остальное, надо смотреть сколько сообщений реально прочиталось
         repository.changeUnreadMessageNumber(profileId, chatId, max(chat.unreadMessages - decrementSize, 0))
     }
+
+    suspend fun changeLastUpdate(profileId1: Long, profileId2: Long, chatId: UUID, timestamp: Instant) =
+        repository.changeLastUpdate(profileId1, profileId2, chatId, timestamp)
 }
