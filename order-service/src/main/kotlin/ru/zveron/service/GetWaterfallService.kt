@@ -43,6 +43,7 @@ class GetWaterfallService(
                     Status.terminalStatuses().joinToString(","),
                 ),
             ),
+            sort = request.sort,
         )
 
         val subwayStation =
